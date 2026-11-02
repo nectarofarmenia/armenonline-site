@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="hy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Nectar of Armenia — Cart</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Coustard:wght@900&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Lora:wght@600;700&family=Noto+Serif+Armenian:wght@600;700&family=Noto+Sans+Armenian:wght@400;500;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+html,body{background:#1D5545;overscroll-behavior-y:none}
+@keyframes arevaSpin{to{transform:rotate(360deg)}}
+.areva{animation:arevaSpin 60s linear infinite;transform-origin:50% 50%;transform-box:fill-box}
+@keyframes kTurn{0%{transform:perspective(700px) rotateY(-30deg) scale(.98);filter:brightness(.9)}50%{transform:perspective(700px) rotateY(30deg) scale(1.02);filter:brightness(1.12)}100%{transform:perspective(700px) rotateY(-30deg) scale(.98);filter:brightness(.9)}}
+.spin-k{animation:kTurn 7s ease-in-out infinite;transform-origin:50% 60%}
+.spin-k-rev{animation-direction:reverse}
+@media (prefers-reduced-motion:reduce){.spin-k{animation:none !important}}
+@media (prefers-reduced-motion:reduce){.areva{animation:none !important}}
+body{margin:0}
+a{color:#1D5545}a:hover{color:#133B30}
+input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
+@media (max-width:760px){.ws-hide{display:none !important}.logo3d{height:54px !important}.ws-h1{font-size:36px !important}}
+.raise-header{background:linear-gradient(180deg,#31775F 0%,#22604C 45%,#164536 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.25),inset 0 -3px 6px rgba(0,0,0,.35),0 2px 4px rgba(0,0,0,.25),0 10px 26px rgba(0,0,0,.38) !important}
+.logo3d{filter:drop-shadow(0 2px 0 rgba(0,0,0,.55)) drop-shadow(0 6px 10px rgba(0,0,0,.4))}
+.btn-gold{background:linear-gradient(180deg,#FCDB82 0%,#EDB040 50%,#D38A22 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.7),inset 0 -3px 0 rgba(120,70,0,.25),0 2px 3px rgba(0,0,0,.2),0 6px 14px rgba(0,0,0,.28)}
+.btn-green{background:linear-gradient(180deg,#34806A 0%,#1D5545 55%,#133B30 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.25),inset 0 -3px 0 rgba(0,0,0,.28),0 2px 3px rgba(0,0,0,.2),0 6px 14px rgba(19,59,48,.35)}
+.btn-ghost{box-shadow:inset 0 2px 0 rgba(255,255,255,.18),inset 0 -2px 4px rgba(0,0,0,.2),0 6px 14px rgba(0,0,0,.28)}
+.pill-group{box-shadow:inset 0 3px 7px rgba(0,0,0,.55),0 1px 0 rgba(255,255,255,.15)}
+.hero3d{background:radial-gradient(ellipse at 72% 45%,#357F69 0%,#1F5947 50%,#133B30 100%) !important;box-shadow:inset 0 12px 24px rgba(0,0,0,.18),inset 0 -20px 36px rgba(0,0,0,.25)}
+.card3d{background:linear-gradient(180deg,#FFFFFF 0%,#F8F3E8 100%) !important;box-shadow:inset 0 2px 0 #FFFFFF,inset 0 -2px 0 rgba(120,90,30,.06),0 3px 6px rgba(19,59,48,.08),0 18px 36px rgba(19,59,48,.16)}
+.card3d-dark{background:linear-gradient(180deg,#36806B 0%,#245F4D 60%,#1E5242 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.2),inset 0 -3px 6px rgba(0,0,0,.2),0 18px 36px rgba(0,0,0,.35)}
+.pw-wrap{position:relative;display:block}.pw-wrap .fld{padding-right:52px;width:100%;box-sizing:border-box}.pw-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:42px;height:42px;border:none;background:transparent;color:#1D5545;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}.pw-eye:hover{background:#F3EBD7}
+.fld{min-height:50px;border-radius:12px;border:1px solid #D8CDB4;background:#FBF9F4;padding:0 14px;font-size:16px;font-family:inherit;color:#1E2A24;width:100%;box-sizing:border-box}
+.fld:focus{outline:2px solid #EBA93A;outline-offset:1px;border-color:#EBA93A}
+.lbl{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#33403A}
+.qty{display:inline-flex;align-items:center;border:1.5px solid #D8CDB4;border-radius:999px;background:#FFFFFF;overflow:hidden}
+.qty button{width:40px;height:40px;border:none;background:transparent;font-size:20px;font-weight:800;color:#1D5545;cursor:pointer;font-family:inherit}
+.qty button:hover{background:#F3EBD7}
+.qty span{min-width:30px;text-align:center;font-weight:800;font-size:16px}
+.tab{flex:1 1 0;min-height:50px;border:none;border-radius:999px;font-family:inherit;font-weight:800;font-size:16px;cursor:pointer;background:transparent;color:#1D5545}
+.tab.on{background:linear-gradient(180deg,#34806A 0%,#1D5545 55%,#133B30 100%);color:#F6E3B4;box-shadow:inset 0 0 0 1.5px rgba(235,169,58,.85),0 4px 10px rgba(19,59,48,.25)}
+.opt{display:flex;align-items:center;gap:12px;min-height:58px;padding:0 16px;border-radius:16px;border:1.5px solid #E4DCC8;background:#FFFFFF;cursor:pointer;font-family:inherit;font-size:16px;font-weight:700;color:#1E2A24;text-align:left;width:100%}
+.opt.on{border-color:#EBA93A;box-shadow:0 0 0 3px rgba(235,169,58,.22);background:#FFFCF4}
+.dot{width:20px;height:20px;border-radius:50%;border:2px solid #C9BB98;flex:0 0 auto;box-sizing:border-box}
+.opt.on .dot{border:6px solid #1D5545}
+.pm.on{box-shadow:0 0 0 3px #EBA93A,0 6px 14px rgba(0,0,0,.18)}
+.daybtn{flex:0 0 auto;min-width:92px;padding:10px 12px;border-radius:16px;border:1.5px solid #E4DCC8;background:#FFFFFF;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;color:#1E2A24}
+.daybtn.on{border-color:#1D5545;background:#1D5545;color:#F6E3B4;box-shadow:inset 0 0 0 1.5px rgba(235,169,58,.85)}
+.paybtn{min-height:52px;border-radius:14px;border:none;font-family:inherit;font-weight:800;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.social{min-height:52px;border-radius:999px;border:1.5px solid #D8CDB4;background:#FFFFFF;font-family:inherit;font-weight:800;font-size:15px;color:#1E2A24;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;width:100%}
+.social:hover{border-color:#EBA93A}
+@media (max-width:760px){.two-col{flex-direction:column !important}.sum-card{position:static !important}.hdr-back{display:none !important}}
+</style>
+</helmet>
+<div style="font-family: Manrope, 'Noto Sans Armenian', system-ui, sans-serif; color: #1E2A24; background: #F7F3EA; width: 100%; min-height: 100vh; overflow-x: clip">
+<header class="raise-header" style="background: #133B30; position: sticky; top: 0; z-index: 50">
+<div style="max-width: 1240px; margin: 0 auto; padding: 16px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px">
+<a href="Main.dc.html" aria-label="Nectar of Armenia" style="display: flex; align-items: center; text-decoration: none">
+<img src="img/cf4f14e5b2e161eced326c4ebe8644fd.webp" alt="Nectar of Armenia" class="logo3d" style="height: 72px; width: auto; display: block">
+</a>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-left: auto">
+<div role="group" aria-label="Language" class="pill-group" style="display: flex; gap: 2px; background: #0E2E25; border-radius: 999px; padding: 3px">
+<sc-for list="{{langs}}" as="l" hint-placeholder-count="4">
+<sc-if value="{{l.selected}}" hint-placeholder-val="{{false}}"><button type="button" aria-pressed="true" onClick="{{l.pick}}" class="btn-gold" style="min-height: 38px; min-width: 44px; padding: 0 10px; border-radius: 999px; border: none; background: #EBA93A; color: #133B30; font-family: inherit; font-weight: 800; font-size: 16px; cursor: pointer">{{l.label}}</button></sc-if>
+<sc-if value="{{l.unselected}}" hint-placeholder-val="{{true}}"><button type="button" aria-pressed="false" onClick="{{l.pick}}" style="min-height: 38px; min-width: 44px; padding: 0 10px; border-radius: 999px; border: none; background: transparent; color: #D9E6DF; font-family: inherit; font-weight: 700; font-size: 16px; cursor: pointer">{{l.label}}</button></sc-if>
+</sc-for>
+</div>
+<a href="Main.dc.html#shop" class="hdr-back" style="color: #D9E6DF; font-weight: 700; font-size: 16px; text-decoration: none; padding: 0 6px">{{t.back}}</a>
+<a href="Cart.dc.html" aria-label="{{t.cart}}" class="btn-gold" style="position: relative; width: 48px; height: 48px; border-radius: 999px; background: #EBA93A; color: #133B30; display: inline-flex; align-items: center; justify-content: center; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11h10.2L20 8H6.2"></path><circle cx="9.5" cy="19.5" r="1.4"></circle><circle cx="16.5" cy="19.5" r="1.4"></circle></svg><sc-if value="{{hasCount}}" hint-placeholder-val="{{true}}"><span style="position: absolute; top: -4px; right: -4px; min-width: 22px; height: 22px; border-radius: 999px; background: #1D5545; color: #F6E3B4; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid #F6C35A; box-sizing: border-box">{{count}}</span></sc-if></a>
+</div>
+</div>
+</header><div aria-hidden="true" style="background: #133B30; line-height: 0"><svg viewBox="0 0 1440 60" preserveAspectRatio="none" style="display: block; width: 100%; height: 46px"><path d="M0,0 L1440,0 L1440,22 C1200,52 960,58 720,34 C480,10 240,14 0,40 Z" fill="#1D5545"></path></svg></div>
+<section style="position: relative; overflow: clip">
+<svg viewBox="0 0 405.5 404" aria-hidden="true" class="areva" style="position: absolute; right: -60px; top: 30px; width: min(340px, 60vw); height: auto; opacity: 0.55; pointer-events: none"><path fill="#E4DAC3" d="M382,187.1c-0.7-1.6-0.9-3.9-0.5-5.6c2.6-12.7,3.4-25.5,0.9-38.2c-7.6-38.5-29.6-65-66.5-78.9c-1.7-0.7-3.6-1.8-4.7-3.3 C282.1,19.2,232.9,5,185.7,24.9c-2.3,1-5.1,1.1-7.7,1c-10.9-0.1-22-2-32.7-0.5c-38,5.3-64.4,26.6-79.6,61.7c-1.7,3.8-3.7,6.7-7.2,9 C17.1,123.7,2,175.4,21.8,221.1c1.1,2.6,1.2,5.8,1,8.6c-0.6,6.9-1.7,13.8-2.6,20.7c0.2,0,0.3,0,0.5,0.1c0.2,4.2,0,8.4,0.6,12.5 c6.7,40.3,28.9,68.1,67.2,82.8c2.2,0.8,4.4,2.4,5.7,4.3c28.6,40,77.8,54.1,123.1,35.3c2.8-1.2,6.5-1.3,9.5-0.8 c11.6,2.2,23.2,3.1,34.7,1.1c39.4-6.9,66.6-29,81.1-66.6c0.8-2.1,2.6-4.3,4.5-5.6C388.6,284.6,402.7,233.3,382,187.1z M319.4,83.4 c37.4,18.1,50.7,58.4,47,79.6c-24.1-25.2-53.1-37-87.7-32.9c-34.7,4.1-59.9,22.8-77.4,52.7c-8.2-15.5-5.8-51.4,14.6-76.6 C240.7,75.9,284.1,66.3,319.4,83.4z M207.7,33.9c34.4-8.3,69.2,9.5,79.3,24.9c-35-0.1-63.7,12.7-84.5,40.6 c-20.8,27.8-25,59-15.2,92.4c-19.5-7.5-49.2-37.6-45.7-81.9C144.5,75.2,168.5,43.4,207.7,33.9z M81.8,87.7 C98,54.3,132.9,38.6,161,40.5c-26,24.7-37.9,54.1-33.6,88.7c4.3,34.5,23,59.9,53.3,77.1c-18.3,8.3-54.1,4.7-77.6-16.2 C72.9,163.3,64.6,123,81.8,87.7z M58.1,117c-4.2,67.8,58.4,123.5,128,105.2c-5.2,16.8-34.3,41.2-66.1,43.3 c-45.7,3.1-83.5-28-91.2-71.4C23.9,166.6,39.9,123.6,58.1,117z M78.9,325c-32.5-17.5-46.6-55.1-42.5-80.2 c23.8,26.3,52.7,38.8,87.4,35.4c34.4-3.4,60.2-21.3,78.2-50.9c8.2,19.3,3.5,56-19,79.3C154.7,338,114.7,344.3,78.9,325z M206.7,373 c-36.5,13.7-74.4-0.7-91.8-22c35.6,0.9,64.4-11.5,85.9-38.9c21.5-27.4,25.8-58.6,17-92.1c16,5,40,31.2,43.4,62.9 C265.4,322.9,242.9,359.4,206.7,373z M323.3,323.8c-17.6,36.1-56.6,50.4-81.8,46.8c26.7-23.7,39.1-52.7,35.9-87.2 c-3.2-34.5-21-60.6-50.9-78.7c16.2-7.7,51.1-4.1,74.7,16C331.9,246.7,340.5,288.4,323.3,323.8z M348.5,291.5 c0.2-35.1-12-64.3-39.8-85.5c-27.8-21.2-59.1-25.4-92.9-16c11.8-25.2,41.4-45.3,74.8-44.8c38.9,0.6,69.5,25.2,80.8,60.2 C382.3,239,368.1,275.1,348.5,291.5z"></path></svg>
+<div style="max-width: 1240px; margin: 0 auto; padding: 40px 24px 80px; position: relative; z-index: 1; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #7A5A12; font-weight: 800">{{t.kick}}</span>
+<h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 46px; color: #1D5545">{{t.h1}} <span style="font-size: 22px; color: #7A5A12">({{count}} {{t.items}})</span></h1>
+<p style="margin: 0; font-size: 17px; color: #4A564F">{{t.sub}}</p>
+</div>
+<sc-if value="{{isEmpty}}" hint-placeholder-val="{{false}}">
+<div class="card3d" style="border-radius: 26px; padding: 48px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
+<h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 30px; color: #1D5545">{{t.empty}}</h2>
+<p style="margin: 0; color: #4A564F">{{t.emptyP}}</p>
+<a href="Main.dc.html#shop" class="btn-gold" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 28px; border-radius: 999px; color: #133B30; font-weight: 800; text-decoration: none">{{t.shop}}</a>
+</div>
+</sc-if>
+<sc-if value="{{notEmpty}}" hint-placeholder-val="{{true}}">
+<div class="two-col" style="display: flex; gap: 28px; align-items: flex-start">
+<div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<sc-for list="{{items}}" as="it" hint-placeholder-count="3">
+<div class="card3d" style="border-radius: 22px; padding: 14px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap">
+<div class="photo3d" style="width: 104px; height: 104px; flex: 0 0 auto; border-radius: 16px; background: #F6E9C8; display: flex; align-items: center; justify-content: center; color: #8A7A55; font-size: 12px; text-align: center; padding: 6px; box-sizing: border-box">[{{it.name}}]</div>
+<div style="flex: 1 1 180px; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+<span style="font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 21px; color: #1D5545">{{it.name}}</span>
+<span style="font-size: 14px; color: #6B756F">{{it.size}} · {{it.unit}}</span>
+<button type="button" onClick="{{it.remove}}" style="align-self: flex-start; border: none; background: transparent; padding: 4px 0; color: #9A4B2B; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer">{{t.remove}}</button>
+</div>
+<div class="qty" role="group" aria-label="Qty"><button type="button" onClick="{{it.dec}}" aria-label="−">−</button><span>{{it.qty}}</span><button type="button" onClick="{{it.inc}}" aria-label="+">+</button></div>
+<span style="min-width: 90px; text-align: right; font-family: Fraunces, Lora, serif; font-weight: 700; font-size: 22px; color: #1D5545">{{it.line}}</span>
+</div>
+</sc-for>
+<p style="margin: 6px 0 0; font-size: 15px; color: #4A564F; display: flex; gap: 10px; align-items: center"><span style="font-size: 20px">❄</span>{{t.note}}</p>
+</div>
+<aside class="card3d sum-card" style="flex: 0 0 380px; max-width: 100%; box-sizing: border-box; border-radius: 26px; padding: 26px; display: flex; flex-direction: column; gap: 14px; position: sticky; top: 130px">
+<h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 26px; color: #1D5545">{{t.sum}}</h2>
+<div style="display: flex; justify-content: space-between; font-size: 16px"><span>{{t.subtotal}}</span><strong>{{subtotal}}</strong></div>
+<div style="display: flex; justify-content: space-between; gap: 12px; font-size: 15px; color: #5E6A63"><span>{{t.delivery}}</span><span style="text-align: right">{{t.deliveryV}}</span></div>
+<div style="display: flex; gap: 8px"><input class="fld" placeholder="{{t.promo}}" aria-label="{{t.promo}}" style="flex: 1 1 auto; min-width: 0"><button type="button" class="btn-green" style="flex: 0 0 auto; min-height: 50px; padding: 0 16px; border-radius: 12px; border: none; color: #F7F3EA; font-family: inherit; font-weight: 800; cursor: pointer">{{t.apply}}</button></div>
+<div style="height: 1px; background: #E4DCC8"></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-weight: 800; font-size: 18px">{{t.total}}</span><span style="font-family: Fraunces, Lora, serif; font-weight: 700; font-size: 30px; color: #1D5545">{{subtotal}}</span></div>
+<a href="Checkout.dc.html" class="btn-gold" style="display: flex; align-items: center; justify-content: center; min-height: 56px; border-radius: 999px; color: #133B30; font-weight: 800; font-size: 17px; text-decoration: none">{{t.checkout}} →</a>
+<p style="margin: 0; font-size: 13px; color: #6B756F; text-align: center">🔒 {{t.secure}}</p>
+</aside>
+</div>
+</sc-if>
+</div>
+</section>
+<footer style="background: #133B30; color: #CFE2D9; padding: 28px 24px; text-align: center; font-size: 14px">© 2026 Nectar of Armenia, Inc. · (515) 588-5555 · nectarofarmenia@gmail.com</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+componentDidMount() {
+var self = this; this._last = null;
+this._sync = function () {
+var c = null, l = null;
+try { c = window.localStorage.getItem("noa-cart-v2"); l = window.localStorage.getItem("noa-lang"); } catch (e) { return; }
+var key = c + "|" + l;
+if (self._last === null) { self._last = key; return; }
+if (key === self._last) { return; }
+self._last = key;
+var arr = null; try { arr = JSON.parse(c); } catch (e) { arr = null; }
+var patch = {};
+if (Array.isArray(arr) && arr.length === 11) { patch.q = arr; }
+if (["hy", "en", "ru", "es"].indexOf(l) >= 0) { patch.lang = l; }
+self.setState(patch);
+};
+this._iv = setInterval(this._sync, 700);
+window.addEventListener("storage", this._sync);
+window.addEventListener("focus", this._sync);
+this._sync();
+}
+componentWillUnmount() {
+clearInterval(this._iv);
+window.removeEventListener("storage", this._sync);
+window.removeEventListener("focus", this._sync);
+}
+
+renderVals() {
+var L = {"hy": {"back": "← Շարունակել գնումները", "cart": "Զամբյուղ", "kick": "Ձեր պատվերը", "h1": "Զամբյուղ", "sub": "Ստուգեք ապրանքները և քանակը։ Առաքումը՝ պատվերից 48 ժամ հետո։", "remove": "Հեռացնել", "sum": "Պատվերի ամփոփում", "subtotal": "Ենթագումար", "delivery": "Առաքում", "deliveryV": "Հաշվարկվում է հաջորդ քայլում", "total": "Ընդամենը", "promo": "Զեղչի կոդ", "apply": "Կիրառել", "checkout": "Անցնել վճարման", "note": "Սառեցված առաքում Լոս Անջելեսի շրջանում։ Ձեր պատվերը կհասնի 48 ժամից։", "empty": "Զամբյուղը դատարկ է", "emptyP": "Ավելացրեք ձեր սիրելի ուտեստները։", "shop": "Դիտել արտադրանքը", "items": "ապրանք", "secure": "Անվտանգ վճարում՝ քարտ, Apple Pay, Google Pay", "pn": ["Գաթա", "Խաշ", "Խաշի արգանակ", "Խաշի հավաքածու", "Խինկալի", "Պելմենի", "Բլինչիկ", "Միջուկով քուֆթա", "Կիևյան կոտլետ", "Հավի կոտլետ", "Տավարի կոտլետ"], "ps": ["", "32 oz · 1 տարա", "32 oz · առանց մսի", "3 խաշ + 1 արգանակ · 4 × 32 oz", "10 հատ · 830 գ", "600 գ", "10 հատ · 850 գ", "10 հատ · 800 գ", "6 հատ · 720 գ", "", ""]}, "en": {"back": "← Continue shopping", "cart": "Cart", "kick": "Your order", "h1": "Cart", "sub": "Check your items and quantities. Delivery 48 hours after you order.", "remove": "Remove", "sum": "Order summary", "subtotal": "Subtotal", "delivery": "Delivery", "deliveryV": "Calculated at the next step", "total": "Total", "promo": "Promo code", "apply": "Apply", "checkout": "Go to checkout", "note": "Frozen delivery in the Los Angeles area. Your order arrives in 48 hours.", "empty": "Your cart is empty", "emptyP": "Add your favorite dishes.", "shop": "Browse products", "items": "items", "secure": "Secure payment: card, Apple Pay, Google Pay", "pn": ["Gata", "Khash", "Khash Broth", "Khash Set", "Khinkali", "Pelmeni", "Blinchik", "Mijukov Kufta", "Chicken Kiev", "Chicken Cutlets", "Beef Cutlets"], "ps": ["", "32 oz · 1 container", "32 oz · no meat", "3 khash + 1 broth · 4 × 32 oz", "10 pcs · 29 oz / 830 g", "21 oz / 600 g", "10 pcs · 30 oz / 850 g", "10 pcs · 28 oz / 800 g", "6 pcs · 25 oz / 720 g", "", ""]}, "ru": {"back": "← Продолжить покупки", "cart": "Корзина", "kick": "Ваш заказ", "h1": "Корзина", "sub": "Проверьте товары и количество. Доставка — через 48 часов после заказа.", "remove": "Удалить", "sum": "Итог заказа", "subtotal": "Подытог", "delivery": "Доставка", "deliveryV": "Рассчитывается на следующем шаге", "total": "Итого", "promo": "Промокод", "apply": "Применить", "checkout": "Перейти к оплате", "note": "Доставка в замороженном виде по Лос-Анджелесу. Заказ приедет через 48 часов.", "empty": "Корзина пуста", "emptyP": "Добавьте любимые блюда.", "shop": "Смотреть продукцию", "items": "товаров", "secure": "Безопасная оплата: карта, Apple Pay, Google Pay", "pn": ["Гата", "Хаш", "Бульон хаша", "Набор хаша", "Хинкали", "Пельмени", "Блинчики", "Кюфта с начинкой", "Котлета по-киевски", "Куриные котлеты", "Говяжьи котлеты"], "ps": ["", "32 oz · 1 контейнер", "32 oz · без мяса", "3 хаша + 1 бульон · 4 × 32 oz", "10 шт · 830 г", "600 г", "10 шт · 850 г", "10 шт · 800 г", "6 шт · 720 г", "", ""]}, "es": {"back": "← Seguir comprando", "cart": "Carrito", "kick": "Tu pedido", "h1": "Carrito", "sub": "Revisa tus productos y cantidades. Entrega 48 horas después de tu pedido.", "remove": "Quitar", "sum": "Resumen del pedido", "subtotal": "Subtotal", "delivery": "Envío", "deliveryV": "Se calcula en el siguiente paso", "total": "Total", "promo": "Código promocional", "apply": "Aplicar", "checkout": "Ir a pagar", "note": "Entrega congelada en el área de Los Ángeles. Tu pedido llega en 48 horas.", "empty": "Tu carrito está vacío", "emptyP": "Agrega tus platos favoritos.", "shop": "Ver productos", "items": "productos", "secure": "Pago seguro: tarjeta, Apple Pay, Google Pay", "pn": ["Gata", "Khash", "Caldo de khash", "Set de khash", "Khinkali", "Pelmeni", "Blinchik", "Kufta rellena", "Pollo a la Kiev", "Hamburguesas de pollo", "Hamburguesas de res"], "ps": ["", "32 oz · 1 envase", "32 oz · sin carne", "3 khash + 1 caldo · 4 × 32 oz", "10 pzas · 830 g", "600 g", "10 pzas · 850 g", "10 pzas · 800 g", "6 pzas · 720 g", "", ""]}};
+var self = this;
+var savedLang = null; try { savedLang = window.localStorage.getItem("noa-lang"); } catch (e) { savedLang = null; }
+if (["hy", "en", "ru", "es"].indexOf(savedLang) < 0) { savedLang = null; }
+var lang = (this.state && this.state.lang) || savedLang || "hy";
+var t = L[lang] || L.hy;
+var langs = [{ id: "en", label: "EN" }, { id: "hy", label: "ՀԱՅ" }, { id: "ru", label: "РУ" }, { id: "es", label: "ES" }].map(function (x) {
+return Object.assign({}, x, { selected: x.id === lang, unselected: x.id !== lang, pick: function () { try { window.localStorage.setItem("noa-lang", x.id); } catch (e) {} self.setState({ lang: x.id }); } });
+});
+var PRICES = [0, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0];
+var stored = null; try { stored = JSON.parse(window.localStorage.getItem("noa-cart-v2") || "null"); } catch (e) { stored = null; }
+if (!Array.isArray(stored) || stored.length !== 11) { stored = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; }
+var saveOrder = function (q2, sum2, dayIso) { try { var it = []; q2.forEach(function (n, i) { if (n > 0) { it.push([i, n]); } }); if (it.length) { window.localStorage.setItem("noa-last-order", JSON.stringify({ no: "NOA-" + (10600 + Math.floor(Math.random() * 300)), items: it, total: "$" + sum2.toFixed(2), day: dayIso })); } } catch (e) {} };
+var saveCart = function (c) { try { window.localStorage.setItem("noa-cart-v2", JSON.stringify(c)); } catch (e) {} };
+var prices = PRICES;
+var q = (this.state && this.state.q) || stored;
+var money = function (v) { return "$" + v.toFixed(2); };
+var sub = 0, count = 0;
+var items = [];
+q.forEach(function (n, i) {
+if (n <= 0) { return; }
+sub += n * prices[i]; count += n;
+items.push({ name: t.pn[i], size: t.ps[i], unit: money(prices[i]), qty: n, line: money(n * prices[i]),
+inc: function () { var nq = q.slice(); nq[i] = Math.min(99, nq[i] + 1); saveCart(nq); self.setState({ q: nq }); },
+dec: function () { var nq = q.slice(); nq[i] = Math.max(1, nq[i] - 1); saveCart(nq); self.setState({ q: nq }); },
+remove: function () { var nq = q.slice(); nq[i] = 0; saveCart(nq); self.setState({ q: nq }); } });
+});
+return { t: t, langs: langs, items: items, count: count, hasCount: count > 0, subtotal: money(sub), isEmpty: count === 0, notEmpty: count > 0 };
+}
+}
+</script>
+</body>
+</html>

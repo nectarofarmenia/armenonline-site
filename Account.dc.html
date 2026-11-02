@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="hy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Nectar of Armenia — Account</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Coustard:wght@900&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Lora:wght@600;700&family=Noto+Serif+Armenian:wght@600;700&family=Noto+Sans+Armenian:wght@400;500;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+html,body{background:#1D5545;overscroll-behavior-y:none}
+@keyframes arevaSpin{to{transform:rotate(360deg)}}
+.areva{animation:arevaSpin 60s linear infinite;transform-origin:50% 50%;transform-box:fill-box}
+@keyframes kTurn{0%{transform:perspective(700px) rotateY(-30deg) scale(.98);filter:brightness(.9)}50%{transform:perspective(700px) rotateY(30deg) scale(1.02);filter:brightness(1.12)}100%{transform:perspective(700px) rotateY(-30deg) scale(.98);filter:brightness(.9)}}
+.spin-k{animation:kTurn 7s ease-in-out infinite;transform-origin:50% 60%}
+.spin-k-rev{animation-direction:reverse}
+@media (prefers-reduced-motion:reduce){.spin-k{animation:none !important}}
+@media (prefers-reduced-motion:reduce){.areva{animation:none !important}}
+body{margin:0}
+a{color:#1D5545}a:hover{color:#133B30}
+input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
+@media (max-width:760px){.ws-hide{display:none !important}.logo3d{height:54px !important}.ws-h1{font-size:36px !important}}
+.raise-header{background:linear-gradient(180deg,#31775F 0%,#22604C 45%,#164536 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.25),inset 0 -3px 6px rgba(0,0,0,.35),0 2px 4px rgba(0,0,0,.25),0 10px 26px rgba(0,0,0,.38) !important}
+.logo3d{filter:drop-shadow(0 2px 0 rgba(0,0,0,.55)) drop-shadow(0 6px 10px rgba(0,0,0,.4))}
+.btn-gold{background:linear-gradient(180deg,#FCDB82 0%,#EDB040 50%,#D38A22 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.7),inset 0 -3px 0 rgba(120,70,0,.25),0 2px 3px rgba(0,0,0,.2),0 6px 14px rgba(0,0,0,.28)}
+.btn-green{background:linear-gradient(180deg,#34806A 0%,#1D5545 55%,#133B30 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.25),inset 0 -3px 0 rgba(0,0,0,.28),0 2px 3px rgba(0,0,0,.2),0 6px 14px rgba(19,59,48,.35)}
+.btn-ghost{box-shadow:inset 0 2px 0 rgba(255,255,255,.18),inset 0 -2px 4px rgba(0,0,0,.2),0 6px 14px rgba(0,0,0,.28)}
+.pill-group{box-shadow:inset 0 3px 7px rgba(0,0,0,.55),0 1px 0 rgba(255,255,255,.15)}
+.hero3d{background:radial-gradient(ellipse at 72% 45%,#357F69 0%,#1F5947 50%,#133B30 100%) !important;box-shadow:inset 0 12px 24px rgba(0,0,0,.18),inset 0 -20px 36px rgba(0,0,0,.25)}
+.card3d{background:linear-gradient(180deg,#FFFFFF 0%,#F8F3E8 100%) !important;box-shadow:inset 0 2px 0 #FFFFFF,inset 0 -2px 0 rgba(120,90,30,.06),0 3px 6px rgba(19,59,48,.08),0 18px 36px rgba(19,59,48,.16)}
+.card3d-dark{background:linear-gradient(180deg,#36806B 0%,#245F4D 60%,#1E5242 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.2),inset 0 -3px 6px rgba(0,0,0,.2),0 18px 36px rgba(0,0,0,.35)}
+.pw-wrap{position:relative;display:block}.pw-wrap .fld{padding-right:52px;width:100%;box-sizing:border-box}.pw-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:42px;height:42px;border:none;background:transparent;color:#1D5545;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}.pw-eye:hover{background:#F3EBD7}
+.fld{min-height:50px;border-radius:12px;border:1px solid #D8CDB4;background:#FBF9F4;padding:0 14px;font-size:16px;font-family:inherit;color:#1E2A24;width:100%;box-sizing:border-box}
+.fld:focus{outline:2px solid #EBA93A;outline-offset:1px;border-color:#EBA93A}
+.lbl{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#33403A}
+.qty{display:inline-flex;align-items:center;border:1.5px solid #D8CDB4;border-radius:999px;background:#FFFFFF;overflow:hidden}
+.qty button{width:40px;height:40px;border:none;background:transparent;font-size:20px;font-weight:800;color:#1D5545;cursor:pointer;font-family:inherit}
+.qty button:hover{background:#F3EBD7}
+.qty span{min-width:30px;text-align:center;font-weight:800;font-size:16px}
+.tab{flex:1 1 0;min-height:50px;border:none;border-radius:999px;font-family:inherit;font-weight:800;font-size:16px;cursor:pointer;background:transparent;color:#1D5545}
+.tab.on{background:linear-gradient(180deg,#34806A 0%,#1D5545 55%,#133B30 100%);color:#F6E3B4;box-shadow:inset 0 0 0 1.5px rgba(235,169,58,.85),0 4px 10px rgba(19,59,48,.25)}
+.opt{display:flex;align-items:center;gap:12px;min-height:58px;padding:0 16px;border-radius:16px;border:1.5px solid #E4DCC8;background:#FFFFFF;cursor:pointer;font-family:inherit;font-size:16px;font-weight:700;color:#1E2A24;text-align:left;width:100%}
+.opt.on{border-color:#EBA93A;box-shadow:0 0 0 3px rgba(235,169,58,.22);background:#FFFCF4}
+.dot{width:20px;height:20px;border-radius:50%;border:2px solid #C9BB98;flex:0 0 auto;box-sizing:border-box}
+.opt.on .dot{border:6px solid #1D5545}
+.pm.on{box-shadow:0 0 0 3px #EBA93A,0 6px 14px rgba(0,0,0,.18)}
+.daybtn{flex:0 0 auto;min-width:92px;padding:10px 12px;border-radius:16px;border:1.5px solid #E4DCC8;background:#FFFFFF;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;color:#1E2A24}
+.daybtn.on{border-color:#1D5545;background:#1D5545;color:#F6E3B4;box-shadow:inset 0 0 0 1.5px rgba(235,169,58,.85)}
+.paybtn{min-height:52px;border-radius:14px;border:none;font-family:inherit;font-weight:800;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.social{min-height:52px;border-radius:999px;border:1.5px solid #D8CDB4;background:#FFFFFF;font-family:inherit;font-weight:800;font-size:15px;color:#1E2A24;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;width:100%}
+.social:hover{border-color:#EBA93A}
+@media (max-width:760px){.two-col{flex-direction:column !important}.sum-card{position:static !important}.hdr-back{display:none !important}}
+</style>
+</helmet>
+<div style="font-family: Manrope, 'Noto Sans Armenian', system-ui, sans-serif; color: #1E2A24; background: #F7F3EA; width: 100%; min-height: 100vh; overflow-x: clip">
+<header class="raise-header" style="background: #133B30; position: sticky; top: 0; z-index: 50">
+<div style="max-width: 1240px; margin: 0 auto; padding: 16px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px">
+<a href="Main.dc.html" aria-label="Nectar of Armenia" style="display: flex; align-items: center; text-decoration: none">
+<img src="img/cf4f14e5b2e161eced326c4ebe8644fd.webp" alt="Nectar of Armenia" class="logo3d" style="height: 72px; width: auto; display: block">
+</a>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-left: auto">
+<div role="group" aria-label="Language" class="pill-group" style="display: flex; gap: 2px; background: #0E2E25; border-radius: 999px; padding: 3px">
+<sc-for list="{{langs}}" as="l" hint-placeholder-count="4">
+<sc-if value="{{l.selected}}" hint-placeholder-val="{{false}}"><button type="button" aria-pressed="true" onClick="{{l.pick}}" class="btn-gold" style="min-height: 38px; min-width: 44px; padding: 0 10px; border-radius: 999px; border: none; background: #EBA93A; color: #133B30; font-family: inherit; font-weight: 800; font-size: 16px; cursor: pointer">{{l.label}}</button></sc-if>
+<sc-if value="{{l.unselected}}" hint-placeholder-val="{{true}}"><button type="button" aria-pressed="false" onClick="{{l.pick}}" style="min-height: 38px; min-width: 44px; padding: 0 10px; border-radius: 999px; border: none; background: transparent; color: #D9E6DF; font-family: inherit; font-weight: 700; font-size: 16px; cursor: pointer">{{l.label}}</button></sc-if>
+</sc-for>
+</div>
+<a href="Main.dc.html" class="hdr-back" style="color: #D9E6DF; font-weight: 700; font-size: 16px; text-decoration: none; padding: 0 6px">{{t.back}}</a>
+<a href="Cart.dc.html" aria-label="{{t.cart}}" class="btn-gold" style="position: relative; width: 48px; height: 48px; border-radius: 999px; background: #EBA93A; color: #133B30; display: inline-flex; align-items: center; justify-content: center; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11h10.2L20 8H6.2"></path><circle cx="9.5" cy="19.5" r="1.4"></circle><circle cx="16.5" cy="19.5" r="1.4"></circle></svg><sc-if value="{{hasCount}}" hint-placeholder-val="{{true}}"><span style="position: absolute; top: -4px; right: -4px; min-width: 22px; height: 22px; border-radius: 999px; background: #1D5545; color: #F6E3B4; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid #F6C35A; box-sizing: border-box">{{count}}</span></sc-if></a>
+</div>
+</div>
+</header>
+<section class="hero3d" style="position: relative; overflow: hidden; color: #F7F3EA">
+<svg viewBox="0 0 405.5 404" aria-hidden="true" class="areva" style="position: absolute; left: -80px; top: 60px; width: min(360px, 60vw); height: auto; opacity: 0.5; pointer-events: none"><path fill="#123A2F" d="M382,187.1c-0.7-1.6-0.9-3.9-0.5-5.6c2.6-12.7,3.4-25.5,0.9-38.2c-7.6-38.5-29.6-65-66.5-78.9c-1.7-0.7-3.6-1.8-4.7-3.3 C282.1,19.2,232.9,5,185.7,24.9c-2.3,1-5.1,1.1-7.7,1c-10.9-0.1-22-2-32.7-0.5c-38,5.3-64.4,26.6-79.6,61.7c-1.7,3.8-3.7,6.7-7.2,9 C17.1,123.7,2,175.4,21.8,221.1c1.1,2.6,1.2,5.8,1,8.6c-0.6,6.9-1.7,13.8-2.6,20.7c0.2,0,0.3,0,0.5,0.1c0.2,4.2,0,8.4,0.6,12.5 c6.7,40.3,28.9,68.1,67.2,82.8c2.2,0.8,4.4,2.4,5.7,4.3c28.6,40,77.8,54.1,123.1,35.3c2.8-1.2,6.5-1.3,9.5-0.8 c11.6,2.2,23.2,3.1,34.7,1.1c39.4-6.9,66.6-29,81.1-66.6c0.8-2.1,2.6-4.3,4.5-5.6C388.6,284.6,402.7,233.3,382,187.1z M319.4,83.4 c37.4,18.1,50.7,58.4,47,79.6c-24.1-25.2-53.1-37-87.7-32.9c-34.7,4.1-59.9,22.8-77.4,52.7c-8.2-15.5-5.8-51.4,14.6-76.6 C240.7,75.9,284.1,66.3,319.4,83.4z M207.7,33.9c34.4-8.3,69.2,9.5,79.3,24.9c-35-0.1-63.7,12.7-84.5,40.6 c-20.8,27.8-25,59-15.2,92.4c-19.5-7.5-49.2-37.6-45.7-81.9C144.5,75.2,168.5,43.4,207.7,33.9z M81.8,87.7 C98,54.3,132.9,38.6,161,40.5c-26,24.7-37.9,54.1-33.6,88.7c4.3,34.5,23,59.9,53.3,77.1c-18.3,8.3-54.1,4.7-77.6-16.2 C72.9,163.3,64.6,123,81.8,87.7z M58.1,117c-4.2,67.8,58.4,123.5,128,105.2c-5.2,16.8-34.3,41.2-66.1,43.3 c-45.7,3.1-83.5-28-91.2-71.4C23.9,166.6,39.9,123.6,58.1,117z M78.9,325c-32.5-17.5-46.6-55.1-42.5-80.2 c23.8,26.3,52.7,38.8,87.4,35.4c34.4-3.4,60.2-21.3,78.2-50.9c8.2,19.3,3.5,56-19,79.3C154.7,338,114.7,344.3,78.9,325z M206.7,373 c-36.5,13.7-74.4-0.7-91.8-22c35.6,0.9,64.4-11.5,85.9-38.9c21.5-27.4,25.8-58.6,17-92.1c16,5,40,31.2,43.4,62.9 C265.4,322.9,242.9,359.4,206.7,373z M323.3,323.8c-17.6,36.1-56.6,50.4-81.8,46.8c26.7-23.7,39.1-52.7,35.9-87.2 c-3.2-34.5-21-60.6-50.9-78.7c16.2-7.7,51.1-4.1,74.7,16C331.9,246.7,340.5,288.4,323.3,323.8z M348.5,291.5 c0.2-35.1-12-64.3-39.8-85.5c-27.8-21.2-59.1-25.4-92.9-16c11.8-25.2,41.4-45.3,74.8-44.8c38.9,0.6,69.5,25.2,80.8,60.2 C382.3,239,368.1,275.1,348.5,291.5z"></path></svg>
+<img src="img/9d91996f4ebb65c55fc461bb8efdcd00.webp" alt="" aria-hidden="true" class="spin-k" style="position: absolute; right: 3%; bottom: 40px; width: 260px; height: auto; opacity: 0.18; pointer-events: none">
+<div class="two-col" style="max-width: 1100px; margin: 0 auto; padding: 56px 24px 110px; position: relative; z-index: 1; display: flex; gap: 40px; align-items: center">
+<div class="hdr-back" style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 18px">
+<h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 38px; line-height: 1.12">{{t.sideH}}</h2>
+<p style="margin: 0; font-size: 18px; line-height: 1.55; color: #D9E6DF">{{t.sideP}}</p>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px">
+<sc-for list="{{side}}" as="sd" hint-placeholder-count="4">
+<li style="display: flex; align-items: center; gap: 12px; font-size: 18px; color: #E4ECE6"><span class="btn-gold" style="width: 30px; height: 30px; border-radius: 50%; color: #133B30; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: 0 0 auto; font-size: 15px">✓</span>{{sd.x}}</li>
+</sc-for>
+</ul>
+<div class="card3d-dark" style="border-radius: 20px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; margin-top: 10px">
+<span style="color: #CFE2D9">{{t.biz}}</span>
+<a href="Wholesale.dc.html" style="color: #F6C35A; font-weight: 800; text-decoration: none; font-size: 17px">{{t.bizL}}</a>
+</div>
+</div>
+<div class="card3d" style="flex: 0 1 480px; width: 100%; box-sizing: border-box; border-radius: 28px; padding: 28px; display: flex; flex-direction: column; gap: 18px; color: #1E2A24">
+<sc-if value="{{signed}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 20px 6px">
+<span class="btn-green" style="width: 70px; height: 70px; border-radius: 50%; color: #F6E3B4; display: flex; align-items: center; justify-content: center; font-size: 34px">✓</span>
+<h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 30px; color: #1D5545">{{okTitle}}</h1>
+<p style="margin: 0; font-size: 15px; color: #5E6A63">{{signedNote}}</p>
+<a href="{{myHref}}" class="btn-gold" style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 52px; border-radius: 999px; color: #133B30; font-weight: 800; text-decoration: none">{{myLbl}}</a>
+<a href="Main.dc.html#shop" class="btn-green" style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 50px; border-radius: 999px; color: #F6E3B4; font-weight: 800; text-decoration: none">{{t.goShop}}</a>
+<button type="button" onClick="{{signOut}}" style="border: none; background: none; color: #1D5545; font-family: inherit; font-weight: 800; font-size: 15px; cursor: pointer; text-decoration: underline">{{t.signOut}}</button>
+</div>
+</sc-if>
+<sc-if value="{{notSigned}}" hint-placeholder-val="{{true}}">
+<div role="tablist" style="display: flex; gap: 4px; background: #EFE8D8; border-radius: 999px; padding: 4px">
+<button type="button" role="tab" aria-selected="{{inAria}}" onClick="{{goIn}}" class="tab {{inCls}}">{{t.tabIn}}</button>
+<button type="button" role="tab" aria-selected="{{upAria}}" onClick="{{goUp}}" class="tab {{upCls}}">{{t.tabUp}}</button>
+<button type="button" role="tab" aria-selected="{{wsAria}}" onClick="{{goWs}}" class="tab {{wsCls}}">{{t.tabWs}}</button>
+</div>
+<sc-if value="{{isIn}}" hint-placeholder-val="{{true}}">
+<form style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px"><h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 30px; color: #1D5545">{{t.hIn}}</h1><p style="margin: 0; font-size: 15px; color: #5E6A63">{{t.pIn}}</p></div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<button type="button" onClick="{{signGoogle}}" class="social"><svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>{{t.google}}</button>
+<button type="button" onClick="{{signApple}}" class="social" style="background: #000; color: #fff; border-color: #000"><svg width="18" height="20" viewBox="0 0 17 20" fill="currentColor" aria-hidden="true"><path d="M14.1 10.6c0-2.5 2-3.7 2.1-3.8-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.8-1.7 0-3.3 1-4.1 2.5-1.8 3.1-.5 7.6 1.3 10.1.8 1.2 1.8 2.6 3.1 2.5 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8-.1 0-2.6-1-2.5-4.2zM11.7 3.2c.7-.8 1.1-1.9 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.2-.6 2.9-1.3z"/></svg>{{t.apple}}</button>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; color: #8A8F88; font-size: 14px"><span style="flex: 1; height: 1px; background: #E4DCC8"></span>{{t.or}}<span style="flex: 1; height: 1px; background: #E4DCC8"></span></div>
+<label class="lbl">{{t.email}}<input class="fld" type="email" autocomplete="email"></label>
+<label class="lbl">{{t.pass}}<span class="pw-wrap"><input class="fld" type="{{pwT0}}" autocomplete="current-password"><button type="button" class="pw-eye" onClick="{{pwTog0}}" aria-label="{{pwLbl0}}" title="{{pwLbl0}}"><sc-if value="{{pwOn0}}" hint-placeholder-val="{{false}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9 17.9A10.4 10.4 0 0 1 12 19C5.5 19 2 12 2 12a18 18 0 0 1 4.1-5.1M9.9 5.2A9.6 9.6 0 0 1 12 5c6.5 0 10 7 10 7a18 18 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2"/><path d="M2 2l20 20"/></svg></sc-if><sc-if value="{{pwOff0}}" hint-placeholder-val="{{true}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></sc-if></button></span></label>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px"><label style="display: flex; align-items: center; gap: 8px"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #1D5545">{{t.remember}}</label><a href="#forgot" style="font-weight: 700">{{t.forgot}}</a></div>
+<button type="button" onClick="{{signEmail}}" class="btn-gold" style="min-height: 54px; border-radius: 999px; border: none; color: #133B30; font-family: inherit; font-weight: 800; font-size: 17px; cursor: pointer">{{t.signin}}</button>
+<p style="margin: 0; text-align: center; font-size: 15px; color: #5E6A63">{{t.noAcc}} <button type="button" onClick="{{goUp}}" style="border: none; background: none; padding: 0; color: #1D5545; font-family: inherit; font-weight: 800; font-size: 15px; cursor: pointer; text-decoration: underline">{{t.tabUp}}</button></p>
+</form>
+</sc-if>
+<sc-if value="{{isUp}}" hint-placeholder-val="{{false}}">
+<form style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px"><h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 30px; color: #1D5545">{{t.hUp}}</h1><p style="margin: 0; font-size: 15px; color: #5E6A63">{{t.pUp}}</p></div>
+<div role="radiogroup" aria-label="{{t.acType}}" style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 14px; font-weight: 700; color: #33403A">{{t.acType}}</span>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px">
+<button type="button" role="radio" aria-checked="{{retailAria}}" onClick="{{pickRetail}}" class="opt {{retailCls}}" style="align-items: flex-start; padding: 12px 14px"><span class="dot" style="margin-top: 2px"></span><span style="display: flex; flex-direction: column; gap: 2px"><span>🏠 {{t.acRetail}}</span><span style="font-size: 13px; font-weight: 600; color: #6B756F">{{t.acRetailS}}</span></span></button>
+<button type="button" role="radio" aria-checked="{{bizAria}}" onClick="{{pickBiz}}" class="opt {{bizCls}}" style="align-items: flex-start; padding: 12px 14px"><span class="dot" style="margin-top: 2px"></span><span style="display: flex; flex-direction: column; gap: 2px"><span>🏪 {{t.acBiz}}</span><span style="font-size: 13px; font-weight: 600; color: #6B756F">{{t.acBizS}}</span></span></button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<button type="button" onClick="{{signGoogle}}" class="social"><svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>{{t.google}}</button>
+<button type="button" onClick="{{signApple}}" class="social" style="background: #000; color: #fff; border-color: #000"><svg width="18" height="20" viewBox="0 0 17 20" fill="currentColor" aria-hidden="true"><path d="M14.1 10.6c0-2.5 2-3.7 2.1-3.8-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.8-1.7 0-3.3 1-4.1 2.5-1.8 3.1-.5 7.6 1.3 10.1.8 1.2 1.8 2.6 3.1 2.5 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8-.1 0-2.6-1-2.5-4.2zM11.7 3.2c.7-.8 1.1-1.9 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.2-.6 2.9-1.3z"/></svg>{{t.apple}}</button>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; color: #8A8F88; font-size: 14px"><span style="flex: 1; height: 1px; background: #E4DCC8"></span>{{t.or}}<span style="flex: 1; height: 1px; background: #E4DCC8"></span></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px">
+<label class="lbl">{{t.first}}<input class="fld" autocomplete="given-name" onInput="{{fFirst}}"></label>
+<label class="lbl">{{t.last}}<input class="fld" autocomplete="family-name" onInput="{{fLast}}"></label>
+<label class="lbl">{{t.email}}<input class="fld" type="email" autocomplete="email" onInput="{{fEmail}}"></label>
+<label class="lbl">{{t.phone}}<input class="fld" type="tel" autocomplete="tel" onInput="{{fPhone}}"></label>
+<label class="lbl">{{t.pass}}<span class="pw-wrap"><input class="fld" type="{{pwT1}}" autocomplete="new-password"><button type="button" class="pw-eye" onClick="{{pwTog1}}" aria-label="{{pwLbl1}}" title="{{pwLbl1}}"><sc-if value="{{pwOn1}}" hint-placeholder-val="{{false}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9 17.9A10.4 10.4 0 0 1 12 19C5.5 19 2 12 2 12a18 18 0 0 1 4.1-5.1M9.9 5.2A9.6 9.6 0 0 1 12 5c6.5 0 10 7 10 7a18 18 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2"/><path d="M2 2l20 20"/></svg></sc-if><sc-if value="{{pwOff1}}" hint-placeholder-val="{{true}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></sc-if></button></span></label>
+<label class="lbl">{{t.pass2}}<span class="pw-wrap"><input class="fld" type="{{pwT2}}" autocomplete="new-password"><button type="button" class="pw-eye" onClick="{{pwTog2}}" aria-label="{{pwLbl2}}" title="{{pwLbl2}}"><sc-if value="{{pwOn2}}" hint-placeholder-val="{{false}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9 17.9A10.4 10.4 0 0 1 12 19C5.5 19 2 12 2 12a18 18 0 0 1 4.1-5.1M9.9 5.2A9.6 9.6 0 0 1 12 5c6.5 0 10 7 10 7a18 18 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2"/><path d="M2 2l20 20"/></svg></sc-if><sc-if value="{{pwOff2}}" hint-placeholder-val="{{true}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></sc-if></button></span></label>
+<label class="lbl">{{t.zip}}<input class="fld" autocomplete="postal-code" inputmode="numeric" onInput="{{fZip}}"></label>
+</div>
+<sc-if value="{{isBiz}}" hint-placeholder-val="{{false}}">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; padding: 14px; border-radius: 16px; background: #F3EBD7">
+<label class="lbl" style="grid-column: 1 / -1">{{t.bizName}}<input class="fld" autocomplete="organization" onInput="{{fBiz}}"></label>
+<label class="lbl">{{t.bizType}}<select class="fld" onChange="{{fBizType}}"><sc-for list="{{bizTypes}}" as="bt" hint-placeholder-count="4"><option>{{bt.x}}</option></sc-for></select></label>
+<label class="lbl">{{t.branches}}<input class="fld" type="number" min="1" value="1" onInput="{{fBranches}}"></label>
+<label class="lbl" style="grid-column: 1 / -1">{{t.permit}}<input class="fld" onInput="{{fPermit}}"></label>
+</div>
+</sc-if>
+<label style="display: flex; align-items: center; gap: 10px; font-size: 14px"><input type="checkbox" style="width: 18px; height: 18px; accent-color: #1D5545">{{t.news}}</label>
+<button type="button" onClick="{{signEmail}}" class="{{createCls}}" style="min-height: 54px; border-radius: 999px; border: none; color: {{createColor}}; font-family: inherit; font-weight: 800; font-size: 17px; cursor: pointer">{{createLabel}}</button>
+<sc-if value="{{isBiz}}" hint-placeholder-val="{{false}}"><p style="margin: 0; font-size: 13px; color: #5E6A63; text-align: center">{{t.bizNote}}</p></sc-if>
+<p style="margin: 0; font-size: 12px; color: #6B756F; text-align: center">{{t.terms}}</p>
+<p style="margin: 0; text-align: center; font-size: 15px; color: #5E6A63">{{t.hasAcc}} <button type="button" onClick="{{goIn}}" style="border: none; background: none; padding: 0; color: #1D5545; font-family: inherit; font-weight: 800; font-size: 15px; cursor: pointer; text-decoration: underline">{{t.tabIn}}</button></p>
+</form>
+</sc-if>
+<sc-if value="{{isWs}}" hint-placeholder-val="{{false}}">
+<form style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #7A5A12; font-weight: 800">B2B</span><h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 30px; color: #1D5545">{{t.hWs}}</h1><p style="margin: 0; font-size: 15px; color: #5E6A63">{{t.pWs}}</p></div>
+<label class="lbl">{{t.wsId}}<input class="fld" type="text" autocomplete="username"></label>
+<label class="lbl">{{t.pass}}<span class="pw-wrap"><input class="fld" type="{{pwT3}}" autocomplete="current-password"><button type="button" class="pw-eye" onClick="{{pwTog3}}" aria-label="{{pwLbl3}}" title="{{pwLbl3}}"><sc-if value="{{pwOn3}}" hint-placeholder-val="{{false}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9 17.9A10.4 10.4 0 0 1 12 19C5.5 19 2 12 2 12a18 18 0 0 1 4.1-5.1M9.9 5.2A9.6 9.6 0 0 1 12 5c6.5 0 10 7 10 7a18 18 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2"/><path d="M2 2l20 20"/></svg></sc-if><sc-if value="{{pwOff3}}" hint-placeholder-val="{{true}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></sc-if></button></span></label>
+<div style="display: flex; justify-content: flex-end; font-size: 14px"><a href="#forgot" style="font-weight: 700">{{t.forgot}}</a></div>
+<a href="PartnerAccount.dc.html" class="btn-green" style="display: flex; align-items: center; justify-content: center; min-height: 54px; border-radius: 999px; color: #F6E3B4; font-weight: 800; font-size: 17px; text-decoration: none">{{t.wsBtn}}</a>
+</form>
+</sc-if>
+</sc-if>
+</div>
+</div>
+<sc-if value="{{sheetOpen}}" hint-placeholder-val="{{false}}">
+<div role="dialog" aria-modal="true" style="position: fixed; inset: 0; z-index: 90; background: rgba(10,25,20,.55); display: flex; align-items: center; justify-content: center; padding: 16px">
+<div style="width: min(400px, 100%); background: #FFFFFF; color: #1E2A24; border-radius: 22px; padding: 24px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 24px 60px rgba(0,0,0,.4); animation: softIn .3s ease">
+<strong style="font-size: 19px">{{sheetTitle}}</strong>
+<p style="margin: 0; font-size: 14px; color: #5E6A63">{{t.sheetTxt}}</p>
+<div style="display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #E4DCC8; border-radius: 14px"><span style="width: 38px; height: 38px; border-radius: 50%; background: #1D5545; color: #F6E3B4; display: flex; align-items: center; justify-content: center; font-weight: 800">N</span><span style="display: flex; flex-direction: column; text-align: left"><strong style="font-size: 15px">{{t.demoName}}</strong><span style="font-size: 13px; color: #6B756F">customer@example.com</span></span></div>
+<button type="button" onClick="{{confirmSign}}" style="min-height: 50px; border-radius: 12px; border: none; background: {{sheetBg}}; color: {{sheetFg}}; font-family: inherit; font-weight: 800; font-size: 16px; cursor: pointer">{{t.cont}}</button>
+<button type="button" onClick="{{closeSign}}" style="border: none; background: none; color: #1D5545; font-family: inherit; font-weight: 800; cursor: pointer">{{t.cancel}}</button>
+</div>
+</div>
+</sc-if>
+<svg viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; left: 0; bottom: -2px; width: 100%; height: 80px; display: block; z-index: 2"><path d="M0,48 C240,92 480,92 720,58 C960,24 1200,6 1440,42 L1440,92 L0,92 Z" fill="#133B30"></path></svg>
+</section>
+<footer style="background: #133B30; color: #CFE2D9; padding: 28px 24px; text-align: center; font-size: 14px">© 2026 Nectar of Armenia, Inc. · (515) 588-5555 · nectarofarmenia@gmail.com</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+componentDidMount() {
+var self = this; this._last = null;
+this._sync = function () {
+var c = null, l = null;
+try { c = window.localStorage.getItem("noa-cart-v2"); l = window.localStorage.getItem("noa-lang"); } catch (e) { return; }
+var key = c + "|" + l;
+if (self._last === null) { self._last = key; return; }
+if (key === self._last) { return; }
+self._last = key;
+var arr = null; try { arr = JSON.parse(c); } catch (e) { arr = null; }
+var patch = {};
+if (Array.isArray(arr) && arr.length === 11) { patch.q = arr; }
+if (["hy", "en", "ru", "es"].indexOf(l) >= 0) { patch.lang = l; }
+self.setState(patch);
+};
+this._iv = setInterval(this._sync, 700);
+window.addEventListener("storage", this._sync);
+window.addEventListener("focus", this._sync);
+this._sync();
+}
+componentWillUnmount() {
+clearInterval(this._iv);
+window.removeEventListener("storage", this._sync);
+window.removeEventListener("focus", this._sync);
+}
+
+renderVals() {
+var L = {"hy": {"back": "← Գլխավոր էջ", "cart": "Զամբյուղ", "tabIn": "Մուտք", "tabUp": "Գրանցում", "hIn": "Բարի վերադարձ", "pIn": "Մուտք գործեք՝ պատվերներին հետևելու և արագ գնումներ անելու համար։", "hUp": "Ստեղծեք հաշիվ", "pUp": "Պահեք ձեր հասցեն, հետևեք պատվերներին և ստացեք հատուկ առաջարկներ։", "email": "Էլ. փոստ", "pass": "Գաղտնաբառ", "forgot": "Մոռացե՞լ եք գաղտնաբառը", "remember": "Հիշել ինձ", "signin": "Մուտք գործել", "or": "կամ", "google": "Շարունակել Google-ով", "apple": "Շարունակել Apple-ով", "first": "Անուն", "last": "Ազգանուն", "phone": "Հեռախոս", "pass2": "Կրկնել գաղտնաբառը", "zip": "ZIP կոդ", "news": "Ուզում եմ ստանալ նորություններ և զեղչեր", "terms": "Գրանցվելով՝ համաձայնում եք մեր պայմաններին և գաղտնիության քաղաքականությանը։", "create": "Ստեղծել հաշիվ", "noAcc": "Չունե՞ք հաշիվ։", "hasAcc": "Արդեն ունե՞ք հաշիվ։", "biz": "Խանութ, ռեստորան կամ քեյթրինգ ունե՞ք։", "bizL": "Ստացեք մեծածախ գներ →", "sideH": "Հայկական համը՝ միշտ ձեռքի տակ", "sideP": "Ստեղծեք հաշիվ և պատվիրեք մեր ուտեստները ցանկացած պահի, որ ձեր սառնարանում միշտ պատրաստ ճաշ լինի։", "side": ["Պատրաստ ճաշ րոպեների ընթացքում՝ ուղիղ սառնարանից", "Պահված հասցե և քարտ՝ պատվեր մի քանի վայրկյանում", "Սիրելի պատվերը կրկնեք մեկ սեղմումով", "Առաքում 48 ժամում. հետևեք պատվերին մինչև ձեր դուռը"], "tabWs": "Մեծածախ", "hWs": "Գործընկերների մուտք", "pWs": "Խանութների, ռեստորանների և քեյթերինգի համար։ Մուտք գործեք՝ տեսնելու ձեր մեծածախ գները և պատվիրելու։", "wsId": "Բիզնեսի email կամ գործընկերոջ ID", "wsBtn": "Մուտք գործընկերոջ հաշիվ", "wsNo": "Դեռ գործընկեր չե՞ք։", "wsApply": "Դիմել մեծածախ հաշվի համար →", "wsNote": "Հաշիվը ակտիվանում է մեր հաստատումից հետո։ Հարցերի համար՝ (515) 588-5555", "acType": "Ես գրանցվում եմ որպես", "acRetail": "Հաճախորդ", "acRetailS": "Գնումներ տան և ընտանիքի համար", "acBiz": "Մեծածախ գործընկեր", "acBizS": "Խանութ, ռեստորան, քեյթերինգ", "bizName": "Բիզնեսի անվանում", "bizType": "Բիզնեսի տեսակ", "bizTypes": ["Մթերային խանութ / շուկա", "Ռեստորան / սրճարան", "Քեյթերինգ", "Այլ"], "permit": "Seller's permit համար (ըստ ցանկության)", "branches": "Մասնաճյուղերի քանակ", "bizBtn": "Ուղարկել դիմումը", "bizNote": "Հաշիվը կակտիվանա մեր հաստատումից հետո, և կտեսնեք ձեր մեծածախ գները։", "okIn": "Դուք մուտք եք գործել", "myPage": "Իմ էջը", "goShop": "Անցնել գնումների", "signOut": "Դուրս գալ", "viaG": "Google-ի միջոցով", "viaA": "Apple-ի միջոցով", "viaE": "Էլ. փոստով", "sheetG": "Մուտք Google-ով", "sheetA": "Մուտք Apple-ով", "sheetTxt": "Իրական կայքում այստեղ կբացվի Google-ի կամ Apple-ի պատուհանը՝ ձեր հաշվի ընտրությամբ կամ Face ID-ով։", "demoName": "Ձեր հաշիվը", "cont": "Շարունակել", "cancel": "Չեղարկել", "myShop": "Իմ խանութի էջը", "okUp": "Հաշիվը ստեղծված է", "okBiz": "Դիմումն ուղարկված է"}, "en": {"back": "← Home", "cart": "Cart", "tabIn": "Sign in", "tabUp": "Create account", "hIn": "Welcome back", "pIn": "Sign in to track your orders and check out faster.", "hUp": "Create your account", "pUp": "Save your address, track your orders and get special offers.", "email": "Email", "pass": "Password", "forgot": "Forgot your password?", "remember": "Remember me", "signin": "Sign in", "or": "or", "google": "Continue with Google", "apple": "Continue with Apple", "first": "First name", "last": "Last name", "phone": "Phone", "pass2": "Repeat password", "zip": "ZIP code", "news": "Send me news and discounts", "terms": "By creating an account you agree to our terms and privacy policy.", "create": "Create account", "noAcc": "Don’t have an account?", "hasAcc": "Already have an account?", "biz": "Own a store, restaurant or catering business?", "bizL": "Get wholesale prices →", "sideH": "Armenian flavor, always within reach", "sideP": "Create an account and order our dishes anytime — so a ready meal is always waiting in your freezer.", "side": ["A ready meal in minutes, straight from the freezer", "Saved address and card — order in seconds", "Reorder your favorites in one tap", "Delivery in 48 hours — follow your order to your door"], "tabWs": "Wholesale", "hWs": "Partner sign in", "pWs": "For stores, restaurants and caterers. Sign in to see your wholesale prices and place orders.", "wsId": "Business email or partner ID", "wsBtn": "Sign in to partner account", "wsNo": "Not a partner yet?", "wsApply": "Apply for a wholesale account →", "wsNote": "Accounts are activated after our approval. Questions: (515) 588-5555", "acType": "I’m signing up as", "acRetail": "Customer", "acRetailS": "Shopping for home and family", "acBiz": "Wholesale partner", "acBizS": "Store, restaurant, catering", "bizName": "Business name", "bizType": "Business type", "bizTypes": ["Grocery store / market", "Restaurant / café", "Catering", "Other"], "permit": "Seller's permit number (optional)", "branches": "Number of locations", "bizBtn": "Send application", "bizNote": "Your account is activated after our approval, and you’ll see your wholesale prices.", "okIn": "You’re signed in", "myPage": "My account", "goShop": "Go shopping", "signOut": "Sign out", "viaG": "with Google", "viaA": "with Apple", "viaE": "with email", "sheetG": "Sign in with Google", "sheetA": "Sign in with Apple", "sheetTxt": "On the live site, the Google or Apple window opens here so you can pick your account or use Face ID.", "demoName": "Your account", "cont": "Continue", "cancel": "Cancel", "myShop": "My business page", "okUp": "Your account is ready", "okBiz": "Application sent"}, "ru": {"back": "← На главную", "cart": "Корзина", "tabIn": "Вход", "tabUp": "Регистрация", "hIn": "С возвращением", "pIn": "Войдите, чтобы следить за заказами и оформлять их быстрее.", "hUp": "Создайте аккаунт", "pUp": "Сохраните адрес, следите за заказами и получайте специальные предложения.", "email": "Эл. почта", "pass": "Пароль", "forgot": "Забыли пароль?", "remember": "Запомнить меня", "signin": "Войти", "or": "или", "google": "Продолжить с Google", "apple": "Продолжить с Apple", "first": "Имя", "last": "Фамилия", "phone": "Телефон", "pass2": "Повторите пароль", "zip": "ZIP-код", "news": "Хочу получать новости и скидки", "terms": "Регистрируясь, вы соглашаетесь с нашими условиями и политикой конфиденциальности.", "create": "Создать аккаунт", "noAcc": "Нет аккаунта?", "hasAcc": "Уже есть аккаунт?", "biz": "У вас магазин, ресторан или кейтеринг?", "bizL": "Получите оптовые цены →", "sideH": "Армянский вкус — всегда под рукой", "sideP": "Создайте аккаунт и заказывайте наши блюда в любое время — чтобы в морозилке всегда было готовое блюдо.", "side": ["Готовое блюдо за считанные минуты — прямо из морозилки", "Сохранённые адрес и карта — заказ за секунды", "Любимый заказ — повтор в одно касание", "Доставка за 48 часов — следите за заказом до двери"], "tabWs": "Оптом", "hWs": "Вход для партнёров", "pWs": "Для магазинов, ресторанов и кейтеринга. Войдите, чтобы видеть свои оптовые цены и делать заказы.", "wsId": "Рабочий email или ID партнёра", "wsBtn": "Войти в аккаунт партнёра", "wsNo": "Ещё не партнёр?", "wsApply": "Подать заявку на оптовый аккаунт →", "wsNote": "Аккаунт активируется после нашего одобрения. Вопросы: (515) 588-5555", "acType": "Я регистрируюсь как", "acRetail": "Покупатель", "acRetailS": "Покупки для дома и семьи", "acBiz": "Оптовый партнёр", "acBizS": "Магазин, ресторан, кейтеринг", "bizName": "Название бизнеса", "bizType": "Тип бизнеса", "bizTypes": ["Продуктовый магазин / рынок", "Ресторан / кафе", "Кейтеринг", "Другое"], "permit": "Номер seller's permit (необязательно)", "branches": "Количество точек", "bizBtn": "Отправить заявку", "bizNote": "Аккаунт активируется после нашего одобрения, и вы увидите свои оптовые цены.", "okIn": "Вы вошли", "myPage": "Личный кабинет", "goShop": "Перейти к покупкам", "signOut": "Выйти", "viaG": "через Google", "viaA": "через Apple", "viaE": "по email", "sheetG": "Вход через Google", "sheetA": "Вход через Apple", "sheetTxt": "На настоящем сайте здесь откроется окно Google или Apple, где можно выбрать аккаунт или войти по Face ID.", "demoName": "Ваш аккаунт", "cont": "Продолжить", "cancel": "Отмена", "myShop": "Страница моего бизнеса", "okUp": "Аккаунт создан", "okBiz": "Заявка отправлена"}, "es": {"back": "← Inicio", "cart": "Carrito", "tabIn": "Entrar", "tabUp": "Crear cuenta", "hIn": "Bienvenido de nuevo", "pIn": "Entra para seguir tus pedidos y pagar más rápido.", "hUp": "Crea tu cuenta", "pUp": "Guarda tu dirección, sigue tus pedidos y recibe ofertas especiales.", "email": "Correo electrónico", "pass": "Contraseña", "forgot": "¿Olvidaste tu contraseña?", "remember": "Recordarme", "signin": "Entrar", "or": "o", "google": "Continuar con Google", "apple": "Continuar con Apple", "first": "Nombre", "last": "Apellido", "phone": "Teléfono", "pass2": "Repite la contraseña", "zip": "Código postal", "news": "Quiero recibir noticias y descuentos", "terms": "Al crear una cuenta aceptas nuestros términos y política de privacidad.", "create": "Crear cuenta", "noAcc": "¿No tienes cuenta?", "hasAcc": "¿Ya tienes cuenta?", "biz": "¿Tienes una tienda, restaurante o catering?", "bizL": "Obtén precios de mayoreo →", "sideH": "El sabor armenio, siempre a mano", "sideP": "Crea tu cuenta y pide nuestros platos cuando quieras, para tener siempre una comida lista en tu congelador.", "side": ["Una comida lista en minutos, directo del congelador", "Dirección y tarjeta guardadas: pide en segundos", "Repite tus favoritos con un toque", "Entrega en 48 horas: sigue tu pedido hasta tu puerta"], "tabWs": "Mayoreo", "hWs": "Acceso para socios", "pWs": "Para tiendas, restaurantes y catering. Entra para ver tus precios de mayoreo y hacer pedidos.", "wsId": "Correo del negocio o ID de socio", "wsBtn": "Entrar a la cuenta de socio", "wsNo": "¿Aún no eres socio?", "wsApply": "Solicitar una cuenta de mayoreo →", "wsNote": "Las cuentas se activan tras nuestra aprobación. Preguntas: (515) 588-5555", "acType": "Me registro como", "acRetail": "Cliente", "acRetailS": "Compras para casa y familia", "acBiz": "Socio de mayoreo", "acBizS": "Tienda, restaurante, catering", "bizName": "Nombre del negocio", "bizType": "Tipo de negocio", "bizTypes": ["Tienda de abarrotes / mercado", "Restaurante / café", "Catering", "Otro"], "permit": "Número de seller's permit (opcional)", "branches": "Número de sucursales", "bizBtn": "Enviar solicitud", "bizNote": "Tu cuenta se activa tras nuestra aprobación y verás tus precios de mayoreo.", "okIn": "Has iniciado sesión", "myPage": "Mi cuenta", "goShop": "Ir a comprar", "signOut": "Cerrar sesión", "viaG": "con Google", "viaA": "con Apple", "viaE": "con correo", "sheetG": "Entrar con Google", "sheetA": "Entrar con Apple", "sheetTxt": "En el sitio real, aquí se abre la ventana de Google o Apple para elegir tu cuenta o usar Face ID.", "demoName": "Tu cuenta", "cont": "Continuar", "cancel": "Cancelar", "myShop": "Página de mi negocio", "okUp": "Tu cuenta está lista", "okBiz": "Solicitud enviada"}};
+var self = this;
+var savedLang = null; try { savedLang = window.localStorage.getItem("noa-lang"); } catch (e) { savedLang = null; }
+if (["hy", "en", "ru", "es"].indexOf(savedLang) < 0) { savedLang = null; }
+var lang = (this.state && this.state.lang) || savedLang || "hy";
+var t = L[lang] || L.hy;
+var langs = [{ id: "en", label: "EN" }, { id: "hy", label: "ՀԱՅ" }, { id: "ru", label: "РУ" }, { id: "es", label: "ES" }].map(function (x) {
+return Object.assign({}, x, { selected: x.id === lang, unselected: x.id !== lang, pick: function () { try { window.localStorage.setItem("noa-lang", x.id); } catch (e) {} self.setState({ lang: x.id }); } });
+});
+var PRICES = [0, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0];
+var stored = null; try { stored = JSON.parse(window.localStorage.getItem("noa-cart-v2") || "null"); } catch (e) { stored = null; }
+if (!Array.isArray(stored) || stored.length !== 11) { stored = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; }
+var saveOrder = function (q2, sum2, dayIso) { try { var it = []; q2.forEach(function (n, i) { if (n > 0) { it.push([i, n]); } }); if (it.length) { window.localStorage.setItem("noa-last-order", JSON.stringify({ no: "NOA-" + (10600 + Math.floor(Math.random() * 300)), items: it, total: "$" + sum2.toFixed(2), day: dayIso })); } } catch (e) {} };
+var saveCart = function (c) { try { window.localStorage.setItem("noa-cart-v2", JSON.stringify(c)); } catch (e) {} };
+var mode = (this.state && this.state.mode) || "in";
+var acct = (this.state && this.state.acct) || "retail";
+var st = this.state || {};
+var sheet = st.sheet || "";
+var signedVia = st.signed || "";
+var user = null; try { user = JSON.parse(window.localStorage.getItem("noa-user") || "null"); } catch (e) { user = null; }
+var F = function (k) { return function (e) { self._f = self._f || {}; self._f[k] = e && e.target ? e.target.value : ""; }; };
+var saveUser = function (via) { var f = self._f || {}; var u = { type: acct === "biz" ? "biz" : "retail", first: (f.first || "").trim(), last: (f.last || "").trim(), email: (f.email || "").trim(), phone: (f.phone || "").trim(), zip: (f.zip || "").trim(), biz: (f.biz || "").trim(), bizType: f.bizType || t.bizTypes[0], branches: Math.max(1, parseInt(f.branches || "1", 10) || 1), permit: (f.permit || "").trim(), year: new Date().getFullYear(), via: via, pid: "W-" + (1100 + Math.floor(Math.random() * 800)) }; try { window.localStorage.setItem("noa-user", JSON.stringify(u)); } catch (e) {} return u; };
+var uType = (st.uType) || (user && user.type) || "retail";
+var acCnt = stored.reduce(function (a, b) { return a + (b || 0); }, 0);
+var pwS = (this.state && this.state.pw) || {}; var selfPw = this;
+var pwT = function (i) { return pwS[i] ? "text" : "password"; };
+var pwTog = function (i) { return function () { var n = Object.assign({}, pwS); n[i] = !n[i]; selfPw.setState({ pw: n }); }; };
+var PWL = { hy: ["Ցույց տալ գաղտնաբառը", "Թաքցնել գաղտնաբառը"], en: ["Show password", "Hide password"], ru: ["Показать пароль", "Скрыть пароль"], es: ["Mostrar contraseña", "Ocultar contraseña"] };
+var pwLbl = function (i) { var a = PWL[lang] || PWL.hy; return pwS[i] ? a[1] : a[0]; };
+return { t: t, langs: langs, count: acCnt, hasCount: acCnt > 0, pwT0: pwT(0), pwT1: pwT(1), pwT2: pwT(2), pwT3: pwT(3), pwTog0: pwTog(0), pwTog1: pwTog(1), pwTog2: pwTog(2), pwTog3: pwTog(3), pwOn0: !!pwS[0], pwOff0: !pwS[0], pwOn1: !!pwS[1], pwOff1: !pwS[1], pwOn2: !!pwS[2], pwOff2: !pwS[2], pwOn3: !!pwS[3], pwOff3: !pwS[3], pwLbl0: pwLbl(0), pwLbl1: pwLbl(1), pwLbl2: pwLbl(2), pwLbl3: pwLbl(3),
+side: t.side.map(function (x) { return { x: x }; }),
+isIn: mode === "in", isUp: mode === "up", isWs: mode === "ws", inCls: mode === "in" ? "on" : "", upCls: mode === "up" ? "on" : "", wsCls: mode === "ws" ? "on" : "", inAria: mode === "in" ? "true" : "false", upAria: mode === "up" ? "true" : "false", wsAria: mode === "ws" ? "true" : "false", goWs: function () { self.setState({ mode: "ws" }); },
+signed: !!signedVia, notSigned: !signedVia, signedNote: (uType === "biz" && st.fresh) ? t.bizNote : (signedVia === "google" ? t.viaG : (signedVia === "apple" ? t.viaA : t.viaE)), okTitle: st.fresh ? (uType === "biz" ? t.okBiz : t.okUp) : t.okIn, myHref: uType === "biz" ? "PartnerAccount.dc.html" : "MyAccount.dc.html", myLbl: uType === "biz" ? t.myShop : t.myPage,
+fFirst: F("first"), fLast: F("last"), fEmail: F("email"), fPhone: F("phone"), fZip: F("zip"), fBiz: F("biz"), fBizType: F("bizType"), fBranches: F("branches"), fPermit: F("permit"),
+signGoogle: function () { self.setState({ sheet: "google" }); }, signApple: function () { self.setState({ sheet: "apple" }); }, signEmail: function () { if (mode === "up") { var u = saveUser("email"); self.setState({ signed: "email", uType: u.type, fresh: true }); } else { self.setState({ signed: "email", uType: (user && user.type) || "retail", fresh: false }); } },
+sheetOpen: !!sheet, sheetTitle: sheet === "apple" ? t.sheetA : t.sheetG, sheetBg: sheet === "apple" ? "#000" : "#1A73E8", sheetFg: "#fff",
+confirmSign: function () { if (mode === "up") { var u = saveUser(sheet); self.setState({ signed: sheet, sheet: "", uType: u.type, fresh: true }); } else { self.setState({ signed: sheet, sheet: "", uType: (user && user.type) || "retail", fresh: false }); } }, closeSign: function () { self.setState({ sheet: "" }); }, signOut: function () { self.setState({ signed: "" }); },
+isBiz: acct === "biz", retailCls: acct === "retail" ? "on" : "", bizCls: acct === "biz" ? "on" : "", retailAria: acct === "retail" ? "true" : "false", bizAria: acct === "biz" ? "true" : "false",
+pickRetail: function () { self.setState({ acct: "retail" }); }, pickBiz: function () { self.setState({ acct: "biz" }); },
+bizTypes: t.bizTypes.map(function (x) { return { x: x }; }), createLabel: acct === "biz" ? t.bizBtn : t.create, createCls: acct === "biz" ? "btn-green" : "btn-gold", createColor: acct === "biz" ? "#F6E3B4" : "#133B30",
+goIn: function () { self.setState({ mode: "in" }); }, goUp: function () { self.setState({ mode: "up" }); } };
+}
+}
+</script>
+</body>
+</html>

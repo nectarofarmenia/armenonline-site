@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="hy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Nectar of Armenia — Checkout</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Coustard:wght@900&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Lora:wght@600;700&family=Noto+Serif+Armenian:wght@600;700&family=Noto+Sans+Armenian:wght@400;500;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+html,body{background:#1D5545;overscroll-behavior-y:none}
+@keyframes arevaSpin{to{transform:rotate(360deg)}}
+.areva{animation:arevaSpin 60s linear infinite;transform-origin:50% 50%;transform-box:fill-box}
+@keyframes kTurn{0%{transform:perspective(700px) rotateY(-30deg) scale(.98);filter:brightness(.9)}50%{transform:perspective(700px) rotateY(30deg) scale(1.02);filter:brightness(1.12)}100%{transform:perspective(700px) rotateY(-30deg) scale(.98);filter:brightness(.9)}}
+.spin-k{animation:kTurn 7s ease-in-out infinite;transform-origin:50% 60%}
+.spin-k-rev{animation-direction:reverse}
+@media (prefers-reduced-motion:reduce){.spin-k{animation:none !important}}
+@media (prefers-reduced-motion:reduce){.areva{animation:none !important}}
+body{margin:0}
+a{color:#1D5545}a:hover{color:#133B30}
+input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
+@media (max-width:760px){.ws-hide{display:none !important}.logo3d{height:54px !important}.ws-h1{font-size:36px !important}}
+.raise-header{background:linear-gradient(180deg,#31775F 0%,#22604C 45%,#164536 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.25),inset 0 -3px 6px rgba(0,0,0,.35),0 2px 4px rgba(0,0,0,.25),0 10px 26px rgba(0,0,0,.38) !important}
+.logo3d{filter:drop-shadow(0 2px 0 rgba(0,0,0,.55)) drop-shadow(0 6px 10px rgba(0,0,0,.4))}
+.btn-gold{background:linear-gradient(180deg,#FCDB82 0%,#EDB040 50%,#D38A22 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.7),inset 0 -3px 0 rgba(120,70,0,.25),0 2px 3px rgba(0,0,0,.2),0 6px 14px rgba(0,0,0,.28)}
+.btn-green{background:linear-gradient(180deg,#34806A 0%,#1D5545 55%,#133B30 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.25),inset 0 -3px 0 rgba(0,0,0,.28),0 2px 3px rgba(0,0,0,.2),0 6px 14px rgba(19,59,48,.35)}
+.btn-ghost{box-shadow:inset 0 2px 0 rgba(255,255,255,.18),inset 0 -2px 4px rgba(0,0,0,.2),0 6px 14px rgba(0,0,0,.28)}
+.pill-group{box-shadow:inset 0 3px 7px rgba(0,0,0,.55),0 1px 0 rgba(255,255,255,.15)}
+.hero3d{background:radial-gradient(ellipse at 72% 45%,#357F69 0%,#1F5947 50%,#133B30 100%) !important;box-shadow:inset 0 12px 24px rgba(0,0,0,.18),inset 0 -20px 36px rgba(0,0,0,.25)}
+.card3d{background:linear-gradient(180deg,#FFFFFF 0%,#F8F3E8 100%) !important;box-shadow:inset 0 2px 0 #FFFFFF,inset 0 -2px 0 rgba(120,90,30,.06),0 3px 6px rgba(19,59,48,.08),0 18px 36px rgba(19,59,48,.16)}
+.card3d-dark{background:linear-gradient(180deg,#36806B 0%,#245F4D 60%,#1E5242 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.2),inset 0 -3px 6px rgba(0,0,0,.2),0 18px 36px rgba(0,0,0,.35)}
+.pw-wrap{position:relative;display:block}.pw-wrap .fld{padding-right:52px;width:100%;box-sizing:border-box}.pw-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:42px;height:42px;border:none;background:transparent;color:#1D5545;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}.pw-eye:hover{background:#F3EBD7}
+.fld{min-height:50px;border-radius:12px;border:1px solid #D8CDB4;background:#FBF9F4;padding:0 14px;font-size:16px;font-family:inherit;color:#1E2A24;width:100%;box-sizing:border-box}
+.fld:focus{outline:2px solid #EBA93A;outline-offset:1px;border-color:#EBA93A}
+.lbl{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#33403A}
+.qty{display:inline-flex;align-items:center;border:1.5px solid #D8CDB4;border-radius:999px;background:#FFFFFF;overflow:hidden}
+.qty button{width:40px;height:40px;border:none;background:transparent;font-size:20px;font-weight:800;color:#1D5545;cursor:pointer;font-family:inherit}
+.qty button:hover{background:#F3EBD7}
+.qty span{min-width:30px;text-align:center;font-weight:800;font-size:16px}
+.tab{flex:1 1 0;min-height:50px;border:none;border-radius:999px;font-family:inherit;font-weight:800;font-size:16px;cursor:pointer;background:transparent;color:#1D5545}
+.tab.on{background:linear-gradient(180deg,#34806A 0%,#1D5545 55%,#133B30 100%);color:#F6E3B4;box-shadow:inset 0 0 0 1.5px rgba(235,169,58,.85),0 4px 10px rgba(19,59,48,.25)}
+.opt{display:flex;align-items:center;gap:12px;min-height:58px;padding:0 16px;border-radius:16px;border:1.5px solid #E4DCC8;background:#FFFFFF;cursor:pointer;font-family:inherit;font-size:16px;font-weight:700;color:#1E2A24;text-align:left;width:100%}
+.opt.on{border-color:#EBA93A;box-shadow:0 0 0 3px rgba(235,169,58,.22);background:#FFFCF4}
+.dot{width:20px;height:20px;border-radius:50%;border:2px solid #C9BB98;flex:0 0 auto;box-sizing:border-box}
+.opt.on .dot{border:6px solid #1D5545}
+.pm.on{box-shadow:0 0 0 3px #EBA93A,0 6px 14px rgba(0,0,0,.18)}
+.daybtn{flex:0 0 auto;min-width:92px;padding:10px 12px;border-radius:16px;border:1.5px solid #E4DCC8;background:#FFFFFF;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;color:#1E2A24}
+.daybtn.on{border-color:#1D5545;background:#1D5545;color:#F6E3B4;box-shadow:inset 0 0 0 1.5px rgba(235,169,58,.85)}
+.paybtn{min-height:52px;border-radius:14px;border:none;font-family:inherit;font-weight:800;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.social{min-height:52px;border-radius:999px;border:1.5px solid #D8CDB4;background:#FFFFFF;font-family:inherit;font-weight:800;font-size:15px;color:#1E2A24;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;width:100%}
+.social:hover{border-color:#EBA93A}
+@media (max-width:760px){.two-col{flex-direction:column !important}.sum-card{position:static !important}.hdr-back{display:none !important}}
+</style>
+</helmet>
+<div style="font-family: Manrope, 'Noto Sans Armenian', system-ui, sans-serif; color: #1E2A24; background: #F7F3EA; width: 100%; min-height: 100vh; overflow-x: clip">
+<header class="raise-header" style="background: #133B30; position: sticky; top: 0; z-index: 50">
+<div style="max-width: 1240px; margin: 0 auto; padding: 16px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px">
+<a href="Main.dc.html" aria-label="Nectar of Armenia" style="display: flex; align-items: center; text-decoration: none">
+<img src="img/cf4f14e5b2e161eced326c4ebe8644fd.webp" alt="Nectar of Armenia" class="logo3d" style="height: 72px; width: auto; display: block">
+</a>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-left: auto">
+<div role="group" aria-label="Language" class="pill-group" style="display: flex; gap: 2px; background: #0E2E25; border-radius: 999px; padding: 3px">
+<sc-for list="{{langs}}" as="l" hint-placeholder-count="4">
+<sc-if value="{{l.selected}}" hint-placeholder-val="{{false}}"><button type="button" aria-pressed="true" onClick="{{l.pick}}" class="btn-gold" style="min-height: 38px; min-width: 44px; padding: 0 10px; border-radius: 999px; border: none; background: #EBA93A; color: #133B30; font-family: inherit; font-weight: 800; font-size: 16px; cursor: pointer">{{l.label}}</button></sc-if>
+<sc-if value="{{l.unselected}}" hint-placeholder-val="{{true}}"><button type="button" aria-pressed="false" onClick="{{l.pick}}" style="min-height: 38px; min-width: 44px; padding: 0 10px; border-radius: 999px; border: none; background: transparent; color: #D9E6DF; font-family: inherit; font-weight: 700; font-size: 16px; cursor: pointer">{{l.label}}</button></sc-if>
+</sc-for>
+</div>
+<a href="Cart.dc.html" class="hdr-back" style="color: #D9E6DF; font-weight: 700; font-size: 16px; text-decoration: none; padding: 0 6px">{{t.back}}</a>
+<a href="Cart.dc.html" aria-label="{{t.cart}}" class="btn-gold" style="position: relative; width: 48px; height: 48px; border-radius: 999px; background: #EBA93A; color: #133B30; display: inline-flex; align-items: center; justify-content: center; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11h10.2L20 8H6.2"></path><circle cx="9.5" cy="19.5" r="1.4"></circle><circle cx="16.5" cy="19.5" r="1.4"></circle></svg><sc-if value="{{hasCount}}" hint-placeholder-val="{{true}}"><span style="position: absolute; top: -4px; right: -4px; min-width: 22px; height: 22px; border-radius: 999px; background: #1D5545; color: #F6E3B4; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid #F6C35A; box-sizing: border-box">{{count}}</span></sc-if></a>
+</div>
+</div>
+</header><div aria-hidden="true" style="background: #133B30; line-height: 0"><svg viewBox="0 0 1440 60" preserveAspectRatio="none" style="display: block; width: 100%; height: 46px"><path d="M0,0 L1440,0 L1440,22 C1200,52 960,58 720,34 C480,10 240,14 0,40 Z" fill="#1D5545"></path></svg></div>
+<section style="position: relative; overflow: clip">
+<svg viewBox="0 0 405.5 404" aria-hidden="true" class="areva" style="position: absolute; right: -60px; top: 30px; width: min(340px, 60vw); height: auto; opacity: 0.55; pointer-events: none"><path fill="#E4DAC3" d="M382,187.1c-0.7-1.6-0.9-3.9-0.5-5.6c2.6-12.7,3.4-25.5,0.9-38.2c-7.6-38.5-29.6-65-66.5-78.9c-1.7-0.7-3.6-1.8-4.7-3.3 C282.1,19.2,232.9,5,185.7,24.9c-2.3,1-5.1,1.1-7.7,1c-10.9-0.1-22-2-32.7-0.5c-38,5.3-64.4,26.6-79.6,61.7c-1.7,3.8-3.7,6.7-7.2,9 C17.1,123.7,2,175.4,21.8,221.1c1.1,2.6,1.2,5.8,1,8.6c-0.6,6.9-1.7,13.8-2.6,20.7c0.2,0,0.3,0,0.5,0.1c0.2,4.2,0,8.4,0.6,12.5 c6.7,40.3,28.9,68.1,67.2,82.8c2.2,0.8,4.4,2.4,5.7,4.3c28.6,40,77.8,54.1,123.1,35.3c2.8-1.2,6.5-1.3,9.5-0.8 c11.6,2.2,23.2,3.1,34.7,1.1c39.4-6.9,66.6-29,81.1-66.6c0.8-2.1,2.6-4.3,4.5-5.6C388.6,284.6,402.7,233.3,382,187.1z M319.4,83.4 c37.4,18.1,50.7,58.4,47,79.6c-24.1-25.2-53.1-37-87.7-32.9c-34.7,4.1-59.9,22.8-77.4,52.7c-8.2-15.5-5.8-51.4,14.6-76.6 C240.7,75.9,284.1,66.3,319.4,83.4z M207.7,33.9c34.4-8.3,69.2,9.5,79.3,24.9c-35-0.1-63.7,12.7-84.5,40.6 c-20.8,27.8-25,59-15.2,92.4c-19.5-7.5-49.2-37.6-45.7-81.9C144.5,75.2,168.5,43.4,207.7,33.9z M81.8,87.7 C98,54.3,132.9,38.6,161,40.5c-26,24.7-37.9,54.1-33.6,88.7c4.3,34.5,23,59.9,53.3,77.1c-18.3,8.3-54.1,4.7-77.6-16.2 C72.9,163.3,64.6,123,81.8,87.7z M58.1,117c-4.2,67.8,58.4,123.5,128,105.2c-5.2,16.8-34.3,41.2-66.1,43.3 c-45.7,3.1-83.5-28-91.2-71.4C23.9,166.6,39.9,123.6,58.1,117z M78.9,325c-32.5-17.5-46.6-55.1-42.5-80.2 c23.8,26.3,52.7,38.8,87.4,35.4c34.4-3.4,60.2-21.3,78.2-50.9c8.2,19.3,3.5,56-19,79.3C154.7,338,114.7,344.3,78.9,325z M206.7,373 c-36.5,13.7-74.4-0.7-91.8-22c35.6,0.9,64.4-11.5,85.9-38.9c21.5-27.4,25.8-58.6,17-92.1c16,5,40,31.2,43.4,62.9 C265.4,322.9,242.9,359.4,206.7,373z M323.3,323.8c-17.6,36.1-56.6,50.4-81.8,46.8c26.7-23.7,39.1-52.7,35.9-87.2 c-3.2-34.5-21-60.6-50.9-78.7c16.2-7.7,51.1-4.1,74.7,16C331.9,246.7,340.5,288.4,323.3,323.8z M348.5,291.5 c0.2-35.1-12-64.3-39.8-85.5c-27.8-21.2-59.1-25.4-92.9-16c11.8-25.2,41.4-45.3,74.8-44.8c38.9,0.6,69.5,25.2,80.8,60.2 C382.3,239,368.1,275.1,348.5,291.5z"></path></svg>
+<div style="max-width: 1240px; margin: 0 auto; padding: 40px 24px 80px; position: relative; z-index: 1; display: flex; flex-direction: column; gap: 26px">
+<sc-if value="{{notDone}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #7A5A12; font-weight: 800">{{t.kick}}</span>
+<h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 44px; color: #1D5545">{{t.h1}}</h1>
+<p style="margin: 0; font-size: 15px; color: #4A564F">{{t.have}} <a href="Account.dc.html" style="font-weight: 800">{{t.signin}}</a></p>
+</div>
+<div class="two-col" style="display: flex; gap: 28px; align-items: flex-start">
+<form onSubmit="{{place}}" style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 18px">
+<div class="card3d" style="border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: center; gap: 12px"><span class="btn-gold" style="width: 36px; height: 36px; border-radius: 50%; color: #133B30; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: 0 0 auto">1</span><h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 24px; color: #1D5545">{{t.s1}}</h2></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px"><label class="lbl" style="">{{t.name}}<input class="fld" type="text" autocomplete="name"></label><label class="lbl" style="">{{t.email}}<input class="fld" type="email" autocomplete="email"></label><label class="lbl" style="">{{t.phone}}<input class="fld" type="tel" autocomplete="tel"></label></div>
+<label style="display: flex; align-items: center; gap: 10px; font-size: 15px; color: #33403A"><input type="checkbox" checked style="width: 20px; height: 20px; accent-color: #1D5545">{{t.save}}</label>
+</div>
+<div class="card3d" style="border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: center; gap: 12px"><span class="btn-gold" style="width: 36px; height: 36px; border-radius: 50%; color: #133B30; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: 0 0 auto">2</span><h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 24px; color: #1D5545">{{t.s2}}</h2></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px"><label class="lbl" style="grid-column: 1 / -1">{{t.street}}<input class="fld" type="text" autocomplete="street-address"></label><label class="lbl" style="">{{t.apt}}<input class="fld" type="text" autocomplete="address-line2"></label><label class="lbl" style="">{{t.city}}<input class="fld" type="text" autocomplete="address-level2"></label><label class="lbl" style="">{{t.zip}}<input class="fld" type="text" autocomplete="postal-code"></label></div>
+<label class="lbl">{{t.notes}}<textarea class="fld" rows="2" style="padding: 12px 14px; min-height: 70px; resize: vertical"></textarea></label>
+</div>
+<div class="card3d" style="border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; gap: 12px"><span class="btn-gold" style="width: 36px; height: 36px; border-radius: 50%; color: #133B30; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: 0 0 auto">3</span><h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 24px; color: #1D5545">{{t.s3}}</h2></div>
+<div style="display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 6px; scrollbar-width: thin">
+<sc-for list="{{days}}" as="d" hint-placeholder-count="5">
+<button type="button" onClick="{{d.pick}}" class="daybtn {{d.cls}}"><span style="font-size: 13px; font-weight: 700; opacity: .8">{{d.wd}}</span><span style="font-size: 22px; font-weight: 800">{{d.dd}}</span><span style="font-size: 13px; font-weight: 700">{{d.mm}}</span></button>
+</sc-for>
+</div>
+<p style="margin: 0; font-size: 14px; color: #5E6A63">❄ {{t.dayNote}}</p>
+</div>
+<div class="card3d" style="border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; gap: 12px"><span class="btn-gold" style="width: 36px; height: 36px; border-radius: 50%; color: #133B30; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: 0 0 auto">4</span><h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 24px; color: #1D5545">{{t.s4}}</h2></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px">
+<button type="button" onClick="{{pickApple}}" aria-pressed="{{appleAria}}" class="paybtn pm {{appleCls}}" style="background: #000; color: #fff"><svg width="18" height="20" viewBox="0 0 17 20" fill="currentColor" aria-hidden="true"><path d="M14.1 10.6c0-2.5 2-3.7 2.1-3.8-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.8-1.7 0-3.3 1-4.1 2.5-1.8 3.1-.5 7.6 1.3 10.1.8 1.2 1.8 2.6 3.1 2.5 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8-.1 0-2.6-1-2.5-4.2zM11.7 3.2c.7-.8 1.1-1.9 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.2-.6 2.9-1.3z"/></svg> Pay</button>
+<button type="button" onClick="{{pickGoogle}}" aria-pressed="{{googleAria}}" class="paybtn pm {{googleCls}}" style="background: #fff; color: #3C4043; border: 1.5px solid #D8CDB4"><svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg> Pay</button>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; color: #8A8F88; font-size: 14px"><span style="flex: 1; height: 1px; background: #E4DCC8"></span>{{t.orPay}}<span style="flex: 1; height: 1px; background: #E4DCC8"></span></div>
+<button type="button" onClick="{{pickCard}}" class="opt {{cardCls}}"><span class="dot"></span>💳 {{t.card}}</button>
+<sc-if value="{{isCard}}" hint-placeholder-val="{{true}}">
+<div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px" class="card-grid">
+<label class="lbl" style="grid-column: 1 / -1">{{t.cardNo}}<input class="fld" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456"></label>
+<label class="lbl" style="grid-column: span 2">{{t.exp}}<input class="fld" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY"></label>
+<label class="lbl">{{t.cvc}}<input class="fld" inputmode="numeric" autocomplete="cc-csc" placeholder="123"></label>
+</div>
+</sc-if>
+<sc-if value="{{isWallet}}" hint-placeholder-val="{{false}}"><p style="margin: 0; padding: 12px 14px; border-radius: 12px; background: #F3EBD7; font-size: 14px; color: #33403A">✓ {{walletNote}}</p></sc-if>
+<p style="margin: 0; font-size: 13px; color: #6B756F">🔒 {{t.secure}}</p>
+</div>
+<button type="submit" class="btn-gold" style="min-height: 58px; border-radius: 999px; border: none; color: #133B30; font-family: inherit; font-weight: 800; font-size: 18px; cursor: pointer">{{placeLabel}} · {{total}}</button>
+</form>
+<aside class="card3d sum-card" style="flex: 0 0 360px; max-width: 100%; box-sizing: border-box; border-radius: 26px; padding: 24px; display: flex; flex-direction: column; gap: 12px; position: sticky; top: 130px">
+<h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 24px; color: #1D5545">{{t.sum}}</h2>
+<sc-for list="{{lines}}" as="ln" hint-placeholder-count="3">
+<div style="display: flex; justify-content: space-between; gap: 10px; font-size: 15px"><span>{{ln.name}} × {{ln.qty}}</span><strong>{{ln.line}}</strong></div>
+</sc-for>
+<div style="height: 1px; background: #E4DCC8"></div>
+<div style="display: flex; justify-content: space-between; font-size: 15px"><span>{{t.subtotal}}</span><strong>{{total}}</strong></div>
+<div style="display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: #5E6A63"><span>{{t.delivery}}</span><span style="text-align: right">{{t.deliveryV}}</span></div>
+<div style="display: flex; justify-content: space-between; font-size: 14px; color: #5E6A63"><span>{{t.s3}}</span><strong style="color: #1D5545">{{dayLabel}}</strong></div>
+<div style="height: 1px; background: #E4DCC8"></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-weight: 800; font-size: 18px">{{t.total}}</span><span style="font-family: Fraunces, Lora, serif; font-weight: 700; font-size: 28px; color: #1D5545">{{total}}</span></div>
+</aside>
+</div>
+</sc-if>
+<sc-if value="{{sheet}}" hint-placeholder-val="{{false}}">
+<div role="dialog" aria-modal="true" style="position: fixed; inset: 0; z-index: 90; background: rgba(10,25,20,.55); display: flex; align-items: flex-end; justify-content: center; padding: 16px">
+<div style="width: min(440px, 100%); background: #FFFFFF; border-radius: 26px; padding: 22px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 24px 60px rgba(0,0,0,.4); animation: softIn .3s ease">
+<div style="display: flex; align-items: center; justify-content: space-between"><strong style="font-size: 20px; display: flex; align-items: center; gap: 8px">{{walletName}}</strong><button type="button" onClick="{{closeSheet}}" style="border: none; background: none; color: #1D5545; font-family: inherit; font-weight: 800; font-size: 15px; cursor: pointer">{{t.cancel}}</button></div>
+<div style="display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid #EEE; border-bottom: 1px solid #EEE; font-size: 16px"><span>Nectar of Armenia</span><strong>{{total}}</strong></div>
+<p style="margin: 0; font-size: 13px; color: #6B756F">{{t.sheetP}}</p>
+<button type="button" onClick="{{confirmWallet}}" style="min-height: 54px; border-radius: 14px; border: none; background: #000; color: #fff; font-family: inherit; font-weight: 800; font-size: 17px; cursor: pointer">{{t.confirm}}</button>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{done}}" hint-placeholder-val="{{false}}">
+<div class="card3d" style="max-width: 760px; margin: 20px auto 0; border-radius: 28px; padding: 40px 28px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center">
+<span class="btn-green" style="width: 72px; height: 72px; border-radius: 50%; color: #F6E3B4; display: flex; align-items: center; justify-content: center; font-size: 36px">✓</span>
+<h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 36px; color: #1D5545">{{t.okH}}</h1>
+<p style="margin: 0; font-size: 17px; color: #4A564F; max-width: 520px">{{t.okP}}</p>
+<div style="display: flex; gap: 28px; flex-wrap: wrap; justify-content: center; font-size: 15px"><span>{{t.okNo}}: <strong style="color: #1D5545">NOA-10482</strong></span><span>{{t.okDay}}: <strong style="color: #1D5545">{{dayLabel}}</strong></span></div>
+<ol style="list-style: none; margin: 8px 0 0; padding: 0; display: flex; width: 100%; max-width: 560px">
+<sc-for list="{{timeline}}" as="tl" hint-placeholder-count="4">
+<li style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative"><span style="width: 22px; height: 22px; border-radius: 50%; border: 3px solid {{tl.c}}; background: {{tl.bg}}; box-sizing: border-box; z-index: 1"></span><span style="font-size: 13px; font-weight: 700; color: {{tl.tc}}">{{tl.label}}</span></li>
+</sc-for>
+</ol>
+<div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 6px">
+<a href="Account.dc.html" class="btn-gold" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 26px; border-radius: 999px; color: #133B30; font-weight: 800; text-decoration: none">{{t.okTrack}}</a>
+<a href="Main.dc.html" class="btn-green" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 26px; border-radius: 999px; color: #F7F3EA; font-weight: 800; text-decoration: none">{{t.okHome}}</a>
+</div>
+</div>
+</sc-if>
+</div>
+</section>
+<footer style="background: #133B30; color: #CFE2D9; padding: 28px 24px; text-align: center; font-size: 14px">© 2026 Nectar of Armenia, Inc. · (515) 588-5555 · nectarofarmenia@gmail.com</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+componentDidMount() {
+var self = this; this._last = null;
+this._sync = function () {
+var c = null, l = null;
+try { c = window.localStorage.getItem("noa-cart-v2"); l = window.localStorage.getItem("noa-lang"); } catch (e) { return; }
+var key = c + "|" + l;
+if (self._last === null) { self._last = key; return; }
+if (key === self._last) { return; }
+self._last = key;
+var arr = null; try { arr = JSON.parse(c); } catch (e) { arr = null; }
+var patch = {};
+if (Array.isArray(arr) && arr.length === 11) { patch.q = arr; }
+if (["hy", "en", "ru", "es"].indexOf(l) >= 0) { patch.lang = l; }
+self.setState(patch);
+};
+this._iv = setInterval(this._sync, 700);
+window.addEventListener("storage", this._sync);
+window.addEventListener("focus", this._sync);
+this._sync();
+}
+componentWillUnmount() {
+clearInterval(this._iv);
+window.removeEventListener("storage", this._sync);
+window.removeEventListener("focus", this._sync);
+}
+
+renderVals() {
+var L = {"hy": {"back": "← Վերադառնալ զամբյուղ", "cart": "Զամբյուղ", "kick": "Վճարում", "h1": "Պատվերի ձևակերպում", "s1": "Կոնտակտ", "s2": "Առաքման հասցե", "s3": "Առաքման օր", "s4": "Վճարման եղանակ", "name": "Անուն ազգանուն", "email": "Էլ. փոստ", "phone": "Հեռախոս", "street": "Հասցե", "apt": "Բնակարան / մուտք (ըստ ցանկության)", "city": "Քաղաք", "zip": "ZIP կոդ", "notes": "Նշումներ առաքողի համար", "dayNote": "Ամենավաղ առաքումը՝ պատվերից 48 ժամ հետո։", "card": "Բանկային քարտ", "cardNo": "Քարտի համար", "exp": "Ժամկետ (MM/YY)", "cvc": "CVC", "orPay": "կամ վճարեք քարտով", "sum": "Ձեր պատվերը", "subtotal": "Ենթագումար", "delivery": "Առաքում", "deliveryV": "Հաշվարկվում է ըստ ZIP կոդի", "total": "Ընդամենը", "place": "Հաստատել և վճարել", "secure": "Վճարումը պաշտպանված է։ Քարտի տվյալները մեզ մոտ չեն պահվում։", "save": "Ստեղծել հաշիվ՝ պատվերներին հետևելու համար", "have": "Արդեն ունե՞ք հաշիվ։", "signin": "Մուտք", "okH": "Շնորհակալություն, պատվերն ընդունված է", "okP": "Հաստատումը ուղարկեցինք ձեր էլ. փոստին։ Պատվերի ընթացքին կարող եք հետևել ձեր անձնական էջում։", "okNo": "Պատվերի համար", "okDay": "Առաքման օր", "okTrack": "Դիտել պատվերը", "okHome": "Գլխավոր էջ", "tl": ["Ընդունված", "Պատրաստվում է", "Ճանապարհին", "Առաքված"], "items": "ապրանք", "cancel": "Չեղարկել", "confirm": "Հաստատել վճարումը", "sheetP": "Իրական կայքում այստեղ կբացվի Apple Pay / Google Pay պատուհանը՝ ձեր պահված քարտով և Face ID-ով կամ մատնահետքով։", "walletSel": "Ընտրված է՝", "walletTail": ". Սեղմեք ներքևի կոճակը վճարելու համար։", "payWith": "Վճարել", "pn": ["Գաթա", "Խաշ", "Խաշի արգանակ", "Խաշի հավաքածու", "Խինկալի", "Պելմենի", "Բլինչիկ", "Միջուկով քուֆթա", "Կիևյան կոտլետ", "Հավի կոտլետ", "Տավարի կոտլետ"]}, "en": {"back": "← Back to cart", "cart": "Cart", "kick": "Checkout", "h1": "Complete your order", "s1": "Contact", "s2": "Delivery address", "s3": "Delivery day", "s4": "Payment method", "name": "Full name", "email": "Email", "phone": "Phone", "street": "Street address", "apt": "Apt / suite (optional)", "city": "City", "zip": "ZIP code", "notes": "Notes for the driver", "dayNote": "Earliest delivery is 48 hours after you order.", "card": "Credit or debit card", "cardNo": "Card number", "exp": "Expiry (MM/YY)", "cvc": "CVC", "orPay": "or pay by card", "sum": "Your order", "subtotal": "Subtotal", "delivery": "Delivery", "deliveryV": "Calculated by ZIP code", "total": "Total", "place": "Place order and pay", "secure": "Payment is protected. We never store your card details.", "save": "Create an account to track your orders", "have": "Already have an account?", "signin": "Sign in", "okH": "Thank you — your order is in", "okP": "We sent a confirmation to your email. You can follow your order in your account.", "okNo": "Order number", "okDay": "Delivery day", "okTrack": "View order", "okHome": "Home", "tl": ["Received", "Being prepared", "On the way", "Delivered"], "items": "items", "cancel": "Cancel", "confirm": "Confirm payment", "sheetP": "On the live site, the Apple Pay / Google Pay sheet opens here with your saved card and Face ID or fingerprint.", "walletSel": "Selected:", "walletTail": ". Tap the button below to pay.", "payWith": "Pay with", "pn": ["Gata", "Khash", "Khash Broth", "Khash Set", "Khinkali", "Pelmeni", "Blinchik", "Mijukov Kufta", "Chicken Kiev", "Chicken Cutlets", "Beef Cutlets"]}, "ru": {"back": "← Вернуться в корзину", "cart": "Корзина", "kick": "Оформление", "h1": "Оформление заказа", "s1": "Контакты", "s2": "Адрес доставки", "s3": "День доставки", "s4": "Способ оплаты", "name": "Имя и фамилия", "email": "Эл. почта", "phone": "Телефон", "street": "Адрес", "apt": "Квартира / подъезд (необязательно)", "city": "Город", "zip": "ZIP-код", "notes": "Комментарий для курьера", "dayNote": "Самая ранняя доставка — через 48 часов после заказа.", "card": "Банковская карта", "cardNo": "Номер карты", "exp": "Срок (MM/YY)", "cvc": "CVC", "orPay": "или оплатите картой", "sum": "Ваш заказ", "subtotal": "Подытог", "delivery": "Доставка", "deliveryV": "Рассчитывается по ZIP-коду", "total": "Итого", "place": "Подтвердить и оплатить", "secure": "Оплата защищена. Мы не храним данные вашей карты.", "save": "Создать аккаунт, чтобы следить за заказами", "have": "Уже есть аккаунт?", "signin": "Войти", "okH": "Спасибо, заказ принят", "okP": "Подтверждение отправлено на вашу почту. Следить за заказом можно в личном кабинете.", "okNo": "Номер заказа", "okDay": "День доставки", "okTrack": "Посмотреть заказ", "okHome": "На главную", "tl": ["Принят", "Готовится", "В пути", "Доставлен"], "items": "товаров", "cancel": "Отмена", "confirm": "Подтвердить оплату", "sheetP": "На настоящем сайте здесь откроется окно Apple Pay / Google Pay с вашей сохранённой картой и Face ID или отпечатком пальца.", "walletSel": "Выбрано:", "walletTail": ". Нажмите кнопку ниже, чтобы оплатить.", "payWith": "Оплатить через", "pn": ["Гата", "Хаш", "Бульон хаша", "Набор хаша", "Хинкали", "Пельмени", "Блинчики", "Кюфта с начинкой", "Котлета по-киевски", "Куриные котлеты", "Говяжьи котлеты"]}, "es": {"back": "← Volver al carrito", "cart": "Carrito", "kick": "Pago", "h1": "Finaliza tu pedido", "s1": "Contacto", "s2": "Dirección de entrega", "s3": "Día de entrega", "s4": "Método de pago", "name": "Nombre completo", "email": "Correo electrónico", "phone": "Teléfono", "street": "Dirección", "apt": "Depto. / interior (opcional)", "city": "Ciudad", "zip": "Código postal", "notes": "Notas para el repartidor", "dayNote": "La entrega más temprana es 48 horas después de tu pedido.", "card": "Tarjeta de crédito o débito", "cardNo": "Número de tarjeta", "exp": "Vencimiento (MM/AA)", "cvc": "CVC", "orPay": "o paga con tarjeta", "sum": "Tu pedido", "subtotal": "Subtotal", "delivery": "Envío", "deliveryV": "Se calcula por código postal", "total": "Total", "place": "Confirmar y pagar", "secure": "El pago está protegido. Nunca guardamos los datos de tu tarjeta.", "save": "Crear una cuenta para seguir tus pedidos", "have": "¿Ya tienes cuenta?", "signin": "Entrar", "okH": "Gracias, recibimos tu pedido", "okP": "Te enviamos una confirmación por correo. Puedes seguir tu pedido en tu cuenta.", "okNo": "Número de pedido", "okDay": "Día de entrega", "okTrack": "Ver pedido", "okHome": "Inicio", "tl": ["Recibido", "En preparación", "En camino", "Entregado"], "items": "productos", "cancel": "Cancelar", "confirm": "Confirmar pago", "sheetP": "En el sitio real, aquí se abre Apple Pay / Google Pay con tu tarjeta guardada y Face ID o huella.", "walletSel": "Seleccionado:", "walletTail": ". Toca el botón de abajo para pagar.", "payWith": "Pagar con", "pn": ["Gata", "Khash", "Caldo de khash", "Set de khash", "Khinkali", "Pelmeni", "Blinchik", "Kufta rellena", "Pollo a la Kiev", "Hamburguesas de pollo", "Hamburguesas de res"]}};
+var self = this;
+var savedLang = null; try { savedLang = window.localStorage.getItem("noa-lang"); } catch (e) { savedLang = null; }
+if (["hy", "en", "ru", "es"].indexOf(savedLang) < 0) { savedLang = null; }
+var lang = (this.state && this.state.lang) || savedLang || "hy";
+var t = L[lang] || L.hy;
+var langs = [{ id: "en", label: "EN" }, { id: "hy", label: "ՀԱՅ" }, { id: "ru", label: "РУ" }, { id: "es", label: "ES" }].map(function (x) {
+return Object.assign({}, x, { selected: x.id === lang, unselected: x.id !== lang, pick: function () { try { window.localStorage.setItem("noa-lang", x.id); } catch (e) {} self.setState({ lang: x.id }); } });
+});
+var PRICES = [0, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0];
+var stored = null; try { stored = JSON.parse(window.localStorage.getItem("noa-cart-v2") || "null"); } catch (e) { stored = null; }
+if (!Array.isArray(stored) || stored.length !== 11) { stored = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; }
+var saveOrder = function (q2, sum2, dayIso) { try { var it = []; q2.forEach(function (n, i) { if (n > 0) { it.push([i, n]); } }); if (it.length) { window.localStorage.setItem("noa-last-order", JSON.stringify({ no: "NOA-" + (10600 + Math.floor(Math.random() * 300)), items: it, total: "$" + sum2.toFixed(2), day: dayIso })); } } catch (e) {} };
+var saveCart = function (c) { try { window.localStorage.setItem("noa-cart-v2", JSON.stringify(c)); } catch (e) {} };
+var WD = { hy: ["Կիր", "Երկ", "Երք", "Չրք", "Հնգ", "Ուրբ", "Շբթ"], en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], ru: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], es: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"] };
+var MO = { hy: ["հունվ", "փետր", "մարտ", "ապր", "մայիս", "հունիս", "հուլիս", "օգոստ", "սեպտ", "հոկտ", "նոյեմբ", "դեկտ"], en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], ru: ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"], es: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"] };
+var sel = (this.state && typeof this.state.day === "number") ? this.state.day : 0;
+var start = new Date(Date.now() + 48 * 3600 * 1000);
+var days = [];
+for (var i = 0; i < 6; i++) {
+(function (i) {
+var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+days.push({ wd: (WD[lang] || WD.en)[d.getDay()], dd: d.getDate(), mm: (MO[lang] || MO.en)[d.getMonth()], cls: i === sel ? "on" : "", pick: function () { self.setState({ day: i }); } });
+})(i);
+}
+var selIso = new Date(start.getFullYear(), start.getMonth(), start.getDate() + sel).toISOString();
+var dayLabel = days[sel].wd + ", " + days[sel].dd + " " + days[sel].mm;
+var q = (this.state && this.state.q) || stored, sum = 0, cnt = 0, lines = [];
+q.forEach(function (n, i) { if (!n) { return; } sum += n * PRICES[i]; cnt += n; lines.push({ name: t.pn[i], qty: n, line: "$" + (n * PRICES[i]).toFixed(2) }); });
+var done = !!(this.state && this.state.done);
+var pm = (this.state && this.state.pm) || "card";
+var sheet = !!(this.state && this.state.sheet);
+var walletName = pm === "apple" ? "Apple Pay" : "Google Pay";
+var timeline = t.tl.map(function (label, i) { var on = i === 0; return { label: label, c: on ? "#1D5545" : "#D8CDB4", bg: on ? "#EBA93A" : "#FFFFFF", tc: on ? "#1D5545" : "#8A8F88" }; });
+return { pickApple: function () { self.setState({ pm: "apple", sheet: true }); }, pickGoogle: function () { self.setState({ pm: "google", sheet: true }); }, pickCard: function () { self.setState({ pm: "card" }); },
+appleCls: pm === "apple" ? "on" : "", googleCls: pm === "google" ? "on" : "", cardCls: pm === "card" ? "on" : "", appleAria: pm === "apple" ? "true" : "false", googleAria: pm === "google" ? "true" : "false",
+isCard: pm === "card", isWallet: pm !== "card", walletNote: t.walletSel + " " + walletName + t.walletTail, walletName: walletName, sheet: sheet && !done,
+placeLabel: pm === "card" ? t.place : t.payWith + " " + walletName,
+closeSheet: function () { self.setState({ sheet: false }); },
+confirmWallet: function () { saveOrder(q, sum, selIso); saveCart([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); self.setState({ sheet: false, done: true, q: q }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (x) {} },
+t: t, langs: langs, days: days, dayLabel: dayLabel, lines: lines, total: "$" + sum.toFixed(2), count: cnt, hasCount: cnt > 0, done: done, notDone: !done, timeline: timeline,
+place: function (e) { if (e && e.preventDefault) { e.preventDefault(); } if (pm !== "card") { self.setState({ sheet: true }); return; } saveOrder(q, sum, selIso); saveCart([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); self.setState({ done: true, q: q }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (x) {} } };
+}
+}
+</script>
+</body>
+</html>

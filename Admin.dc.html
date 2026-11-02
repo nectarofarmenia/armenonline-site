@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="hy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Nectar of Armenia — Admin</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Coustard:wght@900&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Lora:wght@600;700&family=Noto+Serif+Armenian:wght@600;700&family=Noto+Sans+Armenian:wght@400;500;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+html,body{background:#1D5545;overscroll-behavior-y:none}
+@keyframes arevaSpin{to{transform:rotate(360deg)}}
+.areva{animation:arevaSpin 60s linear infinite;transform-origin:50% 50%;transform-box:fill-box}
+@keyframes kTurn{0%{transform:perspective(700px) rotateY(-30deg) scale(.98);filter:brightness(.9)}50%{transform:perspective(700px) rotateY(30deg) scale(1.02);filter:brightness(1.12)}100%{transform:perspective(700px) rotateY(-30deg) scale(.98);filter:brightness(.9)}}
+.spin-k{animation:kTurn 7s ease-in-out infinite;transform-origin:50% 60%}
+.spin-k-rev{animation-direction:reverse}
+@media (prefers-reduced-motion:reduce){.spin-k{animation:none !important}}
+@media (prefers-reduced-motion:reduce){.areva{animation:none !important}}
+body{margin:0}
+a{color:#1D5545}a:hover{color:#133B30}
+input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
+@media (max-width:760px){.ws-hide{display:none !important}.logo3d{height:54px !important}.ws-h1{font-size:36px !important}}
+.raise-header{background:linear-gradient(180deg,#31775F 0%,#22604C 45%,#164536 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.25),inset 0 -3px 6px rgba(0,0,0,.35),0 2px 4px rgba(0,0,0,.25),0 10px 26px rgba(0,0,0,.38) !important}
+.logo3d{filter:drop-shadow(0 2px 0 rgba(0,0,0,.55)) drop-shadow(0 6px 10px rgba(0,0,0,.4))}
+.btn-gold{background:linear-gradient(180deg,#FCDB82 0%,#EDB040 50%,#D38A22 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.7),inset 0 -3px 0 rgba(120,70,0,.25),0 2px 3px rgba(0,0,0,.2),0 6px 14px rgba(0,0,0,.28)}
+.btn-green{background:linear-gradient(180deg,#34806A 0%,#1D5545 55%,#133B30 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.25),inset 0 -3px 0 rgba(0,0,0,.28),0 2px 3px rgba(0,0,0,.2),0 6px 14px rgba(19,59,48,.35)}
+.btn-ghost{box-shadow:inset 0 2px 0 rgba(255,255,255,.18),inset 0 -2px 4px rgba(0,0,0,.2),0 6px 14px rgba(0,0,0,.28)}
+.pill-group{box-shadow:inset 0 3px 7px rgba(0,0,0,.55),0 1px 0 rgba(255,255,255,.15)}
+.hero3d{background:radial-gradient(ellipse at 72% 45%,#357F69 0%,#1F5947 50%,#133B30 100%) !important;box-shadow:inset 0 12px 24px rgba(0,0,0,.18),inset 0 -20px 36px rgba(0,0,0,.25)}
+.card3d{background:linear-gradient(180deg,#FFFFFF 0%,#F8F3E8 100%) !important;box-shadow:inset 0 2px 0 #FFFFFF,inset 0 -2px 0 rgba(120,90,30,.06),0 3px 6px rgba(19,59,48,.08),0 18px 36px rgba(19,59,48,.16)}
+.card3d-dark{background:linear-gradient(180deg,#36806B 0%,#245F4D 60%,#1E5242 100%) !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.2),inset 0 -3px 6px rgba(0,0,0,.2),0 18px 36px rgba(0,0,0,.35)}
+.pw-wrap{position:relative;display:block}.pw-wrap .fld{padding-right:52px;width:100%;box-sizing:border-box}.pw-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:42px;height:42px;border:none;background:transparent;color:#1D5545;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}.pw-eye:hover{background:#F3EBD7}
+.fld{min-height:50px;border-radius:12px;border:1px solid #D8CDB4;background:#FBF9F4;padding:0 14px;font-size:16px;font-family:inherit;color:#1E2A24;width:100%;box-sizing:border-box}
+.fld:focus{outline:2px solid #EBA93A;outline-offset:1px;border-color:#EBA93A}
+.lbl{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#33403A}
+.qty{display:inline-flex;align-items:center;border:1.5px solid #D8CDB4;border-radius:999px;background:#FFFFFF;overflow:hidden}
+.qty button{width:40px;height:40px;border:none;background:transparent;font-size:20px;font-weight:800;color:#1D5545;cursor:pointer;font-family:inherit}
+.qty button:hover{background:#F3EBD7}
+.qty span{min-width:30px;text-align:center;font-weight:800;font-size:16px}
+.tab{flex:1 1 0;min-height:50px;border:none;border-radius:999px;font-family:inherit;font-weight:800;font-size:16px;cursor:pointer;background:transparent;color:#1D5545}
+.tab.on{background:linear-gradient(180deg,#34806A 0%,#1D5545 55%,#133B30 100%);color:#F6E3B4;box-shadow:inset 0 0 0 1.5px rgba(235,169,58,.85),0 4px 10px rgba(19,59,48,.25)}
+.opt{display:flex;align-items:center;gap:12px;min-height:58px;padding:0 16px;border-radius:16px;border:1.5px solid #E4DCC8;background:#FFFFFF;cursor:pointer;font-family:inherit;font-size:16px;font-weight:700;color:#1E2A24;text-align:left;width:100%}
+.opt.on{border-color:#EBA93A;box-shadow:0 0 0 3px rgba(235,169,58,.22);background:#FFFCF4}
+.dot{width:20px;height:20px;border-radius:50%;border:2px solid #C9BB98;flex:0 0 auto;box-sizing:border-box}
+.opt.on .dot{border:6px solid #1D5545}
+.pm.on{box-shadow:0 0 0 3px #EBA93A,0 6px 14px rgba(0,0,0,.18)}
+.daybtn{flex:0 0 auto;min-width:92px;padding:10px 12px;border-radius:16px;border:1.5px solid #E4DCC8;background:#FFFFFF;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;color:#1E2A24}
+.daybtn.on{border-color:#1D5545;background:#1D5545;color:#F6E3B4;box-shadow:inset 0 0 0 1.5px rgba(235,169,58,.85)}
+.paybtn{min-height:52px;border-radius:14px;border:none;font-family:inherit;font-weight:800;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.social{min-height:52px;border-radius:999px;border:1.5px solid #D8CDB4;background:#FFFFFF;font-family:inherit;font-weight:800;font-size:15px;color:#1E2A24;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;width:100%}
+.social:hover{border-color:#EBA93A}
+@media (max-width:760px){.two-col{flex-direction:column !important}.sum-card{position:static !important}.hdr-back{display:none !important}}
+.wa-nav{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border:none;border-radius:12px;background:transparent;font-family:inherit;font-weight:700;font-size:15px;color:#E4ECE6;cursor:pointer;text-align:left;width:100%}
+.wa-nav:hover{background:rgba(255,255,255,.08)}
+.wa-nav.on{background:rgba(235,169,58,.18);color:#F6C35A;box-shadow:inset 0 0 0 1.5px rgba(235,169,58,.85)}
+.ad-lang{min-height:36px;min-width:44px;padding:0 10px;border-radius:999px;border:none;background:transparent;color:#D9E6DF;font-family:inherit;font-weight:700;cursor:pointer}
+.ad-lang.on{background:linear-gradient(180deg,#FCDB82,#EDB040 50%,#D38A22);color:#133B30;font-weight:800}
+.ad-chip{min-height:38px;padding:0 14px;border-radius:999px;border:1.5px solid #D8CDB4;background:#FFFFFF;color:#1D5545;font-family:inherit;font-weight:700;cursor:pointer}
+.ad-chip.on{background:#1D5545;color:#F6E3B4;border-color:#1D5545}
+.ad-tag{display:inline-flex;align-items:center;white-space:nowrap;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;background:#EEE;color:#444}
+.ad-tag.r{background:#E8F1FB;color:#1D4E89}.ad-tag.w{background:#F3EBD7;color:#7A5A12}
+.ad-tag.paid{background:#E2F0E7;color:#2F7A55}.ad-tag.unpaid{background:#FDE7E4;color:#B03A2E}.ad-tag.inv{background:#FFF1D6;color:#9A6A00}
+.ad-tag.st0{background:#FDE7E4;color:#B03A2E}.ad-tag.st1{background:#E8F1FB;color:#1D4E89}.ad-tag.st2{background:#FFF1D6;color:#9A6A00}.ad-tag.st3{background:#EDE7FB;color:#5A3EA8}.ad-tag.st4{background:#E2F0E7;color:#2F7A55}
+.ad-tag.ok{background:#E2F0E7;color:#2F7A55}.ad-tag.low{background:#FFF1D6;color:#9A6A00}.ad-tag.out{background:#FDE7E4;color:#B03A2E}.ad-tag.pend{background:#FFF1D6;color:#9A6A00}.ad-tag.act{background:#E2F0E7;color:#2F7A55}
+.ad-num{width:64px;text-align:center;border:none;background:transparent;font-family:inherit;font-weight:800;font-size:15px;color:#1E2A24;-moz-appearance:textfield}
+.ad-order{border:1.5px solid #ECE3CF;border-radius:16px;background:#FFFFFF;overflow:hidden}
+.ad-orow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;width:100%;padding:12px 14px;border:none;background:transparent;font-family:inherit;font-size:14px;color:#1E2A24;cursor:pointer}
+.ad-orow:hover{background:#FBF7EE}
+.ad-btn{min-height:40px;padding:0 14px;border-radius:999px;border:none;font-family:inherit;font-weight:800;font-size:14px;cursor:pointer;color:#F6E3B4}
+.ad-btn-l{background:#FFFFFF;color:#1D5545;border:1.5px solid #D8CDB4}
+.ad-btn-l:hover{border-color:#EBA93A}
+.ad-kpi:hover{transform:translateY(-2px)}
+.ad-tpl{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;border:1.5px solid #E4DCC8;background:#FFFFFF;color:#1E2A24}
+.ad-tpl.on{border-color:#1D5545;background:#1D5545;color:#F6E3B4}
+.ad-switch{width:42px;height:24px;border-radius:999px;border:none;background:#CFC6B0;position:relative;cursor:pointer;flex:0 0 auto;padding:0}
+.ad-switch span{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s ease}
+.ad-switch.on{background:#2F9E6B}.ad-switch.on span{left:21px}
+</style>
+</helmet>
+<div style="font-family: Manrope, 'Noto Sans Armenian', system-ui, sans-serif; color: #1E2A24; background: #F7F3EA; width: 100%; min-height: 100vh; overflow-x: clip; position: relative">
+<header class="raise-header" style="background: #133B30; position: sticky; top: 0; z-index: 50">
+<div style="max-width: 1440px; margin: 0 auto; padding: 12px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px">
+<div style="display: flex; align-items: center; gap: 14px"><img src="img/cf4f14e5b2e161eced326c4ebe8644fd.webp" alt="Nectar of Armenia" class="logo3d" style="height: 58px; width: auto; display: block"><span style="font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #F6C35A; font-weight: 800; border-left: 1px solid #2E6A58; padding-left: 14px">{{t.title}}</span></div>
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+<div role="group" aria-label="Language" class="pill-group" style="display: flex; gap: 2px; background: #0E2E25; border-radius: 999px; padding: 3px">
+<sc-for list="{{langs}}" as="l" hint-placeholder-count="2"><button type="button" onClick="{{l.pick}}" class="ad-lang {{l.cls}}">{{l.label}}</button></sc-for>
+</div>
+<button type="button" onClick="{{toggleBell}}" aria-label="{{t.bell}}" class="btn-ghost" style="position: relative; width: 46px; height: 46px; border-radius: 999px; border: 1.5px solid #EBA93A; background: transparent; color: #F6E3B4; font-size: 20px; cursor: pointer">🔔<sc-if value="{{hasAlerts}}" hint-placeholder-val="{{true}}"><span style="position: absolute; top: -5px; right: -5px; min-width: 22px; height: 22px; border-radius: 999px; background: #C0392B; color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center">{{alertCount}}</span></sc-if></button>
+<a href="Main.dc.html" style="color: #D9E6DF; font-weight: 700; text-decoration: none">{{t.site}}</a>
+</div>
+</div>
+<sc-if value="{{bellOpen}}" hint-placeholder-val="{{false}}">
+<div style="position: absolute; right: 24px; top: calc(100% + 6px); width: min(360px, calc(100vw - 32px)); background: #FFFFFF; color: #1E2A24; border-radius: 18px; padding: 14px; box-shadow: 0 18px 40px rgba(0,0,0,.3); display: flex; flex-direction: column; gap: 8px; z-index: 60">
+<strong style="color: #1D5545">{{t.bell}}</strong>
+<sc-for list="{{alerts}}" as="al" hint-placeholder-count="3"><div style="display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; border-radius: 12px; background: #FFF4E5; font-size: 14px"><span>{{al.icon}}</span><span>{{al.text}}</span></div></sc-for>
+</div>
+</sc-if>
+</header>
+<div style="max-width: 1440px; margin: 0 auto; padding: 22px 24px 70px; display: flex; gap: 22px; align-items: flex-start" class="two-col">
+<aside class="card3d-dark sum-card" style="flex: 0 0 250px; max-width: 100%; box-sizing: border-box; border-radius: 22px; padding: 14px; display: flex; flex-direction: column; gap: 3px; position: sticky; top: 100px; color: #F7F3EA">
+<sc-for list="{{navs}}" as="nv" hint-placeholder-count="9"><button type="button" onClick="{{nv.pick}}" class="wa-nav {{nv.cls}}"><span>{{nv.icon}}</span><span style="flex: 1">{{nv.label}}</span><sc-if value="{{nv.hasBadge}}" hint-placeholder-val="{{false}}"><span style="min-width: 22px; height: 22px; border-radius: 999px; background: #EBA93A; color: #133B30; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; padding: 0 6px">{{nv.badge}}</span></sc-if></button></sc-for>
+</aside>
+<main style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+<sc-if value="{{tab0}}" hint-placeholder-val="{{true}}">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px">
+<sc-for list="{{kpis}}" as="kp" hint-placeholder-count="6"><button type="button" onClick="{{kp.go}}" class="card3d ad-kpi" style="border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 6px; text-align: left; border: none; cursor: pointer; font-family: inherit"><span style="font-size: 13px; color: #6B756F; font-weight: 700">{{kp.icon}} {{kp.label}}</span><strong style="font-family: Fraunces, Lora, serif; font-size: 30px; color: {{kp.color}}">{{kp.val}}</strong></button></sc-for>
+</div>
+<sc-if value="{{hasLow}}" hint-placeholder-val="{{true}}">
+<div style="border-radius: 20px; padding: 18px 20px; background: #FFF4E5; border: 1.5px solid #F2B05E; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px">
+<span style="font-size: 26px">⚠️</span>
+<div style="flex: 1 1 260px; min-width: 0"><strong style="color: #8A4B00">{{t.lowH}}</strong><div style="font-size: 14px; color: #6B4A1A">{{t.lowP}} {{lowNames}}</div></div>
+<button type="button" onClick="{{goStock}}" class="btn-gold" style="min-height: 44px; padding: 0 18px; border-radius: 999px; border: none; color: #133B30; font-family: inherit; font-weight: 800; cursor: pointer">{{t.goStock}}</button>
+</div>
+</sc-if>
+<div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545; font-size: 22px">{{t.recent}}</h2>
+<div style="overflow-x: auto"><table style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 640px"><thead><tr><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.order}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.customer}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.type}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.total}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.pay}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.st}}</th></tr></thead><tbody>
+<sc-for list="{{recent}}" as="o" hint-placeholder-count="5"><tr><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><strong>{{o.no}}</strong></td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle">{{o.cust}}</td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><span class="ad-tag {{o.typeCls}}">{{o.typeL}}</span></td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle">{{o.total}}</td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><span class="ad-tag {{o.payCls}}">{{o.payL}}</span></td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><span class="ad-tag st{{o.st}}">{{o.stL}}</span></td></tr></sc-for>
+</tbody></table></div>
+</div>
+</sc-if>
+
+<sc-if value="{{tab1}}" hint-placeholder-val="{{false}}">
+<div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">{{t.stockH}}</h1><p style="margin: 0; color: #5E6A63">{{t.stockP}}</p>
+<div style="overflow-x: auto"><table style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 640px"><thead><tr><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.prod}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.inStock}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.min}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.reserved}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.status}}</th></tr></thead><tbody>
+<sc-for list="{{stock}}" as="s" hint-placeholder-count="11"><tr><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><strong>{{s.name}}</strong></td>
+<td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><div class="qty"><button type="button" onClick="{{s.dec}}">−</button><input type="number" value="{{s.qty}}" onChange="{{s.set}}" class="ad-num"><button type="button" onClick="{{s.inc}}">+</button></div></td>
+<td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><input type="number" value="{{s.min}}" onChange="{{s.setMin}}" class="ad-num" style="border: 1px solid #D8CDB4; border-radius: 10px; height: 38px; background: #FBF9F4"></td>
+<td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle">{{s.res}} {{t.pcs}}</td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><span class="ad-tag {{s.cls}}">{{s.label}}</span></td></tr></sc-for>
+</tbody></table></div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: center; padding-top: 4px"><strong style="color: #1D5545">{{t.notifyBy}}:</strong>
+<label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #1D5545">{{t.byEmail}}</label>
+<label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #1D5545">{{t.bySms}}</label></div>
+</div>
+</sc-if>
+
+<sc-if value="{{tab2}}" hint-placeholder-val="{{false}}">
+<div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px"><h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">{{t.ordersH}}</h1><div style="display: flex; flex-wrap: wrap; gap: 8px"><sc-for list="{{typeChips}}" as="tc" hint-placeholder-count="3"><button type="button" onClick="{{tc.pick}}" class="ad-chip {{tc.cls}}">{{tc.label}}</button></sc-for></div></div>
+<sc-if value="{{hasCustFilter}}" hint-placeholder-val="{{false}}"><div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 14px; background: #F3EBD7"><span>{{t.filterBy}} <strong>{{custFilter}}</strong> · {{custCount}} {{t.custOrders}} · {{custTotal}}</span><button type="button" onClick="{{clearCust}}" style="margin-left: auto; border: none; background: none; color: #1D5545; font-family: inherit; font-weight: 800; cursor: pointer">{{t.showAll}} ✕</button></div></sc-if>
+<sc-for list="{{orderList}}" as="o" hint-placeholder-count="6">
+<div class="ad-order">
+<button type="button" onClick="{{o.toggle}}" class="ad-orow"><strong style="min-width: 100px">{{o.no}}</strong><span style="flex: 1 1 160px; text-align: left">{{o.cust}} <span style="color: #6B756F; font-size: 13px">· {{o.city}}</span></span><span class="ad-tag {{o.typeCls}}">{{o.typeL}}</span><span style="min-width: 80px; text-align: right; font-weight: 800">{{o.total}}</span><span class="ad-tag {{o.payCls}}">{{o.payL}}</span><span class="ad-tag st{{o.st}}">{{o.stL}}</span><span style="color: #7A5A12">{{o.chev}}</span></button>
+<sc-if value="{{o.open}}" hint-placeholder-val="{{false}}">
+<div style="padding: 4px 14px 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="font-size: 14px; color: #33403A"><strong>{{t.items}}:</strong> {{o.items}} · <strong>{{t.delDay}}:</strong> {{o.day}}</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+<sc-if value="{{o.canApprove}}" hint-placeholder-val="{{false}}"><button type="button" onClick="{{o.approve}}" class="btn-green ad-btn">✓ {{t.approve}}</button></sc-if>
+<sc-if value="{{o.canPay}}" hint-placeholder-val="{{false}}"><button type="button" onClick="{{o.markPaid}}" class="ad-btn ad-btn-l">💵 {{t.markPaid}}</button></sc-if>
+<button type="button" onClick="{{o.sendInv}}" class="ad-btn ad-btn-l">✉ {{o.invLabel}}</button>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700">{{t.driver}}<select class="fld" style="min-height: 40px; width: auto" onChange="{{o.setDriver}}"><sc-for list="{{o.drvOpts}}" as="d" hint-placeholder-count="4"><option value="{{d.v}}" selected="{{d.sel}}">{{d.label}}</option></sc-for></select></label>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{tab3}}" hint-placeholder-val="{{false}}">
+<div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px"><h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">{{t.custH}}</h1><div style="display: flex; flex-wrap: wrap; gap: 8px"><sc-for list="{{custChips}}" as="cc" hint-placeholder-count="3"><button type="button" onClick="{{cc.pick}}" class="ad-chip {{cc.cls}}">{{cc.label}}</button></sc-for></div></div>
+<div style="overflow-x: auto"><table style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 640px"><thead><tr><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.customer}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.type}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.city}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.orders}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.spent}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8"></th></tr></thead><tbody>
+<sc-for list="{{custList}}" as="c" hint-placeholder-count="6"><tr><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><strong>{{c.name}}</strong><br><span style="font-size: 12px; color: #6B756F">{{c.email}} · {{c.phone}}</span></td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><span class="ad-tag {{c.typeCls}}">{{c.typeL}}</span></td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle">{{c.city}}</td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle">{{c.n}}</td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><strong>{{c.total}}</strong></td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><button type="button" onClick="{{c.view}}" class="ad-btn ad-btn-l">{{t.view}} →</button></td></tr></sc-for>
+</tbody></table></div>
+</div>
+</sc-if>
+
+<sc-if value="{{tab4}}" hint-placeholder-val="{{false}}">
+<div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">{{t.wsH}}</h1><p style="margin: 0; color: #5E6A63">{{t.wsP}}</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px">
+<sc-for list="{{partners}}" as="w" hint-placeholder-count="4">
+<div style="border: 1.5px solid {{w.border}}; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px; background: {{w.bg}}">
+<div style="display: flex; justify-content: space-between; gap: 8px; align-items: flex-start"><strong style="font-size: 17px; color: #1D5545">🏪 {{w.name}}</strong><span class="ad-tag {{w.stCls}}">{{w.stL}}</span></div>
+<div style="font-size: 14px; color: #33403A; display: grid; grid-template-columns: auto 1fr; gap: 3px 10px"><span style="color: #6B756F">{{t.contact}}</span><span>{{w.contact}}</span><span style="color: #6B756F">📞</span><span>{{w.phone}}</span><span style="color: #6B756F">✉</span><span>{{w.email}}</span><span style="color: #6B756F">{{t.city}}</span><span>{{w.city}}</span><span style="color: #6B756F">{{t.permit}}</span><span>{{w.permit}}</span><span style="color: #6B756F">{{t.locs}}</span><span>{{w.locs}}</span><span style="color: #6B756F">{{t.team}}</span><span>{{w.team}}</span><span style="color: #6B756F">{{t.terms}}</span><span>{{w.terms}}</span><span style="color: #6B756F">{{t.spent}}</span><span><strong>{{w.spent}}</strong></span></div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px">
+<sc-if value="{{w.isPending}}" hint-placeholder-val="{{false}}"><button type="button" onClick="{{w.approve}}" class="btn-green ad-btn">✓ {{t.approveApp}}</button><button type="button" class="ad-btn ad-btn-l">{{t.reject}}</button></sc-if>
+<sc-if value="{{w.isActive}}" hint-placeholder-val="{{true}}"><button type="button" onClick="{{w.view}}" class="ad-btn ad-btn-l">{{t.view}} →</button><button type="button" class="ad-btn ad-btn-l">{{t.priceList}}</button></sc-if>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{tab5}}" hint-placeholder-val="{{false}}">
+<div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px"><div><h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">{{t.delH}}</h1><p style="margin: 4px 0 0; color: #5E6A63">{{t.delP}}</p></div><button type="button" onClick="{{sendApri}}" class="btn-gold" style="min-height: 48px; padding: 0 20px; border-radius: 999px; border: none; color: #133B30; font-family: inherit; font-weight: 800; cursor: pointer">{{apriLabel}}</button></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px">
+<sc-for list="{{drvSum}}" as="ds" hint-placeholder-count="4"><div style="border-radius: 16px; padding: 12px 14px; background: {{ds.bg}}; color: {{ds.fg}}"><strong>🚚 {{ds.name}}</strong><div style="font-size: 13px">{{ds.n}} {{t.stops}} · {{ds.cities}}</div></div></sc-for>
+</div>
+<sc-for list="{{byCity}}" as="bc" hint-placeholder-count="3">
+<div style="border-top: 1.5px solid #E4DCC8; padding-top: 12px; display: flex; flex-direction: column; gap: 8px">
+<strong style="color: #1D5545; font-size: 17px">📍 {{bc.city}} <span style="color: #6B756F; font-weight: 600; font-size: 14px">· {{bc.n}} {{t.stops}}</span></strong>
+<sc-for list="{{bc.orders}}" as="o" hint-placeholder-count="2">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-size: 14px; padding: 6px 0"><strong style="min-width: 96px">{{o.no}}</strong><span style="flex: 1 1 160px">{{o.cust}}</span><span class="ad-tag {{o.typeCls}}">{{o.typeL}}</span><span class="ad-tag st{{o.st}}">{{o.stL}}</span>
+<select class="fld" style="min-height: 38px; width: auto" onChange="{{o.setDriver}}"><sc-for list="{{o.drvOpts}}" as="d" hint-placeholder-count="4"><option value="{{d.v}}" selected="{{d.sel}}">{{d.label}}</option></sc-for></select></div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{tab6}}" hint-placeholder-val="{{false}}">
+<div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">{{t.mailH}}</h1><p style="margin: 0; color: #5E6A63">{{t.mailP}}</p>
+<div class="two-col" style="display: flex; gap: 18px; align-items: flex-start">
+<div style="flex: 0 0 280px; max-width: 100%; display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{tpls}}" as="tp" hint-placeholder-count="5"><div class="ad-tpl {{tp.cls}}"><button type="button" onClick="{{tp.pick}}" style="flex: 1; border: none; background: none; text-align: left; font-family: inherit; font-weight: 700; font-size: 15px; color: inherit; cursor: pointer; padding: 0">✉ {{tp.label}}</button><button type="button" onClick="{{tp.toggle}}" class="ad-switch {{tp.onCls}}" aria-label="{{t.auto}}"><span></span></button></div></sc-for>
+<span style="font-size: 12px; color: #6B756F">⟵ {{t.auto}}</span>
+</div>
+<div style="flex: 1 1 auto; min-width: 0; border: 1.5px solid #E4DCC8; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: #FFFFFF">
+<div style="font-size: 14px; display: grid; grid-template-columns: auto 1fr; gap: 6px 10px"><span style="color: #6B756F">{{t.from}}</span><strong>Nectar of Armenia &lt;nofaorder@gmail.com&gt;</strong><span style="color: #6B756F">{{t.to}}</span><span>{customer_email}</span><span style="color: #6B756F">{{t.subj}}</span><input class="fld" style="min-height: 40px" value="{{tplSubj}}"></div>
+<textarea class="fld" rows="9" style="padding: 12px 14px; min-height: 200px; resize: vertical; line-height: 1.5">{{tplBody}}</textarea>
+<div style="font-size: 13px; color: #5E6A63"><strong>{{t.fields}}:</strong> {customer_name} {order_no} {total} {delivery_date} {invoice_no} {due_date} {pay_link} {driver_name} {business_name}</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center"><button type="button" onClick="{{sendTest}}" class="btn-green ad-btn">{{testLabel}}</button><span style="font-size: 13px; color: #9A6A00">ℹ {{t.gmail}}</span></div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{tab7}}" hint-placeholder-val="{{false}}">
+<div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">{{t.prodH}}</h1><p style="margin: 0; color: #5E6A63">{{t.prodP}}</p>
+<div style="overflow-x: auto"><table style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 560px"><thead><tr><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.prod}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.need}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.min}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.inStock}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.toMake}}</th></tr></thead><tbody>
+<sc-for list="{{plan}}" as="p" hint-placeholder-count="11"><tr><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><strong>{{p.name}}</strong></td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle">{{p.need}}</td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle">{{p.min}}</td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle">{{p.qty}}</td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><span class="ad-tag {{p.cls}}">{{p.make}}</span></td></tr></sc-for>
+</tbody></table></div>
+</div>
+</sc-if>
+
+<sc-if value="{{tab8}}" hint-placeholder-val="{{false}}">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px">
+<div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px"><h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545; font-size: 22px">{{t.rev7}}</h2>
+<div style="display: flex; align-items: flex-end; gap: 10px; height: 200px; padding-top: 10px">
+<sc-for list="{{bars}}" as="b" hint-placeholder-count="7"><div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end"><span style="font-size: 11px; color: #5E6A63">{{b.v}}</span><div style="width: 100%; height: {{b.h}}; border-radius: 8px 8px 4px 4px; background: linear-gradient(180deg,#EBA93A,#D38A22)"></div><span style="font-size: 12px; font-weight: 700; color: #33403A">{{b.d}}</span></div></sc-for>
+</div></div>
+<div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px"><h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545; font-size: 22px">{{t.top}}</h2>
+<sc-for list="{{topP}}" as="tp" hint-placeholder-count="5"><div style="display: flex; flex-direction: column; gap: 4px"><div style="display: flex; justify-content: space-between; font-size: 14px"><span>{{tp.name}}</span><strong>{{tp.q}} {{t.pcs}}</strong></div><div style="height: 10px; border-radius: 999px; background: #F0E8D6"><div style="height: 100%; width: {{tp.w}}; border-radius: 999px; background: #1D5545"></div></div></div></sc-for>
+<div style="display: flex; justify-content: space-between; font-size: 14px; padding-top: 8px; border-top: 1px solid #ECE3CF"><span>{{t.split}}</span><strong>{{splitTxt}}</strong></div>
+<button type="button" class="ad-btn ad-btn-l" style="align-self: flex-start">⬇ {{t.export}}</button>
+</div>
+</div>
+</sc-if>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+renderVals() {
+var L = {"hy": {"title": "Ադմին", "site": "← Կայք", "nav": ["Ամփոփում", "Պահեստ", "Պատվերներ", "Հաճախորդներ", "Մեծածախ գործընկերներ", "Առաքումներ", "Նամակներ", "Արտադրության պլան", "Հաշվետվություններ"], "k": ["Այսօրվա պատվերներ", "Այսօրվա եկամուտ", "Սպասում են հաստատման", "Չվճարված", "Այսօրվա առաքումներ", "Քիչ մնացորդ"], "lowH": "Ուշադրություն՝ քիչ մնացորդ", "lowP": "Այս ապրանքները հասել են նվազագույն քանակին։", "goStock": "Բացել պահեստը", "recent": "Վերջին պատվերներ", "all": "Բոլորը", "retail": "Մանրածախ", "ws": "Մեծածախ", "stockH": "Պահեստ", "stockP": "Թարմացրեք մնացորդը և նվազագույն քանակը։ Երբ մնացորդը իջնի նվազագույնից, կստանաք ծանուցում։", "prod": "Ապրանք", "inStock": "Մնացորդ", "min": "Նվազագույն", "reserved": "Պատվիրված", "status": "Վիճակ", "ok": "Բավարար", "low": "Քիչ է", "out": "Վերջացել է", "notifyBy": "Ծանուցել ինձ", "byEmail": "Email-ով (nectarofarmenia@gmail.com)", "bySms": "SMS-ով (515) 588-5555", "ordersH": "Պատվերներ", "order": "Պատվեր", "customer": "Հաճախորդ", "type": "Տեսակ", "city": "Քաղաք", "total": "Գումար", "pay": "Վճարում", "st": "Կարգավիճակ", "paid": "Վճարված", "unpaid": "Չվճարված", "invoice": "Ինվոյս ուղարկված", "sts": ["Նոր", "Հաստատված", "Պատրաստվում է", "Ճանապարհին", "Առաքված"], "approve": "Հաստատել", "markPaid": "Նշել վճարված", "sendInv": "Ուղարկել ինվոյս", "sent": "✓ Ուղարկվեց", "driver": "Վարորդ", "none": "— Ընտրել —", "delDay": "Առաքման օր", "items": "Ապրանքներ", "showAll": "Ցույց տալ բոլորը", "filterBy": "Ֆիլտր՝", "custOrders": "պատվերներ", "custH": "Հաճախորդներ", "orders": "Պատվերներ", "spent": "Ընդհանուր", "last": "Վերջին պատվեր", "view": "Դիտել պատվերները", "wsH": "Մեծածախ գործընկերներ", "wsP": "Բոլոր մեծածախ հաճախորդները և նոր դիմումները։", "contact": "Կոնտակտ", "permit": "Seller's permit", "locs": "Մասնաճյուղեր", "team": "Թիմ", "terms": "Վճարման պայման", "pending": "Սպասում է", "active": "Ակտիվ", "approveApp": "Հաստատել դիմումը", "priceList": "Գնացուցակ", "reject": "Մերժել", "delH": "Առաքումներ և վարորդներ", "delP": "Բաժանեք պատվերները վարորդներին՝ ըստ քաղաքների։", "sendApri": "Ուղարկել My Apri Work-ին", "sentApri": "✓ Ուղարկվեց վարորդներին", "stops": "կանգառ", "unassigned": "Չբաշխված", "mailH": "Ավտոմատ նամակներ", "mailP": "Նամակները կուղարկվեն nofaorder@gmail.com հասցեից՝ ձեր պատրաստած ձևանմուշով։", "tpl": ["Պատվերի հաստատում", "Ինվոյս", "Վճարման անդորրագիր", "Առաքման ծանուցում", "Մեծածախ հաշվի հաստատում"], "auto": "Ուղարկել ավտոմատ", "test": "Ուղարկել փորձնական", "from": "Ումից", "to": "Ում", "subj": "Թեմա", "fields": "Փոփոխականներ", "gmail": "Gmail-ը կմիացնենք կայքը հրապարակելիս։", "prodH": "Արտադրության պլան", "prodP": "Հաջորդ 3 օրվա պատվերներ + նվազագույն պաշար − մնացորդ = որքան պետք է պատրաստել։", "need": "Պատվերներ", "toMake": "Պատրաստել", "enough": "Բավարար է", "repH": "Հաշվետվություններ", "rev7": "Եկամուտ՝ վերջին 7 օր", "top": "Ամենավաճառվող ապրանքներ", "split": "Մանրածախ / Մեծածախ", "export": "Ներբեռնել Excel", "bell": "Ծանուցումներ", "pcs": "հատ", "pn": ["Գաթա", "Խաշ", "Խաշի արգանակ", "Խաշի հավաքածու", "Խինկալի", "Պելմենի", "Բլինչիկ", "Միջուկով քուֆթա", "Կիևյան կոտլետ", "Հավի կոտլետ", "Տավարի կոտլետ"], "tb": [["Ձեր պատվերը {order_no} ընդունված է", "Բարև {customer_name},\n\nՇնորհակալություն պատվերի համար։ Ձեր պատվերը {order_no} հաստատված է։\nԱռաքման օր՝ {delivery_date}\nԳումար՝ {total}\n\nNectar of Armenia\n(515) 588-5555"], ["Ինվոյս {invoice_no}՝ {business_name}", "Հարգելի {customer_name},\n\nԿցված է {invoice_no} ինվոյսը {total} գումարով։\nՎճարման ժամկետ՝ {due_date}\nՎճարել առցանց՝ {pay_link}\n\nNectar of Armenia"], ["Վճարումը ստացվել է՝ {order_no}", "Բարև {customer_name},\n\nՍտացել ենք ձեր {total} վճարումը {order_no} պատվերի համար։ Շնորհակալություն։\n\nNectar of Armenia"], ["Ձեր պատվերը ճանապարհին է", "Բարև {customer_name},\n\n{order_no} պատվերը այսօր կառաքի {driver_name}-ը։\nՄոտավոր ժամ՝ {eta}\n\nNectar of Armenia"], ["Բարի գալուստ, {business_name}", "Հարգելի {customer_name},\n\nՁեր մեծածախ հաշիվը հաստատված է։ Մուտք գործեք՝ տեսնելու ձեր գները և պատվիրելու։\n{login_link}\n\nNectar of Armenia"]]}, "en": {"title": "Admin", "site": "← Website", "nav": ["Overview", "Inventory", "Orders", "Customers", "Wholesale partners", "Deliveries", "Emails", "Production plan", "Reports"], "k": ["Orders today", "Revenue today", "Awaiting approval", "Unpaid", "Deliveries today", "Low stock"], "lowH": "Attention: low stock", "lowP": "These products have reached their minimum quantity.", "goStock": "Open inventory", "recent": "Recent orders", "all": "All", "retail": "Retail", "ws": "Wholesale", "stockH": "Inventory", "stockP": "Update stock and minimum levels. When stock drops to the minimum, you get a notification.", "prod": "Product", "inStock": "In stock", "min": "Minimum", "reserved": "Ordered", "status": "Status", "ok": "OK", "low": "Low", "out": "Out of stock", "notifyBy": "Notify me", "byEmail": "By email (nectarofarmenia@gmail.com)", "bySms": "By SMS (515) 588-5555", "ordersH": "Orders", "order": "Order", "customer": "Customer", "type": "Type", "city": "City", "total": "Total", "pay": "Payment", "st": "Status", "paid": "Paid", "unpaid": "Unpaid", "invoice": "Invoice sent", "sts": ["New", "Approved", "Preparing", "On the way", "Delivered"], "approve": "Approve", "markPaid": "Mark paid", "sendInv": "Send invoice", "sent": "✓ Sent", "driver": "Driver", "none": "— Choose —", "delDay": "Delivery day", "items": "Items", "showAll": "Show all", "filterBy": "Filter:", "custOrders": "orders", "custH": "Customers", "orders": "Orders", "spent": "Total spent", "last": "Last order", "view": "View orders", "wsH": "Wholesale partners", "wsP": "All wholesale customers and new applications.", "contact": "Contact", "permit": "Seller's permit", "locs": "Locations", "team": "Team", "terms": "Payment terms", "pending": "Pending", "active": "Active", "approveApp": "Approve application", "priceList": "Price list", "reject": "Reject", "delH": "Deliveries and drivers", "delP": "Assign orders to drivers by city.", "sendApri": "Send to My Apri Work", "sentApri": "✓ Sent to drivers", "stops": "stops", "unassigned": "Unassigned", "mailH": "Automatic emails", "mailP": "Emails are sent from nofaorder@gmail.com using your own templates.", "tpl": ["Order confirmation", "Invoice", "Payment receipt", "Delivery notice", "Wholesale account approved"], "auto": "Send automatically", "test": "Send test", "from": "From", "to": "To", "subj": "Subject", "fields": "Variables", "gmail": "We’ll connect Gmail when the site goes live.", "prodH": "Production plan", "prodP": "Orders for the next 3 days + minimum stock − current stock = how much to make.", "need": "Ordered", "toMake": "To make", "enough": "Enough", "repH": "Reports", "rev7": "Revenue, last 7 days", "top": "Best-selling products", "split": "Retail / Wholesale", "export": "Download Excel", "bell": "Notifications", "pcs": "pcs", "pn": ["Gata", "Khash", "Khash Broth", "Khash Set", "Khinkali", "Pelmeni", "Blinchik", "Mijukov Kufta", "Chicken Kiev", "Chicken Cutlets", "Beef Cutlets"], "tb": [["Your order {order_no} is confirmed", "Hello {customer_name},\n\nThank you for your order. Your order {order_no} is confirmed.\nDelivery day: {delivery_date}\nTotal: {total}\n\nNectar of Armenia\n(515) 588-5555"], ["Invoice {invoice_no} — {business_name}", "Dear {customer_name},\n\nAttached is invoice {invoice_no} for {total}.\nDue date: {due_date}\nPay online: {pay_link}\n\nNectar of Armenia"], ["Payment received — {order_no}", "Hello {customer_name},\n\nWe received your payment of {total} for order {order_no}. Thank you.\n\nNectar of Armenia"], ["Your order is on the way", "Hello {customer_name},\n\nOrder {order_no} will be delivered today by {driver_name}.\nEstimated time: {eta}\n\nNectar of Armenia"], ["Welcome, {business_name}", "Dear {customer_name},\n\nYour wholesale account is approved. Sign in to see your prices and place orders.\n{login_link}\n\nNectar of Armenia"]]}};
+var self = this; var st = this.state || {};
+var lang = st.lang || "hy"; var t = L[lang] || L.hy;
+var langs = [{ id: "hy", label: "ՀԱՅ" }, { id: "en", label: "EN" }].map(function (x) { return { label: x.label, cls: x.id === lang ? "on" : "", pick: function () { self.setState({ lang: x.id }); } }; });
+var money = function (v) { return "$" + v.toFixed(2); };
+var RP = [0, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0];
+var WP = [0, 15.00, 12.00, 45.00, 18.75, 18.75, 26.25, 26.25, 15.75, 0, 0];
+var stockQ = st.stock || [40, 120, 70, 25, 140, 160, 90, 110, 35, 0, 0];
+var mins = st.mins || [20, 50, 30, 10, 150, 60, 40, 50, 40, 20, 20];
+var DRV = ["Arsen", "Gor", "Narek"];
+var CUST = [["Ani Petrosyan", "R", "Glendale", "ani@example.com", "(818) 555-0142"], ["Karen Hakobyan", "R", "Pasadena", "karen@example.com", "(626) 555-0190"], ["Lusine Mkrtchyan", "R", "Burbank", "lusine@example.com", "(818) 555-0177"], ["Sona Grigoryan", "R", "Los Angeles", "sona@example.com", "(323) 555-0121"], ["Ararat Market", "W", "Glendale", "owner@araratmarket.com", "(818) 555-0101"], ["Tumanyan Deli", "W", "Burbank", "orders@tumanyandeli.com", "(818) 555-0133"], ["Sevan Catering", "W", "North Hollywood", "hello@sevancatering.com", "(747) 555-0188"]];
+var BASE = [["NOA-10512", 0, [[4, 2], [2, 1]], "paid", 0, -1, 2], ["NOA-W-2231", 4, [[1, 12], [4, 20], [8, 10]], "inv", 0, -1, 2], ["NOA-10511", 1, [[3, 1]], "paid", 1, 0, 2], ["NOA-W-2228", 5, [[5, 10], [6, 6], [7, 6]], "unpaid", 1, 1, 3], ["NOA-10509", 2, [[6, 1], [8, 2]], "paid", 2, 1, 2], ["NOA-10508", 3, [[1, 2], [4, 1]], "unpaid", 0, -1, 3], ["NOA-W-2225", 4, [[2, 6], [1, 12]], "paid", 3, 0, 2], ["NOA-10505", 0, [[5, 1]], "paid", 4, 2, -5], ["NOA-W-2219", 6, [[1, 24], [3, 2], [4, 30]], "paid", 4, 2, -3]];
+var ov = st.ov || {};
+var orders = BASE.map(function (b, i) {
+var o = ov[i] || {}; var c = CUST[b[1]]; var isW = c[1] === "W";
+var tot = 0; b[2].forEach(function (x) { tot += x[1] * (isW ? WP[x[0]] : RP[x[0]]); });
+return { i: i, no: b[0], ci: b[1], cust: c[0], city: c[2], isW: isW, items: b[2], total: tot, pay: o.pay || b[3], st: typeof o.st === "number" ? o.st : b[4], drv: typeof o.drv === "number" ? o.drv : b[5], dayOff: b[6], inv: !!o.inv };
+});
+var setO = function (i, patch) { var n = Object.assign({}, ov); n[i] = Object.assign({}, n[i] || {}, patch); self.setState({ ov: n }); };
+var now = new Date();
+var MO = lang === "hy" ? ["հունվ", "փետր", "մարտ", "ապր", "մայիս", "հունիս", "հուլիս", "օգոստ", "սեպտ", "հոկտ", "նոյեմբ", "դեկտ"] : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+var fdate = function (off) { var d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + off); return d.getDate() + " " + MO[d.getMonth()]; };
+var payL = { paid: t.paid, unpaid: t.unpaid, inv: t.invoice };
+var view = function (o) {
+var open = st.open === o.i;
+return { no: o.no, cust: o.cust, city: o.city, typeCls: o.isW ? "w" : "r", typeL: o.isW ? t.ws : t.retail, total: money(o.total), payCls: o.pay, payL: payL[o.pay], st: o.st, stL: t.sts[o.st],
+items: o.items.map(function (x) { return t.pn[x[0]] + " × " + x[1]; }).join(", "), day: fdate(o.dayOff), open: open, chev: open ? "▲" : "▼",
+toggle: function () { self.setState({ open: open ? -1 : o.i }); }, canApprove: o.st === 0, canPay: o.pay !== "paid",
+approve: function () { setO(o.i, { st: 1 }); }, markPaid: function () { setO(o.i, { pay: "paid" }); }, sendInv: function () { setO(o.i, { inv: true, pay: o.pay === "paid" ? "paid" : "inv" }); }, invLabel: o.inv ? t.sent : t.sendInv,
+drvOpts: [{ v: "-1", label: t.none, sel: o.drv < 0 }].concat(DRV.map(function (d, k) { return { v: String(k), label: d, sel: o.drv === k }; })),
+setDriver: function (e) { setO(o.i, { drv: +(e && e.target ? e.target.value : -1) }); } };
+};
+var reserved = stockQ.map(function () { return 0; });
+orders.forEach(function (o) { if (o.st < 4) { o.items.forEach(function (x) { reserved[x[0]] += x[1]; }); } });
+var stLevel = function (i) { return stockQ[i] <= 0 ? "out" : (stockQ[i] <= mins[i] ? "low" : "ok"); };
+var setStock = function (i, v) { var n = stockQ.slice(); n[i] = Math.max(0, v); self.setState({ stock: n }); };
+var stock = t.pn.map(function (nm, i) { var lv = stLevel(i); return { name: nm, qty: stockQ[i], min: mins[i], res: reserved[i], cls: lv, label: t[lv],
+inc: function () { setStock(i, stockQ[i] + 1); }, dec: function () { setStock(i, stockQ[i] - 1); }, set: function (e) { setStock(i, parseInt(e.target.value || "0", 10) || 0); },
+setMin: function (e) { var n = mins.slice(); n[i] = Math.max(0, parseInt(e.target.value || "0", 10) || 0); self.setState({ mins: n }); } }; });
+var lowIdx = []; t.pn.forEach(function (n, i) { if (stLevel(i) !== "ok") { lowIdx.push(i); } });
+var pendingApps = (st.approved || []).indexOf(6) >= 0 ? 0 : 1;
+var alerts = lowIdx.map(function (i) { return { icon: stockQ[i] <= 0 ? "⛔" : "⚠️", text: t.pn[i] + " — " + t.inStock + ": " + stockQ[i] + " (" + t.min + " " + mins[i] + ")" }; });
+if (pendingApps) { alerts.push({ icon: "🏪", text: "Sevan Catering — " + t.pending }); }
+var newCnt = orders.filter(function (o) { return o.st === 0; }).length;
+var unpaid = orders.filter(function (o) { return o.pay !== "paid"; });
+var todayOrders = orders.filter(function (o) { return o.dayOff >= 2 && o.i < 3; });
+var revToday = 0; todayOrders.forEach(function (o) { revToday += o.total; });
+var tab = st.tab || 0;
+var go = function (n, extra) { return function () { self.setState(Object.assign({ tab: n, bell: false }, extra || {})); }; };
+var unpaidSum = 0; unpaid.forEach(function (o) { unpaidSum += o.total; });
+var kpis = [["🧾", t.k[0], String(todayOrders.length), "#1D5545", 2], ["💵", t.k[1], money(revToday), "#1D5545", 8], ["⏳", t.k[2], String(newCnt + pendingApps), "#B03A2E", 2], ["💳", t.k[3], money(unpaidSum), "#9A6A00", 2], ["🚚", t.k[4], String(orders.filter(function (o) { return o.dayOff === 2; }).length), "#1D5545", 5], ["⚠️", t.k[5], String(lowIdx.length), lowIdx.length ? "#B03A2E" : "#2F7A55", 1]].map(function (k) { return { icon: k[0], label: k[1], val: k[2], color: k[3], go: go(k[4]) }; });
+var icons = ["📊", "📦", "🧾", "👥", "🏪", "🚚", "✉️", "🏭", "📈"];
+var badges = [0, lowIdx.length, newCnt, 0, pendingApps, orders.filter(function (o) { return o.drv < 0 && o.st < 4; }).length, 0, 0, 0];
+var navs = t.nav.map(function (lb, i) { return { label: lb, icon: icons[i], cls: i === tab ? "on" : "", hasBadge: badges[i] > 0, badge: badges[i], pick: go(i) }; });
+var tf = st.tf || "all";
+var typeChips = [["all", t.all], ["r", t.retail], ["w", t.ws]].map(function (x) { return { label: x[1], cls: x[0] === tf ? "on" : "", pick: function () { self.setState({ tf: x[0] }); } }; });
+var cf = typeof st.cf === "number" ? st.cf : -1;
+var olist = orders.filter(function (o) { return (tf === "all" || (tf === "w") === o.isW) && (cf < 0 || o.ci === cf); });
+var cfTot = 0; olist.forEach(function (o) { cfTot += o.total; });
+var ctf = st.ctf || "all";
+var custChips = [["all", t.all], ["r", t.retail], ["w", t.ws]].map(function (x) { return { label: x[1], cls: x[0] === ctf ? "on" : "", pick: function () { self.setState({ ctf: x[0] }); } }; });
+var custList = CUST.map(function (c, ci) { var mine = orders.filter(function (o) { return o.ci === ci; }); var s = 0; mine.forEach(function (o) { s += o.total; }); return { ci: ci, name: c[0], typeCls: c[1] === "W" ? "w" : "r", typeL: c[1] === "W" ? t.ws : t.retail, city: c[2], email: c[3], phone: c[4], n: mine.length, total: money(s), isW: c[1] === "W", view: go(2, { cf: ci, tf: "all" }) }; }).filter(function (c) { return ctf === "all" || (ctf === "w") === c.isW; });
+var appr = st.approved || [];
+var PART = [[4, "Armen Sargsyan", "SP-102-55871", 2, 4, "Net 15"], [5, "Tigran Avetisyan", "SP-118-20934", 1, 2, "Net 7"], [6, "Mariam Hovhannisyan", "SP-131-77410", 1, 1, "—"]];
+var partners = PART.map(function (p) { var c = CUST[p[0]]; var pend = p[0] === 6 && appr.indexOf(6) < 0; var mine = orders.filter(function (o) { return o.ci === p[0]; }); var s = 0; mine.forEach(function (o) { s += o.total; });
+return { name: c[0], contact: p[1], phone: c[4], email: c[3], city: c[2], permit: p[2], locs: p[3], team: p[4], terms: p[5], spent: money(s), isPending: pend, isActive: !pend, stCls: pend ? "pend" : "act", stL: pend ? t.pending : t.active, border: pend ? "#F2B05E" : "#E4DCC8", bg: pend ? "#FFFAF0" : "#FFFFFF",
+approve: function () { self.setState({ approved: appr.concat([6]) }); }, view: go(2, { cf: p[0], tf: "all" }) }; });
+var active = orders.filter(function (o) { return o.st < 4; });
+var cities = []; active.forEach(function (o) { if (cities.indexOf(o.city) < 0) { cities.push(o.city); } });
+var byCity = cities.map(function (c) { var os = active.filter(function (o) { return o.city === c; }).map(view); return { city: c, n: os.length, orders: os }; });
+var drvSum = DRV.map(function (d, k) { var os = active.filter(function (o) { return o.drv === k; }); var cs = []; os.forEach(function (o) { if (cs.indexOf(o.city) < 0) { cs.push(o.city); } }); return { name: d, n: os.length, cities: cs.join(", ") || "—", bg: "#E8F1EC", fg: "#1D5545" }; });
+var un = active.filter(function (o) { return o.drv < 0; }).length;
+drvSum.push({ name: t.unassigned, n: un, cities: "", bg: un ? "#FDE7E4" : "#F0F0F0", fg: un ? "#B03A2E" : "#666" });
+var tsel = st.tsel || 0; var autos = st.autos || [true, true, true, true, true];
+var tpls = t.tpl.map(function (lb, i) { return { label: lb, cls: i === tsel ? "on" : "", onCls: autos[i] ? "on" : "", pick: function () { self.setState({ tsel: i }); }, toggle: function () { var n = autos.slice(); n[i] = !n[i]; self.setState({ autos: n }); } }; });
+var plan = t.pn.map(function (nm, i) { var need = reserved[i]; var make = need + mins[i] - stockQ[i]; return { name: nm, need: need, min: mins[i], qty: stockQ[i], make: make > 0 ? "+" + make + " " + t.pcs : t.enough, cls: make > 0 ? "low" : "ok" }; });
+var REV = [612, 845, 530, 1290, 980, 1475, 1120]; var mx = Math.max.apply(null, REV);
+var bars = REV.map(function (v, k) { return { v: "$" + v, h: Math.round(v / mx * 150) + "px", d: fdate(k - 6).split(" ")[0] }; });
+var sold = t.pn.map(function (nm, i) { var q = 0; orders.forEach(function (o) { o.items.forEach(function (x) { if (x[0] === i) { q += x[1]; } }); }); return { name: nm, q: q }; }).sort(function (a, b) { return b.q - a.q; }).slice(0, 5);
+var mq = sold[0] ? sold[0].q : 1; var topP = sold.map(function (s) { return { name: s.name, q: s.q, w: Math.round(s.q / mq * 100) + "%" }; });
+var rS = 0, wS = 0; orders.forEach(function (o) { if (o.isW) { wS += o.total; } else { rS += o.total; } });
+return { t: t, langs: langs, navs: navs, kpis: kpis, tab0: tab === 0, tab1: tab === 1, tab2: tab === 2, tab3: tab === 3, tab4: tab === 4, tab5: tab === 5, tab6: tab === 6, tab7: tab === 7, tab8: tab === 8,
+recent: orders.slice(0, 6).map(view), hasLow: lowIdx.length > 0, lowNames: lowIdx.map(function (i) { return t.pn[i]; }).join(", "), goStock: go(1),
+alerts: alerts, alertCount: alerts.length, hasAlerts: alerts.length > 0, bellOpen: !!st.bell, toggleBell: function () { self.setState({ bell: !st.bell }); },
+stock: stock, typeChips: typeChips, orderList: olist.map(view), hasCustFilter: cf >= 0, custFilter: cf >= 0 ? CUST[cf][0] : "", custCount: olist.length, custTotal: money(cfTot), clearCust: function () { self.setState({ cf: -1 }); },
+custChips: custChips, custList: custList, partners: partners, byCity: byCity, drvSum: drvSum,
+apriLabel: st.apri ? t.sentApri : t.sendApri, sendApri: function () { self.setState({ apri: true }); setTimeout(function () { self.setState({ apri: false }); }, 2200); },
+tpls: tpls, tplSubj: t.tb[tsel][0], tplBody: t.tb[tsel][1], testLabel: st.tested ? t.sent : t.test, sendTest: function () { self.setState({ tested: true }); setTimeout(function () { self.setState({ tested: false }); }, 1800); },
+plan: plan, bars: bars, topP: topP, splitTxt: money(rS) + " / " + money(wS) };
+}
+}
+</script>
+</body>
+</html>
