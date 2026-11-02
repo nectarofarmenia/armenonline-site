@@ -399,7 +399,8 @@ var swOther = null; try { var cu1 = JSON.parse(window.localStorage.getItem("noa-
 var doSwitch = function () { if (!swOther) { return; } try { window.localStorage.setItem("noa-user", JSON.stringify(swOther)); window.localStorage.setItem("noa-session", swOther.email.toLowerCase() + "|" + (swOther.type === "biz" ? "biz" : "retail")); } catch (e) {} };
 
 var bizN = isU ? (user.biz || ((user.first || "") + " " + (user.last || "")).trim() || "—") : t.biz;
-var tab = typeof st.tab === "number" ? st.tab : 5;
+var hashTab = 5; try { if (window.location.hash === "#order") { hashTab = 0; } } catch (e) {}
+var tab = typeof st.tab === "number" ? st.tab : hashTab;
 var icons = ["⚡", "🚚", "👥", "📍", "🧾", "📊", "📦", "🏪", "⚙️"];
 var navL = t.nav.concat([t.navDash, t.navOrders, t.navStore, t.navSet]);
 var navs = [5, 0, 6, 1, 4, 7, 2, 8].map(function (i) { return { label: navL[i], icon: icons[i], cls: i === tab ? "on" : "", pick: function () { self.setState({ tab: i }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }; });
