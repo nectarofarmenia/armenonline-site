@@ -437,7 +437,7 @@ var saveLocs = function (arr) { if (isU) { try { var u = JSON.parse(window.local
 var curLocs = LOCS.map(function (x) { return { name: x[0], addr: x[1], hours: x[2] }; });
 var locs = LOCS.map(function (x, k) { return { name: x[0], addr: x[1], hours: x[2], canRm: LOCS.length > 1, rm: function () { var a = curLocs.slice(); a.splice(k, 1); saveLocs(a); } }; });
 var fd = function (n) { return new Date(now.getFullYear(), now.getMonth(), now.getDate() + n); };
-var DL = isU ? [] : [[2, "NOA-W-2210", 0, [[4, 20], [1, 12]], 1], [5, "NOA-W-2214", 1, [[5, 10], [6, 6]], 0], [9, "NOA-W-2214", 0, [[3, 2], [8, 10]], 0], [16, "NOA-W-2219", 0, [[1, 24], [2, 6]], 0]];
+var DL = isU ? [] : [[2, "NofA-W-2210", 0, [[4, 20], [1, 12]], 1], [5, "NofA-W-2214", 1, [[5, 10], [6, 6]], 0], [9, "NofA-W-2214", 0, [[3, 2], [8, 10]], 0], [16, "NofA-W-2219", 0, [[1, 24], [2, 6]], 0]];
 var STC = [["#F3EBD7", "#7A5A12"], ["#FFF1D6", "#9A6A00"], ["#E2F0E7", "#2F7A55"]];
 var dels = DL.map(function (x) { var d = fd(x[0]); return { dd: d.getDate(), mm: (MO[lang] || MO.en)[d.getMonth()], no: x[1], loc: LOCS[x[2]][0], items: x[3].map(function (y) { return t.pn[y[0]] + " × " + y[1]; }).join(", "), st: t.st[x[4]], bg: STC[x[4]][0], fg: STC[x[4]][1] }; });
 var owner = isU ? [((user.first || "") + " " + (user.last || "")).trim() || bizN, user.email || "", 0, t.you] : ["Armen", "owner@araratmarket.com", 0, t.you];
@@ -469,12 +469,12 @@ var ALL = [];
 var OKEY = "noa-ws-orders|" + (isU ? (user.email || "").toLowerCase() : "demo");
 var RO = []; try { RO = JSON.parse(window.localStorage.getItem(OKEY) || "null") || (isU ? JSON.parse(window.localStorage.getItem("noa-ws-orders") || "[]") : []); } catch (e) { RO = []; }
 var saveRO = function (a) { try { window.localStorage.setItem(OKEY, JSON.stringify(a)); } catch (e) {} self.setState({ roT: Date.now() }); };
-var RALL = RO.map(function (o, ix) { return { no: o.no, d: new Date(o.date), loc: o.loc || 0, items: o.items, st: o.await ? 3 : (o.st || 0), by: o.by || "", ix: ix }; });
+var RALL = RO.map(function (o, ix) { return { no: String(o.no).replace(/^NOA-/, "NofA-"), d: new Date(o.date), loc: o.loc || 0, items: o.items, st: o.await ? 3 : (o.st || 0), by: o.by || "", ix: ix }; });
 if (isU) { ALL = RALL.slice(); }
 else { ALL = RALL.slice(); for (var m = 13; m >= 0; m--) { var cnt = 2 + ((m * 7) % 3); for (var k2 = 0; k2 < cnt; k2++) { var day = 2 + ((k2 * 9 + m * 5) % 25); var d0 = new Date(now.getFullYear(), now.getMonth() - m, day);
  var p1 = 1 + ((m + k2) % 8), p2 = 1 + ((m * 3 + k2 + 2) % 8), p3 = 1 + ((m + k2 * 5 + 4) % 8);
  var its = [[p1, 6 + ((m + k2) % 4) * 6]]; if (p2 !== p1) { its.push([p2, 4 + ((m * 2 + k2) % 5) * 2]); } if (p3 !== p1 && p3 !== p2) { its.push([p3, 10 + (k2 % 3) * 10]); }
- var future = d0 > now; ALL.push({ ix: -1, no: "NOA-W-" + (1700 + (13 - m) * 4 + k2), d: d0, loc: (m + k2) % Math.max(1, LOCS.length), items: its, st: future ? (k2 % 2) : 2 }); } } }
+ var future = d0 > now; ALL.push({ ix: -1, no: "NofA-W-" + (1700 + (13 - m) * 4 + k2), d: d0, loc: (m + k2) % Math.max(1, LOCS.length), items: its, st: future ? (k2 % 2) : 2 }); } } }
 ALL.forEach(function (o) { o.total = mkTotal(o.items); o.units = 0; o.items.forEach(function (x) { o.units += x[1]; }); if (o.loc >= LOCS.length) { o.loc = 0; } });
 ALL.sort(function (a, b) { return b.d - a.d; });
 var per = typeof st.per === "number" ? st.per : 2; var locF = st.locF || "all"; var stF = st.stF || "all"; var qS = (st.qS || "").trim().toLowerCase();
@@ -533,8 +533,8 @@ return Object.assign(dashVals, { hasSw: isU && !!swOther, doSwitch: doSwitch, bi
 t: t, langs: langs, count: 0, hasCount: false, navs: navs, tabQO: tab === 0, tabDel: tab === 1, tabTeam: tab === 2, tabLoc: tab === 7, tabInv: tab === 4,
 rows: rows, total: money(sum), units: units, days: days, dayList: dayList, nDel: sel.length, locs: locs, dels: dels, members: members, roleOpts: roleOpts, roleInfo: roleInfo, invs: invs,
 oneCls: split ? "" : "on", splitCls: split ? "on" : "", planOne: function () { self.setState({ split: false, sel: [sel[0]] }); }, planSplit: function () { self.setState({ split: true }); },
-done: done, notDone: !done, sendForPay: function () { var ro = RO.slice(); var its = []; IDX.forEach(function (pi, k) { if (q[k] > 0) { its.push([pi, q[k]]); } }); sel.forEach(function (di) { ro.push({ no: "NOA-W-" + (3000 + ro.length + 1), date: dates[di].toISOString(), loc: 0, items: its, st: 0, await: true, by: actor ? actor.name : "" }); }); saveRO(ro); self.setState({ done: true, sentAwait: true }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} },
-payNow: function () { var ro = RO.slice(); var its = []; IDX.forEach(function (pi, k) { if (q[k] > 0) { its.push([pi, q[k]]); } }); sel.forEach(function (di) { ro.push({ no: "NOA-W-" + (3000 + ro.length + 1), date: dates[di].toISOString(), loc: 0, items: its, st: 0, by: actor ? actor.name : "" }); }); saveRO(ro); self.setState({ done: true, sentAwait: false }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} }, again: function () { self.setState({ done: false }); },
+done: done, notDone: !done, sendForPay: function () { var ro = RO.slice(); var its = []; IDX.forEach(function (pi, k) { if (q[k] > 0) { its.push([pi, q[k]]); } }); sel.forEach(function (di) { ro.push({ no: "NofA-W-" + (3000 + ro.length + 1), date: dates[di].toISOString(), loc: 0, items: its, st: 0, await: true, by: actor ? actor.name : "" }); }); saveRO(ro); self.setState({ done: true, sentAwait: true }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} },
+payNow: function () { var ro = RO.slice(); var its = []; IDX.forEach(function (pi, k) { if (q[k] > 0) { its.push([pi, q[k]]); } }); sel.forEach(function (di) { ro.push({ no: "NofA-W-" + (3000 + ro.length + 1), date: dates[di].toISOString(), loc: 0, items: its, st: 0, by: actor ? actor.name : "" }); }); saveRO(ro); self.setState({ done: true, sentAwait: false }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} }, again: function () { self.setState({ done: false }); },
 invVal: st.inv || "", setInv: function (e) { self.setState({ inv: e && e.target ? e.target.value : "" }); }, setRole: function (e) { self.setState({ role: e && e.target ? +e.target.value : 1 }); },
 invite: function () { var em = (st.inv || "").trim(); if (!em || em.indexOf("@") < 1) { return; } var nm = em.split("@")[0]; saveTeam(extra.concat([[nm.charAt(0).toUpperCase() + nm.slice(1), em, st.role || 1, "P"]])); self.setState({ inv: "" }); } });
 }
