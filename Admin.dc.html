@@ -100,6 +100,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </div>
 </sc-if>
 </header>
+<div aria-hidden="true" style="background: #133B30; line-height: 0"><svg viewBox="0 0 1440 60" preserveAspectRatio="none" style="display: block; width: 100%; height: 46px"><path d="M0,0 L1440,0 L1440,22 C1200,52 960,58 720,34 C480,10 240,14 0,40 Z" fill="#1D5545"></path></svg></div>
 <div style="max-width: 1440px; margin: 0 auto; padding: 22px 24px 70px; display: flex; gap: 22px; align-items: flex-start" class="two-col">
 <aside class="card3d-dark sum-card" style="flex: 0 0 250px; max-width: 100%; box-sizing: border-box; border-radius: 22px; padding: 14px; display: flex; flex-direction: column; gap: 3px; position: sticky; top: 100px; color: #F7F3EA">
 <sc-for list="{{navs}}" as="nv" hint-placeholder-count="9"><button type="button" onClick="{{nv.pick}}" class="wa-nav {{nv.cls}}"><span>{{nv.icon}}</span><span style="flex: 1">{{nv.label}}</span><sc-if value="{{nv.hasBadge}}" hint-placeholder-val="{{false}}"><span style="min-width: 22px; height: 22px; border-radius: 999px; background: #EBA93A; color: #133B30; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; padding: 0 6px">{{nv.badge}}</span></sc-if></button></sc-for>
