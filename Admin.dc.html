@@ -82,6 +82,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </style>
 </helmet>
 <div style="font-family: Manrope, 'Noto Sans Armenian', system-ui, sans-serif; color: #1E2A24; background: #F7F3EA; width: 100%; min-height: 100vh; overflow-x: clip; position: relative">
+<div class="hdr-stick" style="position: sticky; top: 0; z-index: 60">
 <header class="raise-header" style="background: #133B30; position: sticky; top: 0; z-index: 50">
 <div style="max-width: 1440px; margin: 0 auto; padding: 12px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px">
 <div style="display: flex; align-items: center; gap: 14px"><img src="img/cf4f14e5b2e161eced326c4ebe8644fd.webp" alt="Nectar of Armenia" class="logo3d" style="height: 58px; width: auto; display: block"><span style="font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #F6C35A; font-weight: 800; border-left: 1px solid #2E6A58; padding-left: 14px">{{t.title}}</span></div>
@@ -101,8 +102,9 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </sc-if>
 </header>
 <div aria-hidden="true" style="background: #133B30; line-height: 0"><svg viewBox="0 0 1440 60" preserveAspectRatio="none" style="display: block; width: 100%; height: 46px"><path d="M0,0 L1440,0 L1440,22 C1200,52 960,58 720,34 C480,10 240,14 0,40 Z" fill="#1D5545"></path></svg></div>
+</div>
 <div style="max-width: 1440px; margin: 0 auto; padding: 22px 24px 70px; display: flex; gap: 22px; align-items: flex-start" class="two-col">
-<aside class="card3d-dark sum-card" style="flex: 0 0 250px; max-width: 100%; box-sizing: border-box; border-radius: 22px; padding: 14px; display: flex; flex-direction: column; gap: 3px; position: sticky; top: 100px; color: #F7F3EA">
+<aside class="card3d-dark sum-card" style="flex: 0 0 250px; max-width: 100%; box-sizing: border-box; border-radius: 22px; padding: 14px; display: flex; flex-direction: column; gap: 3px; position: sticky; top: 145px; color: #F7F3EA">
 <sc-for list="{{navs}}" as="nv" hint-placeholder-count="9"><button type="button" onClick="{{nv.pick}}" class="wa-nav {{nv.cls}}"><span>{{nv.icon}}</span><span style="flex: 1">{{nv.label}}</span><sc-if value="{{nv.hasBadge}}" hint-placeholder-val="{{false}}"><span style="min-width: 22px; height: 22px; border-radius: 999px; background: #EBA93A; color: #133B30; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; padding: 0 6px">{{nv.badge}}</span></sc-if></button></sc-for>
 </aside>
 <main style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 20px">
