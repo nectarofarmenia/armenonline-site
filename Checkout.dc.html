@@ -175,9 +175,9 @@ class Component extends DCLogic {
 componentDidMount() {
 var self = this; this._last = null;
 this._sync = function () {
-var c = null, l = null;
-try { c = window.localStorage.getItem("noa-cart-v2"); l = window.localStorage.getItem("noa-lang"); } catch (e) { return; }
-var key = c + "|" + l;
+var c = null, l = null, u = null, o = null;
+try { c = window.localStorage.getItem("noa-cart-v2"); l = window.localStorage.getItem("noa-lang"); u = window.localStorage.getItem("noa-user"); o = window.localStorage.getItem("noa-last-order"); } catch (e) { return; }
+var key = c + "|" + l + "|" + u + "|" + o;
 if (self._last === null) { self._last = key; return; }
 if (key === self._last) { return; }
 self._last = key;
@@ -185,6 +185,7 @@ var arr = null; try { arr = JSON.parse(c); } catch (e) { arr = null; }
 var patch = {};
 if (Array.isArray(arr) && arr.length === 11) { patch.q = arr; }
 if (["hy", "en", "ru", "es"].indexOf(l) >= 0) { patch.lang = l; }
+patch._u = u; patch._o = o;
 self.setState(patch);
 };
 this._iv = setInterval(this._sync, 700);
