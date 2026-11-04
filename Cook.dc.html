@@ -814,7 +814,7 @@ return Object.assign(apVals, { isBizSess: !!(accU && accU.type === "biz"), bizNo
           var d = f.r * (f.L === 2 ? 3.2 : 2.6); x.globalAlpha = f.a; x.drawImage(SP, f.x - d / 2, f.y - d / 2, d, d); }
         x.globalAlpha = 1; requestAnimationFrame(tick); }
       requestAnimationFrame(tick); }
-    function music() { if (embed || /^(Admin|Checkout|QR)/.test(page)) { return; } var AC = window.AudioContext || window.webkitAudioContext; if (!AC) { return; }
+    function music() { if (embed || /^(Admin|Checkout|QR)/.test(page)) { return; } 
       var onMain = /^(Main|index)/.test(page) || page === ""; var hy = L() === "hy";
       var pref = "on"; try { pref = localStorage.getItem("noa-music") || "on"; } catch (e) {}
       var css2 = ".nt-mu{position:fixed;right:18px;bottom:" + (onMain ? "200px" : "76px") + ";z-index:85;width:46px;height:46px;border-radius:50%;border:1.5px solid #EBA93A;background:#1D5545;color:#F6E3B4;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:2px;box-shadow:0 8px 18px rgba(0,0,0,.25);padding:0;font:700 18px/1 system-ui}" +
@@ -827,62 +827,16 @@ return Object.assign(apVals, { isBizSess: !!(accU && accU.type === "biz"), bizNo
       var btn = document.createElement("button"); btn.type = "button"; btn.className = "nt-mu " + (pref === "off" ? "off" : "wait"); btn.innerHTML = "<i></i><i></i><i></i><i></i><span></span>";
       function lab() { var on = btn.classList.contains("on"); var tx = on ? (hy ? "Անջատել երաժշտությունը" : "Turn music off") : (hy ? "Միացնել երաժշտությունը" : "Turn music on"); btn.setAttribute("aria-label", tx); btn.querySelector("span").textContent = tx; }
       lab(); document.body.appendChild(btn);
-      var ctx = null, master = null, timer = null, nextT = 0, idx = 0, playing = false;
-      var BPM = 152, B = 60 / BPM;
-      var N = { C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196, A3: 220, B3: 246.94, C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880, C2: 65.41, F2: 87.31, G2: 98, E2: 82.41, D2: 73.42, A2: 110 };
-      var A1 = [["E5",1],["E5",1],["E5",2],["E5",1],["E5",1],["E5",2],["E5",1],["G5",1],["C5",1.5],["D5",.5],["E5",4]];
-      var CHO = A1.concat([["F5",1],["F5",1],["F5",1.5],["F5",.5],["F5",1],["E5",1],["E5",1],["E5",.5],["E5",.5],["E5",1],["D5",1],["D5",1],["E5",1],["D5",2],["G5",2]])
-        .concat(A1).concat([["F5",1],["F5",1],["F5",1.5],["F5",.5],["F5",1],["E5",1],["E5",1],["E5",.5],["E5",.5],["G5",1],["G5",1],["F5",1],["D5",1],["C5",2],["G4",.5],["A4",.5],["B4",.5],["C5",.5]]);
-      var VER = [["G4",1],["E5",1],["D5",1],["C5",1],["G4",3],["G4",.5],["G4",.5],["G4",1],["E5",1],["D5",1],["C5",1],["A4",4],["A4",1],["F5",1],["E5",1],["D5",1],["B4",4],["G5",1],["G5",1],["F5",1],["D5",1],["E5",4],
-                 ["G4",1],["E5",1],["D5",1],["C5",1],["G4",4],["G4",1],["E5",1],["D5",1],["C5",1],["A4",3],["A4",1],["A4",1],["F5",1],["E5",1],["D5",1],["G5",1],["G5",1],["G5",1],["G5",1],["A5",1],["G5",1],["F5",1],["D5",1],["C5",3],["G4",1]];
-      var MEL = VER.concat(CHO).concat(CHO);
-      var BARS_V = ["C","C","F","F","G","G","C","C","C","C","F","F","G","G","C","G"];
-      var BARS_C = ["C","C","C","C","F","C","D","G","C","C","C","C","F","C","G","C"];
-      var PROG = BARS_V.concat(BARS_C).concat(BARS_C);
-      var ROOT = { C: ["C2","G2"], F: ["F2","C3"], G: ["G2","D3"], D: ["D2","A2"] };
-      var CHD = { C: ["E4","G4","C5"], F: ["F4","A4","C5"], G: ["D4","G4","B4"], D: ["D4","F4","A4"] };
-      CHD.D = ["D4","A4","C5"];
-      function verb(c) { var len = c.sampleRate * 1.6, b = c.createBuffer(2, len, c.sampleRate); for (var ch = 0; ch < 2; ch++) { var d = b.getChannelData(ch); for (var i = 0; i < len; i++) { d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.6); } } var cv = c.createConvolver(); cv.buffer = b; return cv; }
-      var NB = null; function noiseBuf() { if (NB) { return NB; } var len = ctx.sampleRate * 0.5; NB = ctx.createBuffer(1, len, ctx.sampleRate); var d = NB.getChannelData(0); for (var i = 0; i < len; i++) { d[i] = Math.random() * 2 - 1; } return NB; }
-      function env(g, t, a, peak, dec) { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + dec); }
-      function lead(f, t, dur) { var o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), o3 = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain();
-        o1.type = "square"; o2.type = "sawtooth"; o3.type = "sine"; o1.frequency.value = f; o2.frequency.value = f * 1.004; o3.frequency.value = f * 2;
-        lp.type = "lowpass"; lp.frequency.setValueAtTime(5200, t); lp.frequency.exponentialRampToValueAtTime(1400, t + Math.min(0.5, dur)); lp.Q.value = 2;
-        var g1 = ctx.createGain(); g1.gain.value = 0.35; var g3 = ctx.createGain(); g3.gain.value = 0.5;
-        o1.connect(g1); o2.connect(g1); g1.connect(lp); o3.connect(g3); g3.connect(g); lp.connect(g); g.connect(master);
-        var hold = Math.max(0.08, dur * 0.85); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16, t + 0.01); g.gain.exponentialRampToValueAtTime(0.09, t + 0.12); g.gain.setValueAtTime(0.09, t + hold); g.gain.exponentialRampToValueAtTime(0.0001, t + hold + 0.12);
-        [o1, o2, o3].forEach(function (o) { o.start(t); o.stop(t + hold + 0.2); }); }
-      function glock(f, t) { var o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.value = f * 2; o.connect(g); g.connect(master); env(g, t, 0.005, 0.07, 0.6); o.start(t); o.stop(t + 0.7); }
-      function bass(f, t, dur) { var o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain(); o.type = "sawtooth"; o.frequency.value = f; lp.type = "lowpass"; lp.frequency.value = 520; o.connect(lp); lp.connect(g); g.connect(master);
-        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.26, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.92); o.start(t); o.stop(t + dur); }
-      function stab(fs, t) { fs.forEach(function (f) { var o = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter(); o.type = "triangle"; o.frequency.value = f; lp.type = "lowpass"; lp.frequency.value = 3000; o.connect(lp); lp.connect(g); g.connect(master); env(g, t, 0.006, 0.05, 0.22); o.start(t); o.stop(t + 0.3); }); }
-      function kick(t) { var o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(45, t + 0.12); o.connect(g); g.connect(master); env(g, t, 0.002, 0.55, 0.22); o.start(t); o.stop(t + 0.3); }
-      function snare(t) { var s = ctx.createBufferSource(); s.buffer = noiseBuf(); var bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 1900; bp.Q.value = 0.8; var g = ctx.createGain(); s.connect(bp); bp.connect(g); g.connect(master); env(g, t, 0.002, 0.22, 0.16); s.start(t); s.stop(t + 0.25);
-        var o = ctx.createOscillator(), g2 = ctx.createGain(); o.type = "triangle"; o.frequency.value = 190; o.connect(g2); g2.connect(master); env(g2, t, 0.002, 0.12, 0.08); o.start(t); o.stop(t + 0.12); }
-      function hat(t, v) { var s = ctx.createBufferSource(); s.buffer = noiseBuf(); var hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 8000; var g = ctx.createGain(); s.connect(hp); hp.connect(g); g.connect(master); env(g, t, 0.001, v, 0.04); s.start(t); s.stop(t + 0.06); }
-      function jingle(t, v) { var s = ctx.createBufferSource(); s.buffer = noiseBuf(); var bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 6500; bp.Q.value = 3; var g = ctx.createGain(); s.connect(bp); bp.connect(g); g.connect(master); env(g, t, 0.003, v, 0.12); s.start(t, Math.random() * 0.3); s.stop(t + 0.16);
-        [5200, 6900, 8300].forEach(function (f) { var o = ctx.createOscillator(), g2 = ctx.createGain(); o.frequency.value = f * (0.98 + Math.random() * 0.04); o.connect(g2); g2.connect(master); env(g2, t + Math.random() * 0.01, 0.002, v * 0.06, 0.09); o.start(t); o.stop(t + 0.12); }); }
-      var beatPos = 0;
-      function sched() { while (nextT < ctx.currentTime + 0.5) { var n = MEL[idx]; var d = n[1] * B;
-          if (n[0] !== "R") { lead(N[n[0]], nextT, d); if (idx >= VER.length + CHO.length) { glock(N[n[0]], nextT); } }
-          var bp0 = beatPos, bp1 = beatPos + n[1];
-          for (var k8 = Math.ceil(bp0 * 2); k8 < bp1 * 2; k8++) { var kb = k8 / 2; var tt = nextT + (kb - bp0) * B; var bar = Math.floor(kb / 4); var ch = PROG[bar % PROG.length]; var inBar = kb - bar * 4;
-            var sw = (k8 % 2 === 1) ? B * 0.08 : 0; tt += sw;
-            jingle(tt, k8 % 2 === 0 ? 0.11 : 0.07); hat(tt, k8 % 2 === 0 ? 0.04 : 0.025);
-            if (k8 % 2 === 0) { var ib = inBar;
-              if (ib === 0 || ib === 2) { kick(tt); } if (ib === 1 || ib === 3) { snare(tt); }
-              bass(N[ROOT[ch][ib % 2 === 0 ? 0 : 1]] * (ib === 2 ? 2 : 1), tt, B * 0.9); }
-            else { stab(CHD[ch].map(function (x) { return N[x] / 2; }), tt); } }
-          beatPos = bp1; nextT += d; idx++; if (idx >= MEL.length) { idx = 0; beatPos = 0; } } }
-      function start() { if (playing) { return; } try { if (!ctx) { ctx = new AC(); master = ctx.createGain(); master.gain.value = 0.0001; var rv = verb(ctx), wet = ctx.createGain(); wet.gain.value = 0.18; var comp = ctx.createDynamicsCompressor(); master.connect(comp); master.connect(rv); rv.connect(wet); wet.connect(comp); comp.connect(ctx.destination); }
-          if (ctx.state === "suspended") { ctx.resume(); } playing = true; nextT = ctx.currentTime + 0.15; idx = 0; beatPos = 0;
-          master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(Math.max(0.0001, master.gain.value), ctx.currentTime); master.gain.exponentialRampToValueAtTime(0.5, ctx.currentTime + 1.2);
-          timer = setInterval(sched, 120); sched(); btn.className = "nt-mu on"; lab(); } catch (e) {} }
-      function stop() { playing = false; clearInterval(timer); if (ctx && master) { var t0 = ctx.currentTime; master.gain.cancelScheduledValues(t0); master.gain.setValueAtTime(Math.max(0.0001, master.gain.value), t0); master.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.5); setTimeout(function () { if (!playing && ctx) { ctx.suspend(); } }, 600); } btn.className = "nt-mu off"; lab(); }
+      var au = new Audio(); au.src = "ny/music.mp3"; au.loop = true; au.preload = "none"; au.volume = 0; var playing = false, fadeT = null, ok = true;
+      au.addEventListener("error", function () { ok = false; btn.style.display = "none"; });
+      try { fetch("ny/music.mp3", { method: "HEAD" }).then(function (r) { if (!r.ok) { ok = false; btn.style.display = "none"; } }).catch(function () {}); } catch (e) {}
+      function fade(to, ms, done) { clearInterval(fadeT); var from = au.volume, st0 = Date.now(); fadeT = setInterval(function () { var k = Math.min(1, (Date.now() - st0) / ms); au.volume = Math.max(0, Math.min(1, from + (to - from) * k)); if (k >= 1) { clearInterval(fadeT); if (done) { done(); } } }, 40); }
+      function start() { if (playing || !ok) { return; } var pr = au.play(); playing = true; btn.className = "nt-mu on"; lab(); if (pr && pr.catch) { pr.catch(function () { playing = false; btn.className = "nt-mu wait"; lab(); }); } fade(0.35, 2500); }
+      function stop() { playing = false; btn.className = "nt-mu off"; lab(); fade(0, 500, function () { au.pause(); }); }
       btn.addEventListener("click", function (e) { e.stopPropagation(); if (playing) { stop(); try { localStorage.setItem("noa-music", "off"); } catch (x) {} } else { start(); try { localStorage.setItem("noa-music", "on"); } catch (x) {} } });
       if (pref !== "off") { var first = function (e) { if (e && e.target && e.target.closest && e.target.closest(".nt-mu")) { return; } window.removeEventListener("pointerdown", first, true); window.removeEventListener("keydown", first, true); var p2 = "on"; try { p2 = localStorage.getItem("noa-music") || "on"; } catch (x) {} if (p2 !== "off") { start(); } };
         window.addEventListener("pointerdown", first, true); window.addEventListener("keydown", first, true); }
-      document.addEventListener("visibilitychange", function () { if (!ctx) { return; } if (document.hidden) { if (playing) { ctx.suspend(); } } else if (playing) { ctx.resume(); } });
+      document.addEventListener("visibilitychange", function () { if (document.hidden) { if (playing) { au.pause(); } } else if (playing) { au.play().catch(function () {}); } });
     }
     function go() { bar(); garland(); snow(); music(); }
     if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", go); } else { go(); }
