@@ -465,7 +465,7 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 </div>
 <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px">
 <span style="font-weight: 800; color: #F6C35A; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase">{{t.fContact}}</span>
-<a href="tel:+15155885555" style="color: #E4ECE6; text-decoration: none">(515) 588-5555</a>
+<a href="tel:+15155885555" style="color: #E4ECE6; text-decoration: none">+1 (515) 588 5555</a>
 <a href="mailto:nectarofarmenia@gmail.com" style="color: #E4ECE6; text-decoration: none">nectarofarmenia@gmail.com</a>
 <a href="mailto:nofaorder@gmail.com" style="color: #E4ECE6; text-decoration: none">{{t.fOrders}}: nofaorder@gmail.com</a>
 </div>
@@ -830,10 +830,11 @@ return { isBizSess: !!(accU && accU.type === "biz"), bizNote: bz[0], bizBtn: bz[
   document.addEventListener("keydown", function (e) { if (!box || box.style.display !== "block" || e.target !== cur) { return; } if (e.key === "ArrowDown") { e.preventDefault(); sel = Math.min(items.length - 1, sel + 1); render(false); } else if (e.key === "ArrowUp") { e.preventDefault(); sel = Math.max(0, sel - 1); render(false); } else if (e.key === "Enter" && sel >= 0) { e.preventDefault(); pick(sel); } else if (e.key === "Escape") { hide(); } }, true);
   document.addEventListener("focusout", function (e) { if (e.target === cur) { setTimeout(hide, 180); } }, true);
 
-  function fmtPh(v) { var d = String(v || "").replace(/\D/g, ""); if (d.length === 11 && d.charAt(0) === "1") { d = d.slice(1); } d = d.slice(0, 10); if (!d) { return ""; } if (d.length <= 3) { return "(" + d; } if (d.length <= 6) { return "(" + d.slice(0, 3) + ") " + d.slice(3); } return "(" + d.slice(0, 3) + ") " + d.slice(3, 6) + "-" + d.slice(6); }
-  document.addEventListener("input", function (e) { var el = e.target; if (!el || el.tagName !== "INPUT" || el.type !== "tel" || el.__nofaSet) { return; } var v = el.value; var digits = v.replace(/\D/g, ""); var prev = el.__phPrev || ""; if (e.inputType === "deleteContentBackward" && digits === prev.replace(/\D/g, "")) { digits = digits.slice(0, -1); } var f = fmtPh(digits); el.__phPrev = f; if (f !== v) { setVal(el, f); try { el.setSelectionRange(f.length, f.length); } catch (x) {} } }, true);
-  document.addEventListener("focusin", function (e) { var el = e.target; if (el && el.tagName === "INPUT" && el.type === "tel" && el.value && /^\D*\d{10,11}\D*$/.test(el.value) && el.value !== fmtPh(el.value)) { setVal(el, fmtPh(el.value)); el.__phPrev = el.value; } }, true);
-  setTimeout(function () { Array.prototype.forEach.call(document.querySelectorAll('input[type="tel"]'), function (el) { if (el.value && el.value !== fmtPh(el.value) && el.value.replace(/\D/g, "").length >= 10) { setVal(el, fmtPh(el.value)); } }); }, 1200);
+  function phDigits(v) { v = String(v || ""); var d = v.replace(/\D/g, ""); if (/^\s*\+\s*1/.test(v)) { d = d.slice(1); } else if (d.length === 11 && d.charAt(0) === "1") { d = d.slice(1); } return d.slice(0, 10); }
+  function fmtPh(v) { var d = phDigits(v); if (!d) { return ""; } if (d.length <= 3) { return "+1 (" + d; } if (d.length <= 6) { return "+1 (" + d.slice(0, 3) + ") " + d.slice(3); } return "+1 (" + d.slice(0, 3) + ") " + d.slice(3, 6) + " " + d.slice(6); }
+  document.addEventListener("input", function (e) { var el = e.target; if (!el || el.tagName !== "INPUT" || el.type !== "tel" || el.__nofaSet) { return; } var v = el.value; var digits = phDigits(v); var prev = el.__phPrev || ""; if (e.inputType === "deleteContentBackward" && digits === phDigits(prev)) { digits = digits.slice(0, -1); } var f = digits ? fmtPh("+1" + digits) : ""; el.__phPrev = f; if (f !== v) { setVal(el, f); try { el.setSelectionRange(f.length, f.length); } catch (x) {} } }, true);
+  document.addEventListener("focusin", function (e) { var el = e.target; if (el && el.tagName === "INPUT" && el.type === "tel" && el.value && phDigits(el.value).length === 10 && el.value !== fmtPh(el.value)) { setVal(el, fmtPh(el.value)); el.__phPrev = el.value; } }, true);
+  setTimeout(function () { Array.prototype.forEach.call(document.querySelectorAll('input[type="tel"]'), function (el) { if (el.value && phDigits(el.value).length === 10 && el.value !== fmtPh(el.value)) { setVal(el, fmtPh(el.value)); } }); }, 1200);
   window.addEventListener("resize", place); window.addEventListener("scroll", place, true);
 })();
 </script>
