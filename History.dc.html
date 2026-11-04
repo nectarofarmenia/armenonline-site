@@ -863,12 +863,19 @@ return Object.assign(apVals, { isBizSess: !!(accU && accU.type === "biz"), bizNo
       var btn = document.createElement("button"); btn.type = "button"; btn.className = "nt-mu " + (pref === "off" ? "off" : "wait"); btn.innerHTML = "<i></i><i></i><i></i><i></i><span></span>";
       function lab() { var on = btn.classList.contains("on"); var tx = on ? (hy ? "Անջատել երաժշտությունը" : "Turn music off") : (hy ? "Միացնել երաժշտությունը" : "Turn music on"); btn.setAttribute("aria-label", tx); btn.querySelector("span").textContent = tx; }
       lab(); document.body.appendChild(btn);
-      var au = new Audio(); au.src = "ny/music.mp3"; au.loop = true; au.preload = "none"; au.volume = 0; var playing = false, fadeT = null, ok = true;
-      au.addEventListener("error", function () { ok = false; btn.style.display = "none"; });
-      try { fetch("ny/music.mp3", { method: "HEAD" }).then(function (r) { if (!r.ok) { ok = false; btn.style.display = "none"; } }).catch(function () {}); } catch (e) {}
+      var SRCS = ["ny/music.mp3",
+        "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/4a/Jingle_Bells_(120bpm)_(Kevin_MacLeod)_(ISRC_USUAN1100187).opus/Jingle_Bells_(120bpm)_(Kevin_MacLeod)_(ISRC_USUAN1100187).opus.mp3",
+        "https://upload.wikimedia.org/wikipedia/commons/4/4a/Jingle_Bells_(120bpm)_(Kevin_MacLeod)_(ISRC_USUAN1100187).opus",
+        "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/03/Jingle_Bells.ogg/Jingle_Bells.ogg.mp3"];
+      var si = 0, want = false, playing = false, fadeT = null, ok = true, credit = false;
+      var au = new Audio(); au.loop = true; au.preload = "none"; au.volume = 0; au.src = SRCS[0];
+      function showCredit() { if (credit || si === 0) { return; } credit = true; var cr = document.createElement("div"); cr.className = "nt-cr"; cr.innerHTML = '🎵 “Jingle Bells” — Kevin MacLeod (<a href="https://incompetech.com" target="_blank" rel="noopener">incompetech.com</a>), <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY</a>'; document.body.appendChild(cr); }
+      au.addEventListener("error", function () { si++; if (si < SRCS.length) { au.src = SRCS[si]; if (want) { au.play().then(function () { playing = true; btn.className = "nt-mu on"; lab(); fade(0.35, 2500); }).catch(function () {}); } } else { ok = false; want = false; playing = false; btn.style.display = "none"; } });
+      au.addEventListener("playing", showCredit);
+      var cst = document.createElement("style"); cst.textContent = ".nt-cr{background:#0F2A22;color:#8FA89C;font:600 11.5px/1.5 Manrope,system-ui;text-align:center;padding:6px 12px 10px}.nt-cr a{color:#CFE2D9}"; document.head.appendChild(cst);
       function fade(to, ms, done) { clearInterval(fadeT); var from = au.volume, st0 = Date.now(); fadeT = setInterval(function () { var k = Math.min(1, (Date.now() - st0) / ms); au.volume = Math.max(0, Math.min(1, from + (to - from) * k)); if (k >= 1) { clearInterval(fadeT); if (done) { done(); } } }, 40); }
-      function start() { if (playing || !ok) { return; } var pr = au.play(); playing = true; btn.className = "nt-mu on"; lab(); if (pr && pr.catch) { pr.catch(function () { playing = false; btn.className = "nt-mu wait"; lab(); }); } fade(0.35, 2500); }
-      function stop() { playing = false; btn.className = "nt-mu off"; lab(); fade(0, 500, function () { au.pause(); }); }
+      function start() { if (playing || !ok) { return; } want = true; var pr = au.play(); playing = true; btn.className = "nt-mu on"; lab(); if (pr && pr.catch) { pr.catch(function () { playing = false; btn.className = "nt-mu wait"; lab(); }); } fade(0.35, 2500); }
+      function stop() { want = false; playing = false; btn.className = "nt-mu off"; lab(); fade(0, 500, function () { au.pause(); }); }
       btn.addEventListener("click", function (e) { e.stopPropagation(); if (playing) { stop(); try { localStorage.setItem("noa-music", "off"); } catch (x) {} } else { start(); try { localStorage.setItem("noa-music", "on"); } catch (x) {} } });
       if (pref !== "off") { var first = function (e) { if (e && e.target && e.target.closest && e.target.closest(".nt-mu")) { return; } window.removeEventListener("pointerdown", first, true); window.removeEventListener("keydown", first, true); var p2 = "on"; try { p2 = localStorage.getItem("noa-music") || "on"; } catch (x) {} if (p2 !== "off") { start(); } };
         window.addEventListener("pointerdown", first, true); window.addEventListener("keydown", first, true); }
