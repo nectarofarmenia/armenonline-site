@@ -797,8 +797,6 @@ return Object.assign(apVals, { isBizSess: !!(accU && accU.type === "biz"), bizNo
       ".nt-orn.st b{border-radius:0;background:none!important;box-shadow:none;color:#F6C35A;font-size:16px;line-height:1;text-shadow:0 0 8px rgba(246,195,90,.8)}.nt-orn.st b:before{display:none}" +
       "@keyframes ntSw{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}" +
       ".nt-snow{position:fixed;inset:0;pointer-events:none;z-index:45}" +
-      ".apri3d:after,.ap-fig:after,.ak-chef:after{content:'';position:absolute;left:62%;top:11%;width:21%;aspect-ratio:100/70;background:url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 70'><path d='M50 38 C40 18 22 10 4 14 C10 20 8 26 14 30 C8 34 10 40 6 46 C24 50 42 46 50 38Z' fill='%232E7D4F' stroke='%231C5236' stroke-width='2'/><path d='M50 38 C60 18 78 10 96 14 C90 20 92 26 86 30 C92 34 90 40 94 46 C76 50 58 46 50 38Z' fill='%23358C59' stroke='%231C5236' stroke-width='2'/><path d='M50 38 C36 30 22 26 10 28 M50 38 C64 30 78 26 90 28' stroke='%231C5236' stroke-width='1.6' fill='none'/><circle cx='42' cy='44' r='9' fill='%23C62828'/><circle cx='58' cy='44' r='9' fill='%23B71C1C'/><circle cx='50' cy='54' r='9' fill='%23D32F2F'/><circle cx='39' cy='41' r='2.6' fill='%23FFFFFF' opacity='.75'/><circle cx='55' cy='41' r='2.6' fill='%23FFFFFF' opacity='.75'/><circle cx='47' cy='51' r='2.6' fill='%23FFFFFF' opacity='.75'/></svg>\") no-repeat center/contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.25));pointer-events:none}" +
-      ".ap-fig,.ak-chef{position:relative}" +
       "@media (max-width:640px){.nt-bar{font-size:13px;padding:7px 34px 7px 12px;flex-wrap:nowrap;gap:10px}.nt-bar .nt-sp,.nt-bar .nt-l{display:none}.nt-bar .nt-s{display:inline}.nt-gar{height:30px}}" +
       "@media (prefers-reduced-motion:reduce){.nt-orn{animation:none}.nt-snow{display:none}}" +
       "html.emb .nt-bar,html.emb .nt-snow{display:none!important}@media print{.nt-bar,.nt-gar,.nt-snow{display:none!important}}";
@@ -822,12 +820,24 @@ return Object.assign(apVals, { isBizSess: !!(accU && accU.type === "biz"), bizNo
       var x = c.getContext("2d"), W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1), F = [];
       function rs() { W = window.innerWidth; H = window.innerHeight; c.width = W * dpr; c.height = H * dpr; c.style.width = W + "px"; c.style.height = H + "px"; x.setTransform(dpr, 0, 0, dpr, 0, 0); }
       rs(); window.addEventListener("resize", rs);
-      var N = W < 640 ? 22 : 46; for (var i = 0; i < N; i++) { F.push({ x: Math.random() * W, y: Math.random() * H, r: 1 + Math.random() * 2.4, v: 0.25 + Math.random() * 0.55, w: Math.random() * 6.28, g: Math.random() < 0.22 }); }
-      var run = true; document.addEventListener("visibilitychange", function () { run = !document.hidden; if (run) { requestAnimationFrame(tick); } });
-      function tick() { if (!run) { return; } x.clearRect(0, 0, W, H);
-        for (var i = 0; i < F.length; i++) { var f = F[i]; f.y += f.v; f.w += 0.012; f.x += Math.sin(f.w) * 0.35; if (f.y > H + 5) { f.y = -5; f.x = Math.random() * W; }
-          x.beginPath(); x.arc(f.x, f.y, f.r, 0, 6.283); x.fillStyle = f.g ? "rgba(246,214,140,.75)" : "rgba(255,255,255,.82)"; x.shadowColor = "rgba(255,255,255,.6)"; x.shadowBlur = 3; x.fill(); }
-        requestAnimationFrame(tick); }
+      // soft flake sprite (radial falloff, like a real out-of-focus snowflake)
+      var SP = document.createElement("canvas"); SP.width = SP.height = 64; var sx = SP.getContext("2d");
+      var gr = sx.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.35, "rgba(255,255,255,.9)"); gr.addColorStop(0.7, "rgba(255,255,255,.35)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+      sx.fillStyle = gr; sx.fillRect(0, 0, 64, 64);
+      function mk(top) { var z = Math.random(); var layer = z < 0.55 ? 0 : (z < 0.88 ? 1 : 2);
+        var r = layer === 0 ? 0.8 + Math.random() * 1.1 : (layer === 1 ? 1.8 + Math.random() * 1.6 : 3.2 + Math.random() * 2.6);
+        return { x: Math.random() * (W + 200) - 100, y: top ? -10 - Math.random() * H * 0.3 : Math.random() * H, r: r, L: layer,
+          v: (layer === 0 ? 0.28 : layer === 1 ? 0.55 : 0.95) + Math.random() * 0.35, a: layer === 0 ? 0.45 + Math.random() * 0.25 : (layer === 1 ? 0.7 + Math.random() * 0.25 : 0.55 + Math.random() * 0.3),
+          ph: Math.random() * 6.283, sw: 0.4 + Math.random() * 1.1, sf: 0.006 + Math.random() * 0.014, dr: (layer + 1) * 0.35 }; }
+      var N = Math.round(Math.min(130, Math.max(40, W * H / 16000)) * (W < 640 ? 0.6 : 1)); for (var i = 0; i < N; i++) { F.push(mk(false)); }
+      var run = true, t0 = performance.now(), last = t0; document.addEventListener("visibilitychange", function () { run = !document.hidden; if (run) { last = performance.now(); requestAnimationFrame(tick); } });
+      function wind(t) { return Math.sin(t * 0.00011) * 0.45 + Math.sin(t * 0.00037 + 1.7) * 0.25 + Math.max(0, Math.sin(t * 0.00005)) * Math.sin(t * 0.0013) * 0.35; }
+      function tick(now) { if (!run) { return; } var dt = Math.min(3, (now - last) / 16.67); last = now; x.clearRect(0, 0, W, H); var wd = wind(now - t0);
+        for (var i = 0; i < F.length; i++) { var f = F[i]; f.ph += f.sf * dt;
+          f.y += f.v * dt; f.x += (Math.sin(f.ph) * f.sw * 0.35 + wd * f.dr) * dt;
+          if (f.y > H + 12 || f.x < -120 || f.x > W + 120) { var n = mk(true); if (f.x < -120) { n.x = W + 40 * Math.random(); n.y = Math.random() * H * 0.6; } else if (f.x > W + 120) { n.x = -40 * Math.random(); n.y = Math.random() * H * 0.6; } F[i] = n; continue; }
+          var d = f.r * (f.L === 2 ? 3.2 : 2.6); x.globalAlpha = f.a; x.drawImage(SP, f.x - d / 2, f.y - d / 2, d, d); }
+        x.globalAlpha = 1; requestAnimationFrame(tick); }
       requestAnimationFrame(tick); }
     function go() { bar(); garland(); snow(); }
     if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", go); } else { go(); }
