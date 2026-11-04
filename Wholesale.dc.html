@@ -300,6 +300,39 @@ return { team: t.team.map(function (x) { return { x: x }; }), shareLink: shareLi
 }
 }
 </script>
+<script id="nofa-addr-ac">
+(function () {
+  if (window.__nofaAC) { return; } window.__nofaAC = 1;
+  var css = '.nofa-ac{position:absolute;z-index:9999;background:#FBF8F1;border:1.5px solid #EBA93A;border-radius:14px;box-shadow:0 18px 44px rgba(19,59,48,.28);padding:6px;max-height:310px;overflow:auto;font-family:Manrope,"Noto Sans Armenian",system-ui,sans-serif;box-sizing:border-box}' +
+    '.nofa-ac button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;border:none;background:none;padding:9px 12px;border-radius:10px;cursor:pointer;font:inherit;color:#1E2A24}' +
+    '.nofa-ac button:hover,.nofa-ac button.on{background:#E8F1EC}.nofa-ac b{font-size:14.5px;color:#1D5545;font-weight:800}.nofa-ac span{font-size:12.5px;color:#6B756F}.nofa-ac .ft{font-size:11px;color:#9A9F98;padding:4px 12px 2px}.nofa-ac .ld{font-size:13px;color:#6B756F;padding:8px 12px}';
+  var stl = document.createElement('style'); stl.textContent = css; document.head.appendChild(stl);
+  var AB = { "Alabama":"AL","Alaska":"AK","Arizona":"AZ","Arkansas":"AR","California":"CA","Colorado":"CO","Connecticut":"CT","Delaware":"DE","District of Columbia":"DC","Florida":"FL","Georgia":"GA","Hawaii":"HI","Idaho":"ID","Illinois":"IL","Indiana":"IN","Iowa":"IA","Kansas":"KS","Kentucky":"KY","Louisiana":"LA","Maine":"ME","Maryland":"MD","Massachusetts":"MA","Michigan":"MI","Minnesota":"MN","Mississippi":"MS","Missouri":"MO","Montana":"MT","Nebraska":"NE","Nevada":"NV","New Hampshire":"NH","New Jersey":"NJ","New Mexico":"NM","New York":"NY","North Carolina":"NC","North Dakota":"ND","Ohio":"OH","Oklahoma":"OK","Oregon":"OR","Pennsylvania":"PA","Rhode Island":"RI","South Carolina":"SC","South Dakota":"SD","Tennessee":"TN","Texas":"TX","Utah":"UT","Vermont":"VT","Virginia":"VA","Washington":"WA","West Virginia":"WV","Wisconsin":"WI","Wyoming":"WY" };
+  var box = null, cur = null, items = [], sel = -1, timer = null, seq = 0;
+  function isAddr(el) { return el && el.tagName === "INPUT" && /^(street-address|address-line1)$/.test(el.getAttribute("autocomplete") || "") && !el.hasAttribute("data-noac"); }
+  function setVal(el, v) { var proto = el.tagName === "SELECT" ? HTMLSelectElement.prototype : (el.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype); var d = Object.getOwnPropertyDescriptor(proto, "value"); d.set.call(el, v); el.__nofaSet = true; el.dispatchEvent(new Event("input", { bubbles: true })); el.dispatchEvent(new Event("change", { bubbles: true })); el.__nofaSet = false; }
+  function fmt(p) { var line1 = [p.housenumber, p.street].filter(Boolean).join(" ") || p.name || ""; var city = p.city || p.town || p.village || p.locality || p.district || p.county || ""; var st = AB[p.state] || p.state || ""; var zip = p.postcode || ""; return { line1: line1, city: city, st: st, zip: zip, sub: [city, (st + " " + zip).trim()].filter(Boolean).join(", "), full: [line1, city, (st + " " + zip).trim()].filter(Boolean).join(", ") }; }
+  function hide() { if (box) { box.style.display = "none"; } items = []; sel = -1; }
+  function place() { if (!box || !cur) { return; } var r = cur.getBoundingClientRect(); box.style.left = (r.left + window.scrollX) + "px"; box.style.top = (r.bottom + window.scrollY + 6) + "px"; box.style.width = Math.max(r.width, 280) + "px"; }
+  function render(loading) { if (!box) { box = document.createElement("div"); box.className = "nofa-ac"; box.setAttribute("role", "listbox"); document.body.appendChild(box); box.addEventListener("mousedown", function (e) { e.preventDefault(); }); }
+    box.innerHTML = ""; if (loading) { var l = document.createElement("div"); l.className = "ld"; l.textContent = "…"; box.appendChild(l); }
+    items.forEach(function (it, i) { var b = document.createElement("button"); b.type = "button"; if (i === sel) { b.className = "on"; } var t = document.createElement("b"); t.textContent = it.line1 || it.full; var s = document.createElement("span"); s.textContent = it.sub; b.appendChild(t); b.appendChild(s); b.addEventListener("click", function () { pick(i); }); box.appendChild(b); });
+    if (!loading && !items.length) { hide(); return; }
+    if (items.length) { var f = document.createElement("div"); f.className = "ft"; f.textContent = "📍 OpenStreetMap"; box.appendChild(f); }
+    place(); box.style.display = "block"; }
+  function scope(el) { var n = el; for (var k = 0; k < 7 && n && n.parentElement; k++) { n = n.parentElement; if (n.querySelector('[autocomplete="postal-code"], [autocomplete="address-level2"]')) { return n; } } return null; }
+  function pick(i) { var it = items[i]; var el = cur; if (!it || !el) { return; } var sc = el.getAttribute("autocomplete") === "address-line1" ? scope(el) : null;
+    if (sc) { setVal(el, it.line1 || it.full); var c = sc.querySelector('[autocomplete="address-level2"]'); if (c && it.city) { setVal(c, it.city); } var z = sc.querySelector('[autocomplete="postal-code"]'); if (z && it.zip) { setVal(z, it.zip); } var s = sc.querySelector('[autocomplete="address-level1"]'); if (s && it.st) { setVal(s, it.st); } }
+    else { setVal(el, it.full); }
+    hide(); el.focus(); }
+  function search(el, q) { var my = ++seq; render(true);
+    fetch("https://photon.komoot.io/api/?limit=7&lang=en&lat=34.15&lon=-118.25&bbox=-125,24,-66,50&q=" + encodeURIComponent(q)).then(function (r) { return r.json(); }).then(function (j) { if (my !== seq || cur !== el) { return; } var seen = {}; items = (j.features || []).map(function (f) { return f.properties || {}; }).filter(function (p) { return !p.countrycode || p.countrycode === "US"; }).map(fmt).filter(function (it) { if (!it.line1 || seen[it.full]) { return false; } seen[it.full] = 1; return true; }).slice(0, 6); sel = -1; render(false); }).catch(function () { if (my === seq) { hide(); } }); }
+  document.addEventListener("input", function (e) { var el = e.target; if (!isAddr(el) || el.__nofaSet) { return; } cur = el; var q = (el.value || "").trim(); clearTimeout(timer); if (q.length < 3) { hide(); return; } timer = setTimeout(function () { search(el, q); }, 260); }, true);
+  document.addEventListener("keydown", function (e) { if (!box || box.style.display !== "block" || e.target !== cur) { return; } if (e.key === "ArrowDown") { e.preventDefault(); sel = Math.min(items.length - 1, sel + 1); render(false); } else if (e.key === "ArrowUp") { e.preventDefault(); sel = Math.max(0, sel - 1); render(false); } else if (e.key === "Enter" && sel >= 0) { e.preventDefault(); pick(sel); } else if (e.key === "Escape") { hide(); } }, true);
+  document.addEventListener("focusout", function (e) { if (e.target === cur) { setTimeout(hide, 180); } }, true);
+  window.addEventListener("resize", place); window.addEventListener("scroll", place, true);
+})();
+</script>
 <style id="pg-arr-css">.pgx{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;gap:8px}.pgx button{width:46px;height:46px;border-radius:50%;border:1.5px solid #EBA93A;background:#1D5545;color:#F6E3B4;font:800 22px/1 Manrope,system-ui,sans-serif;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;padding:0}.pgx button:hover{background:#133B30}.pgx .up{background:linear-gradient(180deg,#FCDB82,#EDB040 50%,#D38A22);color:#133B30;border-color:#D38A22}.pgx.main{bottom:88px;flex-direction:column}.pg-arrows{display:none !important}@media print{.pgx{display:none}}</style><div class="pgx" id="pgx"><button type="button" aria-label="Back" onclick="history.back()">‹</button><button type="button" aria-label="Forward" onclick="history.forward()">›</button><button type="button" class="up" aria-label="Top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button></div>
 </body>
 </html>
