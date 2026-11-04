@@ -946,7 +946,7 @@ return Object.assign(extVals, dzVals, lgVals, chVals, avVals, ivVals, rdpVals, c
 </script>
 <script id="nofa-embhost">
 (function () { if (window.__nofaEH) { return; } window.__nofaEH = 1;
-  window.addEventListener("message", function (e) { var d = e.data; if (!d || typeof d.nofaH !== "number") { return; }
+  window.addEventListener("message", function (e) { var d = e.data; if (d && typeof d.nofaWheel === "number") { window.scrollBy({ top: d.nofaWheel, left: 0, behavior: "auto" }); return; } if (!d || typeof d.nofaH !== "number") { return; }
     var fs = document.querySelectorAll("iframe.ext-frame"); for (var i = 0; i < fs.length; i++) { if (fs[i].contentWindow === e.source) { fs[i].style.height = Math.max(400, Math.min(20000, d.nofaH)) + "px"; } } });
 })();
 </script>
