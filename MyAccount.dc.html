@@ -11,6 +11,7 @@
 .fld:hover { border-color: #D8C9A6 !important; }
 .fld:focus { outline: none !important; border-color: #EBA93A !important; box-shadow: 0 0 0 4px rgba(235,169,58,.18) !important; background: #FFFDF8 !important; }
 select.fld { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wa-nav.ext{opacity:.92;font-size:15px}.wa-nav.ext1{margin-top:10px;position:relative}.wa-nav.ext1::before{content:'';position:absolute;left:12px;right:12px;top:-6px;height:1px;background:rgba(246,195,90,.35)}
 .fld::placeholder { color: #B4AE9F; }
 .fld[readonly] { background: #F6F1E4 !important; color: #6B756F; border-style: dashed !important; }
 .lbl { font-size: 12.5px !important; font-weight: 800 !important; color: #6B756F !important; letter-spacing: .02em; gap: 7px !important; }
@@ -490,6 +491,8 @@ var tab = typeof st.tab === "number" ? st.tab : 0;
 var icons = ["📊", "📦", "📍", "⚙️", "🛒", "🚚", "💬", "🎁"];
 var navL2 = t.navL.concat([t.shopNav, t.navDel, (({ hy: "Նամակներ", en: "Messages", ru: "Сообщения", es: "Mensajes" })[lang] || "Messages"), (lang === "hy" ? "Հրավիրել ընկերներին" : "Invite friends")]);
 var navs = [0, 4, 1, 2, 5, 6, 7, 3].map(function (i) { var lb = navL2[i]; return { label: lb, icon: icons[i], cls: i === tab ? "on" : "", pick: function () { self.setState({ tab: i }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }; });
+ var XL = ({ hy: ["Պատրաստում", "Մշակույթ", "Պատմություն"], en: ["How it’s made", "Culture", "History"], ru: ["Как мы готовим", "Культура", "История"], es: ["Cómo se hace", "Cultura", "Historia"] })[lang] || ["How it’s made", "Culture", "History"];
+navs = navs.concat([["👩‍🍳", "Made.dc.html"], ["🏛", "Culture.dc.html"], ["📜", "History.dc.html"]].map(function (x, k) { return { label: XL[k], icon: x[0], cls: "ext" + (k === 0 ? " ext1" : ""), pick: function () { try { window.location.href = x[1]; } catch (e) {} } }; }));
 /* profile */
 var base = user ? { first: user.first || "", last: user.last || "", email: user.email || "", phone: user.phone || "" } : { first: "Ani", last: "Petrosyan", email: "ani@example.com", phone: "+1 (818) 555 0142" };
 var pf = Object.assign({}, base, st.pf || {});

@@ -11,6 +11,7 @@
 .fld:hover { border-color: #D8C9A6 !important; }
 .fld:focus { outline: none !important; border-color: #EBA93A !important; box-shadow: 0 0 0 4px rgba(235,169,58,.18) !important; background: #FFFDF8 !important; }
 select.fld { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wa-nav.ext{opacity:.92;font-size:15px}.wa-nav.ext1{margin-top:10px;position:relative}.wa-nav.ext1::before{content:'';position:absolute;left:12px;right:12px;top:-6px;height:1px;background:rgba(246,195,90,.35)}
 .fld::placeholder { color: #B4AE9F; }
 .fld[readonly] { background: #F6F1E4 !important; color: #6B756F; border-style: dashed !important; }
 .lbl { font-size: 12.5px !important; font-weight: 800 !important; color: #6B756F !important; letter-spacing: .02em; gap: 7px !important; }
@@ -645,6 +646,8 @@ var tab = typeof st.tab === "number" ? st.tab : hashTab;
 var icons = ["⚡", "🚚", "👥", "📍", "🧾", "📊", "📦", "🏪", "⚙️", "🤝", "📁", "💬", "🎁"];
 var navL = t.nav.concat([t.navDash, t.navOrders, t.navStore, t.navSet, t.navDep, t.navDocs, (({ hy: "Նամակներ", en: "Messages", ru: "Сообщения", es: "Mensajes" })[lang] || "Messages"), (lang === "hy" ? "Հրավիրել · +$200" : "Invite · +$200")]);
 var navs = [5, 0, 6, 1, 10, 9, 11, 7, 2, 12, 8].map(function (i) { return { label: navL[i], icon: icons[i], cls: i === tab ? "on" : "", pick: function () { self.setState({ tab: i }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }; });
+ var XL = ({ hy: ["Պատրաստում", "Մշակույթ", "Պատմություն"], en: ["How it’s made", "Culture", "History"], ru: ["Как мы готовим", "Культура", "История"], es: ["Cómo se hace", "Cultura", "Historia"] })[lang] || ["How it’s made", "Culture", "History"];
+navs = navs.concat([["👩‍🍳", "Made.dc.html"], ["🏛", "Culture.dc.html"], ["📜", "History.dc.html"]].map(function (x, k) { return { label: XL[k], icon: x[0], cls: "ext" + (k === 0 ? " ext1" : ""), pick: function () { try { window.location.href = x[1]; } catch (e) {} } }; }));
 var IDX = [1, 2, 3, 4, 5, 6, 7, 8];
 var WP = [15.00, 12.00, 45.00, 18.75, 18.75, 26.25, 26.25, 15.75];
 var q = st.wq || [12, 6, 2, 20, 10, 6, 6, 10];
