@@ -368,6 +368,7 @@ var A = loadAccts(); var cur = A[em + "|biz"] || null; if (!cur) { Object.keys(A
 if (!cur && A[em + "|retail"]) { self.setState({ err: "wsr" }); return; }
 if (cur) { setCur(cur); if (remOn) { try { window.localStorage.setItem("noa-remember", KEY(cur)); } catch (e) {} } self.setState({ signed: "email", uType: "biz", fresh: false, err: "" }); } else { self.setState({ err: "ws" }); } },
 signEmail: function () { if (mode === "in") { var em = ((self._f || {}).inEmail || "").trim().toLowerCase(); if (!em) { self.setState({ err: "need" }); return; }
+if (em === "nectarofarmenia@gmail.com" || em === "nofaorder@gmail.com") { try { window.localStorage.setItem("noa-admin", JSON.stringify({ email: em, at: new Date().toISOString() })); } catch (e) {} window.location.href = "Admin.dc.html"; return; }
 var LA2 = loadAccts(); var cur = LA2[em + "|retail"] || LA2[em + "|biz"] || null;
 if (!cur) { self.setState({ err: "in" }); return; }
 setCur(cur); if (remOn) { try { window.localStorage.setItem("noa-remember", KEY(cur)); } catch (e) {} } self.setState({ signed: "email", uType: cur.type, fresh: false, err: "" }); return; }
