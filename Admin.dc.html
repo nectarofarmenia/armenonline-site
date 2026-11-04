@@ -65,6 +65,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 .social{min-height:52px;border-radius:999px;border:1.5px solid #D8CDB4;background:#FFFFFF;font-family:inherit;font-weight:800;font-size:15px;color:#1E2A24;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;width:100%}
 .social:hover{border-color:#EBA93A}
 @media (max-width:760px){.two-col{flex-direction:column !important}.sum-card{position:static !important}.hdr-back{display:none !important}}
+.ch-store{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;border-radius:14px;border:1.5px solid #ECE3CF;background:#FBF9F4;font-family:inherit;font-size:14px;color:#1E2A24;cursor:pointer}.ch-store.on{border-color:#1D5545;background:#E8F1EC}.ch-mem{min-height:36px;padding:0 12px;border-radius:999px;border:1.5px solid #D8CDB4;background:#fff;font-family:inherit;font-weight:700;font-size:13.5px;color:#1D5545;cursor:pointer}.ch-mem.on{background:#1D5545;color:#F6E3B4;border-color:#1D5545}.ch-badge{display:inline-flex;min-width:20px;height:20px;border-radius:999px;background:#B03A2E;color:#fff;font-size:11px;font-weight:800;align-items:center;justify-content:center;padding:0 5px}@media(max-width:760px){.ch-grid{grid-template-columns:1fr!important}}
 .inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .inv-folder{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px;border-radius:18px;border:1.5px solid #ECE3CF;background:#FBF9F4;font-family:inherit;cursor:pointer;text-align:left;transition:transform .15s,border-color .15s,box-shadow .15s}
 .inv-folder:hover{transform:translateY(-2px);border-color:#EBA93A;box-shadow:0 8px 20px rgba(29,85,69,.10)}
@@ -381,6 +382,26 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </sc-if>
 </div>
 </sc-if>
+<sc-if value="{{tab11}}" hint-placeholder-val="{{false}}">
+<div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 26px; color: #1D5545">{{ch.aH}}</h1>
+<p style="margin: 0; color: #5E6A63; font-size: 14px; line-height: 1.5">{{ch.aP}}</p>
+<sc-if value="{{chNoStores}}" hint-placeholder-val="{{false}}"><p style="margin: 0; padding: 14px; border-radius: 14px; background: #F3EBD7; color: #5E6A63">{{ch.noStores}}</p></sc-if>
+<div style="display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: 16px; align-items: start" class="ch-grid">
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 13px; font-weight: 800; color: #5E6A63">🏪 {{ch.store}}</span>
+<sc-for list="{{chStores}}" as="c" hint-placeholder-count="3"><button type="button" onClick="{{c.pick}}" class="ch-store {{c.cls}}"><span style="flex: 1 1 auto; text-align: left"><strong>{{c.name}}</strong><br><span style="font-size: 12px; color: #6B756F">{{c.sub}}</span></span><sc-if value="{{c.hasU}}" hint-placeholder-val="{{false}}"><span class="ch-badge">{{c.u}}</span></sc-if></button></sc-for></div>
+<div style="display: flex; flex-direction: column; gap: 12px; min-width: 0">
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center"><span style="font-size: 13px; font-weight: 800; color: #5E6A63">✉ {{ch.to}}:</span><sc-for list="{{chMembers}}" as="m" hint-placeholder-count="3"><button type="button" onClick="{{m.pick}}" class="ch-mem {{m.cls}}">{{m.name}} <span style="font-size: 11px; opacity: .75">· {{m.role}}</span><sc-if value="{{m.hasU}}" hint-placeholder-val="{{false}}"> <span class="ch-badge">{{m.u}}</span></sc-if></button></sc-for></div>
+<span style="font-size: 12.5px; color: #6B756F">{{chToLine}}</span>
+<div style="height: 420px; overflow-y: auto; display: flex; flex-direction: column-reverse; gap: 10px; padding: 14px; border-radius: 16px; background: #FBF8F1; border: 1px solid #ECE3CF">
+<sc-if value="{{chEmpty}}" hint-placeholder-val="{{false}}"><p style="margin: auto; color: #8A8F86; font-size: 14px; text-align: center">{{ch.aEmpty}}</p></sc-if>
+<sc-for list="{{chMsgs}}" as="m" hint-placeholder-count="4"><div style="display: flex; justify-content: {{m.jc}}"><div style="max-width: 78%; padding: 10px 14px; border-radius: 16px; background: {{m.bg}}; color: {{m.fg}}; box-shadow: 0 2px 6px rgba(0,0,0,.06); display: flex; flex-direction: column; gap: 3px"><span style="font-size: 11.5px; font-weight: 800; opacity: .8">{{m.who}}</span><span style="font-size: 14.5px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere">{{m.text}}</span><span style="font-size: 11px; opacity: .65; align-self: flex-end">{{m.time}}</span></div></div></sc-for>
+</div>
+<div style="display: flex; gap: 8px; align-items: flex-end"><textarea class="fld" rows="2" style="padding: 10px 14px; min-height: 52px; resize: none; flex: 1 1 auto" placeholder="{{ch.ph}}" value="{{chDraft}}" onInput="{{chSetDraft}}" onKeyDown="{{chKey}}"></textarea><button type="button" onClick="{{chSend}}" class="btn-green" style="min-height: 52px; padding: 0 20px; border-radius: 14px; border: none; color: #F6E3B4; font-family: inherit; font-weight: 800; cursor: pointer; white-space: nowrap; flex: 0 0 auto">{{ch.send}} ➤</button></div>
+</div>
+</div>
+</div>
+</sc-if>
 <sc-if value="{{tab8}}" hint-placeholder-val="{{false}}">
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px">
 <div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px"><h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545; font-size: 22px">{{t.rev7}}</h2>
@@ -400,7 +421,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
 class Component extends DCLogic {
-componentDidMount() { var self = this; this._lu = null; this._iv = setInterval(function () { var u = null; try { u = window.localStorage.getItem("noa-user"); } catch (e) { u = null; } u = u + "|" + (function () { try { var w = window.localStorage.getItem("noa-accounts") || ""; for (var i = 0; i < window.localStorage.length; i++) { var k = window.localStorage.key(i); if (k && k.indexOf("noa-ws-orders") === 0) { w += k + window.localStorage.getItem(k); } } return w; } catch (e) { return ""; } })();
+componentDidMount() { var self = this; this._lu = null; this._iv = setInterval(function () { var u = null; try { u = window.localStorage.getItem("noa-user"); } catch (e) { u = null; } u = u + "|" + (function () { try { var w = window.localStorage.getItem("noa-accounts") || ""; for (var i = 0; i < window.localStorage.length; i++) { var k = window.localStorage.key(i); if (k && (k.indexOf("noa-ws-orders") === 0 || k.indexOf("noa-chat") === 0)) { w += k + window.localStorage.getItem(k); } } return w; } catch (e) { return ""; } })();
 if (u !== self._lu) { self._lu = u; self.setState({ rtick: Date.now() }); } }, 1000); }
 componentWillUnmount() { clearInterval(this._iv); }
 renderVals() {
@@ -496,10 +517,37 @@ var wq = wqList.map(function (w) { var o = w.o; var id = w.key + "#" + w.ix; var
   sendProp: function () { var f = wsF[id] || {}; var d = f.d || minD; setWs(w.key, w.ix, { ap: "proposed", pd: d + "T12:00:00", pnote: f.n || "", decidedAt: new Date().toISOString() }); } }; });
 var wqRecent = wsAll.filter(function (w) { return w.o.ap === "approved" || w.o.ap === "rejected" || w.o.ap === "cancelled"; }).sort(function (a, b) { return (b.o.decidedAt || b.o.chargedAt || "") < (a.o.decidedAt || a.o.chargedAt || "") ? -1 : 1; }).slice(0, 6).map(function (w) { var o = w.o; var m = { approved: [t.wqApproved, "#2F7A55"], rejected: [t.wqRejected, "#B03A2E"], cancelled: [t.wqCancelled, "#6B756F"] }[o.ap]; return { no: String(o.no), biz: w.biz, req: wsFd(o.date), total: money(wsTot(o)), res: m[0], col: m[1] }; });
 var wqPendN = wqList.filter(function (w) { return w.o.ap === "pending"; }).length;
-var icons = ["📊", "📦", "🧾", "👥", "🏪", "🚚", "✉️", "🏭", "📈", "🆕", "📑"];
+var CHT = {"hy": {"nav": "Նամակներ", "H": "💬 Նամակագրություն Nectar of Armenia-ի հետ", "P": "Գրեք մեզ պատվերների, առաքումների կամ հաշիվների մասին։ Պատասխանում ենք աշխատանքային ժամերին՝ երկուշաբթի–շաբաթ, 8:00–18:00։", "ph": "Գրեք հաղորդագրություն…", "send": "Ուղարկել", "empty": "Դեռ նամակներ չկան։ Գրեք առաջինը։", "you": "Դուք", "nofa": "Nectar of Armenia", "threads": "Զրույցներ", "pick": "Ընտրեք զրույցը", "onlyOwn": "Դուք տեսնում եք միայն ձեր նամակագրությունը։", "aH": "💬 Չատ խանութների հետ", "aP": "Ընտրեք խանութը և այն աշխատակցին, ում ուզում եք գրել։ Յուրաքանչյուր աշխատակից ունի առանձին նամակագրություն։", "store": "Խանութ", "to": "Ում", "aEmpty": "Այս աշխատակցի հետ դեռ նամակներ չկան։", "noStores": "Գրանցված խանութներ դեռ չկան։"}, "en": {"nav": "Messages", "H": "💬 Messages with Nectar of Armenia", "P": "Write to us about orders, deliveries or invoices. We reply during business hours, Mon–Sat 8:00–18:00.", "ph": "Type a message…", "send": "Send", "empty": "No messages yet. Start the conversation.", "you": "You", "nofa": "Nectar of Armenia", "threads": "Conversations", "pick": "Pick a conversation", "onlyOwn": "You can see only your own conversation.", "aH": "💬 Chat with stores", "aP": "Pick a store and the team member you want to write to. Each team member has a separate conversation.", "store": "Store", "to": "To", "aEmpty": "No messages with this team member yet.", "noStores": "No registered stores yet."}};
+var ch = CHT[lang] || CHT.en;
+var chLoad = function (sk) { var o = null; try { o = JSON.parse(window.localStorage.getItem("noa-chat|" + sk) || "null"); } catch (e) { o = null; } if (!o && sk === "demo") { var t0 = Date.now(); o = { th: { "owner@araratmarket.com": { msgs: [{ f: "n", by: "Nectar of Armenia", x: "Բարև Ձեզ։ Ձեր NofA-W-2219 պատվերը կառաքվի վաղը՝ 9:00–11:00 միջակայքում։", at: new Date(t0 - 864e5).toISOString() }, { f: "s", by: "Armen", x: "Շնորհակալություն, սպասում ենք։", at: new Date(t0 - 86e6).toISOString() }], rs: new Date(t0 - 85e6).toISOString(), ra: new Date(t0 - 85e6).toISOString() } } }; } return o || { th: {} }; };
+var chSave = function (sk, o) { try { window.localStorage.setItem("noa-chat|" + sk, JSON.stringify(o)); } catch (e) {} self.setState({ chT: Date.now() }); };
+var chTime = function (iso) { var d = new Date(iso); return d.toLocaleString(lang === "hy" ? "hy-AM" : "en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }); };
+var chUnread = function (thr, side) { if (!thr) { return 0; } var r = side === "s" ? thr.rs : thr.ra; var other = side === "s" ? "n" : "s"; return (thr.msgs || []).filter(function (m) { return m.f === other && (!r || m.at > r); }).length; };
+var chView = function (thr) { return (thr && thr.msgs ? thr.msgs : []).slice().reverse().map(function (m) { var mine = m.f === "n"; return { jc: mine ? "flex-end" : "flex-start", bg: mine ? "#1D5545" : "#FFFFFF", fg: mine ? "#F6E3B4" : "#1E2A24", who: m.f === "n" ? ch.nofa : m.by, text: m.x, time: chTime(m.at) }; }); };
+
+var chStoresRaw = (function () { var out = [{ sk: "demo", name: "Արարատ Մարկետ (demo)", sub: "Glendale", mem: [["Armen Sargsyan", "owner@araratmarket.com", 0], ["Lilit", "lilit@araratmarket.com", 1], ["David", "receiving@araratmarket.com", 2]] }];
+ try { var A = JSON.parse(window.localStorage.getItem("noa-accounts") || "{}") || {}; Object.keys(A).forEach(function (k) { var a = A[k]; if (!a || !a.email || !(a.type === "biz" || k.slice(-4) === "|biz")) { return; } var em = a.email.toLowerCase(); var mem = [[((a.first || "") + " " + (a.last || "")).trim() || a.biz || em, em, 0]].concat((a.team || []).map(function (m) { return [m[0], String(m[1] || "").toLowerCase(), m[2]]; })); out.push({ sk: em, name: a.biz || em, sub: em, mem: mem }); }); } catch (e) {}
+ return out; })();
+var RL = ({ hy: ["Սեփականատեր", "Մենեջեր", "Ընդունող", "Պատվիրող"], en: ["Owner", "Manager", "Receiving", "Orderer"] })[lang] || ["Owner", "Manager", "Receiving", "Orderer"];
+var chStoreSel = st.chStore && chStoresRaw.some(function (x) { return x.sk === st.chStore; }) ? st.chStore : (chStoresRaw[0] ? chStoresRaw[0].sk : "");
+var chStoreObj = chStoresRaw.filter(function (x) { return x.sk === chStoreSel; })[0] || null;
+var chDataA = chStoreObj ? chLoad(chStoreSel) : { th: {} };
+var chMemSel = chStoreObj ? ((st.chMem && chStoreObj.mem.some(function (m) { return m[1] === st.chMem; })) ? st.chMem : chStoreObj.mem[0][1]) : "";
+var chThrA = chDataA.th[chMemSel];
+var chUnreadAdmin = 0; chStoresRaw.forEach(function (x) { var d = chLoad(x.sk); Object.keys(d.th || {}).forEach(function (e) { chUnreadAdmin += chUnread(d.th[e], "n"); }); });
+if (tab === 11 && chThrA && chUnread(chThrA, "n") > 0) { setTimeout(function () { var o = chLoad(chStoreSel); if (o.th[chMemSel]) { o.th[chMemSel].ra = new Date().toISOString(); chSave(chStoreSel, o); } }, 50); }
+var chSendA = function () { var x = (st.chDraft || "").trim(); if (!x || !chStoreObj) { return; } var o = chLoad(chStoreSel); var th = o.th[chMemSel] || { msgs: [] }; th.msgs = (th.msgs || []).concat([{ f: "n", by: "Nectar of Armenia", x: x, at: new Date().toISOString() }]); th.ra = new Date().toISOString(); o.th[chMemSel] = th; chSave(chStoreSel, o); self.setState({ chDraft: "" }); };
+var chMemObj = chStoreObj ? chStoreObj.mem.filter(function (m) { return m[1] === chMemSel; })[0] : null;
+var chValsA = { tab11: tab === 11, ch: ch, chNoStores: chStoresRaw.length === 0,
+ chStores: chStoresRaw.map(function (x) { var d = chLoad(x.sk); var u = 0; Object.keys(d.th || {}).forEach(function (e) { u += chUnread(d.th[e], "n"); }); return { name: x.name, sub: x.sub, cls: x.sk === chStoreSel ? "on" : "", hasU: u > 0, u: String(u), pick: function () { self.setState({ chStore: x.sk, chMem: "" }); } }; }),
+ chMembers: chStoreObj ? chStoreObj.mem.map(function (m) { var u = chUnread(chDataA.th[m[1]], "n"); return { name: m[0], role: RL[m[2]] || "", cls: m[1] === chMemSel ? "on" : "", hasU: u > 0, u: String(u), pick: function () { self.setState({ chMem: m[1] }); } }; }) : [],
+ chToLine: chMemObj ? chMemObj[0] + " · " + chMemObj[1] + " · " + (chStoreObj ? chStoreObj.name : "") : "",
+ chMsgs: chView(chThrA), chEmpty: !(chThrA && chThrA.msgs && chThrA.msgs.length), chDraft: st.chDraft || "", chSetDraft: function (e) { self.setState({ chDraft: e.target.value }); },
+ chKey: function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); chSendA(); } }, chSend: chSendA };
+var icons = ["📊", "📦", "🧾", "👥", "🏪", "🚚", "✉️", "🏭", "📈", "🆕", "📑", "💬"];
 var badges = [0, lowIdx.length, newCnt, 0, 0, orders.filter(function (o) { return o.drv < 0 && o.st < 4; }).length, 0, 0, 0];
-badges[9] = pendingApps; badges[10] = 0; badges[2] = badges[2] + wqPendN; var navL = t.nav.concat([t.regNav, t.invNav]);
-var navs = [0, 9, 1, 2, 10, 3, 4, 5, 6, 7, 8].map(function (i) { var lb = navL[i]; return { label: lb, icon: icons[i], cls: i === tab ? "on" : "", hasBadge: badges[i] > 0, badge: badges[i], pick: go(i) }; });
+badges[9] = pendingApps; badges[10] = 0; badges[11] = chUnreadAdmin; badges[2] = badges[2] + wqPendN; var navL = t.nav.concat([t.regNav, t.invNav, (lang === "en" ? "Chat" : "Չատ")]);
+var navs = [0, 9, 1, 2, 10, 11, 3, 4, 5, 6, 7, 8].map(function (i) { var lb = navL[i]; return { label: lb, icon: icons[i], cls: i === tab ? "on" : "", hasBadge: badges[i] > 0, badge: badges[i], pick: go(i) }; });
 
 function invYmd(d) { var m = d.getMonth() + 1, dd = d.getDate(); return d.getFullYear() + "-" + (m < 10 ? "0" : "") + m + "-" + (dd < 10 ? "0" : "") + dd; }
 var INV_TODAY = new Date(); var invToday = invYmd(INV_TODAY);
@@ -562,14 +610,14 @@ var nfLines = nf.lines.map(function (l, i) { return { opts: [1, 2, 3, 4, 5, 6, 7
 setP: function (e) { var L2 = nf.lines.map(function (x) { return x.slice(); }); L2[i][0] = parseInt(e.target.value, 10); setNf({ lines: L2 }); },
 setQ: function (e) { var L2 = nf.lines.map(function (x) { return x.slice(); }); L2[i][1] = Math.max(0, parseInt(e.target.value || "0", 10) || 0); setNf({ lines: L2 }); },
 del: function () { if (nf.lines.length > 1) { setNf({ lines: nf.lines.filter(function (x, j) { return j !== i; }) }); } } }; });
-var invVals = { wq: wq, wqN: String(wqList.length), wqHas: wqList.length > 0, wqEmpty: wqList.length === 0, wqRecent: wqRecent, wqHasRecent: wqRecent.length > 0, tab10: tab === 10, invKpis: invKpis, invCfgOpen: !!st.icfg, invToggleCfg: function () { self.setState({ icfg: !st.icfg }); }, cfgFields: cfgFields, cfgSaveL: st.cfgOk ? t.saved : t.save,
+var invVals = Object.assign(chValsA, { wq: wq, wqN: String(wqList.length), wqHas: wqList.length > 0, wqEmpty: wqList.length === 0, wqRecent: wqRecent, wqHasRecent: wqRecent.length > 0, tab10: tab === 10, invKpis: invKpis, invCfgOpen: !!st.icfg, invToggleCfg: function () { self.setState({ icfg: !st.icfg }); }, cfgFields: cfgFields, cfgSaveL: st.cfgOk ? t.saved : t.save,
 cfgSave: function () { try { window.localStorage.setItem("noa-paycfg", JSON.stringify(cfg)); } catch (e) {} self.setState({ cfgDraft: null, cfgOk: true }); setTimeout(function () { self.setState({ cfgOk: false }); }, 1800); },
 invNewOn: !!st.inew, invNewOpen: function () { self.setState({ inew: true, iv: "", nf: null }); }, invNewClose: function () { self.setState({ inew: false, nf: null }); },
 nfCustOpts: nfCustOpts, nfSetCust: function (e) { var ci = parseInt(e.target.value, 10); setNf({ ci: ci, net: invNetOf(ci) }); }, nfNetOpts: nfNetOpts, nfSetNet: function (e) { setNf({ net: parseInt(e.target.value, 10) || 0 }); },
 nfLines: nfLines, nfAdd: function () { setNf({ lines: nf.lines.concat([[1, 1]]) }); }, nfNote: nf.note || "", nfSetNote: function (e) { setNf({ note: e.target.value }); }, nfTotal: money(nfTot),
 nfCreate: function () { var lines = nf.lines.filter(function (l) { return l[1] > 0; }); if (!lines.length) { return; } var a = invLoad(); var no = invNextNo(a); a.push({ no: no, ci: nf.ci, date: invToday, net: nf.net, items: lines, status: "unpaid", method: "", paidAt: "", note: nf.note || "" }); invSave(a); self.setState({ inew: false, nf: null, iv: no, iy: invToday.slice(0, 4), im: parseInt(invToday.slice(5, 7), 10) }); },
 invViewOn: !!curInv && !st.inew, invClose: function () { self.setState({ iv: "" }); }, invPrint: function () { try { window.print(); } catch (e) {} }, iv: iv, pc: pc,
-invBrowse: !curInv && !st.inew, crumbs: crumbs, invLvl0: !iy, invLvl1: !!iy && !im, invLvl2: !!iy && !!im, yearFolders: yearFolders, monthFolders: monthFolders, invRows: invRows, noInvRows: invRows.length === 0, invChips: invChips };
+invBrowse: !curInv && !st.inew, crumbs: crumbs, invLvl0: !iy, invLvl1: !!iy && !im, invLvl2: !!iy && !!im, yearFolders: yearFolders, monthFolders: monthFolders, invRows: invRows, noInvRows: invRows.length === 0, invChips: invChips });
 var tf = st.tf || "all";
 var typeChips = [["all", t.all], ["r", t.retail], ["w", t.ws]].map(function (x) { return { label: x[1], cls: x[0] === tf ? "on" : "", pick: function () { self.setState({ tf: x[0] }); } }; });
 var cf = typeof st.cf === "number" ? st.cf : -1;

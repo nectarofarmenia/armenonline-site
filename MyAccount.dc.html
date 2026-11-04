@@ -370,7 +370,7 @@ var self = this; this._last = null;
 this._sync = function () {
 var c = null, l = null, u = null, o = null;
 try { c = window.localStorage.getItem("noa-cart-v2"); l = window.localStorage.getItem("noa-lang"); u = window.localStorage.getItem("noa-user"); o = window.localStorage.getItem("noa-last-order"); } catch (e) { return; }
-var w = ""; try { for (var i = 0; i < window.localStorage.length; i++) { var k = window.localStorage.key(i); if (k && k.indexOf("noa-ws-orders") === 0) { w += k + window.localStorage.getItem(k); } } } catch (e) {}
+var w = ""; try { for (var i = 0; i < window.localStorage.length; i++) { var k = window.localStorage.key(i); if (k && (k.indexOf("noa-ws-orders") === 0 || k.indexOf("noa-chat") === 0)) { w += k + window.localStorage.getItem(k); } } } catch (e) {}
 var key = c + "|" + l + "|" + u + "|" + o + "|" + w;
 if (self._last === null) { self._last = key; return; }
 if (key === self._last) { return; }

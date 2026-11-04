@@ -298,6 +298,19 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </div>
 </sc-if>
 </sc-if>
+<sc-if value="{{tabChat}}" hint-placeholder-val="{{false}}">
+<div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 26px; color: #1D5545">{{ch.H}}</h1>
+<p style="margin: 0; color: #5E6A63; font-size: 14px; line-height: 1.5">{{ch.P}}</p>
+<sc-if value="{{chIsOwner}}" hint-placeholder-val="{{true}}"><div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center"><span style="font-size: 13px; font-weight: 800; color: #5E6A63">{{ch.threads}}:</span><sc-for list="{{chThreads}}" as="c" hint-placeholder-count="3"><button type="button" onClick="{{c.pick}}" class="wa-chip {{c.cls}}">{{c.name}}<sc-if value="{{c.hasU}}" hint-placeholder-val="{{false}}"> <span style="display: inline-flex; min-width: 20px; height: 20px; border-radius: 999px; background: #B03A2E; color: #fff; font-size: 11px; font-weight: 800; align-items: center; justify-content: center; padding: 0 5px; margin-left: 4px">{{c.u}}</span></sc-if></button></sc-for></div></sc-if>
+<sc-if value="{{chNotOwner}}" hint-placeholder-val="{{false}}"><span style="font-size: 13px; color: #6B756F">🔒 {{ch.onlyOwn}}</span></sc-if>
+<div style="height: 420px; overflow-y: auto; display: flex; flex-direction: column-reverse; gap: 10px; padding: 14px; border-radius: 16px; background: #FBF8F1; border: 1px solid #ECE3CF">
+<sc-if value="{{chEmpty}}" hint-placeholder-val="{{false}}"><p style="margin: auto; color: #8A8F86; font-size: 14px; text-align: center">{{ch.empty}}</p></sc-if>
+<sc-for list="{{chMsgs}}" as="m" hint-placeholder-count="4"><div style="display: flex; justify-content: {{m.jc}}"><div style="max-width: 78%; padding: 10px 14px; border-radius: 16px; background: {{m.bg}}; color: {{m.fg}}; box-shadow: 0 2px 6px rgba(0,0,0,.06); display: flex; flex-direction: column; gap: 3px"><span style="font-size: 11.5px; font-weight: 800; opacity: .8">{{m.who}}</span><span style="font-size: 14.5px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere">{{m.text}}</span><span style="font-size: 11px; opacity: .65; align-self: flex-end">{{m.time}}</span></div></div></sc-for>
+</div>
+<div style="display: flex; gap: 8px; align-items: flex-end"><textarea class="fld" rows="2" style="padding: 10px 14px; min-height: 52px; resize: none; flex: 1 1 auto" placeholder="{{ch.ph}}" value="{{chDraft}}" onInput="{{chSetDraft}}" onKeyDown="{{chKey}}"></textarea><button type="button" onClick="{{chSend}}" class="btn-green" style="min-height: 52px; padding: 0 20px; border-radius: 14px; border: none; color: #F6E3B4; font-family: inherit; font-weight: 800; cursor: pointer; white-space: nowrap; flex: 0 0 auto">{{ch.send}} ➤</button></div>
+</div>
+</sc-if>
 <sc-if value="{{tabSet}}" hint-placeholder-val="{{false}}">
 <div class="card3d" style="border-radius: 26px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
 <h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">{{t.setH}}</h1>
@@ -536,7 +549,7 @@ var self = this; this._last = null;
 this._sync = function () {
 var c = null, l = null, u = null, o = null;
 try { c = window.localStorage.getItem("noa-cart-v2"); l = window.localStorage.getItem("noa-lang"); u = window.localStorage.getItem("noa-user"); o = window.localStorage.getItem("noa-last-order"); } catch (e) { return; }
-var w = ""; try { for (var i = 0; i < window.localStorage.length; i++) { var k = window.localStorage.key(i); if (k && k.indexOf("noa-ws-orders") === 0) { w += k + window.localStorage.getItem(k); } } } catch (e) {}
+var w = ""; try { for (var i = 0; i < window.localStorage.length; i++) { var k = window.localStorage.key(i); if (k && (k.indexOf("noa-ws-orders") === 0 || k.indexOf("noa-chat") === 0)) { w += k + window.localStorage.getItem(k); } } } catch (e) {}
 var key = c + "|" + l + "|" + u + "|" + o + "|" + w;
 if (self._last === null) { self._last = key; return; }
 if (key === self._last) { return; }
@@ -578,9 +591,9 @@ var doSwitch = function () { if (!swOther) { return; } try { window.localStorage
 var bizN = isU ? (user.biz || ((user.first || "") + " " + (user.last || "")).trim() || "—") : t.biz;
 var hashTab = 5; try { if (window.location.hash === "#order") { hashTab = 0; } } catch (e) {}
 var tab = typeof st.tab === "number" ? st.tab : hashTab;
-var icons = ["⚡", "🚚", "👥", "📍", "🧾", "📊", "📦", "🏪", "⚙️", "🤝", "📁"];
-var navL = t.nav.concat([t.navDash, t.navOrders, t.navStore, t.navSet, t.navDep, t.navDocs]);
-var navs = [5, 0, 6, 1, 10, 9, 7, 2, 8].map(function (i) { return { label: navL[i], icon: icons[i], cls: i === tab ? "on" : "", pick: function () { self.setState({ tab: i }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }; });
+var icons = ["⚡", "🚚", "👥", "📍", "🧾", "📊", "📦", "🏪", "⚙️", "🤝", "📁", "💬"];
+var navL = t.nav.concat([t.navDash, t.navOrders, t.navStore, t.navSet, t.navDep, t.navDocs, (({ hy: "Նամակներ", en: "Messages", ru: "Сообщения", es: "Mensajes" })[lang] || "Messages")]);
+var navs = [5, 0, 6, 1, 10, 9, 11, 7, 2, 8].map(function (i) { return { label: navL[i], icon: icons[i], cls: i === tab ? "on" : "", pick: function () { self.setState({ tab: i }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }; });
 var IDX = [1, 2, 3, 4, 5, 6, 7, 8];
 var WP = [15.00, 12.00, 45.00, 18.75, 18.75, 26.25, 26.25, 15.75];
 var q = st.wq || [12, 6, 2, 20, 10, 6, 6, 10];
@@ -810,7 +823,28 @@ var lgVals = { lg: lg, lgF: lgF, lgSet: lgSet, lgSave: lgSave, lgCur: dzEm || "�
  lgMsgOn: !!st.lgMsg, lgMsg: st.lgMsg || "", lgMsgCol: st.lgErr ? "#B03A2E" : "#2F7A55",
  dzTyped: st.dzTyped || "", dzType: function (e) { self.setState({ dzTyped: e.target.value, dzMsg: "" }); }, dzGoBg: ((st.dzTyped || "").trim().toLowerCase() === dzEm && dzEm) ? "#B03A2E" : "#D9A39C", dzBackdrop: function (e) { if (e.target === e.currentTarget) { self.setState({ dzOpen: false, dzTyped: "" }); } } };
 
-return Object.assign(dashVals, docVals, dzVals, lgVals, { hasLogo: !!(isU ? user.logo : st.logo), noLogo: !(isU ? user.logo : st.logo), logoSrc: (isU ? user.logo : st.logo) || "",
+var CHT = {"hy": {"nav": "Նամակներ", "H": "💬 Նամակագրություն Nectar of Armenia-ի հետ", "P": "Գրեք մեզ պատվերների, առաքումների կամ հաշիվների մասին։ Պատասխանում ենք աշխատանքային ժամերին՝ երկուշաբթի–շաբաթ, 8:00–18:00։", "ph": "Գրեք հաղորդագրություն…", "send": "Ուղարկել", "empty": "Դեռ նամակներ չկան։ Գրեք առաջինը։", "you": "Դուք", "nofa": "Nectar of Armenia", "threads": "Զրույցներ", "pick": "Ընտրեք զրույցը", "onlyOwn": "Դուք տեսնում եք միայն ձեր նամակագրությունը։", "aH": "💬 Չատ խանութների հետ", "aP": "Ընտրեք խանութը և այն աշխատակցին, ում ուզում եք գրել։ Յուրաքանչյուր աշխատակից ունի առանձին նամակագրություն։", "store": "Խանութ", "to": "Ում", "aEmpty": "Այս աշխատակցի հետ դեռ նամակներ չկան։", "noStores": "Գրանցված խանութներ դեռ չկան։"}, "en": {"nav": "Messages", "H": "💬 Messages with Nectar of Armenia", "P": "Write to us about orders, deliveries or invoices. We reply during business hours, Mon–Sat 8:00–18:00.", "ph": "Type a message…", "send": "Send", "empty": "No messages yet. Start the conversation.", "you": "You", "nofa": "Nectar of Armenia", "threads": "Conversations", "pick": "Pick a conversation", "onlyOwn": "You can see only your own conversation.", "aH": "💬 Chat with stores", "aP": "Pick a store and the team member you want to write to. Each team member has a separate conversation.", "store": "Store", "to": "To", "aEmpty": "No messages with this team member yet.", "noStores": "No registered stores yet."}};
+var ch = CHT[lang] || CHT.en;
+var chLoad = function (sk) { var o = null; try { o = JSON.parse(window.localStorage.getItem("noa-chat|" + sk) || "null"); } catch (e) { o = null; } if (!o && sk === "demo") { var t0 = Date.now(); o = { th: { "owner@araratmarket.com": { msgs: [{ f: "n", by: "Nectar of Armenia", x: "Բարև Ձեզ։ Ձեր NofA-W-2219 պատվերը կառաքվի վաղը՝ 9:00–11:00 միջակայքում։", at: new Date(t0 - 864e5).toISOString() }, { f: "s", by: "Armen", x: "Շնորհակալություն, սպասում ենք։", at: new Date(t0 - 86e6).toISOString() }], rs: new Date(t0 - 85e6).toISOString(), ra: new Date(t0 - 85e6).toISOString() } } }; } return o || { th: {} }; };
+var chSave = function (sk, o) { try { window.localStorage.setItem("noa-chat|" + sk, JSON.stringify(o)); } catch (e) {} self.setState({ chT: Date.now() }); };
+var chTime = function (iso) { var d = new Date(iso); return d.toLocaleString(lang === "hy" ? "hy-AM" : "en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }); };
+var chUnread = function (thr, side) { if (!thr) { return 0; } var r = side === "s" ? thr.rs : thr.ra; var other = side === "s" ? "n" : "s"; return (thr.msgs || []).filter(function (m) { return m.f === other && (!r || m.at > r); }).length; };
+var chView = function (thr) { return (thr && thr.msgs ? thr.msgs : []).slice().reverse().map(function (m) { var mine = m.f === "s"; return { jc: mine ? "flex-end" : "flex-start", bg: mine ? "#1D5545" : "#FFFFFF", fg: mine ? "#F6E3B4" : "#1E2A24", who: m.f === "n" ? ch.nofa : m.by, text: m.x, time: chTime(m.at) }; }); };
+
+var chSk = isU ? (user.email || "").toLowerCase() : "demo";
+var chData = chLoad(chSk);
+var chPeople = [owner].concat(extra).filter(function (m) { return m && m[1]; }).map(function (m) { return { name: m[0], email: String(m[1]).toLowerCase() }; });
+var chMe = actor && extra[actIdx] ? { name: extra[actIdx][0], email: String(extra[actIdx][1]).toLowerCase() } : { name: owner[0], email: String(owner[1]).toLowerCase() };
+var chSel = actor ? chMe.email : (st.chSel || chMe.email);
+var chThr = chData.th[chSel];
+var chUnreadTot = 0; chPeople.forEach(function (p) { if (!actor || p.email === chMe.email) { chUnreadTot += chUnread(chData.th[p.email], "s"); } });
+if (tab === 11 && chThr && chUnread(chThr, "s") > 0) { setTimeout(function () { var o = chLoad(chSk); if (o.th[chSel]) { o.th[chSel].rs = new Date().toISOString(); chSave(chSk, o); } }, 50); }
+var chSendFn = function () { var x = (st.chDraft || "").trim(); if (!x) { return; } var o = chLoad(chSk); var th = o.th[chSel] || { msgs: [] }; th.msgs = (th.msgs || []).concat([{ f: "s", by: chMe.name, x: x, at: new Date().toISOString() }]); th.rs = new Date().toISOString(); th.nm = (chPeople.filter(function (p) { return p.email === chSel; })[0] || chMe).name; o.th[chSel] = th; o.biz = bizN; chSave(chSk, o); self.setState({ chDraft: "" }); };
+var chVals = { tabChat: tab === 11, ch: ch, chIsOwner: !actor && chPeople.length > 1, chNotOwner: !!actor,
+ chThreads: chPeople.map(function (p) { var u = chUnread(chData.th[p.email], "s"); return { name: p.name + (p.email === chMe.email ? " (" + ch.you + ")" : ""), cls: p.email === chSel ? "on" : "", hasU: u > 0, u: String(u), pick: function () { self.setState({ chSel: p.email }); } }; }),
+ chMsgs: chView(chThr), chEmpty: !(chThr && chThr.msgs && chThr.msgs.length), chDraft: st.chDraft || "", chSetDraft: function (e) { self.setState({ chDraft: e.target.value }); },
+ chKey: function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); chSendFn(); } }, chSend: chSendFn };
+return Object.assign(dashVals, docVals, dzVals, lgVals, chVals, { hasLogo: !!(isU ? user.logo : st.logo), noLogo: !(isU ? user.logo : st.logo), logoSrc: (isU ? user.logo : st.logo) || "",
  pickLogo: function (e) { var f = e.target.files && e.target.files[0]; if (!f) { return; } var rd = new FileReader(); rd.onload = function () { var im = new Image(); im.onload = function () { var S = 160; var c = document.createElement("canvas"); c.width = S; c.height = S; var x = c.getContext("2d"); x.fillStyle = "#FFFFFF"; x.fillRect(0, 0, S, S); var k = Math.max(S / im.width, S / im.height); var w = im.width * k, h = im.height * k; x.drawImage(im, (S - w) / 2, (S - h) / 2, w, h); var d = c.toDataURL("image/jpeg", 0.88); if (isU) { try { var u = JSON.parse(window.localStorage.getItem("noa-user") || "null"); if (u) { u.logo = d; window.localStorage.setItem("noa-user", JSON.stringify(u)); var A = JSON.parse(window.localStorage.getItem("noa-accounts") || "{}") || {}; var k2 = (u.email || "").toLowerCase() + "|biz"; if (A[k2]) { A[k2].logo = d; window.localStorage.setItem("noa-accounts", JSON.stringify(A)); } } } catch (er) {} self.setState({ lt: Date.now() }); } else { self.setState({ logo: d }); } }; im.src = rd.result; }; rd.readAsDataURL(f); try { e.target.value = ""; } catch (er) {} },
  rtCols: [0, 1, 3, 2].map(function (k) { return { x: t.roles[k] }; }), rtRows: (function () { var M = [[1, 1, 1, 0], [1, 1, 0, 0], [1, 1, 1, 0], [1, 1, 1, 1], [1, 1, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]]; return t.rtRows.map(function (a, i) { return { a: a, c: M[i].map(function (v) { return { v: v ? "✓" : "—", col: v ? "#2F7A55" : "#C9C2B2" }; }) }; }); })(), rtFlow: t.rtFlow.map(function (x, i) { return { n: String(i + 1), x: x }; }), qLocName: (LOCS[qLocI] || ["—"])[0], qLocOpts: LOCS.map(function (x, k) { return { v: String(k), label: x[0], sel: k === qLocI && !st.qlf }; }).concat([{ v: "new", label: t.addLocOpt, sel: !!st.qlf }]), qLocAddr: (LOCS[qLocI] || ["", ""])[1] + ((LOCS[qLocI] || [])[2] ? " · " + LOCS[qLocI][2] : ""), qLocHas: !st.qlf, qlfOn: !!st.qlf, qlfErr: !!st.qlfErr,
  setQLoc: function (e) { var v = e.target.value; if (v === "new") { self._lf = {}; self.setState({ qlf: true, qlfErr: false }); } else { self.setState({ qLoc: parseInt(v, 10) || 0, qlf: false }); } },
