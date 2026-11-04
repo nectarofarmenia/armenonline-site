@@ -305,6 +305,9 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 <div style="padding: 16px 18px; border-radius: 16px; background: #F3EBD7; display: flex; flex-direction: column; gap: 4px"><strong style="color: #1D5545">📍 {{t.dPickAddr}}</strong><span style="color: #5E6A63">🕘 {{t.dPickHours}}</span><span style="font-size: 13px; color: #6B756F">{{t.dPickNote}}</span></div>
 </div>
 </sc-if>
+<sc-if value="{{extOn}}" hint-placeholder-val="{{false}}">
+<div class="ext-wrap" style="border-radius: 26px; overflow: hidden; background: #F7F3EA; box-shadow: 0 3px 6px rgba(19,59,48,.08), 0 18px 36px rgba(19,59,48,.14); min-height: 400px"><iframe class="ext-frame" src="{{extSrc}}" title="{{extTitle}}" loading="lazy" style="display: block; width: 100%; height: 900px; border: 0; background: #F7F3EA"></iframe></div>
+</sc-if>
 <sc-if value="{{tabInvite}}" hint-placeholder-val="{{false}}">
 <div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 16px">
 <h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">🎁 {{iv.H}}</h1>
@@ -492,7 +495,9 @@ var icons = ["📊", "📦", "📍", "⚙️", "🛒", "🚚", "💬", "🎁"];
 var navL2 = t.navL.concat([t.shopNav, t.navDel, (({ hy: "Նամակներ", en: "Messages", ru: "Сообщения", es: "Mensajes" })[lang] || "Messages"), (lang === "hy" ? "Հրավիրել ընկերներին" : "Invite friends")]);
 var navs = [0, 4, 1, 2, 5, 6, 7, 3].map(function (i) { var lb = navL2[i]; return { label: lb, icon: icons[i], cls: i === tab ? "on" : "", pick: function () { self.setState({ tab: i }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }; });
  var XL = ({ hy: ["Պատրաստում", "Մշակույթ", "Պատմություն"], en: ["How it’s made", "Culture", "History"], ru: ["Как мы готовим", "Культура", "История"], es: ["Cómo se hace", "Cultura", "Historia"] })[lang] || ["How it’s made", "Culture", "History"];
-navs = navs.concat([["👩‍🍳", "Made.dc.html"], ["🏛", "Culture.dc.html"], ["📜", "History.dc.html"]].map(function (x, k) { return { label: XL[k], icon: x[0], cls: "ext" + (k === 0 ? " ext1" : ""), pick: function () { try { window.location.href = x[1]; } catch (e) {} } }; }));
+var XP = ["Made", "Culture", "History"];
+navs = navs.concat([["👩‍🍳", 20], ["🏛", 21], ["📜", 22]].map(function (x, k) { return { label: XL[k], icon: x[0], cls: (tab === x[1] ? "on " : "") + "ext" + (k === 0 ? " ext1" : ""), pick: function () { self.setState({ tab: x[1] }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }; }));
+var extVals = { extOn: tab >= 20 && tab <= 22, extSrc: (tab >= 20 && tab <= 22) ? XP[tab - 20] + ".dc.html?embed=1&lang=" + lang : "about:blank", extTitle: (tab >= 20 && tab <= 22) ? XL[tab - 20] : "" };
 /* profile */
 var base = user ? { first: user.first || "", last: user.last || "", email: user.email || "", phone: user.phone || "" } : { first: "Ani", last: "Petrosyan", email: "ani@example.com", phone: "+1 (818) 555 0142" };
 var pf = Object.assign({}, base, st.pf || {});
@@ -715,7 +720,7 @@ var stVals = { stMini: [0, 1, 2, 3, 4].map(function (i) { return i < stShow ? "�
  stHasRw: stRwA.length > 0, stRw: stRwA.slice().reverse().map(function (r) { return { name: t.pn[r.p], st: stT.rwSt }; }),
  stHasFr: stRefs.length > 0, stFr: stRefs.slice().reverse().slice(0, 12).map(function (r) { return { n: r.name }; }), stHow: stT.how.map(function (h) { return { h: h[0], p: h[1] }; }),
  stTest: function () { try { var R = JSON.parse(window.localStorage.getItem("noa-refs") || "[]") || []; var nms = ["Karen", "Lusine", "Ani", "Tigran", "Mariam", "Davit", "Nare"]; var nm = nms[R.length % nms.length] + " " + (R.length + 1); R.push({ ref: stMe, email: "test" + Date.now() + "@x.com", name: nm, type: "retail", at: new Date().toISOString() }); window.localStorage.setItem("noa-refs", JSON.stringify(R)); } catch (e) {} self.setState({ stT2: Date.now() }); } };
-return Object.assign(dzVals, lgVals, chVals, avVals, ivVals, rdpVals, crVals, stVals, { tabDel: tab === 5, dNextDay: (WD[lang] || WD.en)[nd.getDay()] + ", " + nd.getDate() + " " + mo[nd.getMonth()], dRules: t.dR.map(function (x) { return { x: x }; }),
+return Object.assign(extVals, dzVals, lgVals, chVals, avVals, ivVals, rdpVals, crVals, stVals, { tabDel: tab === 5, dNextDay: (WD[lang] || WD.en)[nd.getDay()] + ", " + nd.getDate() + " " + mo[nd.getMonth()], dRules: t.dR.map(function (x) { return { x: x }; }),
  dChk: !a0 ? t.dNoAddr : (in0 ? t.dIn : t.dOut), dChkAddr: a0 ? (a0.street + ", " + a0.city) : "", dChkBg: !a0 ? "#F3EBD7" : (in0 ? "#E2F0E7" : "#FDE7E4"), dChkFg: !a0 ? "#5E6A63" : (in0 ? "#1F5E3E" : "#B03A2E"),
  dZoneL: ZONE2.map(function (c) { var mine = c.toLowerCase() === c0; return { c: (mine ? "📍 " : "") + c, bg: mine ? "#1D5545" : "#FFFFFF", fg: mine ? "#F6E3B4" : "#33403A", fw: mine ? "800" : "600" }; }),
  zoneTitle: ({ hy: "Որտեղ ենք առաքում", en: "Where we deliver", ru: "Куда доставляем", es: "Dónde entregamos" }[lang] || "Where we deliver"), zoneList: "Glendale, Burbank, Pasadena, Los Angeles, North Hollywood, Van Nuys, Sherman Oaks, Studio City, Encino, Tarzana, Reseda, Northridge, Granada Hills, Sun Valley, Sunland, Tujunga, La Crescenta, Montrose, La Cañada Flintridge, Altadena, South Pasadena, Eagle Rock, Atwater Village, Hollywood, West Hollywood, Toluca Lake, Valley Village, Universal City", pickTxt: ({ hy: "Կարող եք նաև անվճար վերցնել Glendale-ից (փիկափ)։", en: "You can also pick up for free in Glendale.", ru: "Можно забрать бесплатно в Глендейле.", es: "También puedes recoger gratis en Glendale." }[lang] || ""), tabShop: tab === 4, goShop: function () { self.setState({ tab: 4 }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} }, prods: prods, cartLines: cartLines, cartEmpty: cartLines.length === 0, cartHas: cartLines.length > 0, cartSub: money(cSub), cartCnt: cq.reduce(function (a, b) { return a + (b || 0); }, 0),
@@ -937,6 +942,12 @@ return Object.assign(dzVals, lgVals, chVals, avVals, ivVals, rdpVals, crVals, st
     if (first) { setTimeout(open, 1800); } else { i = Math.floor(Math.random() * 5) + 1; setTimeout(peek, 900); }
   }
   if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", init); } else { init(); }
+})();
+</script>
+<script id="nofa-embhost">
+(function () { if (window.__nofaEH) { return; } window.__nofaEH = 1;
+  window.addEventListener("message", function (e) { var d = e.data; if (!d || typeof d.nofaH !== "number") { return; }
+    var fs = document.querySelectorAll("iframe.ext-frame"); for (var i = 0; i < fs.length; i++) { if (fs[i].contentWindow === e.source) { fs[i].style.height = Math.max(400, Math.min(20000, d.nofaH)) + "px"; } } });
 })();
 </script>
 <style id="pg-arr-css">.pgx{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;gap:8px}.pgx button{width:46px;height:46px;border-radius:50%;border:1.5px solid #EBA93A;background:#1D5545;color:#F6E3B4;font:800 22px/1 Manrope,system-ui,sans-serif;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;padding:0}.pgx button:hover{background:#133B30}.pgx .up{background:linear-gradient(180deg,#FCDB82,#EDB040 50%,#D38A22);color:#133B30;border-color:#D38A22}.pgx.main{bottom:88px;flex-direction:column}.pg-arrows{display:none !important}@media print{.pgx{display:none}}</style><div class="pgx" id="pgx"><button type="button" aria-label="Back" onclick="history.back()">‹</button><button type="button" aria-label="Forward" onclick="history.forward()">›</button><button type="button" class="up" aria-label="Top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button></div>
