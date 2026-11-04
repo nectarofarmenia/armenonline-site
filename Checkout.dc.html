@@ -6,6 +6,17 @@
 <meta name="robots" content="noindex">
 <title>Nectar of Armenia — Checkout</title>
 <script src="./support.js"></script>
+<style id="nofa-select-css">
+@supports (appearance: base-select) {
+  select { appearance: base-select; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 500; }
+  select::picker(select) { appearance: base-select; background: #FBF8F1; color: #1E2A24; border: 1.5px solid #EBA93A; border-radius: 14px; padding: 6px; box-shadow: 0 18px 44px rgba(19,59,48,.28); max-height: 320px; overflow-y: auto; }
+  select option { padding: 9px 12px; border-radius: 10px; font-family: Manrope, 'Noto Sans Armenian', system-ui, sans-serif; font-size: 15px; color: #1E2A24; background: transparent; }
+  select option:hover, select option:focus-visible { background: #E8F1EC; color: #1D5545; outline: none; }
+  select option:checked { background: #1D5545; color: #F6E3B4; font-weight: 800; }
+  select option::checkmark { color: #EBA93A; }
+  select::picker-icon { color: #1D5545; }
+}
+</style>
 </head>
 <body>
 <x-dc>
