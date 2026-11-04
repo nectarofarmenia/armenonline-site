@@ -544,10 +544,12 @@ if (!cart) { try { cart = JSON.parse(window.localStorage.getItem("noa-cart-v2") 
 if (!Array.isArray(cart) || cart.length !== 11) { cart = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; }
 var cartCount = cart.reduce(function (a, b) { return a + (b || 0); }, 0);
 var addedIdx = (this.state && typeof this.state.added === "number") ? this.state.added : -1;
+var SOLD = (function () { try { var a = JSON.parse(window.localStorage.getItem("noa-stock") || "null"); return Array.isArray(a) ? a.map(function (x) { return +x <= 0; }) : []; } catch (e) { return []; } })(); var SOLDL = ({ hy: "Սպառված է", en: "Sold out", ru: "Нет в наличии", es: "Agotado" })[lang] || "Sold out";
 var products = t.p.map(function (name, i) {
-var tag = tagIdx[i] >= 0 ? t.tags[tagIdx[i]] : "";
-var has = !!prices[i];
-return { img: PIMG[i], hasImg: !!PIMG[i], noImg: !PIMG[i], name: name, size: sizes[i], price: has ? prices[i] : t.priceSoon, tag: tag, hasTag: !!tag, addLabel: !has ? t.soon : (addedIdx === i ? t.added : t.add), addCls: !has ? "btn-soon" : (addedIdx === i ? "btn-gold" : "btn-green"),
+var so = !!SOLD[i];
+var tag = so ? "⛔ " + SOLDL : (tagIdx[i] >= 0 ? t.tags[tagIdx[i]] : "");
+var has = !!prices[i] && !so;
+return { img: PIMG[i], hasImg: !!PIMG[i], noImg: !PIMG[i], name: name, size: sizes[i], price: prices[i] ? prices[i] : t.priceSoon, tag: tag, hasTag: !!tag, addLabel: so ? SOLDL : !has ? t.soon : (addedIdx === i ? t.added : t.add), addCls: !has ? "btn-soon" : (addedIdx === i ? "btn-gold" : "btn-green"),
 add: function () { if (!has) { return; } var nc = cart.slice(); nc[i] = Math.min(99, (nc[i] || 0) + 1); try { window.localStorage.setItem("noa-cart-v2", JSON.stringify(nc)); } catch (e) {} self.setState({ cart: nc, added: i }); clearTimeout(self._addT); self._addT = setTimeout(function () { self.setState({ added: -1 }); }, 1500); } };
 });
 var tabs = [

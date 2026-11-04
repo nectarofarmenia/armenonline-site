@@ -465,7 +465,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 10px 0; border-top: 1px solid #ECE3CF">
 <div style="flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column"><strong style="color: #1D5545">{{r.name}}</strong><span style="font-size: 13px; color: #6B756F">{{r.size}}</span></div>
 <span style="min-width: 80px; font-weight: 800; color: #1D5545">{{r.price}}</span>
-<div class="qty" role="group" aria-label="{{t.qty}}"><button type="button" onClick="{{r.dec}}">−</button><span>{{r.q}}</span><button type="button" onClick="{{r.inc}}">+</button></div>
+<sc-if value="{{r.notSold}}" hint-placeholder-val="{{true}}"><div class="qty" role="group" aria-label="{{t.qty}}"><button type="button" onClick="{{r.dec}}">−</button><span>{{r.q}}</span><button type="button" onClick="{{r.inc}}">+</button></div></sc-if><sc-if value="{{r.sold}}" hint-placeholder-val="{{false}}"><span style="display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border-radius: 999px; background: #FDE7E4; color: #B03A2E; font-weight: 800; font-size: 13.5px; letter-spacing: .02em">⛔ {{r.soldL}}</span></sc-if>
 <span style="min-width: 86px; text-align: right; font-family: Fraunces, Lora, serif; font-weight: 700; font-size: 18px; color: #1D5545">{{r.line}}</span>
 </div>
 </sc-for>
@@ -673,8 +673,10 @@ var plVals = { plOn: tab === 30, plT: plT, plRows: plSrc.map(function (r, i) { r
 var q = (st.wq && st.wq.length === IDX.length) ? st.wq : [10, 20, 10, 6, 6, 10, 8, 8];
 var money = function (v) { return "$" + v.toFixed(2); };
 var sum = 0, units = 0;
-var rows = IDX.map(function (pi, k) { sum += q[k] * WP[k]; units += q[k]; return { name: t.pn[pi], size: t.ps[pi], price: money(WP[k]), q: q[k], line: money(q[k] * WP[k]),
-inc: function () { var n = q.slice(); n[k] = Math.min(999, n[k] + 1); self.setState({ wq: n }); }, dec: function () { var n = q.slice(); n[k] = Math.max(0, n[k] - 1); self.setState({ wq: n }); } }; });
+var SOLD = (function () { try { var a = JSON.parse(window.localStorage.getItem("noa-stock") || "null"); return Array.isArray(a) ? a.map(function (x) { return +x <= 0; }) : []; } catch (e) { return []; } })(); var SOLDL = ({ hy: "Սպառված է", en: "Sold out", ru: "Нет в наличии", es: "Agotado" })[lang] || "Sold out";
+q = q.map(function (v, k) { return SOLD[IDX[k]] ? 0 : v; });
+var rows = IDX.map(function (pi, k) { sum += q[k] * WP[k]; units += q[k]; return { name: t.pn[pi], size: t.ps[pi], price: money(WP[k]), q: q[k], line: money(q[k] * WP[k]), sold: !!SOLD[pi], notSold: !SOLD[pi], soldL: SOLDL,
+inc: function () { if (SOLD[pi]) { return; } var n = q.slice(); n[k] = Math.min(999, n[k] + 1); self.setState({ wq: n }); }, dec: function () { var n = q.slice(); n[k] = Math.max(0, n[k] - 1); self.setState({ wq: n }); } }; });
 var WD = { hy: ["Կիր", "Երկ", "Երք", "Չրք", "Հնգ", "Ուրբ", "Շբթ"], en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], ru: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], es: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"] };
 var MO = { hy: ["հունվ", "փետր", "մարտ", "ապր", "մայիս", "հունիս", "հուլիս", "օգոստ", "սեպտ", "հոկտ", "նոյեմբ", "դեկտ"], en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], ru: ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"], es: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"] };
 var now = new Date();
