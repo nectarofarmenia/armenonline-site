@@ -671,9 +671,8 @@ place: function (e) { if (e && e.preventDefault) { e.preventDefault(); } if (fm 
         window.addEventListener("pointerdown", first, true); window.addEventListener("keydown", first, true); }
       document.addEventListener("visibilitychange", function () { if (document.hidden) { if (playing) { au.pause(); } } else if (playing) { au.play().catch(function () {}); } });
     }
-    function go() { bar(); garland(); snow(); music(); }
+    function go() { bar(); snow(); music(); }
     if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", go); } else { go(); }
-    var tries = 0, iv = setInterval(function () { garland(); if (++tries > 20) { clearInterval(iv); } }, 500);
   }
 })();
 </script>
