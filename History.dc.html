@@ -760,6 +760,81 @@ return Object.assign(apVals, { isBizSess: !!(accU && accU.type === "biz"), bizNo
   check(); setInterval(check, 1500);
 })();
 </script>
+<script id="nofa-theme">
+(function () { if (window.__nofaTheme) { return; } window.__nofaTheme = 1;
+  var CFG = {"site": "auto", "list": [{"id": "default", "icon": "🌿", "hy": "Սովորական", "en": "Classic", "dhy": "Մեր հիմնական կանաչ-ոսկեգույն դիզայնը։", "den": "Our everyday green and gold design.", "ready": true}, {"id": "newyear", "icon": "❄️", "hy": "Ամանոր և Սուրբ Ծնունդ", "en": "New Year & Christmas", "dhy": "Թեթև ձյուն, ոսկեգույն զարդեր գլխամասում, Ապրին՝ եղևնու ճյուղով, տոնական գոտի և խորհուրդներ։", "den": "Light snowfall, gold ornaments under the header, Apri with holly, a festive banner and tips.", "from": "11-04", "to": "01-13", "ready": true, "sw": ["#133B30", "#EBA93A", "#B3262E", "#FFFFFF"]}, {"id": "thanks", "icon": "🦃", "hy": "Thanksgiving", "en": "Thanksgiving", "dhy": "Աշնանային տերևներ և տոնական սեղանի առաջարկներ։", "den": "Autumn leaves and holiday table offers.", "from": "11-20", "to": "11-28", "ready": false, "sw": ["#7A3B12", "#E08A2E", "#F3D9A4", "#1D5545"]}, {"id": "sargis", "icon": "❤️", "hy": "Սուրբ Սարգիս և Վալենտին", "en": "St. Sargis & Valentine’s", "dhy": "Նուրբ սրտիկներ և զույգերի համար առաջարկներ։", "den": "Soft hearts and offers for couples.", "from": "01-25", "to": "02-15", "ready": false, "sw": ["#8E1F3B", "#F2B5C2", "#EBA93A", "#FFFFFF"]}, {"id": "easter", "icon": "🌸", "hy": "Զատիկ և գարուն", "en": "Easter & spring", "dhy": "Ծաղիկներ, գարնանային գույներ և զատկական սեղան։", "den": "Blossoms, spring colors and an Easter table.", "from": "03-20", "to": "04-30", "ready": false, "sw": ["#2F7A55", "#F4C6D7", "#FCE7A2", "#FFFFFF"]}, {"id": "vardavar", "icon": "💧", "hy": "Վարդավառ և ամառ", "en": "Vardavar & summer", "dhy": "Ջրի կաթիլներ, վարդեր և ամառային թարմություն։", "den": "Water drops, roses and summer freshness.", "from": "07-01", "to": "08-15", "ready": false, "sw": ["#1E6FA8", "#9ED8F2", "#E85A7A", "#FFFFFF"]}]};
+  var page = (location.pathname.split("/").pop() || "");
+  function L() { try { return localStorage.getItem("noa-lang") || "hy"; } catch (e) { return "hy"; } }
+  function md(d) { return (d.getMonth() + 1) * 100 + d.getDate(); }
+  function num(s) { var p = String(s || "").split("-"); return (+p[0]) * 100 + (+p[1]); }
+  function inRange(th, d) { if (!th.from || !th.to) { return false; } var a = num(th.from), b = num(th.to), x = md(d); return a <= b ? (x >= a && x <= b) : (x >= a || x <= b); }
+  function dates() { try { return JSON.parse(localStorage.getItem("noa-theme-dates") || "{}") || {}; } catch (e) { return {}; } }
+  function pick() { var sel = CFG.site || "auto"; try { var o = localStorage.getItem("noa-theme-sel"); if (o) { sel = o; } } catch (e) {}
+    var dd = dates(); var list = CFG.list.map(function (t) { var x = {}; for (var k in t) { x[k] = t[k]; } if (dd[t.id]) { x.from = dd[t.id].from || x.from; x.to = dd[t.id].to || x.to; } return x; });
+    if (sel !== "auto") { return list.filter(function (t) { return t.id === sel && t.ready; })[0] || null; }
+    var now = new Date(); return list.filter(function (t) { return t.ready && t.id !== "default" && inRange(t, now); })[0] || null; }
+  var TH = pick(); window.NOFA_THEME_LIST = CFG.list;
+  if (!TH || TH.id === "default") { window.NOFA_THEME = null; return; }
+  var embed = /[?&]embed=1/.test(location.search);
+  if (TH.id === "newyear") {
+    window.NOFA_THEME = { id: "newyear", greet: " 🎄", tips: {
+      hy: { home: [["🎄 Ամանորյա և Սուրբ Ծննդյան սեղանի համար՝ գաթա, խինկալի, քուֆթա և խաշ։ Պատվիրեք նախօրոք, որ տոներին ամեն ինչ պատրաստ լինի։", "Պատվիրել տոների համար", "Main.dc.html#shop"]],
+            me: ["🎄 Տոնական սեղանի համար պատվիրեք նախօրոք։ Մեր ապրանքները պահվում են 6 ամիս, այնպես որ կարող եք պաշար անել։"],
+            biz: ["🎄 Տոնական սեզոնին պահանջարկը մեծանում է։ Պատվիրեք նախօրոք, որ դարակները դատարկ չմնան մինչև հունվարի 13-ը։"],
+            ws: ["🎄 Տոներից առաջ հաճախորդները պաշար են անում։ Գրանցվեք հիմա, որ սեզոնին արդեն մեր ապրանքներն ունենաք։"] },
+      en: { home: [["🎄 For your New Year and Christmas table: gata, khinkali, kufta and khash. Order ahead so everything is ready for the holidays.", "Order for the holidays", "Main.dc.html#shop"]],
+            me: ["🎄 Order ahead for the holiday table. Our products keep 6 months in the freezer, so you can stock up."],
+            biz: ["🎄 Demand grows in the holiday season. Order ahead so your shelves stay full through January 13."],
+            ws: ["🎄 Customers stock up before the holidays. Sign up now to have our products in time for the season."] } } };
+    var css = ".nt-bar{position:relative;z-index:55;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;padding:9px 44px 9px 16px;background:linear-gradient(90deg,#0F2F26,#1D5545 50%,#0F2F26);color:#F6E3B4;font:700 14px/1.4 Manrope,'Noto Sans Armenian',system-ui,sans-serif;text-align:center;border-bottom:1px solid rgba(235,169,58,.55)}" +
+      ".nt-bar a{color:#133B30;background:linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22);padding:4px 14px;border-radius:999px;text-decoration:none;font-weight:800;font-size:13px;white-space:nowrap}" +
+      ".nt-bar button{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:none;color:#CFE2D9;font-size:15px;cursor:pointer;padding:4px 6px}" +
+      ".nt-bar .nt-sp{color:#F6C35A;letter-spacing:.2em}.nt-bar .nt-s{display:none}" +
+      "header{position:relative}.nt-gar{position:absolute;left:0;right:0;top:100%;height:40px;pointer-events:none;z-index:3;overflow:visible}" +
+      ".nt-gar svg.nt-line{position:absolute;inset:0 0 auto 0;width:100%;height:28px;display:block}" +
+      ".nt-orn{position:absolute;top:0;transform-origin:50% 0;animation:ntSw 4.5s ease-in-out infinite}.nt-orn i{display:block;width:1px;margin:0 auto;background:rgba(235,169,58,.85)}.nt-orn b{display:block;border-radius:50%;box-shadow:inset -3px -4px 6px rgba(0,0,0,.25),inset 3px 3px 5px rgba(255,255,255,.45),0 4px 8px rgba(0,0,0,.25)}" +
+      ".nt-orn b:before{content:'';display:block;width:30%;height:4px;margin:-3px auto 0;border-radius:2px;background:#C9A24A}" +
+      ".nt-orn.st b{border-radius:0;background:none!important;box-shadow:none;color:#F6C35A;font-size:16px;line-height:1;text-shadow:0 0 8px rgba(246,195,90,.8)}.nt-orn.st b:before{display:none}" +
+      "@keyframes ntSw{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}" +
+      ".nt-snow{position:fixed;inset:0;pointer-events:none;z-index:45}" +
+      ".apri3d:after,.ap-fig:after,.ak-chef:after{content:'';position:absolute;left:62%;top:11%;width:21%;aspect-ratio:100/70;background:url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 70'><path d='M50 38 C40 18 22 10 4 14 C10 20 8 26 14 30 C8 34 10 40 6 46 C24 50 42 46 50 38Z' fill='%232E7D4F' stroke='%231C5236' stroke-width='2'/><path d='M50 38 C60 18 78 10 96 14 C90 20 92 26 86 30 C92 34 90 40 94 46 C76 50 58 46 50 38Z' fill='%23358C59' stroke='%231C5236' stroke-width='2'/><path d='M50 38 C36 30 22 26 10 28 M50 38 C64 30 78 26 90 28' stroke='%231C5236' stroke-width='1.6' fill='none'/><circle cx='42' cy='44' r='9' fill='%23C62828'/><circle cx='58' cy='44' r='9' fill='%23B71C1C'/><circle cx='50' cy='54' r='9' fill='%23D32F2F'/><circle cx='39' cy='41' r='2.6' fill='%23FFFFFF' opacity='.75'/><circle cx='55' cy='41' r='2.6' fill='%23FFFFFF' opacity='.75'/><circle cx='47' cy='51' r='2.6' fill='%23FFFFFF' opacity='.75'/></svg>\") no-repeat center/contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.25));pointer-events:none}" +
+      ".ap-fig,.ak-chef{position:relative}" +
+      "@media (max-width:640px){.nt-bar{font-size:13px;padding:7px 34px 7px 12px;flex-wrap:nowrap;gap:10px}.nt-bar .nt-sp,.nt-bar .nt-l{display:none}.nt-bar .nt-s{display:inline}.nt-gar{height:30px}}" +
+      "@media (prefers-reduced-motion:reduce){.nt-orn{animation:none}.nt-snow{display:none}}" +
+      "html.emb .nt-bar,html.emb .nt-snow{display:none!important}@media print{.nt-bar,.nt-gar,.nt-snow{display:none!important}}";
+    var st = document.createElement("style"); st.id = "nt-css"; st.textContent = css; (document.head || document.documentElement).appendChild(st);
+    function bar() { if (embed || /^Admin/.test(page)) { return; } var k = "noa-nt-bar"; try { if (sessionStorage.getItem(k)) { return; } } catch (e) {}
+      var hy = L() === "hy"; var b = document.createElement("div"); b.className = "nt-bar"; b.setAttribute("role", "note");
+      var onMain = /^(Main|index)/.test(page) || page === "";
+      b.innerHTML = '<span class="nt-sp">✦</span><span class="nt-l">' + (hy ? "Ամանորյա և Սուրբ Ծննդյան սեղանը՝ Nectar of Armenia-ից։ Պատվիրեք նախօրոք, տոները մոտ են" : "Your New Year & Christmas table from Nectar of Armenia. Order ahead, the holidays are near") + '</span><span class="nt-s">' + (hy ? "🎄 Տոնական սեղանի համար" : "🎄 For your holiday table") + '</span><span class="nt-sp">✦</span><a href="' + (onMain ? "#shop" : "Main.dc.html#shop") + '">' + (hy ? "Պատվիրել →" : "Order now →") + '</a><button type="button" aria-label="close">✕</button>';
+      b.querySelector("button").addEventListener("click", function () { b.remove(); try { sessionStorage.setItem(k, "1"); } catch (e) {} });
+      document.body.insertBefore(b, document.body.firstChild); }
+    function garland() { var h = document.querySelector("header"); if (!h || h.querySelector(".nt-gar")) { return; }
+      var g = document.createElement("div"); g.className = "nt-gar"; g.setAttribute("aria-hidden", "true");
+      var html = '<svg class="nt-line" viewBox="0 0 240 28" preserveAspectRatio="none"><path d="M0 3 Q30 22 60 5 Q90 22 120 5 Q150 22 180 5 Q210 22 240 3" fill="none" stroke="#EBA93A" stroke-width="1.4" opacity=".9" vector-effect="non-scaling-stroke"/></svg>';
+      var cols = ["#B3262E", "#EBA93A", "#F7F3EA", "#2E7D4F", "#C9A24A"]; var n = window.innerWidth < 640 ? 7 : 13;
+      for (var k = 0; k < n; k++) { var x = (k + 0.5) / n * 100; var seg = (x % 25) / 25; var y = 3 + Math.sin(seg * Math.PI) * 15; var star = k % 4 === 2;
+        var sz = star ? 16 : (k % 3 === 0 ? 14 : 11); var len = 6 + (k % 3) * 4;
+        html += '<span class="nt-orn' + (star ? ' st' : '') + '" style="left:calc(' + x + '% - ' + (sz / 2) + 'px);top:' + (y * (window.innerWidth < 640 ? 0.7 : 1)) + 'px;animation-delay:' + (-k * 0.37) + 's"><i style="height:' + len + 'px"></i><b style="width:' + sz + 'px;height:' + sz + 'px;background:radial-gradient(circle at 35% 30%,#fff8,' + cols[k % cols.length] + ' 45%)">' + (star ? '✦' : '') + '</b></span>'; }
+      g.innerHTML = html; h.appendChild(g); }
+    function snow() { if (embed) { return; } try { if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { return; } } catch (e) {}
+      var c = document.createElement("canvas"); c.className = "nt-snow"; c.setAttribute("aria-hidden", "true"); document.body.appendChild(c);
+      var x = c.getContext("2d"), W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1), F = [];
+      function rs() { W = window.innerWidth; H = window.innerHeight; c.width = W * dpr; c.height = H * dpr; c.style.width = W + "px"; c.style.height = H + "px"; x.setTransform(dpr, 0, 0, dpr, 0, 0); }
+      rs(); window.addEventListener("resize", rs);
+      var N = W < 640 ? 22 : 46; for (var i = 0; i < N; i++) { F.push({ x: Math.random() * W, y: Math.random() * H, r: 1 + Math.random() * 2.4, v: 0.25 + Math.random() * 0.55, w: Math.random() * 6.28, g: Math.random() < 0.22 }); }
+      var run = true; document.addEventListener("visibilitychange", function () { run = !document.hidden; if (run) { requestAnimationFrame(tick); } });
+      function tick() { if (!run) { return; } x.clearRect(0, 0, W, H);
+        for (var i = 0; i < F.length; i++) { var f = F[i]; f.y += f.v; f.w += 0.012; f.x += Math.sin(f.w) * 0.35; if (f.y > H + 5) { f.y = -5; f.x = Math.random() * W; }
+          x.beginPath(); x.arc(f.x, f.y, f.r, 0, 6.283); x.fillStyle = f.g ? "rgba(246,214,140,.75)" : "rgba(255,255,255,.82)"; x.shadowColor = "rgba(255,255,255,.6)"; x.shadowBlur = 3; x.fill(); }
+        requestAnimationFrame(tick); }
+      requestAnimationFrame(tick); }
+    function go() { bar(); garland(); snow(); }
+    if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", go); } else { go(); }
+    var tries = 0, iv = setInterval(function () { garland(); if (++tries > 20) { clearInterval(iv); } }, 500);
+  }
+})();
+</script>
 <script id="nofa-apri">
 (function () {
   if (window.__nofaApri) { return; } window.__nofaApri = 1;
@@ -770,7 +845,7 @@ return Object.assign(apVals, { isBizSess: !!(accU && accU.type === "biz"), bizNo
   var IMG = "img/c1999a6e0a1f0a5218be4d17335ab22d.webp", HAND = "img/f9280bbbf31cb7aba245e670f4e5ae57.webp", LEAF = "img/2fc668d693fee0e6607551e82b831db8.webp";
   function hello() { var h = new Date().getHours(), l = L(); var u = U(); var n = u && u.first ? u.first : "";
     var g = l === "hy" ? (h < 12 ? "Բարի լույս" : h < 18 ? "Բարև" : "Բարի երեկո") : l === "ru" ? (h < 12 ? "Доброе утро" : h < 18 ? "Здравствуйте" : "Добрый вечер") : l === "es" ? (h < 12 ? "Buenos días" : h < 18 ? "Hola" : "Buenas noches") : (h < 12 ? "Good morning" : h < 18 ? "Hi" : "Good evening");
-    return g + (n ? ", " + n : "") + "! 👋"; }
+    return g + (n ? ", " + n : "") + "! " + (window.NOFA_THEME && window.NOFA_THEME.greet ? window.NOFA_THEME.greet.trim() : "👋"); }
   var TIPS = {
     hy: { home: [["Բարի գալուստ։ Ես Շեֆ Ապրին եմ 🍑 Մեր ուտեստները պատրաստվում են ձեռքով, Գլենդեյլի մեր խոհանոցում, և սառեցվում են, որ վայելեք ցանկացած երեկո։", "Դիտել ապրանքները", "Main.dc.html#shop"],
             ["Առաջին անգա՞մ եք։ Ընտրեք ապրանքները, ավելացրեք զամբյուղ, և մենք կառաքենք սառեցված վիճակում ❄️", "Սկսել գնումները", "Main.dc.html#shop"],
@@ -820,7 +895,7 @@ return Object.assign(apVals, { isBizSess: !!(accU && accU.type === "biz"), bizNo
     document.body.appendChild(d);
     var fig = d.querySelector(".ap-fig"), tEl = d.querySelector(".ap-t"), pEl = d.querySelector(".ap-p"), dots = d.querySelector(".ap-dots");
     var i = 0, tm = null;
-    function paint() { var tp = T()[KIND]; i = i % tp.length; tEl.textContent = i === 0 ? hello() : (L() === "hy" ? "Շեֆ Ապրի" : "Chef Apri"); var it = tp[i]; var tx = typeof it === "string" ? it : it[0]; pEl.textContent = tx; var act = d.querySelector(".ap-act"); if (typeof it !== "string" && it[1]) { act.textContent = it[1] + " →"; act.setAttribute("href", ISMAIN && it[2].indexOf("Main.dc.html#") === 0 ? it[2].slice(12) : it[2]); act.className = "ap-act on"; } else { act.className = "ap-act"; }
+    function paint() { var TT = window.NOFA_THEME && window.NOFA_THEME.tips ? (window.NOFA_THEME.tips[L()] || window.NOFA_THEME.tips.en) : null; var tp = (TT && TT[KIND] ? TT[KIND] : []).concat(T()[KIND]); i = i % tp.length; tEl.textContent = i === 0 ? hello() : (L() === "hy" ? "Շեֆ Ապրի" : "Chef Apri"); var it = tp[i]; var tx = typeof it === "string" ? it : it[0]; pEl.textContent = tx; var act = d.querySelector(".ap-act"); if (typeof it !== "string" && it[1]) { act.textContent = it[1] + " →"; act.setAttribute("href", ISMAIN && it[2].indexOf("Main.dc.html#") === 0 ? it[2].slice(12) : it[2]); act.className = "ap-act on"; } else { act.className = "ap-act"; }
       d.querySelector(".ap-nx").textContent = T().next + " →"; d.querySelector(".ap-hd").textContent = T().hide; fig.setAttribute("aria-label", T().call);
       dots.innerHTML = tp.map(function (_, k) { return "<i class='" + (k === i ? "on" : "") + "'></i>"; }).join(""); }
     function arm() { clearTimeout(tm); tm = setTimeout(peek, 14000); }
