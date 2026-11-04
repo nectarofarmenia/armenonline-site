@@ -376,7 +376,11 @@ var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
 days.push({ wd: (WD[lang] || WD.en)[d.getDay()], dd: d.getDate(), mm: (MO[lang] || MO.en)[d.getMonth()], cls: i === sel ? "on" : "", pick: function () { self.setState({ day: i }); } });
 })(i);
 }
-var selIso = new Date(start.getFullYear(), start.getMonth(), start.getDate() + sel).toISOString();
+var poS = null; try { poS = JSON.parse(window.localStorage.getItem("noa-preorder") || "null"); } catch (e) { poS = null; }
+if (poS && poS.date) { var pp = poS.date.split("-"); var pd = new Date(+pp[0], +pp[1] - 1, +pp[2]); var off = Math.round((pd - new Date(start.getFullYear(), start.getMonth(), start.getDate())) / 86400000);
+  if (off >= 6) { days.push({ wd: (WD[lang] || WD.en)[pd.getDay()], dd: pd.getDate(), mm: (MO[lang] || MO.en)[pd.getMonth()] + (poS.label ? " · " + poS.label : " · 🗓"), cls: "", pick: function () { self.setState({ day: 6 }); } }); off = 6; }
+  if (off >= 0 && !(this.state && typeof this.state.day === "number")) { sel = off; days.forEach(function (d0, k) { d0.cls = k === sel ? "on" : ""; }); } }
+var selIso = (sel === 6 && poS && poS.date) ? new Date(+poS.date.split("-")[0], +poS.date.split("-")[1] - 1, +poS.date.split("-")[2]).toISOString() : new Date(start.getFullYear(), start.getMonth(), start.getDate() + sel).toISOString();
 var dayLabel = days[sel].wd + ", " + days[sel].dd + " " + days[sel].mm;
 var q = (this.state && this.state.q) || stored, sum = 0, cnt = 0, lines = [];
 q.forEach(function (n, i) { if (!n) { return; } sum += n * PRICES[i]; cnt += n; lines.push({ name: t.pn[i], qty: n, line: "$" + (n * PRICES[i]).toFixed(2) }); });
