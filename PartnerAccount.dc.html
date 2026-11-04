@@ -641,7 +641,7 @@ depArr.forEach(function (r) { var k = IDX.indexOf(r[0]); var price = k >= 0 ? WP
  depRows.push({ name: t.pn[r[0]], q: r[1], val: money(price * r[1]), given: fdate(given), exp: fdate(exp), ret: fdate(retBy) + (soon ? " ⚠" : ""), expC: soon ? "#B03A2E" : "#33403A", expW: soon ? "800" : "500" }); });
 var sgKey = "noa-depsign|" + (isU ? (user.email || "").toLowerCase() : "demo");
 var signed = null; try { signed = JSON.parse(window.localStorage.getItem(sgKey) || "null"); } catch (e) { signed = null; }
-var sg = Object.assign({ name: isU ? ((user.first || "") + " " + (user.last || "")).trim() : "", title: "", biz: isU ? (user.biz || "") : t.biz, sig: "", agree: false }, st.sg || {});
+var sg = Object.assign({ name: isU ? (((user.first || "") + " " + (user.last || "")).trim() || user.contact || "") : "Armen Sargsyan", title: isU ? (user.role || "Owner") : "Owner", biz: isU ? (user.biz || "") : t.biz, sig: "", agree: false }, st.sg || {});
 var sgInit = (sg.name || "").trim().split(/\s+/).filter(Boolean).map(function (w) { return w.charAt(0).toUpperCase(); }).join("").slice(0, 3);
 var sgSet = {}; ["name", "title", "biz", "sig"].forEach(function (k) { sgSet[k] = function (e) { var n = Object.assign({}, sg); n[k] = e.target.value; self.setState({ sg: n, sgErr: false }); }; });
 var dashVals = { tabDep: tab === 9, depRows: depRows, hasDep: depRows.length > 0, noDep: depRows.length === 0, depTotal: money(depTot), depUnitsN: String(depU), depSoonN: String(depSoon), hasSoon: depSoon > 0, soonBg: depSoon ? "#FDE7E4" : "#E8F1EC", soonFg: depSoon ? "#B03A2E" : "#1D5545",
