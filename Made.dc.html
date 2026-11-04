@@ -743,6 +743,86 @@ return Object.assign(apVals, { isBizSess: !!(accU && accU.type === "biz"), bizNo
   check(); setInterval(check, 1500);
 })();
 </script>
+<script id="nofa-apri">
+(function () {
+  if (window.__nofaApri) { return; } window.__nofaApri = 1;
+  var page = (location.pathname.split("/").pop() || "");
+  var KIND = /^PartnerAccount/.test(page) ? "biz" : /^Wholesale/.test(page) ? "ws" : /^MyAccount/.test(page) ? "me" : "home"; var ISMAIN = /^(Main|index)/.test(page) || page === "";
+  function L() { try { return localStorage.getItem("noa-lang") || "hy"; } catch (e) { return "hy"; } }
+  function U() { try { return JSON.parse(localStorage.getItem("noa-user") || "null"); } catch (e) { return null; } }
+  var IMG = "img/c1999a6e0a1f0a5218be4d17335ab22d.webp", HAND = "img/f9280bbbf31cb7aba245e670f4e5ae57.webp", LEAF = "img/2fc668d693fee0e6607551e82b831db8.webp";
+  function hello() { var h = new Date().getHours(), l = L(); var u = U(); var n = u && u.first ? u.first : "";
+    var g = l === "hy" ? (h < 12 ? "Բարի լույս" : h < 18 ? "Բարև" : "Բարի երեկո") : l === "ru" ? (h < 12 ? "Доброе утро" : h < 18 ? "Здравствуйте" : "Добрый вечер") : l === "es" ? (h < 12 ? "Buenos días" : h < 18 ? "Hola" : "Buenas noches") : (h < 12 ? "Good morning" : h < 18 ? "Hi" : "Good evening");
+    return g + (n ? ", " + n : "") + "! 👋"; }
+  var TIPS = {
+    hy: { home: [["Բարի գալուստ։ Ես Շեֆ Ապրին եմ 🍑 Մեր ուտեստները պատրաստվում են ձեռքով, Գլենդեյլի մեր խոհանոցում, և սառեցվում են, որ վայելեք ցանկացած երեկո։", "Դիտել ապրանքները", "Main.dc.html#shop"],
+            ["Առաջին անգա՞մ եք։ Ընտրեք ապրանքները, ավելացրեք զամբյուղ, և մենք կառաքենք սառեցված վիճակում ❄️", "Սկսել գնումները", "Main.dc.html#shop"],
+            ["Չգիտե՞ք ինչպես պատրաստել։ Ամեն ապրանքի համար ունեմ քայլ առ քայլ հրահանգներ և իմ գաղտնի խորհուրդները 🍳", "Ինչպես պատրաստել", "Main.dc.html#apri-tips"],
+            ["Գրանցվեք և հրավիրեք ընկերներին. 5 ընկեր = 1 տուփ անվճար, ինքներդ եք ընտրում 🎁", "Գրանցվել", "Account.dc.html"],
+            ["Մեր բոլոր ապրանքները սառնարանում պահվում են 6 ամիս, այնպես որ կարող եք պատվիրել պաշարով։", "", ""],
+            ["Ունե՞ք խանութ, ռեստորան կամ քեյթրինգ։ Բացեք մեծածախ հաշիվ՝ ձեր գներով 🏪", "Մեծածախ", "Wholesale.dc.html"]],
+          me: ["Ես Շեֆ Ապրին եմ։ Եթե հարց ունեք, գրեք մեզ «Նամակներ» բաժնում, կպատասխանենք։", "Հրավիրեք 5 ընկեր և ստացեք մեկ տուփ անվճար, ինքներդ ընտրեք որը 🎁", "Առաքման օրն ու ժամը տեսնում եք «Առաքում» բաժնում։", "Ձեր բոլոր պատվերները պահվում են «Իմ պատվերները» բաժնում, կարող եք նույնը նորից պատվիրել։", "Մեր բոլոր ապրանքները պահպանվում են 6 ամիս սառնարանում ❄️"],
+          biz: ["Բարի գալուստ ձեր գործընկերային էջ։ Արագ պատվերից կարող եք ընտրել մասնաճյուղը։", "Հրավիրեք ուրիշ խանութ և ստացեք $200 զեղչ ձեր հաշվից 💰", "Հաշիվները գտնում եք «Փաստաթղթեր» բաժնում, ֆիլտրով՝ ըստ տարվա և ամսվա։", "Պատվերը վճարվում է միայն մեր հաստատումից հետո։", "Ավանդով ապրանքը վերադարձնելիս պետք է մնացած լինի առնվազն 3 ամիս պահպանման ժամկետ։"],
+          ws: ["Ուզո՞ւմ եք մեր ապրանքը ձեր խանութում։ Գրանցվեք որպես գործընկեր, մնացածը ես կօգնեմ 🙂", "Առաքում ենք սառնարանային ֆուրգոնով, Cambro տուփերով, որ ամեն ինչ հասնի սառած վիճակում ❄️", "Ձեր քաղաքը ցանկում չէ՞։ Առաջարկեք այն, և մենք կտեսնենք։"],
+          next: "Հաջորդ խորհուրդը", hide: "Թաքցնել", call: "Կանչել Ապրիին" },
+    en: { home: [["Welcome! I'm Chef Apri 🍑 Our dishes are made by hand in our Glendale kitchen and frozen so you can enjoy them any night.", "See the products", "Main.dc.html#shop"],
+            ["First time here? Pick your products, add them to the cart and we'll deliver them frozen ❄️", "Start shopping", "Main.dc.html#shop"],
+            ["Not sure how to cook it? I have step-by-step instructions and my secret tips for every product 🍳", "How to cook", "Main.dc.html#apri-tips"],
+            ["Sign up and invite friends: 5 friends = 1 free box, you pick which 🎁", "Sign up", "Account.dc.html"],
+            ["All our products keep 6 months in the freezer, so you can stock up.", "", ""],
+            ["Have a store, restaurant or catering? Open a wholesale account with your own prices 🏪", "Wholesale", "Wholesale.dc.html"]],
+          me: ["I'm Chef Apri. Questions? Write to us in Messages and we'll reply.", "Invite 5 friends and get one box free — you pick which 🎁", "Your delivery day and time are in the Delivery tab.", "All your orders are saved in My orders — reorder in one tap.", "All our products keep 6 months in the freezer ❄️"],
+          biz: ["Welcome to your partner page. In quick order you can pick the branch.", "Invite another store and get $200 off your invoices 💰", "Invoices are in Documents, with year and month filters.", "Orders are charged only after we confirm them.", "Goods on deposit must be returned with at least 3 months of shelf life left."],
+          ws: ["Want our products in your store? Register as a partner — I'll help with the rest 🙂", "We deliver in a refrigerated van with Cambro boxes, so everything arrives frozen ❄️", "City not on the list? Suggest it and we'll look into it."],
+          next: "Next tip", hide: "Hide", call: "Call Apri" } };
+  TIPS.ru = TIPS.en; TIPS.es = TIPS.en;
+  function T() { return TIPS[L()] || TIPS.en; }
+  var css = ".ap-dock{position:fixed;left:14px;bottom:0;z-index:9000;font-family:Manrope,'Noto Sans Armenian',system-ui,sans-serif;pointer-events:none}" +
+    ".ap-fig{position:relative;width:150px;pointer-events:auto;cursor:pointer;transform:translateY(105%);transition:transform .7s cubic-bezier(.34,1.45,.55,1);filter:drop-shadow(0 10px 14px rgba(0,0,0,.28))}" +
+    ".ap-fig img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}.ap-fig .ap-h{position:absolute;left:78.95%;top:49.74%;width:15.64%;transform-origin:25.5% 82.7%}.ap-fig .ap-l{position:absolute;left:71.96%;top:34.7%;width:25.46%;transform-origin:10% 80%}" +
+    ".ap-dock.peek .ap-fig{transform:translateY(62%)}.ap-dock.peek .ap-fig:hover{transform:translateY(55%)}.ap-dock.peek .ap-fig{animation:apBob 3.2s ease-in-out infinite}" +
+    ".ap-dock.open .ap-fig{transform:translateY(8%)}.ap-dock.open .ap-h{animation:apWave .5s ease-in-out infinite alternate}.ap-dock.open .ap-l,.ap-dock.peek .ap-l{animation:apLeaf 3s ease-in-out infinite}" +
+    ".ap-dock.gone .ap-fig{transform:translateY(110%)}" +
+    "@keyframes apWave{from{transform:rotate(-14deg)}to{transform:rotate(10deg)}}@keyframes apLeaf{0%,100%{transform:rotate(0)}30%{transform:rotate(-7deg)}60%{transform:rotate(5deg)}}" +
+    "@keyframes apBob{0%,100%{margin-bottom:0}50%{margin-bottom:6px}}" +
+    ".ap-bub{box-sizing:border-box;position:absolute;left:150px;bottom:120px;width:min(290px,calc(100vw - 180px));padding:14px 16px 12px;border-radius:20px 20px 20px 6px;background:#FFFDF7;color:#133B30;box-shadow:0 18px 40px rgba(19,59,48,.28),0 0 0 1.5px rgba(235,169,58,.65);pointer-events:auto;opacity:0;transform:translateY(12px) scale(.92);transform-origin:0 100%;transition:opacity .35s ease .25s,transform .45s cubic-bezier(.34,1.45,.55,1) .25s;visibility:hidden}" +
+    ".ap-dock.open .ap-bub{opacity:1;transform:none;visibility:visible}" +
+    ".ap-bub b{display:block;font-family:Fraunces,'Noto Serif Armenian',Lora,serif;font-size:17px;color:#1D5545;margin-bottom:4px}.ap-bub p{margin:0;font-size:14px;line-height:1.5;color:#3D4A43}" +
+    ".ap-row{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:10px}.ap-row button{border:none;background:none;font:800 12.5px Manrope,'Noto Sans Armenian',system-ui;cursor:pointer;padding:4px 0}.ap-nx{color:#1D5545}.ap-hd{color:#8A8F86}" +
+    ".ap-act{display:none;margin-top:10px;align-self:flex-start;min-height:36px;line-height:36px;padding:0 16px;border-radius:999px;background:linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22);color:#133B30;font-weight:800;font-size:13.5px;text-decoration:none;box-shadow:0 4px 10px rgba(211,138,34,.35)}.ap-act.on{display:inline-block}.ap-dots{display:flex;gap:4px}.ap-dots i{width:6px;height:6px;border-radius:50%;background:#E5DBC3}.ap-dots i.on{background:#EBA93A}" +
+    ".ap-x{position:absolute;top:8px;right:10px;border:none;background:none;color:#A39B89;font-size:15px;cursor:pointer;line-height:1}" +
+    "@media (max-width:640px){.ap-fig{width:104px}.ap-bub{left:96px;bottom:86px;width:min(250px,calc(100vw - 116px))}.ap-dock{left:6px}}" +
+    "@media (prefers-reduced-motion:reduce){.ap-fig,.ap-bub{transition:none!important}.ap-h,.ap-l,.ap-fig{animation:none!important}}" +
+    ".ap-dock.ap-main{left:76px}@media (max-width:640px){.ap-dock.ap-main{left:62px}.ap-dock.ap-main .ap-bub{left:64px;bottom:96px;width:min(250px,calc(100vw - 140px))}}" +
+    "@media print{.ap-dock{display:none!important}}";
+  function init() {
+    var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
+    var d = document.createElement("div"); d.className = "ap-dock gone"; d.setAttribute("aria-live", "polite");
+    d.innerHTML = '<div class="ap-bub" role="dialog"><button type="button" class="ap-x" aria-label="close">✕</button><b class="ap-t"></b><p class="ap-p"></p><a class="ap-act" href="#"></a><div class="ap-row"><button type="button" class="ap-hd"></button><span class="ap-dots"></span><button type="button" class="ap-nx"></button></div></div>' +
+      '<div class="ap-fig" role="button" tabindex="0"><img src="' + IMG + '" alt="Chef Apri"><img class="ap-h" src="' + HAND + '" alt=""><img class="ap-l" src="' + LEAF + '" alt=""></div>';
+    document.body.appendChild(d);
+    var fig = d.querySelector(".ap-fig"), tEl = d.querySelector(".ap-t"), pEl = d.querySelector(".ap-p"), dots = d.querySelector(".ap-dots");
+    var i = 0, tm = null;
+    function paint() { var tp = T()[KIND]; i = i % tp.length; tEl.textContent = i === 0 ? hello() : (L() === "hy" ? "Շեֆ Ապրի" : "Chef Apri"); var it = tp[i]; var tx = typeof it === "string" ? it : it[0]; pEl.textContent = tx; var act = d.querySelector(".ap-act"); if (typeof it !== "string" && it[1]) { act.textContent = it[1] + " →"; act.setAttribute("href", ISMAIN && it[2].indexOf("Main.dc.html#") === 0 ? it[2].slice(12) : it[2]); act.className = "ap-act on"; } else { act.className = "ap-act"; }
+      d.querySelector(".ap-nx").textContent = T().next + " →"; d.querySelector(".ap-hd").textContent = T().hide; fig.setAttribute("aria-label", T().call);
+      dots.innerHTML = tp.map(function (_, k) { return "<i class='" + (k === i ? "on" : "") + "'></i>"; }).join(""); }
+    function arm() { clearTimeout(tm); tm = setTimeout(peek, 14000); }
+    function open() { paint(); d.className = "ap-dock open" + (ISMAIN ? " ap-main" : ""); arm(); }
+    function peek() { clearTimeout(tm); d.className = "ap-dock peek" + (ISMAIN ? " ap-main" : ""); }
+    fig.addEventListener("click", function () { if (d.classList.contains("open")) { i++; paint(); arm(); } else { open(); } });
+    fig.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fig.click(); } });
+    d.querySelector(".ap-nx").addEventListener("click", function () { i++; paint(); arm(); });
+    d.querySelector(".ap-hd").addEventListener("click", peek); d.querySelector(".ap-x").addEventListener("click", peek);
+    d.querySelector(".ap-bub").addEventListener("mouseenter", function () { clearTimeout(tm); }); d.querySelector(".ap-bub").addEventListener("mouseleave", arm);
+    var sk = "noa-apri-seen|" + KIND, first = true; try { first = !sessionStorage.getItem(sk); sessionStorage.setItem(sk, "1"); } catch (e) {}
+    d.querySelector(".ap-act").addEventListener("click", function () { peek(); });
+    if (ISMAIN) { d.classList.add("ap-main"); }
+    var start = function () { if (first) { setTimeout(open, 1200); } else { i = Math.floor(Math.random() * 5) + 1; setTimeout(peek, 600); } };
+    if (ISMAIN && (window.scrollY || 0) < 380) { var onS = function () { if ((window.scrollY || 0) >= 380) { window.removeEventListener("scroll", onS); start(); } }; window.addEventListener("scroll", onS, { passive: true }); } else { start(); }
+  }
+  if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", init); } else { init(); }
+})();
+</script>
 <style id="pg-arr-css">.pgx{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;gap:8px}.pgx button{width:46px;height:46px;border-radius:50%;border:1.5px solid #EBA93A;background:#1D5545;color:#F6E3B4;font:800 22px/1 Manrope,system-ui,sans-serif;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;padding:0}.pgx button:hover{background:#133B30}.pgx .up{background:linear-gradient(180deg,#FCDB82,#EDB040 50%,#D38A22);color:#133B30;border-color:#D38A22}.pgx.main{bottom:88px;flex-direction:column}.pg-arrows{display:none !important}@media print{.pgx{display:none}}</style><div class="pgx" id="pgx"><button type="button" aria-label="Back" onclick="history.back()">‹</button><button type="button" aria-label="Forward" onclick="history.forward()">›</button><button type="button" class="up" aria-label="Top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button></div>
 </body>
 </html>
