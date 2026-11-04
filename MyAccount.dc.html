@@ -494,10 +494,10 @@ var tab = typeof st.tab === "number" ? st.tab : 0;
 var icons = ["📊", "📦", "📍", "⚙️", "🛒", "🚚", "💬", "🎁"];
 var navL2 = t.navL.concat([t.shopNav, t.navDel, (({ hy: "Նամակներ", en: "Messages", ru: "Сообщения", es: "Mensajes" })[lang] || "Messages"), (lang === "hy" ? "Հրավիրել ընկերներին" : "Invite friends")]);
 var navs = [0, 4, 1, 2, 5, 6, 7, 3].map(function (i) { var lb = navL2[i]; return { label: lb, icon: icons[i], cls: i === tab ? "on" : "", pick: function () { self.setState({ tab: i }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }; });
- var XL = ({ hy: ["Պատրաստում", "Մշակույթ", "Պատմություն"], en: ["How it’s made", "Culture", "History"], ru: ["Как мы готовим", "Культура", "История"], es: ["Cómo se hace", "Cultura", "Historia"] })[lang] || ["How it’s made", "Culture", "History"];
-var XP = ["Made", "Culture", "History"];
-navs = navs.concat([["👩‍🍳", 20], ["🏛", 21], ["📜", 22]].map(function (x, k) { return { label: XL[k], icon: x[0], cls: (tab === x[1] ? "on " : "") + "ext" + (k === 0 ? " ext1" : ""), pick: function () { self.setState({ tab: x[1] }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }; }));
-var extVals = { extOn: tab >= 20 && tab <= 22, extSrc: (tab >= 20 && tab <= 22) ? XP[tab - 20] + ".dc.html?embed=1&lang=" + lang : "about:blank", extTitle: (tab >= 20 && tab <= 22) ? XL[tab - 20] : "" };
+ var XL = ({ hy: ["Ինչպես պատրաստել", "Պատրաստում", "Մշակույթ", "Պատմություն"], en: ["How to cook", "How it’s made", "Culture", "History"], ru: ["Как приготовить", "Как мы готовим", "Культура", "История"], es: ["Cómo cocinar", "Cómo se hace", "Cultura", "Historia"] })[lang] || ["How to cook", "How it’s made", "Culture", "History"];
+var XP = ["Made", "Culture", "History", "", "", "", "", "", "", "Cook"];
+navs = navs.concat([["🍳", 29], ["👩‍🍳", 20], ["🏛", 21], ["📜", 22]].map(function (x, k) { return { label: XL[k], icon: x[0], cls: (tab === x[1] ? "on " : "") + "ext" + (k === 0 ? " ext1" : ""), pick: function () { self.setState({ tab: x[1] }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }; }));
+var extVals = { extOn: (tab >= 20 && tab <= 22) || tab === 29, extSrc: ((tab >= 20 && tab <= 22) || tab === 29) ? XP[tab - 20] + ".dc.html?embed=1&lang=" + lang : "about:blank", extTitle: tab === 29 ? XL[0] : ((tab >= 20 && tab <= 22) ? XL[tab - 19] : "") };
 /* profile */
 var base = user ? { first: user.first || "", last: user.last || "", email: user.email || "", phone: user.phone || "" } : { first: "Ani", last: "Petrosyan", email: "ani@example.com", phone: "+1 (818) 555 0142" };
 var pf = Object.assign({}, base, st.pf || {});

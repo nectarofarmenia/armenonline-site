@@ -19,7 +19,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
 }
 </style>
 <script id="nofa-embed">(function(){try{if(!/[?&]embed=1/.test(location.search)){return;}var d=document.documentElement;d.className+=" emb";
-var st=document.createElement("style");st.textContent="html.emb header,html.emb .hdr-wave,html.emb footer,html.emb .fab-buy,html.emb #pgx,html.emb [aria-label='Back to top'],html.emb .ap-dock,html.emb .nf-bell,html.emb .nf-wrap,html.emb .nf-panel{display:none!important}html.emb body{background:#F7F3EA}html.emb main{min-height:0!important}html.emb main>div[aria-hidden]{display:none!important}html.emb section>div{padding-top:40px!important}";
+var st=document.createElement("style");st.textContent="html.emb header,html.emb .hdr-wave,html.emb footer,html.emb .fab-buy,html.emb #pgx,html.emb [aria-label='Back to top'],html.emb .ap-dock,html.emb .nf-bell,html.emb .nf-wrap,html.emb .nf-panel{display:none!important}html.emb body{background:#F7F3EA}html.emb main{min-height:0!important;padding-bottom:28px;display:flow-root}html.emb .ak-box{margin-bottom:0!important}html.emb main>div[aria-hidden]{display:none!important}html.emb section>div{padding-top:40px!important}";
 document.head.appendChild(st);
 document.addEventListener("click",function(e){var a=e.target&&e.target.closest?e.target.closest("a[href]"):null;if(!a){return;}var h=a.getAttribute("href")||"";if(h.charAt(0)==="#"){return;}e.preventDefault();try{window.top.location.href=a.href;}catch(x){location.href=a.href;}},true);
 var last=0;function post(){var m=document.querySelector("main");var h=m?Math.ceil(m.getBoundingClientRect().bottom+window.scrollY):document.documentElement.scrollHeight;if(Math.abs(h-last)>4){last=h;try{parent.postMessage({nofaH:h,page:location.pathname.split("/").pop()},"*");}catch(x){}}}
@@ -148,6 +148,7 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 <nav aria-label="Main" class="nav-desk" style="flex: 1 1 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 16px; font-size: 19px; font-weight: 700; white-space: nowrap">
 <a href="Main.dc.html#shop" style="text-decoration: none; color: #F7F3EA">{{t.navShop}}</a>
 <a href="Made.dc.html" style="text-decoration: none; color: #F7F3EA">{{t.navMade}}</a>
+<a href="Cook.dc.html" style="text-decoration: none; color: #F7F3EA">{{t.navCook}}</a>
 <a href="Main.dc.html#story" style="text-decoration: none; color: #F7F3EA">{{t.navStory}}</a>
 <a href="Culture.dc.html" style="text-decoration: none; color: #F7F3EA">{{t.navCulture}}</a>
 <a href="Main.dc.html#faq" style="text-decoration: none; color: #F7F3EA">{{t.navFaq}}</a>
@@ -200,6 +201,7 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 <div class="mob-only mob-panel" style="flex-direction: column; padding: 4px 22px 22px; border-top: 1px solid rgba(255,255,255,.12)">
 <a href="Main.dc.html#shop" class="mob-link" onClick="{{closeMenu}}">{{t.navShop}}</a>
 <a href="Made.dc.html" class="mob-link" onClick="{{closeMenu}}">{{t.navMade}}</a>
+<a href="Cook.dc.html" class="mob-link" onClick="{{closeMenu}}">{{t.navCook}}</a>
 <a href="Wholesale.dc.html" class="mob-link" style="color: #F6C35A">{{t.navWholesale}}</a>
 <a href="Culture.dc.html" class="mob-link" onClick="{{closeMenu}}">{{t.navCulture}}</a>
 <a href="History.dc.html" class="mob-link" onClick="{{closeMenu}}">{{t.navHistory}}</a>
@@ -403,7 +405,7 @@ var tab = (this.state && this.state.tab) || "khinkali";
 var L = {
 en: {
 bar: "Delivered frozen 48 hours after you order · [YOUR DELIVERY AREA]",
-navShop: "Products", navMade: "How it's made", navStory: "About us", navCulture: "Culture", navHistory: "History", histH2: "The story behind our dishes", cultSoon: "New content coming soon.", navFaq: "FAQ", navWholesale: "Wholesale", signin: "Sign in", cart: "Cart",
+navShop: "Products", navMade: "How it's made", navCook: "How to cook", navStory: "About us", navCulture: "Culture", navHistory: "History", histH2: "The story behind our dishes", cultSoon: "New content coming soon.", navFaq: "FAQ", navWholesale: "Wholesale", signin: "Sign in", cart: "Cart",
 heroKick: "Handmade in Glendale, California",
 heroH1: "Armenian taste. Zero effort.",
 heroP: "We cook, you enjoy. Real Armenian dishes, ready in minutes.",
@@ -436,7 +438,7 @@ tags: ["3 Khash + 1 Broth free"], setSize: "3 Khash + 1 Khash Broth · 4 × 32 o
 },
 hy: {
 bar: "Սառեցված առաքում՝ պատվերից 48 ժամ հետո · [ՁԵՐ ԱՌԱՔՄԱՆ ՏԱՐԱԾՔԸ]",
-navShop: "Արտադրանք", navMade: "Պատրաստում", navStory: "Մեր մասին", navCulture: "Մշակույթ", navHistory: "Պատմություն", histH2: "Մեր ուտեստների պատմությունը", cultSoon: "Նոր բովանդակությունը շուտով։", navFaq: "Հարցեր", navWholesale: "Մեծածախ", signin: "Մուտք", cart: "Զամբյուղ",
+navShop: "Արտադրանք", navMade: "Պատրաստում", navCook: "Ինչպես պատրաստել", navStory: "Մեր մասին", navCulture: "Մշակույթ", navHistory: "Պատմություն", histH2: "Մեր ուտեստների պատմությունը", cultSoon: "Նոր բովանդակությունը շուտով։", navFaq: "Հարցեր", navWholesale: "Մեծածախ", signin: "Մուտք", cart: "Զամբյուղ",
 heroKick: "Ձեռքով պատրաստված Գլենդեյլում, Կալիֆոռնիա",
 heroH1: "Հայկական համ՝ առանց ջանքի։",
 heroP: "Մենք պատրաստում ենք, դուք վայելում եք։ Իսկական հայկական ուտեստներ՝ րոպեների ընթացքում։",
@@ -469,7 +471,7 @@ tags: ["3 Խաշ + 1 արգանակ նվեր"], setSize: "3 Խաշ + 1 Խաշի 
 },
 ru: {
 bar: "Доставка в замороженном виде через 48 часов после заказа · [ВАША ЗОНА ДОСТАВКИ]",
-navShop: "Продукция", navMade: "Как готовим", navStory: "О нас", navCulture: "Культура", navHistory: "История", histH2: "История наших блюд", cultSoon: "Скоро здесь появится новый раздел.", navFaq: "Вопросы", navWholesale: "Оптом", signin: "Войти", cart: "Корзина",
+navShop: "Продукция", navMade: "Как готовим", navCook: "Как приготовить", navStory: "О нас", navCulture: "Культура", navHistory: "История", histH2: "История наших блюд", cultSoon: "Скоро здесь появится новый раздел.", navFaq: "Вопросы", navWholesale: "Оптом", signin: "Войти", cart: "Корзина",
 heroKick: "Ручная работа, Глендейл, Калифорния",
 heroH1: "Армянский вкус. Без усилий.",
 heroP: "Мы готовим, вы наслаждаетесь. Настоящие армянские блюда — за считанные минуты.",
@@ -502,7 +504,7 @@ tags: ["3 хаша + 1 бульон в подарок"], setSize: "3 хаша + 
 },
 es: {
 bar: "Entregado congelado 48 horas después de tu pedido · [TU ZONA DE ENTREGA]",
-navShop: "Productos", navMade: "Elaboración", navStory: "Nosotros", navCulture: "Cultura", navHistory: "Historia", histH2: "La historia de nuestros platos", cultSoon: "Muy pronto, nuevo contenido.", navFaq: "Preguntas", navWholesale: "Mayoreo", signin: "Entrar", cart: "Carrito",
+navShop: "Productos", navMade: "Elaboración", navCook: "Cómo cocinar", navStory: "Nosotros", navCulture: "Cultura", navHistory: "Historia", histH2: "La historia de nuestros platos", cultSoon: "Muy pronto, nuevo contenido.", navFaq: "Preguntas", navWholesale: "Mayoreo", signin: "Entrar", cart: "Carrito",
 heroKick: "Hecho a mano en Glendale, California",
 heroH1: "Sabor armenio. Sin esfuerzo.",
 heroP: "Nosotros cocinamos, tú disfrutas. Auténtica comida armenia, lista en minutos.",
