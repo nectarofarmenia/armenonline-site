@@ -653,9 +653,9 @@ var navs = [5, 0, 6, 1, 10, 9, 11, 7, 2, 12, 8].map(function (i) { return { labe
 var XP = ["Made", "Culture", "History", "", "", "", "", "", "", "Cook"];
 navs = navs.concat([["🍳", 29], ["👩‍🍳", 20], ["🏛", 21], ["📜", 22]].map(function (x, k) { return { label: XL[k], icon: x[0], cls: (tab === x[1] ? "on " : "") + "ext" + (k === 0 ? " ext1" : ""), pick: function () { self.setState({ tab: x[1] }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }; }));
 var extVals = { extOn: (tab >= 20 && tab <= 22) || tab === 29, extSrc: ((tab >= 20 && tab <= 22) || tab === 29) ? XP[tab - 20] + ".dc.html?embed=1&lang=" + lang : "about:blank", extTitle: tab === 29 ? XL[0] : ((tab >= 20 && tab <= 22) ? XL[tab - 19] : "") };
-var IDX = [1, 2, 3, 4, 5, 6, 7, 8];
-var WP = [15.00, 12.00, 45.00, 18.75, 18.75, 26.25, 26.25, 15.75];
-var q = st.wq || [12, 6, 2, 20, 10, 6, 6, 10];
+var IDX = [4, 5, 6, 7, 8];
+var WP = [18.75, 18.75, 26.25, 26.25, 15.75];
+var q = (st.wq && st.wq.length === IDX.length) ? st.wq : [20, 10, 6, 6, 10];
 var money = function (v) { return "$" + v.toFixed(2); };
 var sum = 0, units = 0;
 var rows = IDX.map(function (pi, k) { sum += q[k] * WP[k]; units += q[k]; return { name: t.pn[pi], size: t.ps[pi], price: money(WP[k]), q: q[k], line: money(q[k] * WP[k]),
@@ -709,10 +709,11 @@ var ALL = [];
 var OKEY = "noa-ws-orders|" + (isU ? (user.email || "").toLowerCase() : "demo");
 var RO = []; try { RO = JSON.parse(window.localStorage.getItem(OKEY) || "null") || (isU ? JSON.parse(window.localStorage.getItem("noa-ws-orders") || "[]") : []); } catch (e) { RO = []; }
 var saveRO = function (a) { try { window.localStorage.setItem(OKEY, JSON.stringify(a)); } catch (e) {} self.setState({ roT: Date.now() }); };
+RO = RO.map(function (o) { return Object.assign({}, o, { items: (o.items || []).filter(function (x) { return IDX.indexOf(x[0]) >= 0; }) }); });
 var RALL = RO.map(function (o, ix) { return { no: String(o.no).replace(/^NOA-/, "NofA-"), d: new Date(o.date), loc: o.loc || 0, items: o.items, st: o.await ? 3 : (o.st || 0), by: o.by || "", ix: ix, ap: o.await ? "" : (o.ap || ""), pd: o.pd || "", pnote: o.pnote || "", pm: o.pm || "", chargedAt: o.chargedAt || "", reqDate: o.reqDate || o.date }; });
 if (isU) { ALL = RALL.slice(); }
 else { ALL = RALL.slice(); for (var m = 13; m >= 0; m--) { var cnt = 2 + ((m * 7) % 3); for (var k2 = 0; k2 < cnt; k2++) { var day = 2 + ((k2 * 9 + m * 5) % 25); var d0 = new Date(now.getFullYear(), now.getMonth() - m, day);
- var p1 = 1 + ((m + k2) % 8), p2 = 1 + ((m * 3 + k2 + 2) % 8), p3 = 1 + ((m + k2 * 5 + 4) % 8);
+ var p1 = IDX[(m + k2) % 5], p2 = IDX[(m * 3 + k2 + 2) % 5], p3 = IDX[(m + k2 * 5 + 4) % 5];
  var its = [[p1, 6 + ((m + k2) % 4) * 6]]; if (p2 !== p1) { its.push([p2, 4 + ((m * 2 + k2) % 5) * 2]); } if (p3 !== p1 && p3 !== p2) { its.push([p3, 10 + (k2 % 3) * 10]); }
  var future = d0 > now; ALL.push({ ix: -1, no: "NofA-W-" + (1700 + (13 - m) * 4 + k2), d: d0, loc: (m + k2) % Math.max(1, LOCS.length), items: its, st: future ? (k2 % 2) : 2 }); } } }
 ALL.forEach(function (o) { o.total = mkTotal(o.items); o.units = 0; o.items.forEach(function (x) { o.units += x[1]; }); if (o.loc >= LOCS.length) { o.loc = 0; } });
@@ -768,7 +769,7 @@ var notifs = t.notifs.map(function (lb, i) { return { label: lb, e: nt[i][0], s:
 var awaitArr = ALL.filter(function (o) { return o.st === 3; });
 var awaitList = awaitArr.map(function (o) { return { no: o.no, by: o.by || "—", date: fdate(o.d), items: o.items.map(function (x) { return t.pn[x[0]] + " × " + x[1]; }).join(", "), total: money(o.total), pay: function () { var a = RO.slice(); if (a[o.ix]) { a[o.ix] = Object.assign({}, a[o.ix], { await: false, st: 0, ap: "pending", pm: pmLabel(), reqDate: a[o.ix].date }); saveRO(a); } } }; });
 var depKey = "noa-deposit|" + (isU ? (user.email || "").toLowerCase() : "demo");
-var depArr = (function () { var a = null; try { a = JSON.parse(window.localStorage.getItem(depKey) || "null"); } catch (e) { a = null; } return a || (isU ? [] : [[1, 24, -20, 140], [4, 20, -12, 155], [6, 10, -100, 50], [8, 12, -5, 170]]); })();
+var depArr = (function () { var a = null; try { a = JSON.parse(window.localStorage.getItem(depKey) || "null"); } catch (e) { a = null; } return a || (isU ? [] : [[5, 24, -20, 140], [4, 20, -12, 155], [6, 10, -100, 50], [8, 12, -5, 170]]); })();
 var depRows = []; var depTot = 0, depU = 0, depSoon = 0;
 depArr.forEach(function (r) { var k = IDX.indexOf(r[0]); var price = k >= 0 ? WP[k] : 0; var given = new Date(now.getFullYear(), now.getMonth(), now.getDate() + r[2]); var exp = new Date(given.getFullYear(), given.getMonth() + 6, given.getDate()); var retBy = new Date(given.getFullYear(), given.getMonth() + 3, given.getDate()); var soon = (retBy - now) / 864e5 <= 30; depTot += price * r[1]; depU += r[1]; if (soon) { depSoon += r[1]; }
  depRows.push({ name: t.pn[r[0]], q: r[1], val: money(price * r[1]), given: fdate(given), exp: fdate(exp), ret: fdate(retBy) + (soon ? " ⚠" : ""), expC: soon ? "#B03A2E" : "#33403A", expW: soon ? "800" : "500" }); });
@@ -805,7 +806,7 @@ var PRW = { 1: 15.00, 2: 12.00, 3: 45.00, 4: 18.75, 5: 18.75, 6: 26.25, 7: 26.25
 var docInvSrc = (function () {
  if (isU) { return ALL.filter(function (o) { return o.items && o.items.length; }).map(function (o) { return { no: "NofA-INV-" + String(o.no).replace(/^NofA-(W-)?/, ""), date: dYmd(o.d), net: 0, items: o.items, status: o.st === 3 ? "unpaid" : "paid" }; }); }
  var a = null; try { a = JSON.parse(window.localStorage.getItem("noa-invoices") || "null"); } catch (e) { a = null; }
- if (!Array.isArray(a)) { a = []; var T0 = new Date(); var k = 0; for (var back = 14; back >= 0; back--) { var d0 = new Date(T0.getFullYear(), T0.getMonth() - back, 1); [4, 5, 6].forEach(function (ci, j) { if ((back + j) % 3 === 2) { return; } var dt = new Date(d0.getFullYear(), d0.getMonth(), Math.min(4 + j * 8 + (back % 4), 27)); if (dt > T0) { dt = new Date(T0.getFullYear(), T0.getMonth(), Math.max(1, T0.getDate() - j)); } k++; var mm = d0.getMonth() + 1; var paid = back >= 1 ? !(back === 1 && j === 0) : (j === 0); a.push({ no: "NofA-INV-" + String(d0.getFullYear()).slice(2) + (mm < 10 ? "0" : "") + mm + "-" + (10 + j), ci: ci, date: dYmd(dt), net: ({ 4: 15, 5: 7, 6: 0 })[ci], items: [[1 + (k % 8), 6 + (k * 3) % 14], [1 + ((k + 3) % 8), 4 + (k * 5) % 10]], status: paid ? "paid" : "unpaid" }); }); } }
+ if (!Array.isArray(a)) { a = []; var T0 = new Date(); var k = 0; for (var back = 14; back >= 0; back--) { var d0 = new Date(T0.getFullYear(), T0.getMonth() - back, 1); [4, 5, 6].forEach(function (ci, j) { if ((back + j) % 3 === 2) { return; } var dt = new Date(d0.getFullYear(), d0.getMonth(), Math.min(4 + j * 8 + (back % 4), 27)); if (dt > T0) { dt = new Date(T0.getFullYear(), T0.getMonth(), Math.max(1, T0.getDate() - j)); } k++; var mm = d0.getMonth() + 1; var paid = back >= 1 ? !(back === 1 && j === 0) : (j === 0); a.push({ no: "NofA-INV-" + String(d0.getFullYear()).slice(2) + (mm < 10 ? "0" : "") + mm + "-" + (10 + j), ci: ci, date: dYmd(dt), net: ({ 4: 15, 5: 7, 6: 0 })[ci], items: [[4 + (k % 5), 6 + (k * 3) % 14], [4 + ((k + 3) % 5), 4 + (k * 5) % 10]], status: paid ? "paid" : "unpaid" }); }); } }
  return a.filter(function (v) { return v.ci === 4; }); })();
 var docInvs = docInvSrc.map(function (v) { var tot = 0; v.items.forEach(function (x) { tot += (PRW[x[0]] || 0) * x[1]; }); var due = dYmd(new Date(new Date(v.date + "T12:00:00").getTime() + (v.net || 0) * 864e5)); return Object.assign({}, v, { tot: tot, due: due, y: v.date.slice(0, 4), m: parseInt(v.date.slice(5, 7), 10) }); }).sort(function (a, b) { return a.date < b.date ? 1 : -1; });
 var dsec = st.dsec || ""; var diy = st.diy || ""; var dim = st.dim || 0; var dview = st.dview || "";
@@ -921,7 +922,7 @@ var ivBiz = bizN;
 var ivCode = (function () { var e = (ivU && ivU.email) || "demo"; var h = 0; for (var i = 0; i < e.length; i++) { h = (h * 33 + e.charCodeAt(i)) >>> 0; } return h.toString(36).toUpperCase().slice(0, 6); })();
 var ivLink = "https://armenonline.com/Account.dc.html?ref=" + ivCode + "#biz";
 var ivMode = st.ivMode || "email"; var ivName = st.ivName || "";
-var ivDefMsg = (lang === "hy" ? "Բարև" + (ivName ? " " + ivName : "") + ",\n\nԵս " + ivBiz + "-ից եմ։ Մենք աշխատում ենք Nectar of Armenia-ի հետ՝ նրանց հայկական սառեցված ուտեստները (խինկալի, պելմենի, գաթա, խաշ) շատ լավ են վաճառվում։ Գրանցվեք որպես մեծածախ գործընկեր, առաքումը սառնարանային մեքենայով է, իսկ ապրանքը կարելի է վերցնել նաև դեպոզիտով։\n\n" + ivFrom : "Hi" + (ivName ? " " + ivName : "") + ",\n\nI’m with " + ivBiz + ". We work with Nectar of Armenia — their Armenian frozen foods (khinkali, pelmeni, gata, khash) sell really well. Sign up as a wholesale partner: delivery is by refrigerated van and goods are also available on deposit.\n\n" + ivFrom);
+var ivDefMsg = (lang === "hy" ? "Բարև" + (ivName ? " " + ivName : "") + ",\n\nԵս " + ivBiz + "-ից եմ։ Մենք աշխատում ենք Nectar of Armenia-ի հետ՝ նրանց հայկական սառեցված ուտեստները (խինկալի, պելմենի, բլինչիկ, քուֆթա) շատ լավ են վաճառվում։ Գրանցվեք որպես մեծածախ գործընկեր, առաքումը սառնարանային մեքենայով է, իսկ ապրանքը կարելի է վերցնել նաև դեպոզիտով։\n\n" + ivFrom : "Hi" + (ivName ? " " + ivName : "") + ",\n\nI’m with " + ivBiz + ". We work with Nectar of Armenia — their Armenian frozen foods (khinkali, pelmeni, blinchik, kufta) sell really well. Sign up as a wholesale partner: delivery is by refrigerated van and goods are also available on deposit.\n\n" + ivFrom);
 var ivMsg = typeof st.ivMsg === "string" ? st.ivMsg : ivDefMsg;
 var ivKey = "noa-invites|" + ((ivU && ivU.email) || "demo").toLowerCase();
 var ivLogA = []; try { ivLogA = JSON.parse(window.localStorage.getItem(ivKey) || "[]") || []; } catch (e) { ivLogA = []; }
