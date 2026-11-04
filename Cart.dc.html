@@ -386,14 +386,14 @@ return { t: t, langs: langs, items: items, count: count, hasCount: count > 0, su
       ".nt-snow{position:fixed;inset:0;pointer-events:none;z-index:45}" +
       ".nt-deco,#shop,#made,#culture,#history,#faq{position:relative;isolation:isolate}" +
       "#shop::before,#made::before,#made::after,#culture::before,#history::before,#faq::after{content:'';position:absolute;z-index:-1;pointer-events:none;background-repeat:no-repeat;background-position:center;background-size:contain}" +
-      "#shop::before{right:3%;top:6px;width:min(170px,26vw);aspect-ratio:220/320;background-image:url(ny/gtree.svg);opacity:1}" +
-      "#made::before{left:3%;top:0;width:min(190px,26vw);aspect-ratio:260/300;background-image:url(ny/gbaubles.svg);background-position:center top;opacity:.75}" +
+      "#shop::before{right:3%;top:4px;width:min(124px,22vw);aspect-ratio:220/320;background-image:url(ny/gtree.svg);opacity:1}" +
+      "#made::before{left:3%;top:0;width:min(190px,26vw);aspect-ratio:260/300;background-image:url(ny/gbaubles.svg);background-position:center top;opacity:1}" +
       "#made::after{right:5%;top:30px;width:min(120px,17vw);aspect-ratio:1;background-image:url(ny/gflake.svg);opacity:1;animation:ntRot 80s linear infinite}" +
       "#culture::before{right:3%;top:10px;width:min(150px,22vw);aspect-ratio:220/320;background-image:url(ny/gtree.svg);opacity:.95}" +
       "#history::before{left:58%;top:16px;width:min(140px,22vw);aspect-ratio:220/320;background-image:url(ny/gtree.svg);opacity:.9}" +
-      "#faq::after{right:3%;top:0;width:min(180px,26vw);aspect-ratio:260/300;background-image:url(ny/gbaubles.svg);background-position:center top;opacity:.7;transform:scaleX(-1)}" +
+      "#faq::after{right:3%;top:0;width:min(180px,26vw);aspect-ratio:260/300;background-image:url(ny/gbaubles.svg);background-position:center top;opacity:1;transform:scaleX(-1)}" +
       "@keyframes ntSpinY{from{transform:perspective(900px) rotateY(0deg)}to{transform:perspective(900px) rotateY(360deg)}}@keyframes ntRot{to{transform:rotate(360deg)}}@keyframes ntTurn{0%,100%{transform:perspective(900px) rotateY(-28deg)}50%{transform:perspective(900px) rotateY(28deg)}}@keyframes ntBough{0%,100%{transform:rotate(0deg)}50%{transform:rotate(1.2deg)}}@keyframes ntFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-14px) rotate(2deg)}}" +
-      "@media (max-width:640px){#shop::before,#culture::before,#history::before{width:84px;opacity:.6}#made::before{width:96px;opacity:.55}#made::after{width:60px;top:10px;opacity:.5}#faq::after{width:90px;opacity:.5}}" +
+      "@media (max-width:640px){#shop::before,#culture::before,#history::before{width:84px;opacity:.6}#made::before{width:96px;opacity:.85}#made::after{width:60px;top:10px;opacity:.5}#faq::after{width:90px;opacity:.85}}" +
       "@media (prefers-reduced-motion:reduce){#shop::before,#made::before,#made::after,#culture::before,#history::before,#faq::after{animation:none}}" +
       "@media (max-width:640px){.nt-bar{font-size:13px;padding:7px 34px 7px 12px;flex-wrap:nowrap;gap:10px}.nt-bar .nt-sp,.nt-bar .nt-l{display:none}.nt-bar .nt-s{display:inline}.nt-gar{height:30px}}" +
       "@media (prefers-reduced-motion:reduce){.nt-orn{animation:none}.nt-snow{display:none}}" +
@@ -437,7 +437,55 @@ return { t: t, langs: langs, items: items, count: count, hasCount: count > 0, su
           var d = f.r * (f.L === 2 ? 3.2 : 2.6); x.globalAlpha = f.a; x.drawImage(SP, f.x - d / 2, f.y - d / 2, d, d); }
         x.globalAlpha = 1; requestAnimationFrame(tick); }
       requestAnimationFrame(tick); }
-    function go() { bar(); garland(); snow(); }
+    function music() { if (embed || /^(Admin|Checkout|QR)/.test(page)) { return; } var AC = window.AudioContext || window.webkitAudioContext; if (!AC) { return; }
+      var onMain = /^(Main|index)/.test(page) || page === ""; var hy = L() === "hy";
+      var pref = "on"; try { pref = localStorage.getItem("noa-music") || "on"; } catch (e) {}
+      var css2 = ".nt-mu{position:fixed;right:18px;bottom:" + (onMain ? "200px" : "76px") + ";z-index:85;width:46px;height:46px;border-radius:50%;border:1.5px solid #EBA93A;background:#1D5545;color:#F6E3B4;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:2px;box-shadow:0 8px 18px rgba(0,0,0,.25);padding:0;font:700 18px/1 system-ui}" +
+        ".nt-mu i{display:block;width:3px;border-radius:2px;background:#F6C35A;height:6px}.nt-mu.on i{animation:ntEq 1s ease-in-out infinite}.nt-mu.on i:nth-child(2){animation-delay:-.3s}.nt-mu.on i:nth-child(3){animation-delay:-.6s}.nt-mu.on i:nth-child(4){animation-delay:-.15s}" +
+        "@keyframes ntEq{0%,100%{height:5px}50%{height:18px}}.nt-mu.off i{height:4px;opacity:.5}.nt-mu.off:after{content:'';position:absolute;width:30px;height:2px;background:#F6C35A;transform:rotate(-45deg);border-radius:2px}" +
+        ".nt-mu.wait{animation:ntPulse 2s ease-in-out infinite}@keyframes ntPulse{0%,100%{box-shadow:0 8px 18px rgba(0,0,0,.25),0 0 0 0 rgba(235,169,58,.5)}50%{box-shadow:0 8px 18px rgba(0,0,0,.25),0 0 0 8px rgba(235,169,58,0)}}" +
+        ".nt-mu span{position:absolute;right:56px;white-space:nowrap;background:#FFFDF7;color:#133B30;font:700 12.5px Manrope,'Noto Sans Armenian',system-ui;padding:6px 10px;border-radius:10px;box-shadow:0 6px 16px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:opacity .2s}.nt-mu:hover span{opacity:1}" +
+        "@media (max-width:640px){.nt-mu{width:40px;height:40px;right:14px}}@media print{.nt-mu{display:none}}";
+      var st2 = document.createElement("style"); st2.textContent = css2; document.head.appendChild(st2);
+      var btn = document.createElement("button"); btn.type = "button"; btn.className = "nt-mu " + (pref === "off" ? "off" : "wait"); btn.innerHTML = "<i></i><i></i><i></i><i></i><span></span>";
+      function lab() { var on = btn.classList.contains("on"); var tx = on ? (hy ? "Անջատել երաժշտությունը" : "Turn music off") : (hy ? "Միացնել երաժշտությունը" : "Turn music on"); btn.setAttribute("aria-label", tx); btn.querySelector("span").textContent = tx; }
+      lab(); document.body.appendChild(btn);
+      var ctx = null, master = null, timer = null, nextT = 0, idx = 0, playing = false;
+      var BPM = 112, B = 60 / BPM;
+      var N = { C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880, C3: 130.81, F3: 174.61, G3: 196, E3: 164.81 };
+      var A1 = [["E5",1],["E5",1],["E5",2],["E5",1],["E5",1],["E5",2],["E5",1],["G5",1],["C5",1.5],["D5",.5],["E5",4]];
+      var MEL = A1.concat([["F5",1],["F5",1],["F5",1.5],["F5",.5],["F5",1],["E5",1],["E5",1],["E5",.5],["E5",.5],["E5",1],["D5",1],["D5",1],["E5",1],["D5",2],["G5",2]])
+        .concat(A1).concat([["F5",1],["F5",1],["F5",1.5],["F5",.5],["F5",1],["E5",1],["E5",1],["E5",.5],["E5",.5],["G5",1],["G5",1],["F5",1],["D5",1],["C5",4],["R",4]]);
+      var BASS = ["C3","C3","C3","C3","F3","C3","G3","G3","C3","C3","C3","C3","F3","C3","G3","C3","C3"];
+      var CH = { C3: ["E4","G4","C5"], F3: ["F4","A4","C5"], G3: ["D4","G4","B4"] };
+      function verb(c) { var len = c.sampleRate * 2.2, b = c.createBuffer(2, len, c.sampleRate); for (var ch = 0; ch < 2; ch++) { var d = b.getChannelData(ch); for (var i = 0; i < len; i++) { d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.2); } } var cv = c.createConvolver(); cv.buffer = b; return cv; }
+      function bell(f, t, dur, vol) { var o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(); o1.type = "sine"; o2.type = "sine"; o1.frequency.value = f; o2.frequency.value = f * 2.01;
+        var g2 = ctx.createGain(); g2.gain.value = 0.28; o2.connect(g2); g2.connect(g); o1.connect(g); g.connect(master);
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + Math.max(0.6, dur * 1.6));
+        o1.start(t); o2.start(t); o1.stop(t + dur * 1.7 + 0.1); o2.stop(t + dur * 1.7 + 0.1); }
+      function pad(f, t, dur, vol) { var o = ctx.createOscillator(), g = ctx.createGain(); o.type = "triangle"; o.frequency.value = f; o.connect(g); g.connect(master);
+        g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + 0.08); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.start(t); o.stop(t + dur + 0.05); }
+      function sleigh(t) { var len = Math.floor(ctx.sampleRate * 0.06), b = ctx.createBuffer(1, len, ctx.sampleRate), d = b.getChannelData(0); for (var i = 0; i < len; i++) { d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 6); }
+        var s = ctx.createBufferSource(); s.buffer = b; var hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 7000; var g = ctx.createGain(); g.gain.value = 0.05; s.connect(hp); hp.connect(g); g.connect(master); s.start(t); }
+      var beatPos = 0;
+      function sched() { while (nextT < ctx.currentTime + 0.6) { var n = MEL[idx]; var d = n[1] * B;
+          if (n[0] !== "R") { bell(N[n[0]], nextT, d, 0.22); }
+          var bp0 = beatPos, bp1 = beatPos + n[1];
+          for (var k = Math.ceil(bp0); k < bp1; k++) { var tt = nextT + (k - bp0) * B; var bar = Math.floor(k / 4); var bs = BASS[bar % BASS.length];
+            if (k % 4 === 0) { pad(N[bs], tt, B * 3.6, 0.07); CH[bs].forEach(function (c) { pad(N[c] / 2 * 2, tt, B * 3.2, 0.018); }); }
+            if (k % 1 === 0) { sleigh(tt); } }
+          beatPos = bp1; nextT += d; idx++; if (idx >= MEL.length) { idx = 0; beatPos = 0; } } }
+      function start() { if (playing) { return; } try { if (!ctx) { ctx = new AC(); master = ctx.createGain(); master.gain.value = 0.0001; var rv = verb(ctx), wet = ctx.createGain(); wet.gain.value = 0.35; var comp = ctx.createDynamicsCompressor(); master.connect(comp); master.connect(rv); rv.connect(wet); wet.connect(comp); comp.connect(ctx.destination); }
+          if (ctx.state === "suspended") { ctx.resume(); } playing = true; nextT = ctx.currentTime + 0.15; idx = 0; beatPos = 0;
+          master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(Math.max(0.0001, master.gain.value), ctx.currentTime); master.gain.exponentialRampToValueAtTime(0.55, ctx.currentTime + 2.5);
+          timer = setInterval(sched, 120); sched(); btn.className = "nt-mu on"; lab(); } catch (e) {} }
+      function stop() { playing = false; clearInterval(timer); if (ctx && master) { var t0 = ctx.currentTime; master.gain.cancelScheduledValues(t0); master.gain.setValueAtTime(Math.max(0.0001, master.gain.value), t0); master.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.5); setTimeout(function () { if (!playing && ctx) { ctx.suspend(); } }, 600); } btn.className = "nt-mu off"; lab(); }
+      btn.addEventListener("click", function (e) { e.stopPropagation(); if (playing) { stop(); try { localStorage.setItem("noa-music", "off"); } catch (x) {} } else { start(); try { localStorage.setItem("noa-music", "on"); } catch (x) {} } });
+      if (pref !== "off") { var first = function (e) { if (e && e.target && e.target.closest && e.target.closest(".nt-mu")) { return; } window.removeEventListener("pointerdown", first, true); window.removeEventListener("keydown", first, true); var p2 = "on"; try { p2 = localStorage.getItem("noa-music") || "on"; } catch (x) {} if (p2 !== "off") { start(); } };
+        window.addEventListener("pointerdown", first, true); window.addEventListener("keydown", first, true); }
+      document.addEventListener("visibilitychange", function () { if (!ctx) { return; } if (document.hidden) { if (playing) { ctx.suspend(); } } else if (playing) { ctx.resume(); } });
+    }
+    function go() { bar(); garland(); snow(); music(); }
     if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", go); } else { go(); }
     var tries = 0, iv = setInterval(function () { garland(); if (++tries > 20) { clearInterval(iv); } }, 500);
   }
