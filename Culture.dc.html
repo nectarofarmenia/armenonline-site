@@ -814,14 +814,14 @@ return Object.assign(apVals, { isBizSess: !!(accU && accU.type === "biz"), bizNo
       ".nt-snow{position:fixed;inset:0;pointer-events:none;z-index:45}" +
       ".nt-deco,#shop,#made,#culture,#history,#faq{position:relative;isolation:isolate}" +
       "#shop::before,#made::before,#made::after,#culture::before,#history::before,#faq::after{content:'';position:absolute;z-index:-1;pointer-events:none;background-repeat:no-repeat;background-position:center;background-size:contain}" +
-      "#shop::before{right:2.5%;top:6px;width:min(190px,26vw);aspect-ratio:400/560;background-image:url(ny/tree.svg);opacity:.55;transform-origin:50% 100%;animation:ntTurn 14s ease-in-out infinite}" +
-      "#made::before{left:5%;top:14px;width:min(124px,18vw);aspect-ratio:260/360;background-image:url(ny/santa.svg);opacity:.6;animation:ntFloat 9s ease-in-out infinite}" +
-      "#made::after{right:6%;top:12px;width:min(98px,14vw);aspect-ratio:220/370;background-image:url(ny/maiden.svg);opacity:.6;animation:ntFloat 10s ease-in-out -4s infinite}" +
-      "#culture::before{right:3%;top:10px;width:min(170px,24vw);aspect-ratio:400/560;background-image:url(ny/tree.svg);opacity:.5;transform-origin:50% 100%;animation:ntTurn 16s ease-in-out -5s infinite}" +
-      "#history::before{left:58%;top:18px;width:min(160px,22vw);aspect-ratio:400/560;background-image:url(ny/tree.svg);opacity:.55;transform-origin:50% 100%;animation:ntTurn 15s ease-in-out -3s infinite}" +
-      "#faq::after{right:0;top:0;width:min(400px,44vw);aspect-ratio:520/260;background-image:url(ny/bough-r.svg);background-position:right top;opacity:.6;transform-origin:100% 0;animation:ntBough 8s ease-in-out -2s infinite}" +
+      "#shop::before{right:3%;top:6px;width:min(170px,26vw);aspect-ratio:220/320;background-image:url(ny/gtree.svg);opacity:1}" +
+      "#made::before{left:3%;top:0;width:min(190px,26vw);aspect-ratio:260/300;background-image:url(ny/gbaubles.svg);background-position:center top;opacity:.75}" +
+      "#made::after{right:5%;top:30px;width:min(120px,17vw);aspect-ratio:1;background-image:url(ny/gflake.svg);opacity:1;animation:ntRot 80s linear infinite}" +
+      "#culture::before{right:3%;top:10px;width:min(150px,22vw);aspect-ratio:220/320;background-image:url(ny/gtree.svg);opacity:.95}" +
+      "#history::before{left:58%;top:16px;width:min(140px,22vw);aspect-ratio:220/320;background-image:url(ny/gtree.svg);opacity:.9}" +
+      "#faq::after{right:3%;top:0;width:min(180px,26vw);aspect-ratio:260/300;background-image:url(ny/gbaubles.svg);background-position:center top;opacity:.7;transform:scaleX(-1)}" +
       "@keyframes ntSpinY{from{transform:perspective(900px) rotateY(0deg)}to{transform:perspective(900px) rotateY(360deg)}}@keyframes ntRot{to{transform:rotate(360deg)}}@keyframes ntTurn{0%,100%{transform:perspective(900px) rotateY(-28deg)}50%{transform:perspective(900px) rotateY(28deg)}}@keyframes ntBough{0%,100%{transform:rotate(0deg)}50%{transform:rotate(1.2deg)}}@keyframes ntFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-14px) rotate(2deg)}}" +
-      "@media (max-width:640px){#shop::before,#culture::before,#history::before{opacity:.35}#made::before{width:64px;top:6px;left:3%;opacity:.45}#made::after{width:50px;top:6px;right:3%;opacity:.45}#faq::after{width:62vw;opacity:.5}}" +
+      "@media (max-width:640px){#shop::before,#culture::before,#history::before{width:84px;opacity:.6}#made::before{width:96px;opacity:.55}#made::after{width:60px;top:10px;opacity:.5}#faq::after{width:90px;opacity:.5}}" +
       "@media (prefers-reduced-motion:reduce){#shop::before,#made::before,#made::after,#culture::before,#history::before,#faq::after{animation:none}}" +
       "@media (max-width:640px){.nt-bar{font-size:13px;padding:7px 34px 7px 12px;flex-wrap:nowrap;gap:10px}.nt-bar .nt-sp,.nt-bar .nt-l{display:none}.nt-bar .nt-s{display:inline}.nt-gar{height:30px}}" +
       "@media (prefers-reduced-motion:reduce){.nt-orn{animation:none}.nt-snow{display:none}}" +
@@ -836,7 +836,7 @@ return Object.assign(apVals, { isBizSess: !!(accU && accU.type === "biz"), bizNo
     function garland() { var h = document.querySelector("header"); if (!h || h.querySelector(".nt-gar")) { return; }
       var g = document.createElement("div"); g.className = "nt-gar"; g.setAttribute("aria-hidden", "true");
       var html = '<svg class="nt-line" viewBox="0 0 240 28" preserveAspectRatio="none"><path d="M0 3 Q30 22 60 5 Q90 22 120 5 Q150 22 180 5 Q210 22 240 3" fill="none" stroke="#EBA93A" stroke-width="1.4" opacity=".9" vector-effect="non-scaling-stroke"/></svg>';
-      var cols = ["#B3262E", "#EBA93A", "#F7F3EA", "#2E7D4F", "#C9A24A"]; var n = window.innerWidth < 640 ? 7 : 13;
+      var cols = ["#EBA93A", "#F7F3EA", "#C9A24A", "#F6E3B4", "#D9A441"]; var n = window.innerWidth < 640 ? 7 : 13;
       for (var k = 0; k < n; k++) { var x = (k + 0.5) / n * 100; var seg = (x % 25) / 25; var y = 3 + Math.sin(seg * Math.PI) * 15; var star = k % 4 === 2;
         var sz = star ? 16 : (k % 3 === 0 ? 14 : 11); var len = 6 + (k % 3) * 4;
         html += '<span class="nt-orn' + (star ? ' st' : '') + '" style="left:calc(' + x + '% - ' + (sz / 2) + 'px);top:' + (y * (window.innerWidth < 640 ? 0.7 : 1)) + 'px;animation-delay:' + (-k * 0.37) + 's"><i style="height:' + len + 'px"></i><b style="width:' + sz + 'px;height:' + sz + 'px;background:radial-gradient(circle at 35% 30%,#fff8,' + cols[k % cols.length] + ' 45%)">' + (star ? '✦' : '') + '</b></span>'; }
