@@ -7,6 +7,17 @@
 <title>Nectar of Armenia — Admin</title>
 <script src="./support.js"></script>
 <style id="nofa-select-css">
+.fld { background: #FFFFFF !important; border: 1.5px solid #E6DECB !important; border-radius: 14px !important; min-height: 48px; font-size: 15.5px !important; color: #1E2A24; box-shadow: 0 1px 2px rgba(19,59,48,.04) inset; transition: border-color .15s, box-shadow .15s, background .15s; }
+.fld:hover { border-color: #D8C9A6 !important; }
+.fld:focus { outline: none !important; border-color: #EBA93A !important; box-shadow: 0 0 0 4px rgba(235,169,58,.18) !important; background: #FFFDF8 !important; }
+select.fld { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fld::placeholder { color: #B4AE9F; }
+.fld[readonly] { background: #F6F1E4 !important; color: #6B756F; border-style: dashed !important; }
+.lbl { font-size: 12.5px !important; font-weight: 800 !important; color: #6B756F !important; letter-spacing: .02em; gap: 7px !important; }
+.fs-grp { border: 1px solid #EFE7D4; border-radius: 18px; padding: 16px 18px 18px; background: linear-gradient(180deg,#FFFFFF,#FCFAF4); display: flex; flex-direction: column; gap: 14px; }
+.fs-h { display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid #F1EADB; }
+.fs-h strong { font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 17px; color: #1D5545; }
+.fs-ic { width: 32px; height: 32px; border-radius: 10px; background: #E8F1EC; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; }
 aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#31775F 0%,#22604C 38%,#1A4E3E 75%,#164536 100%) !important; box-shadow: inset 0 2px 0 rgba(255,255,255,.25), inset 0 -3px 6px rgba(0,0,0,.35), 0 2px 4px rgba(0,0,0,.25), 0 14px 30px rgba(0,0,0,.32) !important; border: 1px solid rgba(235,169,58,.18); }
 @supports (appearance: base-select) {
   select { appearance: base-select; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 500; }
