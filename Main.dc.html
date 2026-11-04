@@ -916,6 +916,25 @@ return { isBizSess: !!(accU && accU.type === "biz"), bizNote: bz[0], bizBtn: bz[
   window.addEventListener("storage", function (e) { if (e.key === "noa-notify") { check(false); } });
 })();
 </script>
+<script id="nofa-refs">
+(function () {
+  if (window.__nofaRefs) { return; } window.__nofaRefs = 1;
+  function code(e) { e = String(e || "demo"); var h = 0; for (var i = 0; i < e.length; i++) { h = (h * 33 + e.charCodeAt(i)) >>> 0; } return h.toString(36).toUpperCase().slice(0, 6); }
+  try { var q = new URLSearchParams(location.search).get("ref"); if (q) { localStorage.setItem("noa-ref-pending", JSON.stringify({ code: q.toUpperCase(), at: Date.now() })); } } catch (e) {}
+  function check() { try {
+    var p = JSON.parse(localStorage.getItem("noa-ref-pending") || "null"); if (!p) { return; }
+    var u = JSON.parse(localStorage.getItem("noa-user") || "null"); if (!u || !u.email) { return; }
+    var em = u.email.toLowerCase(); var A = JSON.parse(localStorage.getItem("noa-accounts") || "{}") || {};
+    var ref = null; if (p.code === code("demo")) { ref = "demo"; } Object.keys(A).forEach(function (k) { var a = A[k]; if (a && a.email && code(a.email.toLowerCase()) === p.code) { ref = a.email.toLowerCase(); } });
+    if (!ref || ref === em) { return; }
+    var R = JSON.parse(localStorage.getItem("noa-refs") || "[]") || []; if (R.some(function (r) { return r.email === em; })) { localStorage.removeItem("noa-ref-pending"); return; }
+    var nm = ((u.first || "") + " " + (u.last || "")).trim() || em;
+    R.push({ ref: ref, email: em, name: nm, type: u.type === "biz" ? "biz" : "retail", at: new Date().toISOString() }); localStorage.setItem("noa-refs", JSON.stringify(R)); localStorage.removeItem("noa-ref-pending");
+    var N = JSON.parse(localStorage.getItem("noa-notify") || "[]") || []; ["retail:", "biz:"].forEach(function (pf) { N.push({ id: "r" + Date.now().toString(36) + pf.charAt(0), to: pf + ref, kind: "promo", title: "⭐ +1 աստղ", body: nm + "-ը գրանցվեց ձեր հրավերով։", url: "", at: new Date().toISOString() }); }); localStorage.setItem("noa-notify", JSON.stringify(N.slice(-150)));
+  } catch (e) {} }
+  check(); setInterval(check, 1500);
+})();
+</script>
 <style id="pg-arr-css">.pgx{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;gap:8px}.pgx button{width:46px;height:46px;border-radius:50%;border:1.5px solid #EBA93A;background:#1D5545;color:#F6E3B4;font:800 22px/1 Manrope,system-ui,sans-serif;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;padding:0}.pgx button:hover{background:#133B30}.pgx .up{background:linear-gradient(180deg,#FCDB82,#EDB040 50%,#D38A22);color:#133B30;border-color:#D38A22}.pgx.main{bottom:88px;flex-direction:column}.pg-arrows{display:none !important}@media print{.pgx{display:none}}</style><div class="pgx main" id="pgx"><button type="button" aria-label="Back" onclick="history.back()">‹</button><button type="button" aria-label="Forward" onclick="history.forward()">›</button></div>
 </body>
 </html>

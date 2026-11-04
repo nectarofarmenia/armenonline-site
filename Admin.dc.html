@@ -230,6 +230,12 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </sc-if>
 
 <sc-if value="{{tab5}}" hint-placeholder-val="{{false}}">
+<div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px">
+<h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 22px; color: #1D5545">📍 Նոր քաղաքների առաջարկներ</h2>
+<p style="margin: 0; color: #5E6A63; font-size: 14px">Հաճախորդներն ու խանութները, որոնց քաղաքը դեռ մեր առաքման գոտում չէ։ Խմբավորված է ըստ քաղաքի՝ պահանջարկը տեսնելու համար։</p>
+<sc-if value="{{crNone}}" hint-placeholder-val="{{false}}"><p style="margin: 0; padding: 14px; border-radius: 14px; background: #F3EBD7; color: #5E6A63">Առաջարկներ դեռ չկան։</p></sc-if>
+<sc-for list="{{crGroups}}" as="g" hint-placeholder-count="2"><div style="border: 1.5px solid #ECE3CF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 8px"><div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: center"><strong style="font-size: 17px; color: #1D5545">📍 {{g.city}}</strong><span style="font-weight: 800; color: #7A5A12; background: #FFF1D6; padding: 4px 12px; border-radius: 999px">{{g.n}} առաջարկ · ZIP {{g.zips}}</span></div><sc-for list="{{g.rows}}" as="r" hint-placeholder-count="2"><div style="display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13.5px; padding: 6px 10px; border-radius: 10px; background: #FBF9F4"><span>{{r.tag}}</span><strong>{{r.who}}</strong><span style="color: #6B756F">{{r.email}}</span><span style="color: #6B756F">{{r.note}}</span><span style="margin-left: auto; color: #8A8F86">{{r.at}}</span></div></sc-for></div></sc-for>
+</div>
 <div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px"><div><h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">{{t.delH}}</h1><p style="margin: 4px 0 0; color: #5E6A63">{{t.delP}}</p></div><button type="button" onClick="{{sendApri}}" class="btn-gold" style="min-height: 48px; padding: 0 20px; border-radius: 999px; border: none; color: #133B30; font-family: inherit; font-weight: 800; cursor: pointer">{{apriLabel}}</button></div>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px">
@@ -556,7 +562,10 @@ var bcAud = [["all", "Բոլորը"], ["biz", "Բոլոր մեծածախ խան�
 var bcVals = { bc: bc, bcAud: bcAud, bcSent: !!st.bcSent, bcSetTo: function (e) { setBc({ to: e.target.value }); }, bcSetTitle: function (e) { setBc({ title: e.target.value }); }, bcSetBody: function (e) { setBc({ body: e.target.value }); },
  bcTpls: [["🏷 Զեղչ", { kind: "promo", title: "🏷 −15% խինկալիի և պելմենիի վրա", body: "Մինչև կիրակի բոլոր պատվերներին։ Պատվիրեք հիմա «Արագ պատվեր» բաժնում։" }], ["🆕 Նոր ապրանք", { kind: "info", title: "🆕 Նոր ապրանք՝ Տավարի կոտլետ", body: "Արդեն հասանելի է պատվերի համար։" }], ["🎉 Տոնական առաջարկ", { kind: "promo", title: "🎉 Տոնական առաջարկ", body: "Գաթա՝ նվեր յուրաքանչյուր $300-ից ավել պատվերի հետ։" }]].map(function (x) { return { label: x[0], pick: function () { setBc(x[1]); } }; }),
  bcSend: function () { if (!(bc.title || "").trim()) { return; } pushN(bc.to, bc.kind || "promo", bc.title.trim(), (bc.body || "").trim(), bc.to === "retail" ? "Main.dc.html#shop" : "PartnerAccount.dc.html#order"); self.setState({ bc: null, bcSent: true }); setTimeout(function () { self.setState({ bcSent: false }); }, 2500); } };
-var chValsA = Object.assign(bcVals, { tab11: tab === 11, ch: ch, chNoStores: chStoresRaw.length === 0,
+var crRaw = []; try { crRaw = JSON.parse(window.localStorage.getItem("noa-city-req") || "[]") || []; } catch (e) { crRaw = []; }
+var crG = {}; crRaw.forEach(function (r) { var k = String(r.city || "").trim().toLowerCase(); (crG[k] = crG[k] || []).push(r); });
+var crGroups = Object.keys(crG).map(function (k) { var L2 = crG[k]; var zs = []; L2.forEach(function (r) { if (zs.indexOf(r.zip) < 0) { zs.push(r.zip); } }); return { city: L2[0].city, n: L2.length, zips: zs.join(", "), rows: L2.slice().reverse().map(function (r) { return { tag: r.type === "biz" ? "🏪" : (r.type === "retail" ? "🛒" : "🆕"), who: r.biz ? r.biz + (r.name ? " · " + r.name : "") : (r.name || "—"), email: r.email || "", note: r.note || "", at: new Date(r.at).toLocaleDateString("hy-AM", { month: "short", day: "numeric" }) }; }) }; }).sort(function (a, b) { return b.n - a.n; });
+var chValsA = Object.assign(bcVals, { crGroups: crGroups, crNone: crGroups.length === 0, tab11: tab === 11, ch: ch, chNoStores: chStoresRaw.length === 0,
  chStores: chStoresRaw.map(function (x) { var d = chLoad(x.sk); var u = 0; Object.keys(d.th || {}).forEach(function (e) { u += chUnread(d.th[e], "n"); }); return { name: x.name, sub: x.sub, cls: x.sk === chStoreSel ? "on" : "", hasU: u > 0, u: String(u), pick: function () { self.setState({ chStore: x.sk, chMem: "" }); } }; }),
  chWhoL: lang === "hy" ? "Խանութներ և հաճախորդներ" : "Stores & customers", chStoreName: chStoreObj ? chStoreObj.name : "", chHint: "Enter՝ ուղարկել · Shift + Enter՝ նոր տող", chMembers: chStoreObj ? chStoreObj.mem.map(function (m) { var u = chUnread(chDataA.th[m[1]], "n"); return { ini: String(m[0] || "?").charAt(0).toUpperCase(), name: m[0], role: RL[m[2]] || "", cls: m[1] === chMemSel ? "on" : "", hasU: u > 0, u: String(u), pick: function () { self.setState({ chMem: m[1] }); } }; }) : [],
  chToLine: chMemObj ? (chStoreObj && chStoreObj.retail ? chStoreObj.sub + " · " + (lang === "hy" ? "Մանրածախ հաճախորդ" : "Retail customer") : chMemObj[0] + " · " + chMemObj[1] + " · " + (chStoreObj ? chStoreObj.name : "")) : "",
@@ -788,6 +797,25 @@ plan: plan, bars: bars, topP: topP, splitTxt: money(rS) + " / " + money(wS) });
     fresh.forEach(function (n) { shown[n.id] = 1; if (!first || (Date.now() - new Date(n.at).getTime()) < 6 * 3600e3) { toast(n); native(n); } }); try { sessionStorage.setItem(shownKey(), JSON.stringify(shown)); } catch (e) {} render(); }
   var last = null; setInterval(function () { var v = null; try { v = localStorage.getItem("noa-notify"); } catch (e) {} if (v !== last) { var f = last === null; last = v; check(f); } }, 1000);
   window.addEventListener("storage", function (e) { if (e.key === "noa-notify") { check(false); } });
+})();
+</script>
+<script id="nofa-refs">
+(function () {
+  if (window.__nofaRefs) { return; } window.__nofaRefs = 1;
+  function code(e) { e = String(e || "demo"); var h = 0; for (var i = 0; i < e.length; i++) { h = (h * 33 + e.charCodeAt(i)) >>> 0; } return h.toString(36).toUpperCase().slice(0, 6); }
+  try { var q = new URLSearchParams(location.search).get("ref"); if (q) { localStorage.setItem("noa-ref-pending", JSON.stringify({ code: q.toUpperCase(), at: Date.now() })); } } catch (e) {}
+  function check() { try {
+    var p = JSON.parse(localStorage.getItem("noa-ref-pending") || "null"); if (!p) { return; }
+    var u = JSON.parse(localStorage.getItem("noa-user") || "null"); if (!u || !u.email) { return; }
+    var em = u.email.toLowerCase(); var A = JSON.parse(localStorage.getItem("noa-accounts") || "{}") || {};
+    var ref = null; if (p.code === code("demo")) { ref = "demo"; } Object.keys(A).forEach(function (k) { var a = A[k]; if (a && a.email && code(a.email.toLowerCase()) === p.code) { ref = a.email.toLowerCase(); } });
+    if (!ref || ref === em) { return; }
+    var R = JSON.parse(localStorage.getItem("noa-refs") || "[]") || []; if (R.some(function (r) { return r.email === em; })) { localStorage.removeItem("noa-ref-pending"); return; }
+    var nm = ((u.first || "") + " " + (u.last || "")).trim() || em;
+    R.push({ ref: ref, email: em, name: nm, type: u.type === "biz" ? "biz" : "retail", at: new Date().toISOString() }); localStorage.setItem("noa-refs", JSON.stringify(R)); localStorage.removeItem("noa-ref-pending");
+    var N = JSON.parse(localStorage.getItem("noa-notify") || "[]") || []; ["retail:", "biz:"].forEach(function (pf) { N.push({ id: "r" + Date.now().toString(36) + pf.charAt(0), to: pf + ref, kind: "promo", title: "⭐ +1 աստղ", body: nm + "-ը գրանցվեց ձեր հրավերով։", url: "", at: new Date().toISOString() }); }); localStorage.setItem("noa-notify", JSON.stringify(N.slice(-150)));
+  } catch (e) {} }
+  check(); setInterval(check, 1500);
 })();
 </script>
 <style id="pg-arr-css">.pgx{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;gap:8px}.pgx button{width:46px;height:46px;border-radius:50%;border:1.5px solid #EBA93A;background:#1D5545;color:#F6E3B4;font:800 22px/1 Manrope,system-ui,sans-serif;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;padding:0}.pgx button:hover{background:#133B30}.pgx .up{background:linear-gradient(180deg,#FCDB82,#EDB040 50%,#D38A22);color:#133B30;border-color:#D38A22}.pgx.main{bottom:88px;flex-direction:column}.pg-arrows{display:none !important}@media print{.pgx{display:none}}</style><div class="pgx" id="pgx"><button type="button" aria-label="Back" onclick="history.back()">‹</button><button type="button" aria-label="Forward" onclick="history.forward()">›</button><button type="button" class="up" aria-label="Top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button></div>
