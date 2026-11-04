@@ -327,7 +327,8 @@ var self = this; this._last = null;
 this._sync = function () {
 var c = null, l = null, u = null, o = null;
 try { c = window.localStorage.getItem("noa-cart-v2"); l = window.localStorage.getItem("noa-lang"); u = window.localStorage.getItem("noa-user"); o = window.localStorage.getItem("noa-last-order"); } catch (e) { return; }
-var key = c + "|" + l + "|" + u + "|" + o;
+var w = ""; try { for (var i = 0; i < window.localStorage.length; i++) { var k = window.localStorage.key(i); if (k && k.indexOf("noa-ws-orders") === 0) { w += k + window.localStorage.getItem(k); } } } catch (e) {}
+var key = c + "|" + l + "|" + u + "|" + o + "|" + w;
 if (self._last === null) { self._last = key; return; }
 if (key === self._last) { return; }
 self._last = key;
@@ -335,7 +336,7 @@ var arr = null; try { arr = JSON.parse(c); } catch (e) { arr = null; }
 var patch = {};
 if (Array.isArray(arr) && arr.length === 11) { patch.q = arr; }
 if (["hy", "en", "ru", "es"].indexOf(l) >= 0) { patch.lang = l; }
-patch._u = u; patch._o = o;
+patch._u = u; patch._o = o; patch._w = w.length + ":" + w.slice(-60);
 self.setState(patch);
 };
 this._iv = setInterval(this._sync, 700);
