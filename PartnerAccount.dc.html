@@ -653,9 +653,9 @@ var navs = [5, 0, 6, 1, 10, 9, 11, 7, 2, 12, 8].map(function (i) { return { labe
 var XP = ["Made", "Culture", "History", "", "", "", "", "", "", "Cook"];
 navs = navs.concat([["🍳", 29], ["👩‍🍳", 20], ["🏛", 21], ["📜", 22]].map(function (x, k) { return { label: XL[k], icon: x[0], cls: (tab === x[1] ? "on " : "") + "ext" + (k === 0 ? " ext1" : ""), pick: function () { self.setState({ tab: x[1] }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }; }));
 var extVals = { extOn: (tab >= 20 && tab <= 22) || tab === 29, extSrc: ((tab >= 20 && tab <= 22) || tab === 29) ? XP[tab - 20] + ".dc.html?embed=1&lang=" + lang : "about:blank", extTitle: tab === 29 ? XL[0] : ((tab >= 20 && tab <= 22) ? XL[tab - 19] : "") };
-var IDX = [4, 5, 6, 7, 8, 9, 10];
-var WP = [18.75, 18.75, 26.25, 26.25, 15.75, 15.75, 15.75];
-var q = (st.wq && st.wq.length === IDX.length) ? st.wq : [20, 10, 6, 6, 10, 8, 8];
+var IDX = [0, 4, 5, 6, 7, 8, 9, 10];
+var WP = [15.00, 18.75, 18.75, 26.25, 26.25, 15.75, 15.75, 15.75];
+var q = (st.wq && st.wq.length === IDX.length) ? st.wq : [10, 20, 10, 6, 6, 10, 8, 8];
 var money = function (v) { return "$" + v.toFixed(2); };
 var sum = 0, units = 0;
 var rows = IDX.map(function (pi, k) { sum += q[k] * WP[k]; units += q[k]; return { name: t.pn[pi], size: t.ps[pi], price: money(WP[k]), q: q[k], line: money(q[k] * WP[k]),
@@ -713,7 +713,7 @@ RO = RO.map(function (o) { return Object.assign({}, o, { items: (o.items || []).
 var RALL = RO.map(function (o, ix) { return { no: String(o.no).replace(/^NOA-/, "NofA-"), d: new Date(o.date), loc: o.loc || 0, items: o.items, st: o.await ? 3 : (o.st || 0), by: o.by || "", ix: ix, ap: o.await ? "" : (o.ap || ""), pd: o.pd || "", pnote: o.pnote || "", pm: o.pm || "", chargedAt: o.chargedAt || "", reqDate: o.reqDate || o.date }; });
 if (isU) { ALL = RALL.slice(); }
 else { ALL = RALL.slice(); for (var m = 13; m >= 0; m--) { var cnt = 2 + ((m * 7) % 3); for (var k2 = 0; k2 < cnt; k2++) { var day = 2 + ((k2 * 9 + m * 5) % 25); var d0 = new Date(now.getFullYear(), now.getMonth() - m, day);
- var p1 = IDX[(m + k2) % 7], p2 = IDX[(m * 3 + k2 + 2) % 7], p3 = IDX[(m + k2 * 5 + 4) % 7];
+ var p1 = IDX[(m + k2) % 8], p2 = IDX[(m * 3 + k2 + 2) % 8], p3 = IDX[(m + k2 * 5 + 4) % 8];
  var its = [[p1, 6 + ((m + k2) % 4) * 6]]; if (p2 !== p1) { its.push([p2, 4 + ((m * 2 + k2) % 5) * 2]); } if (p3 !== p1 && p3 !== p2) { its.push([p3, 10 + (k2 % 3) * 10]); }
  var future = d0 > now; ALL.push({ ix: -1, no: "NofA-W-" + (1700 + (13 - m) * 4 + k2), d: d0, loc: (m + k2) % Math.max(1, LOCS.length), items: its, st: future ? (k2 % 2) : 2 }); } } }
 ALL.forEach(function (o) { o.total = mkTotal(o.items); o.units = 0; o.items.forEach(function (x) { o.units += x[1]; }); if (o.loc >= LOCS.length) { o.loc = 0; } });
@@ -802,7 +802,7 @@ var docLoadPdf = function (fname, done) { var run = function () { var el = docum
 var dYmd = function (d) { var m = d.getMonth() + 1, dd = d.getDate(); return d.getFullYear() + "-" + (m < 10 ? "0" : "") + m + "-" + (dd < 10 ? "0" : "") + dd; };
 var MOF = (lang === "hy") ? ["Հունվար", "Փետրվար", "Մարտ", "Ապրիլ", "Մայիս", "Հունիս", "Հուլիս", "Օգոստոս", "Սեպտեմբեր", "Հոկտեմբեր", "Նոյեմբեր", "Դեկտեմբեր"] : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 var dFd = function (s0) { var p = s0.split("-"); return parseInt(p[2], 10) + " " + MOF[parseInt(p[1], 10) - 1] + " " + p[0]; };
-var PRW = { 1: 15.00, 2: 12.00, 3: 45.00, 4: 18.75, 5: 18.75, 6: 26.25, 7: 26.25, 8: 15.75, 9: 15.75, 10: 15.75 };
+var PRW = { 0: 15.00, 1: 15.00, 2: 12.00, 3: 45.00, 4: 18.75, 5: 18.75, 6: 26.25, 7: 26.25, 8: 15.75, 9: 15.75, 10: 15.75 };
 var docInvSrc = (function () {
  if (isU) { return ALL.filter(function (o) { return o.items && o.items.length; }).map(function (o) { return { no: "NofA-INV-" + String(o.no).replace(/^NofA-(W-)?/, ""), date: dYmd(o.d), net: 0, items: o.items, status: o.st === 3 ? "unpaid" : "paid" }; }); }
  var a = null; try { a = JSON.parse(window.localStorage.getItem("noa-invoices") || "null"); } catch (e) { a = null; }
