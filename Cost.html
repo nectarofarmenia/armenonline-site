@@ -273,6 +273,16 @@ td.k input.n{border-color:#8CC5A2;background:#F1F7F3;font-weight:800}
 .dtb .dv{font-size:15px;color:#7A5A12}.dtb .old{color:#B03A2E;font-weight:800}
 .shb{display:flex;align-items:center;gap:8px;min-width:120px}.shb .bar{flex:1;height:6px}.shb .bar i{background:#EBA93A}.shb span{font-size:11.5px;font-weight:800;color:#8A7A55;width:34px;text-align:right}
 .dtb tfoot td{background:#FBF8F1;font-weight:800;color:#1D5545}
+
+.pof label small{font-weight:600;color:#A99C7C}
+.pof3{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.4fr);gap:10px;align-items:end;margin-top:10px}.pof3 label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:800;color:#8A7A55}.pof3 label small{font-weight:600;color:#A99C7C}
+.pdk.sm{flex-direction:row!important;font-size:12.5px!important;color:#1D5545!important;padding:7px 12px}
+.ntf{font-size:12.5px;color:#1D5545;background:#E8F1EC;border-radius:12px;padding:8px 12px;line-height:1.4}
+.svd{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border:2px solid #8CC5A2;background:#F1F9F4}
+.svd b{display:block;color:#2F7A55;font-size:16px}.svd span{font-size:13px;color:#33403A}.smsp{margin:8px 0 0;font-size:12.5px;color:#4F5B55;background:#fff;border:1px solid #DCEBE1;border-radius:12px;padding:8px 10px;max-width:640px}
+.svd-a{display:flex;gap:8px}.svd-a a.btn{text-decoration:none}
+.smsb{display:inline-flex;width:32px;height:32px;border-radius:50%;border:1px solid #8CC5A2;background:#F1F9F4;align-items:center;justify-content:center;text-decoration:none;vertical-align:middle}
+@media (max-width:860px){.pof3{grid-template-columns:1fr}}
 @media (max-width:860px){.lh{display:none}.lg.lr{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:8px;padding:12px}.lr .li{grid-column:1/4}.lr .tg{grid-column:4;justify-self:end}
  .lr .lc{display:flex;flex-direction:column;gap:2px}.lr .lc:before{content:attr(data-l);font-size:10.5px;font-weight:800;color:#8A7A55}
  .lr .lp{grid-column:span 4;flex-direction:row;align-items:center;gap:10px;border-top:1px dashed #EDE3CC;padding-top:6px}.lr .lp:before{content:attr(data-l);font-size:11px;font-weight:800;color:#7A5A12;flex:0 0 110px}.lr .lp .pp{flex:0 0 100px}.lr .lp .pr{flex:1}.lr .lp .bar{display:none}}
@@ -363,7 +373,9 @@ document.addEventListener("click",function(e){var pe=e.target.closest("[data-per
   else if(act==="byw"){var pp=S.prod[pi];var cc=calc(pp);if(pp.pieceG>0){pp.batch=Math.round(cc.batchG/pp.pieceG);}}
   else if(act==="dladd"){S.draft.lines.push([0,0,1]);}
   else if(act==="dldel"){S.draft.lines.splice(ri,1);if(!S.draft.lines.length){S.draft.lines=[[0,0,1]];}}
-  else if(act==="dsave"){var d0=S.draft;var ls=d0.lines.filter(function(l){return num(l[2])>0;});if(!ls.length){alert("Ավելացրեք գոնե մեկ ապրանք։");return;}if(!String(d0.name).trim()&&!String(d0.phone).trim()){alert("Գրեք հաճախորդի անունը կամ հեռախոսը։");return;}S.calls.push({id:Date.now(),date:d0.date||today(),name:d0.name,phone:d0.phone,addr:d0.addr,type:d0.type,pay:d0.pay,paid:!!d0.paid,lines:ls.map(function(l){return [+l[0],+l[1],num(l[2])];})});var keep={type:d0.type,pay:d0.pay};S.draft=newDraft();S.draft.type=keep.type;S.draft.pay=keep.pay;}
+  else if(act==="dsave"){var d0=S.draft;var ls=d0.lines.filter(function(l){return num(l[2])>0;});if(!ls.length){alert("Ավելացրեք գոնե մեկ ապրանք։");return;}var phd=String(d0.phone||"").replace(/\D/g,"");if(phd.length<10){alert("Գրեք հաճախորդի հեռախոսահամարը (10 թիվ)։ Պատվերի հաստատումը ուղարկվում է SMS-ով։");return;}
+  if(!/^\s*\d+[A-Za-z\-\/]*\s+\S+/.test(String(d0.addr||""))){alert("Գրեք ամբողջական հասցեն՝ տան համարով (օր.՝ 64 N Mar Vista Ave)։");var ai=document.querySelector('input[data-k="dr.addr"]');if(ai){ai.focus();}return;}S.calls.push({id:Date.now(),date:d0.date||today(),name:d0.name,phone:d0.phone,addr:d0.addr,email:d0.email||"",promo:!!d0.promo,type:d0.type,pay:d0.pay,paid:!!d0.paid,lines:ls.map(function(l){return [+l[0],+l[1],num(l[2])];})});var keep={type:d0.type,pay:d0.pay};S.draft=newDraft();S.draft.type=keep.type;S.draft.pay=keep.pay;S.justSaved=S.calls.length-1;}
+  else if(act==="smsdone"){S.justSaved=null;save();setTimeout(render,50);return;}
   else if(act==="cpaid"){var cc=S.calls[ri];cc.paid=!cc.paid;}
   else if(act==="cdel"){if(!confirm("Ջնջե՞լ այս պատվերը")){return;}S.calls.splice(ri,1);}
   else if(act==="addfix"){S.fixed.push(["Նոր ծախս",0]);}
@@ -378,7 +390,7 @@ document.addEventListener("input",function(e){var el=e.target;var k=el.getAttrib
   else if(a[0]==="p"){var p=S.prod[+a[1]];if(a[2]==="pr"){p.pr[+a[3]]=v;}else if(a[2]==="rec"){p.rec[+a[3]][+a[4]]=a[4]==="1"?v:el.value;}else{p[a[2]]=v;}}
   else if(a[0]==="bag"){S.bag[a[1]]=v;}
   else if(a[0]==="ub"){S.prod[+a[1]].useBag=el.checked;save();render();return;}
-  else if(a[0]==="dr"){S.draft[a[1]]=a[1]==="paid"?el.checked:el.value;save();return;}
+  else if(a[0]==="dr"){S.draft[a[1]]=(a[1]==="paid"||a[1]==="promo")?el.checked:el.value;save();return;}
   else if(a[0]==="dl"){var ln=S.draft.lines[+a[1]];ln[+a[2]]=a[2]==="2"?v:+el.value;save();if(a[2]==="2"){var dtot=document.getElementById("dtot");if(dtot){dtot.textContent=m(draftTotal());}}return;}
   else if(a[0]==="pm"||a[0]==="py"){S[a[0]]=+el.value;save();render();return;}
   else if(a[0]==="cp"){S.calls[+a[1]].pay=el.value;save();return;}
@@ -495,6 +507,9 @@ function inPeriod(d){perInit();if(S.per==="all"){return true;}var dt=new Date(St
   if(dt.getFullYear()!==+S.py){return false;}return S.per==="y"||dt.getMonth()===+S.pm;}
 function perLabel(){perInit();return S.per==="all"?"Բոլոր ժամանակները":S.per==="y"?S.py+" թ.":MOS[+S.pm]+" "+S.py;}
 function draftTotal(){var d=S.draft;var t=0;d.lines.forEach(function(l){var p=S.prod[+l[0]];if(p){t+=num(l[2])*p.pr[chOf(d.type,+l[1])];}});return t;}
+function smsText(c){var tot=0;var its=c.lines.map(function(l){var p=S.prod[+l[0]];if(!p){return "";}tot+=num(l[2])*p.pr[chOf(c.type,+l[1])];return p.name+" × "+num(l[2])+" "+(+l[1]===1?"հատ":p.unit);}).filter(Boolean).join(", ");
+  return "Բարև"+(c.name?" "+c.name:"")+"։ Ձեր պատվերը Nectar of Armenia-ում ընդունված է՝ "+its+"։ Ընդամենը՝ $"+tot.toFixed(2)+(c.addr?"։ Առաքում՝ "+c.addr:"")+"։ Շնորհակալություն։ Հարցերի դեպքում՝ (515) 588-5555";}
+function smsHref(c){var d=String(c.phone||"").replace(/\D/g,"");if(d.length===10){d="1"+d;}return "sms:+"+d+"?&body="+encodeURIComponent(smsText(c));}
 function viewCalc(){if(!S.draft){S.draft=newDraft();}if(!S.calls){S.calls=[];}var d=S.draft;
   var ALLS=sales();var all=ALLS.filter(function(s){return inPeriod(s.date);});
   var DEP=S.prod.map(function(){return {pcs:0,val:0};});var DEPS={};var depT={pcs:0,val:0};
@@ -522,17 +537,19 @@ function viewCalc(){if(!S.draft){S.draft=newDraft();}if(!S.calls){S.calls=[];}va
   // phone order form
   var pOpts=function(sel){return S.prod.map(function(p,i){return '<option value="'+i+'"'+(i===+sel?" selected":"")+'>'+esc(p.name)+'</option>';}).join("");};
   h+='<div class="card"><div class="row"><div><h2>📞 Հեռախոսով պատվեր</h2><p class="sub">Հաճախորդներ, ովքեր պատվիրում են զանգով և չեն ցանկանում գրանցվել։ Պատվերը կմտնի մոնիտորինգի մեջ։</p></div></div>';
-  h+='<div class="pof"><label>Ամսաթիվ<input type="date" class="t" data-k="dr.date" value="'+esc(d.date)+'"></label><label>Անուն / խանութ<input class="t" data-k="dr.name" value="'+esc(d.name)+'" placeholder="Օր.՝ Անի կամ Ararat Market"></label><label>Հեռախոս<input class="t" type="tel" data-k="dr.phone" value="'+esc(d.phone)+'" placeholder="(818) ..."></label><label>Հասցե<input class="t" data-k="dr.addr" value="'+esc(d.addr)+'" placeholder="ոչ պարտադիր"></label></div>';
+  h+='<div class="pof"><label>Ամսաթիվ<input type="date" class="t" data-k="dr.date" value="'+esc(d.date)+'"></label><label>Անուն / խանութ<input class="t" data-k="dr.name" value="'+esc(d.name)+'" placeholder="Օր.՝ Անի կամ Ararat Market"></label><label>Հեռախոս *<input class="t" type="tel" autocomplete="tel" data-k="dr.phone" value="'+esc(d.phone)+'" placeholder="+1 (818) ..."></label><label>Հասցե * <small>(տան համարով)</small><input class="t" autocomplete="street-address" data-k="dr.addr" value="'+esc(d.addr)+'" placeholder="Օր.՝ 64 N Mar Vista Ave, Apt 102"></label></div>'+
+  '<div class="pof3"><label>Email <small>(ոչ պարտադիր)</small><input class="t" type="email" data-k="dr.email" value="'+esc(d.email||"")+'" placeholder="name@example.com"></label><label class="pdk sm"><input type="checkbox" data-k="dr.promo"'+(d.promo?" checked":"")+'> Ուղարկել կարևոր առաջարկներ email-ով</label><div class="ntf">📱 Պատվերի հաստատումը ուղարկվում է <b>SMS-ով</b> հեռախոսին։ Email-ով՝ միայն կարևոր առաջարկներ։</div></div>';
   h+='<div class="pof2"><div><span class="lb">Տեսակ</span><div class="usw"><button type="button" data-dt="r" class="'+(d.type==="r"?"on":"")+'">🛒 Մանրածախ</button><button type="button" data-dt="w" class="'+(d.type==="w"?"on":"")+'">🏪 Մեծածախ</button></div></div><div><span class="lb">Վճարման ձև</span><div class="usw">'+[["cash","💵 Կանխիկ"],["zelle","⚡ Zelle"],["card","💳 Քարտ"]].map(function(x){return '<button type="button" data-dp="'+x[0]+'" class="'+(d.pay===x[0]?"on":"")+'">'+x[1]+'</button>';}).join("")+'</div></div><label class="pdk"><input type="checkbox" data-k="dr.paid"'+(d.paid?" checked":"")+'> Վճարված է</label></div>';
   h+='<div class="pol">';d.lines.forEach(function(l,k){var p=S.prod[+l[0]];var canPc=p&&avail(p,chOf(d.type,1));var j=chOf(d.type,+l[1]);var pr=p?p.pr[j]:0;
     h+='<div class="pll"><select data-k="dl.'+k+'.0">'+pOpts(l[0])+'</select><select data-k="dl.'+k+'.1"><option value="0"'+(+l[1]===0?" selected":"")+'>'+(p?esc(p.unit):"տուփ")+'</option>'+(canPc?'<option value="1"'+(+l[1]===1?" selected":"")+'>հատ</option>':'')+'</select>'+inp("dl."+k+".2",l[2],"",1)+'<span class="mini">× '+m(pr)+'</span><b>'+m(num(l[2])*pr)+'</b><button type="button" class="x" data-act="dldel" data-r="'+k+'">✕</button></div>';});
   h+='</div><div class="row" style="margin-top:10px"><button type="button" class="btn l" data-act="dladd">+ Ապրանք</button><div style="display:flex;align-items:center;gap:12px"><span class="mini">Ընդամենը</span><b style="font-size:22px;color:var(--g)" id="dtot">'+m(draftTotal())+'</b><button type="button" class="btn gold" data-act="dsave">✓ Պահպանել պատվերը</button></div></div></div>';
+  if(S.justSaved!=null&&S.calls[S.justSaved]){var js=S.calls[S.justSaved];h+='<div class="card svd"><div><b>✓ Պատվերը պահպանված է</b><span>Ուղարկեք հաստատման SMS հաճախորդին՝ '+esc(js.phone)+'</span><p class="smsp">'+esc(smsText(js))+'</p></div><div class="svd-a"><a class="btn gold" href="'+smsHref(js)+'" data-act="smsdone">📱 Ուղարկել SMS</a><button type="button" class="btn l" data-act="smsdone">Փակել</button></div></div>';}
   // list
   var list=(S.calls||[]).map(function(c,k){return [c,k];}).filter(function(x){return inPeriod(x[0].date);}).sort(function(a,b){return a[0].date<b[0].date?1:-1;});
   h+='<div class="card"><h2>Հեռախոսով պատվերներ</h2><div class="scroll" style="margin-top:10px"><table class="mtb"><thead><tr><th>Ամսաթիվ</th><th>Հաճախորդ</th><th>Տեսակ</th><th>Ապրանքներ</th><th class="num">Գումար</th><th>Վճարում</th><th></th></tr></thead><tbody>';
   if(!list.length){h+='<tr><td colspan="7" class="mini" style="text-align:center;padding:18px">Դեռ հեռախոսով պատվեր չկա։</td></tr>';}
   list.forEach(function(x){var c=x[0],k=x[1];var tot=0;var its=c.lines.map(function(l){var p=S.prod[+l[0]];if(!p){return "";}var j=chOf(c.type,+l[1]);tot+=num(l[2])*p.pr[j];return esc(p.name)+" × "+num(l[2])+" "+(+l[1]===1?"հատ":esc(p.unit));}).join("<br>");
-    h+='<tr><td>'+esc(c.date)+'</td><td><b>'+esc(c.name||"—")+'</b><br><span class="mini">'+esc(c.phone||"")+(c.addr?" · "+esc(c.addr):"")+'</span></td><td><span class="mp '+(c.type==="w"?"y":"g")+'">'+(c.type==="w"?"Մեծածախ":"Մանրածախ")+'</span></td><td class="mini" style="white-space:normal">'+its+'</td><td class="num"><b>'+m(tot)+'</b></td><td><select class="psel" data-k="cp.'+k+'">'+[["cash","Կանխիկ"],["zelle","Zelle"],["card","Քարտ"]].map(function(o){return '<option value="'+o[0]+'"'+(c.pay===o[0]?" selected":"")+'>'+o[1]+'</option>';}).join("")+'</select> '+(c.paid?'<button type="button" class="pst ok" data-act="cpaid" data-r="'+k+'">✓ Վճարված</button>':'<button type="button" class="pst" data-act="cpaid" data-r="'+k+'">Հաստատել վճարումը</button>')+'</td><td><button type="button" class="x" data-act="cdel" data-r="'+k+'" title="Ջնջել">✕</button></td></tr>';});
+    h+='<tr><td>'+esc(c.date)+'</td><td><b>'+esc(c.name||"—")+'</b><br><span class="mini">'+esc(c.phone||"")+(c.addr?" · "+esc(c.addr):"")+(c.email?" · ✉ "+esc(c.email)+(c.promo?" (առաջարկներ)":""):"")+'</span></td><td><span class="mp '+(c.type==="w"?"y":"g")+'">'+(c.type==="w"?"Մեծածախ":"Մանրածախ")+'</span></td><td class="mini" style="white-space:normal">'+its+'</td><td class="num"><b>'+m(tot)+'</b></td><td><select class="psel" data-k="cp.'+k+'">'+[["cash","Կանխիկ"],["zelle","Zelle"],["card","Քարտ"]].map(function(o){return '<option value="'+o[0]+'"'+(c.pay===o[0]?" selected":"")+'>'+o[1]+'</option>';}).join("")+'</select> '+(c.paid?'<button type="button" class="pst ok" data-act="cpaid" data-r="'+k+'">✓ Վճարված</button>':'<button type="button" class="pst" data-act="cpaid" data-r="'+k+'">Հաստատել վճարումը</button>')+'</td><td style="white-space:nowrap">'+(c.phone?'<a class="smsb" href="'+smsHref(c)+'" title="Ուղարկել SMS">📱</a> ':'')+'<button type="button" class="x" data-act="cdel" data-r="'+k+'" title="Ջնջել">✕</button></td></tr>';});
   h+='</tbody></table></div></div>';
   // fixed expenses
   h+='<div class="card"><h2>Մշտական ամսական ծախսեր</h2><div class="scroll" style="margin-top:8px"><table style="max-width:560px"><tbody>';
@@ -582,6 +599,55 @@ if(/emb/.test(document.documentElement.className)){document.documentElement.styl
   window.addEventListener("wheel",function(e){if(Math.abs(e.deltaY)<=Math.abs(e.deltaX)){return;}var sc=e.target.closest&&e.target.closest(".scroll");e.preventDefault();var k=e.deltaMode===1?32:(e.deltaMode===2?600:1);try{parent.postMessage({nofaWheel:e.deltaY*k},"*");}catch(x){}},{passive:false});}
 if(S.open==null){S.open=-1;}
 render();
+</script>
+<script id="nofa-addr-ac">
+(function () {
+  if (window.__nofaAC) { return; } window.__nofaAC = 1;
+  var css = '.nofa-ac{position:absolute;z-index:9999;background:#FBF8F1;border:1.5px solid #EBA93A;border-radius:14px;box-shadow:0 18px 44px rgba(19,59,48,.28);padding:6px;max-height:310px;overflow:auto;font-family:Manrope,"Noto Sans Armenian",system-ui,sans-serif;box-sizing:border-box}' +
+    '.nofa-ac button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;border:none;background:none;padding:9px 12px;border-radius:10px;cursor:pointer;font:inherit;color:#1E2A24}' +
+    '.nofa-ac button:hover,.nofa-ac button.on{background:#E8F1EC}.nofa-ac b{font-size:14.5px;color:#1D5545;font-weight:800}.nofa-ac span{font-size:12.5px;color:#6B756F}.nofa-ac .ft{font-size:11px;color:#9A9F98;padding:4px 12px 2px}.nofa-ac .ld{font-size:13px;color:#6B756F;padding:8px 12px}';
+  var stl = document.createElement('style'); stl.textContent = css; document.head.appendChild(stl);
+  var AB = { "Alabama":"AL","Alaska":"AK","Arizona":"AZ","Arkansas":"AR","California":"CA","Colorado":"CO","Connecticut":"CT","Delaware":"DE","District of Columbia":"DC","Florida":"FL","Georgia":"GA","Hawaii":"HI","Idaho":"ID","Illinois":"IL","Indiana":"IN","Iowa":"IA","Kansas":"KS","Kentucky":"KY","Louisiana":"LA","Maine":"ME","Maryland":"MD","Massachusetts":"MA","Michigan":"MI","Minnesota":"MN","Mississippi":"MS","Missouri":"MO","Montana":"MT","Nebraska":"NE","Nevada":"NV","New Hampshire":"NH","New Jersey":"NJ","New Mexico":"NM","New York":"NY","North Carolina":"NC","North Dakota":"ND","Ohio":"OH","Oklahoma":"OK","Oregon":"OR","Pennsylvania":"PA","Rhode Island":"RI","South Carolina":"SC","South Dakota":"SD","Tennessee":"TN","Texas":"TX","Utah":"UT","Vermont":"VT","Virginia":"VA","Washington":"WA","West Virginia":"WV","Wisconsin":"WI","Wyoming":"WY" };
+  var box = null, cur = null, items = [], sel = -1, timer = null, seq = 0;
+  function isAddr(el) { return el && el.tagName === "INPUT" && /^(street-address|address-line1)$/.test(el.getAttribute("autocomplete") || "") && !el.hasAttribute("data-noac"); }
+  function setVal(el, v) { var proto = el.tagName === "SELECT" ? HTMLSelectElement.prototype : (el.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype); var d = Object.getOwnPropertyDescriptor(proto, "value"); d.set.call(el, v); el.__nofaSet = true; el.dispatchEvent(new Event("input", { bubbles: true })); el.dispatchEvent(new Event("change", { bubbles: true })); el.__nofaSet = false; }
+  function fmt(p) { var line1 = [p.housenumber, p.street].filter(Boolean).join(" ") || p.name || ""; var city = p.city || p.town || p.village || p.locality || p.district || p.county || ""; var st = AB[p.state] || p.state || ""; var zip = p.postcode || ""; return { line1: line1, city: city, st: st, zip: zip, sub: [city, (st + " " + zip).trim()].filter(Boolean).join(", "), full: [line1, city, (st + " " + zip).trim()].filter(Boolean).join(", ") }; }
+  function hide() { if (box) { box.style.display = "none"; } items = []; sel = -1; }
+  function place() { if (!box || !cur) { return; } var r = cur.getBoundingClientRect(); box.style.left = (r.left + window.scrollX) + "px"; box.style.top = (r.bottom + window.scrollY + 6) + "px"; box.style.width = Math.max(r.width, 280) + "px"; }
+  function render(loading) { if (!box) { box = document.createElement("div"); box.className = "nofa-ac"; box.setAttribute("role", "listbox"); document.body.appendChild(box); box.addEventListener("mousedown", function (e) { e.preventDefault(); }); }
+    box.innerHTML = ""; if (loading) { var l = document.createElement("div"); l.className = "ld"; l.textContent = "…"; box.appendChild(l); }
+    items.forEach(function (it, i) { var b = document.createElement("button"); b.type = "button"; if (i === sel) { b.className = "on"; } var t = document.createElement("b"); t.textContent = it.line1 || it.full; var s = document.createElement("span"); s.textContent = it.sub; b.appendChild(t); b.appendChild(s); b.addEventListener("click", function () { pick(i); }); box.appendChild(b); });
+    if (!loading && !items.length) { hide(); return; }
+    if (items.length) { var f = document.createElement("div"); f.className = "ft"; f.textContent = "📍 OpenStreetMap"; box.appendChild(f); }
+    place(); box.style.display = "block"; }
+  function scope(el) { var n = el; for (var k = 0; k < 7 && n && n.parentElement; k++) { n = n.parentElement; if (n.querySelector('[autocomplete="postal-code"], [autocomplete="address-level2"]')) { return n; } } return null; }
+  function pick(i) { var it = items[i]; var el = cur; if (!it || !el) { return; } var sc = el.getAttribute("autocomplete") === "address-line1" ? scope(el) : null;
+    if (sc) { setVal(el, it.line1 || it.full); var c = sc.querySelector('[autocomplete="address-level2"]'); if (c && it.city) { setVal(c, it.city); } var z = sc.querySelector('[autocomplete="postal-code"]'); if (z && it.zip) { setVal(z, it.zip); } var s = sc.querySelector('[autocomplete="address-level1"]'); if (s && it.st) { setVal(s, it.st); } }
+    else { setVal(el, it.full); }
+    hide(); el.focus(); }
+  function search(el, q) { var my = ++seq; render(true);
+    fetch("https://photon.komoot.io/api/?limit=7&lang=en&lat=34.15&lon=-118.25&bbox=-125,24,-66,50&q=" + encodeURIComponent(q)).then(function (r) { return r.json(); }).then(function (j) { if (my !== seq || cur !== el) { return; } var seen = {}; items = (j.features || []).map(function (f) { return f.properties || {}; }).filter(function (p) { return !p.countrycode || p.countrycode === "US"; }).map(fmt).filter(function (it) { if (!it.line1 || seen[it.full]) { return false; } seen[it.full] = 1; return true; }).slice(0, 6); sel = -1; render(false); }).catch(function () { if (my === seq) { hide(); } }); }
+  document.addEventListener("input", function (e) { var el = e.target; if (!isAddr(el) || el.__nofaSet) { return; } cur = el; var q = (el.value || "").trim(); clearTimeout(timer); if (q.length < 3) { hide(); return; } timer = setTimeout(function () { search(el, q); }, 260); }, true);
+  document.addEventListener("keydown", function (e) { if (!box || box.style.display !== "block" || e.target !== cur) { return; } if (e.key === "ArrowDown") { e.preventDefault(); sel = Math.min(items.length - 1, sel + 1); render(false); } else if (e.key === "ArrowUp") { e.preventDefault(); sel = Math.max(0, sel - 1); render(false); } else if (e.key === "Enter" && sel >= 0) { e.preventDefault(); pick(sel); } else if (e.key === "Escape") { hide(); } }, true);
+  document.addEventListener("focusout", function (e) { if (e.target === cur) { setTimeout(hide, 180); } }, true);
+
+  function phDigits(v) { v = String(v || ""); var d = v.replace(/\D/g, ""); if (/^\s*\+\s*1/.test(v)) { d = d.slice(1); } else if (d.length === 11 && d.charAt(0) === "1") { d = d.slice(1); } return d.slice(0, 10); }
+  function fmtPh(v) { var d = phDigits(v); if (!d) { return ""; } if (d.length <= 3) { return "+1 (" + d; } if (d.length <= 6) { return "+1 (" + d.slice(0, 3) + ") " + d.slice(3); } return "+1 (" + d.slice(0, 3) + ") " + d.slice(3, 6) + " " + d.slice(6); }
+  document.addEventListener("input", function (e) { var el = e.target; if (!el || el.tagName !== "INPUT" || el.type !== "tel" || el.__nofaSet) { return; } var v = el.value; var digits = phDigits(v); var prev = el.__phPrev || ""; if (e.inputType === "deleteContentBackward" && digits === phDigits(prev)) { digits = digits.slice(0, -1); } var f = digits ? fmtPh("+1" + digits) : ""; el.__phPrev = f; if (f !== v) { setVal(el, f); try { el.setSelectionRange(f.length, f.length); } catch (x) {} } }, true);
+  document.addEventListener("focusin", function (e) { var el = e.target; if (el && el.tagName === "INPUT" && el.type === "tel" && el.value && phDigits(el.value).length === 10 && el.value !== fmtPh(el.value)) { setVal(el, fmtPh(el.value)); el.__phPrev = el.value; } }, true);
+  var phScanT = null; function phScan() { Array.prototype.forEach.call(document.querySelectorAll('input[type="tel"]'), function (el) { if (el === document.activeElement) { return; } if (el.value && phDigits(el.value).length === 10 && el.value !== fmtPh(el.value)) { setVal(el, fmtPh(el.value)); } }); }
+  setTimeout(phScan, 600); try { new MutationObserver(function () { clearTimeout(phScanT); phScanT = setTimeout(phScan, 120); }).observe(document.body, { childList: true, subtree: true }); } catch (x) {}
+
+  var CT_RE = /(\+1 \(\d{3}\) \d{3} \d{4}|\(\d{3}\) \d{3}[- ]\d{4}|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})/g;
+  var ctCss = document.createElement("style"); ctCss.textContent = ".nofa-ct{cursor:pointer}"; document.head.appendChild(ctCss);
+  function caretAt(x, y) { if (document.caretRangeFromPoint) { var r = document.caretRangeFromPoint(x, y); return r ? { node: r.startContainer, off: r.startOffset } : null; } if (document.caretPositionFromPoint) { var q = document.caretPositionFromPoint(x, y); return q ? { node: q.offsetNode, off: q.offset } : null; } return null; }
+  function ctAt(x, y) { var c = caretAt(x, y); if (!c || !c.node || c.node.nodeType !== 3) { return null; } var el = c.node.parentElement; if (!el || el.closest("input, textarea, select, a, button, label, [contenteditable]")) { return null; } var t = c.node.textContent; var m; CT_RE.lastIndex = 0; while ((m = CT_RE.exec(t))) { if (c.off >= m.index && c.off <= m.index + m[0].length) { var r = document.createRange(); r.setStart(c.node, m.index); r.setEnd(c.node, m.index + m[0].length); var b = r.getBoundingClientRect(); if (x >= b.left - 2 && x <= b.right + 2 && y >= b.top - 2 && y <= b.bottom + 2) { return { v: m[0], el: el }; } } } return null; }
+  function ctHref(v) { if (v.indexOf("@") > 0) { return "mailto:" + v; } var d = v.replace(/\D/g, ""); if (d.length === 10) { d = "1" + d; } return "tel:+" + d; }
+  var ctLast = null;
+  document.addEventListener("mousemove", function (e) { var h = ctAt(e.clientX, e.clientY); var el = h ? h.el : null; if (ctLast && ctLast !== el) { ctLast.classList.remove("nofa-ct"); ctLast.removeAttribute("title"); } if (el) { el.classList.add("nofa-ct"); el.setAttribute("title", h.v.indexOf("@") > 0 ? "✉ " + h.v : "📞 " + h.v); } ctLast = el; }, { passive: true });
+  document.addEventListener("click", function (e) { if (e.defaultPrevented || e.button !== 0) { return; } var sel = window.getSelection && String(window.getSelection()); if (sel && sel.length > 2) { return; } var h = ctAt(e.clientX, e.clientY); if (h) { e.preventDefault(); window.location.href = ctHref(h.v); } }, true);
+  window.addEventListener("resize", place); window.addEventListener("scroll", place, true);
+})();
 </script>
 </body>
 </html>
