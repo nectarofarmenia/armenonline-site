@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="hy"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>Nectar of Armenia — Վարորդի գրանցում</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+Armenian:wght@400;600;700&family=Noto+Serif+Armenian:wght@600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#F7F3EA;font:15px/1.5 Manrope,'Noto Sans Armenian',system-ui,sans-serif;color:#1E2A24}
+.top{background:linear-gradient(135deg,#246350,#1D5545 50%,#133B30);padding:22px 18px 70px;text-align:center;border-bottom:5px solid #EBA93A}.top img{width:180px;max-width:60%}
+.card{max-width:520px;margin:-50px auto 30px;background:#fff;border-radius:22px;padding:24px 20px;box-shadow:0 14px 36px rgba(19,59,48,.14);position:relative}
+h1{font-family:'Noto Serif Armenian',serif;font-weight:600;color:#1D5545;font-size:24px;margin:0 0 4px}p.s{color:#5E6A63;margin:0 0 16px}
+label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:800;color:#6B5A30;margin-bottom:12px}
+input,select{font:inherit;min-height:46px;border:1.5px solid #D8CDB4;border-radius:12px;padding:8px 12px;background:#FFFDF8}input:focus{outline:none;border-color:#EBA93A;box-shadow:0 0 0 3px rgba(235,169,58,.25)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{width:100%;min-height:50px;border:0;border-radius:999px;background:linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22);color:#133B30;font:800 16px Manrope,'Noto Sans Armenian',sans-serif;cursor:pointer;margin-top:6px}
+.ok{text-align:center}.ok b{display:block;font-size:42px}.err{color:#B03A2E;font-weight:700;font-size:13.5px;min-height:20px}
+.chk{flex-direction:row;align-items:flex-start;gap:8px;font-weight:600;color:#33403A}.chk input{min-height:auto;width:18px;height:18px;margin-top:3px;accent-color:#1D5545}
+@media(max-width:480px){.row{grid-template-columns:1fr}}
+</style></head><body>
+<div class="top"><img src="img/cf4f14e5b2e161eced326c4ebe8644fd.webp" alt="Nectar of Armenia"></div>
+<div class="card" id="c"></div>
+<script>
+var Q=new URLSearchParams(location.search),CODE=(Q.get("inv")||"").toUpperCase(),NM=Q.get("n")||"";
+function L(){try{return JSON.parse(localStorage.getItem("noa-drivers")||"[]")||[];}catch(e){return [];}}
+function esc(s){return String(s||"").replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function form(){var d=L().filter(function(x){return x.code===CODE;})[0]||{name:NM};
+document.getElementById("c").innerHTML='<h1>Բարի գալուստ'+(d.name?", "+esc(d.name):"")+' 👋</h1><p class="s">Nectar of Armenia-ն հրավիրում է ձեզ միանալ մեր առաքման թիմին։ Լրացրեք ձեր տվյալները։</p>'+
+'<label>Անուն Ազգանուն *<input id="nm" value="'+esc(d.name)+'" autocomplete="name"></label>'+
+'<div class="row"><label>Հեռախոս *<input id="ph" type="tel" value="'+esc(d.phone)+'" autocomplete="tel" placeholder="+1 (818) ..."></label><label>Email<input id="em" type="email" value="'+esc(d.email)+'" autocomplete="email"></label></div>'+
+'<label>Հասցե<input id="ad" autocomplete="street-address" placeholder="Փողոց, տուն, քաղաք"></label>'+
+'<div class="row"><label>Վարորդական իրավունքի № *<input id="dl" placeholder="CA D1234567"></label><label>Մեքենա<input id="car" placeholder="Օր.՝ Ford Transit"></label></div>'+
+'<label>Որ օրերին կարող եք աշխատել<input id="days" placeholder="Օր.՝ երկ–ուրբ"></label>'+
+'<label class="chk"><input type="checkbox" id="ag"> Համաձայն եմ, որ Nectar of Armenia-ն ինձ առաքման ցուցակներ և ծանուցումներ ուղարկի SMS-ով։</label>'+
+'<div class="err" id="er"></div><button type="button" id="go">Գրանցվել</button>';
+document.getElementById("go").onclick=function(){var v=function(i){return document.getElementById(i).value.trim();};
+ if(!v("nm")){return err("Գրեք ձեր անունը։");}if(v("ph").replace(/\D/g,"").length<10){return err("Գրեք ճիշտ հեռախոսահամար։");}if(!v("dl")){return err("Գրեք վարորդական իրավունքի համարը։");}if(!document.getElementById("ag").checked){return err("Հաստատեք համաձայնությունը։");}
+ var a=L();var ix=-1;a.forEach(function(x,i){if(CODE&&x.code===CODE){ix=i;}});var rec={name:v("nm"),phone:v("ph"),email:v("em"),addr:v("ad"),lic:v("dl"),car:v("car"),days:v("days"),st:"active",code:CODE,regAt:new Date().toISOString()};
+ if(ix>=0){a[ix]=Object.assign({},a[ix],rec);}else{a.push(rec);}try{localStorage.setItem("noa-drivers",JSON.stringify(a));}catch(e){}
+ document.getElementById("c").innerHTML='<div class="ok"><b>✅</b><h1>Շնորհակալություն, '+esc(rec.name)+'</h1><p class="s">Ձեր գրանցումը ստացվել է։ Մենք կկապվենք ձեզ հետ, և առաքման ցուցակները կստանաք SMS-ով։</p><p class="s">Հարցերի դեպքում՝ <a href="tel:+15155885555">(515) 588-5555</a></p></div>';};}
+function err(t){document.getElementById("er").textContent=t;}
+form();
+</script></body></html>

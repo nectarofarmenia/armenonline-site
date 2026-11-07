@@ -551,7 +551,7 @@ var SITE2ID={0:"gata",1:"khash",2:"khash",3:"khash",4:"khinkali",5:"pelmeni",6:"
 var PAYL={cash:"Կանխիկ",zelle:"Zelle",card:"Քարտ",site:"Կայքում"};
 function pidx(id){for(var i=0;i<S.prod.length;i++){if(S.prod[i].id===id){return i;}}return -1;}
 function today(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
-var DRV=["Arsen","Gor","Narek"];var SLOTS=["9:00–12:00","12:00–15:00","15:00–18:00"];
+var DRV=(function(){try{var a=JSON.parse(localStorage.getItem("noa-drivers")||"null");if(Array.isArray(a)&&a.length){return a.map(function(d){return d.name+(d.st==="off"?" (անջատված)":"");});}}catch(e){}return ["Arsen","Gor","Narek"];})();var SLOTS=["9:00–12:00","12:00–15:00","15:00–18:00"];
 function plusDays(n){var d=new Date();d.setDate(d.getDate()+n);return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
 function newDraft(){return {ddate:plusDays(2),slot:SLOTS[0],drv:-1,date:today(),name:"",phone:"",addr:"",type:"r",pay:"cash",paid:false,note:"",lines:[[0,0,1]]};}
 function chOf(type,unit){return (type==="w"?2:0)+(unit===1?1:0);}
