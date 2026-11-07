@@ -357,6 +357,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 <label class="lbl">{{t.last}}<input class="fld" value="{{pf.last}}" onInput="{{pfSet.last}}" autocomplete="family-name"></label>
 <label class="lbl">{{t.email}}<input class="fld" type="email" value="{{pf.email}}" onInput="{{pfSet.email}}" autocomplete="email"></label>
 <label class="lbl">{{t.phone}}<input class="fld" type="tel" value="{{pf.phone}}" onInput="{{pfSet.phone}}" autocomplete="tel"></label>
+<label class="lbl">🎂 Ծննդյան ամսաթիվ / Birthday<input class="fld" type="date" value="{{pf.dob}}" onInput="{{pfSet.dob}}" autocomplete="bday"><span style="font-size: 12px; color: #6B756F; font-weight: 600">Լրացրեք, և ձեր ծննդյան օրը կստանաք նվեր 🎁</span></label>
 </div>
 <span style="font-size: 13px; color: #5E6A63">{{t.emailNote}}</span>
 <sc-if value="{{hasPMsg}}" hint-placeholder-val="{{false}}"><p role="status" style="margin: 0; padding: 10px 14px; border-radius: 12px; background: {{pMsgBg}}; color: {{pMsgFg}}; font-weight: 700; font-size: 14px">{{pMsg}}</p></sc-if>
@@ -514,18 +515,18 @@ navs = navs.concat([{ label: plT.H, icon: "🏷", cls: tab === 30 ? "on" : "", p
 navs = navs.concat([["🍳", 29], ["👩‍🍳", 20], ["🏛", 21], ["📜", 22]].map(function (x, k) { return { label: XL[k], icon: x[0], cls: (tab === x[1] ? "on " : "") + "ext" + (k === 0 ? " ext1" : ""), pick: function () { self.setState({ tab: x[1] }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }; }));
 var extVals = { extOn: (tab >= 20 && tab <= 22) || tab === 29, extSrc: ((tab >= 20 && tab <= 22) || tab === 29) ? XP[tab - 20] + ".dc.html?embed=1&lang=" + lang : "about:blank", extTitle: tab === 29 ? XL[0] : ((tab >= 20 && tab <= 22) ? XL[tab - 19] : "") };
 /* profile */
-var base = user ? { first: user.first || "", last: user.last || "", email: user.email || "", phone: user.phone || "" } : { first: "Ani", last: "Petrosyan", email: "ani@example.com", phone: "+1 (818) 555 0142" };
+var base = user ? { first: user.first || "", last: user.last || "", email: user.email || "", phone: user.phone || "", dob: user.dob || "" } : { first: "Ani", last: "Petrosyan", email: "ani@example.com", phone: "+1 (818) 555 0142" };
 var pf = Object.assign({}, base, st.pf || {});
-var pfSet = {}; ["first", "last", "phone", "email"].forEach(function (k) { pfSet[k] = function (e) { var n = Object.assign({}, st.pf || {}); n[k] = e.target.value; self.setState({ pf: n }); }; });
+var pfSet = {}; ["first", "last", "phone", "email", "dob"].forEach(function (k) { pfSet[k] = function (e) { var n = Object.assign({}, st.pf || {}); n[k] = e.target.value; self.setState({ pf: n }); }; });
 var saveProf = function () { var newEm = (pf.email || "").trim(); var oldEm = (base.email || "").trim();
  if (user && newEm.toLowerCase() !== oldEm.toLowerCase()) { if (!/^[^@ ]+@[^@ ]+[.][^@ ]+$/.test(newEm)) { self.setState({ pMsg: "bad" }); return; }
   try { var A0 = JSON.parse(window.localStorage.getItem("noa-accounts") || "{}") || {}; if (A0[newEm.toLowerCase() + "|retail"]) { self.setState({ pMsg: "taken" }); return; }
-   var oldK = oldEm.toLowerCase() + "|retail"; var acc0 = A0[oldK] || A0[oldEm.toLowerCase()] || user; delete A0[oldK]; delete A0[oldEm.toLowerCase()]; acc0.email = newEm; acc0.first = pf.first; acc0.last = pf.last; acc0.phone = pf.phone; A0[newEm.toLowerCase() + "|retail"] = acc0;
+   var oldK = oldEm.toLowerCase() + "|retail"; var acc0 = A0[oldK] || A0[oldEm.toLowerCase()] || user; delete A0[oldK]; delete A0[oldEm.toLowerCase()]; acc0.email = newEm; acc0.first = pf.first; acc0.last = pf.last; acc0.phone = pf.phone; acc0.dob = pf.dob || ""; A0[newEm.toLowerCase() + "|retail"] = acc0;
    window.localStorage.setItem("noa-accounts", JSON.stringify(A0)); window.localStorage.setItem("noa-user", JSON.stringify(acc0)); window.localStorage.setItem("noa-session", newEm.toLowerCase() + "|retail");
    var rm = window.localStorage.getItem("noa-remember"); if (rm && rm.indexOf(oldEm.toLowerCase()) === 0) { window.localStorage.setItem("noa-remember", newEm.toLowerCase() + "|retail"); }
    var ol = JSON.parse(window.localStorage.getItem("noa-orders") || "[]") || []; ol.forEach(function (o) { if ((o.email || "").toLowerCase() === oldEm.toLowerCase()) { o.email = newEm; } }); window.localStorage.setItem("noa-orders", JSON.stringify(ol)); } catch (e) {}
   self.setState({ pMsg: "ok:" + newEm, pf: null }); return; }
- if (user) { try { var u = JSON.parse(window.localStorage.getItem("noa-user") || "null"); var A = JSON.parse(window.localStorage.getItem("noa-accounts") || "{}") || {}; var key = (user.email || "").toLowerCase() + "|retail"; var acc = A[key] || A[(user.email || "").toLowerCase()] || user; acc.first = pf.first; acc.last = pf.last; acc.phone = pf.phone; A[key] = acc; window.localStorage.setItem("noa-accounts", JSON.stringify(A)); if (u && (u.type || "retail") !== "biz") { window.localStorage.setItem("noa-user", JSON.stringify(acc)); } } catch (e) {} } self.setState({ saved: true, pf: null, pMsg: "" }); setTimeout(function () { self.setState({ saved: false }); }, 1600); };
+ if (user) { try { var u = JSON.parse(window.localStorage.getItem("noa-user") || "null"); var A = JSON.parse(window.localStorage.getItem("noa-accounts") || "{}") || {}; var key = (user.email || "").toLowerCase() + "|retail"; var acc = A[key] || A[(user.email || "").toLowerCase()] || user; acc.first = pf.first; acc.last = pf.last; acc.phone = pf.phone; acc.dob = pf.dob || ""; A[key] = acc; window.localStorage.setItem("noa-accounts", JSON.stringify(A)); if (u && (u.type || "retail") !== "biz") { window.localStorage.setItem("noa-user", JSON.stringify(acc)); } } catch (e) {} } self.setState({ saved: true, pf: null, pMsg: "" }); setTimeout(function () { self.setState({ saved: false }); }, 1600); };
 var pMsgS = st.pMsg || ""; var pMsg = pMsgS.indexOf("ok:") === 0 ? t.emailChanged.replace("{e}", pMsgS.slice(3)) : (pMsgS === "bad" ? t.emailBad : (pMsgS === "taken" ? t.emailTaken : ""));
 var nm = ((pf.first || "") + " " + (pf.last || "")).trim();
 /* orders */
