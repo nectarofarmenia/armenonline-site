@@ -30,9 +30,9 @@ switch ($a) {
   case 'all': // admin: everything
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $since = (int) ($_GET['since'] ?? 0);
-    $s = $db->prepare('SELECT k, v, t FROM nofa_kv WHERE t > ?'); $s->execute([$since]);
+    $s = $db->prepare("SELECT k, v, t FROM nofa_kv WHERE t > ? AND k NOT LIKE '\\_\\_%' ESCAPE '\\'"); $s->execute([$since]);
     $res = []; $mx = $since; foreach ($s->fetchAll(PDO::FETCH_ASSOC) as $r) { $res[$r['k']] = ['v' => $r['v'], 't' => (int) $r['t']]; if ($r['t'] > $mx) { $mx = (int) $r['t']; } }
-    $n = (int) $db->query('SELECT COUNT(*) FROM nofa_kv')->fetchColumn();
+    $n = (int) $db->query("SELECT COUNT(*) FROM nofa_kv WHERE k NOT LIKE '\\_\\_%' ESCAPE '\\'")->fetchColumn();
     out(['ok' => true, 'kv' => $res, 'now' => $mx, 'count' => $n]);
   case 'put': // admin: save keys
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
@@ -67,6 +67,22 @@ switch ($a) {
       $ins->execute([$kind, $em, hash('sha256', $em . '|' . $data), $data, $ip, now_ms()]); $n++;
     }
     out(['ok' => true, 'n' => $n]);
+  case 'apri_cfg': // admin: save My Apri link token (stored server-side only)
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $b = body(); $tok = preg_replace('/[^a-zA-Z0-9]/', '', (string) ($b['token'] ?? ''));
+    if (strlen($tok) < 16) { out(['ok' => false, 'err' => 'bad_token'], 400); }
+    kv_put($db, '__apri_token', $tok); out(['ok' => true]);
+  case 'apri_pull': // admin: approved production from My Apri Work (sums only)
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $t = kv_get($db, '__apri_token'); if (!$t) { out(['ok' => false, 'err' => 'no_token']); }
+    $from = preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['from'] ?? '') ? $_GET['from'] : date('Y-m-d', time() - 60 * 86400);
+    $to = preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['to'] ?? '') ? $_GET['to'] : date('Y-m-d', time() + 86400);
+    $url = 'https://oddqwjvqqvoeqdrnasqc.supabase.co/rest/v1/rpc/nofa_production'; $key = 'sb_publishable_ZVvJKCJXM5ylUlICX-57vw__ZZqQul0';
+    $ctx = stream_context_create(['http' => ['method' => 'POST', 'timeout' => 12, 'ignore_errors' => true, 'header' => "Content-Type: application/json\r\napikey: $key\r\nAuthorization: Bearer $key\r\n", 'content' => json_encode(['p_token' => $t['v'], 'p_from' => $from, 'p_to' => $to])]]);
+    $r = @file_get_contents($url, false, $ctx); $code = 0; if (isset($http_response_header[0]) && preg_match('/\s(\d{3})\s/', $http_response_header[0], $mm)) { $code = (int) $mm[1]; }
+    if ($r === false || $code >= 400) { out(['ok' => false, 'err' => 'apri_http', 'code' => $code, 'body' => substr((string) $r, 0, 300)]); }
+    $rows = json_decode($r, true); if (!is_array($rows)) { out(['ok' => false, 'err' => 'apri_bad']); }
+    out(['ok' => true, 'rows' => $rows, 'from' => $from, 'to' => $to]);
   case 'pub': // anyone: public site settings (theme, stock, cities)
     $res = []; foreach ($PUBLIC as $k) { $r = kv_get($db, $k); if ($r) { $res[$k] = $r['v']; } }
     if (isset($res['noa-paycfg'])) { $p = json_decode($res['noa-paycfg'], true) ?: []; $res['noa-paycfg'] = json_encode(['zelle' => $p['zelle'] ?? '', 'zphone' => $p['zphone'] ?? '', 'acctName' => $p['acctName'] ?? ''], JSON_UNESCAPED_UNICODE); }

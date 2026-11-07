@@ -192,11 +192,31 @@ setInterval(upd,400);setTimeout(upd,300);})();</script>
         n++; });
       return req("ack", { ids: ids }).then(function () { return n; }); });
   }
+
+  /* ---------- My Apri Work: approved production -> warehouse ---------- */
+  function apriIdx(name) { var n = String(name || "").toLowerCase(); if (/kiev|կիև|կիեվ/.test(n)) { return 8; } if (/gata|գաթա/.test(n)) { return 0; } if (/khinkal|խինկալ/.test(n)) { return 4; } if (/pelmen|պելմեն/.test(n)) { return 5; } if (/blinch|բլինչ/.test(n)) { return 6; } if (/kuft|kyuft|քուֆթ|քյուֆթ/.test(n)) { return 7; } if (/beef|տավար/.test(n)) { return 10; } if (/chick|հավ/.test(n)) { return 9; } if (/khash|խաշ/.test(n)) { return 1; } return -1; }
+  function ppk() { var P = [12, 1, 1, 1, 10, 35, 10, 10, 6, 6, 6]; try { var C = J("noa-cost-v2", {}); var idm = { gata: 0, khinkali: 4, pelmeni: 5, blinchik: 6, kufta: 7, kiev: 8, chcut: 9, beefcut: 10 }; (C.prod || []).forEach(function (p) { if (idm[p.id] != null && +p.packPcs > 0) { P[idm[p.id]] = +p.packPcs; } }); } catch (e) {} return P; }
+  function apriSync() {
+    return req("apri_pull").then(function (j) { var st = { at: new Date().toISOString() };
+      if (!j.ok) { st.ok = false; st.err = j.err === "no_token" ? "Բանալին դեռ մուտքագրված չէ" : ("Կապի սխալ" + (j.code ? " (" + j.code + ")" : "")); LS("noa-apri-st", JSON.stringify(st)); return false; }
+      var L = J("noa-prod", []), S = J("noa-stock", null), Lo = J("noa-stock-pcs", null); if (!Array.isArray(S) || S.length !== 11) { S = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; } if (!Array.isArray(Lo) || Lo.length !== 11) { Lo = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; }
+      var P = ppk(), idx = {}, changed = false, unk = {}; L.forEach(function (r, i) { if (r.src === "apri") { idx[r.id] = i; } });
+      var add = function (pi, q) { if (!q) { return; } if (P[pi] > 1) { var all = Lo[pi] + q; if (all < 0) { S[pi] = Math.max(0, S[pi] + Math.floor(all / P[pi])); Lo[pi] = ((all % P[pi]) + P[pi]) % P[pi]; } else { S[pi] += Math.floor(all / P[pi]); Lo[pi] = all % P[pi]; } } else { S[pi] = Math.max(0, S[pi] + q); } };
+      (j.rows || []).forEach(function (r) { var pi = apriIdx(r.product); if (pi < 0) { unk[r.product] = 1; return; } var d = String(r.d).slice(0, 10), q = Math.round(+r.qty || 0), id = "apri|" + d + "|" + (r.product_id || r.product);
+        if (idx[id] != null) { var old = L[idx[id]]; if (+old.q !== q) { add(pi, q - old.q); old.q = q; old.p = pi; changed = true; } } else { L.push({ id: id, d: d, p: pi, q: q, src: "apri", pk: true }); idx[id] = L.length - 1; add(pi, q); changed = true; } });
+      st.ok = true; st.rows = (j.rows || []).length; st.unk = Object.keys(unk); LS("noa-apri-st", JSON.stringify(st));
+      if (changed) { LS("noa-prod", JSON.stringify(L)); LS("noa-stock", JSON.stringify(S)); LS("noa-stock-pcs", JSON.stringify(Lo)); }
+      return changed; }).catch(function () { LS("noa-apri-st", JSON.stringify({ ok: false, err: "Կապի սխալ", at: new Date().toISOString() })); return false; });
+  }
+  window.nofaApriSave = function (tok) { return req("apri_cfg", { token: tok }).then(function (j) { if (!j.ok) { throw j; } return apriSync(); }); };
+  window.nofaApriSync = apriSync;
   function startAdmin() {
     logoutBtn(); setInterval(logoutBtn, 1500);
     adminPull(true).then(function (changed) { return adminInbox().then(function (n) { return adminPush().then(function () { if (changed || n) { location.reload(); } else { toast("✓ Տվյալները համաժամեցված են սերվերի հետ"); } }); }); }).catch(function () { toast("⚠️ Սերվերի հետ կապ չկա"); });
     setInterval(function () { adminPush().catch(function () {}); }, 4000);
     setInterval(function () { adminInbox().then(function (n) { if (n) { toast("📥 Նոր տվյալներ հաճախորդներից"); return adminPush().then(function () { if (idle()) { location.reload(); } }); } }).catch(function () {}); }, 30000);
+    setTimeout(function () { apriSync().then(function (c) { if (c) { return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 2500);
+    setInterval(function () { apriSync().then(function (c) { if (c) { toast("🏭 Նոր արտադրություն My Apri-ից"); return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 180000);
     setInterval(function () { if (!idle()) { return; } adminPull(false).then(function (c) { if (c && idle()) { location.reload(); } }).catch(function () {}); }, 45000);
     window.addEventListener("beforeunload", function () { try { var m = meta(), items = []; sharedKeys().forEach(function (k) { var v = LG(k); if (!m[k] || m[k].h !== h(v)) { items.push({ k: k, v: v }); } }); if (items.length) { fetch(API + "?a=put", { method: "POST", credentials: "same-origin", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items: items }) }); } } catch (e) {} });
   }
@@ -352,6 +372,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 @media (max-width:1100px){.sx-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.sx-row{grid-template-columns:34px 1fr 1fr;}.sx-num,.sx-pill{display:none}}
 .cu-k b.pl-kv{display:block;font-family:Fraunces,Lora,serif!important;font-size:28px!important;line-height:1.15;color:#F6C35A;font-weight:600}.pl-nums b.pl-v{font-size:19px!important;color:#1D5545;font-weight:800;font-variant-numeric:tabular-nums}.pl-n{line-height:1.2}
 .wh-sum{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:16px;position:relative;z-index:1}.wh-si{padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);display:flex;flex-direction:column;gap:1px}.wh-sn{font-size:13px;font-weight:800;color:#F7F3EA;line-height:1.25}.wh-si b.wh-sv{font-size:20px!important;color:#F6C35A;font-weight:800;margin-top:4px}.wh-si b.wh-sv .sc-interp,.wh-si .sc-interp{font-size:inherit!important;color:inherit!important}.wh-si small{font-size:11.5px;color:#CFE2D9}.wh-si small.wh-st{color:#9BE7B8;font-weight:700}
+.apl{display:flex;flex-direction:column;gap:8px;padding:14px 16px;border-radius:18px;background:#fff;border:1px solid #ECE3CF;margin-bottom:14px}.apl-h{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}.apl-h b{color:#1D5545;font-size:16px}.apl-dot{width:10px;height:10px;border-radius:50%}.apl-st{font-size:13px;color:#5E6A63}.apl-f{display:flex;gap:8px;flex-wrap:wrap}.apl-f .fld{flex:1 1 280px;min-height:40px}
 .wh-ctl{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end}.wh-ctl label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:800;color:#8A7A55}.wh-ctl .fld{min-height:40px}.wh-tr{margin-left:auto;font-size:13.5px;color:#33403A}
 .cmp-per{display:grid;grid-template-columns:1fr 1fr 170px;gap:10px}.cmp-a,.cmp-b{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:flex-end;padding:12px;border-radius:16px;border:1.5px solid #1D5545;background:#F2F8F4}.cmp-b{border-color:#EBA93A;background:#FFF9EA}.cmp-a>b,.cmp-b>b{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;background:#1D5545;font-weight:800}.cmp-b>b{background:#EBA93A;color:#133B30}
 .cmp-a label,.cmp-b label{display:flex;flex-direction:column;gap:3px;font-size:11.5px;font-weight:800;color:#6B756F}.cmp-a .fld,.cmp-b .fld{min-height:38px}.cmp-t{margin-left:auto;font-weight:800;color:#133B30;font-size:15px}
@@ -551,6 +572,9 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </div></sc-for></div>
 </sc-if>
 <sc-if value="{{whTProd}}" hint-placeholder-val="{{false}}">
+<div class="apl"><div class="apl-h"><span class="apl-dot" style="background: {{apC}}"></span><b>🔗 My Apri Work</b><span class="apl-st">{{apSt}}</span><button type="button" onClick="{{apNow}}" class="ad-btn ad-btn-l" style="margin-left: auto">↻ Թարմացնել հիմա</button></div>
+<div class="apl-f"><input class="fld" type="password" placeholder="Supabase-ից ստացած բանալին (token)" value="{{apTok}}" onInput="{{apSetTok}}"><button type="button" onClick="{{apSave}}" class="ad-btn" style="background: #1D5545; color: #F6E3B4; border: 0">Պահել բանալին</button></div>
+<span style="font-size: 12.5px; color: #6B756F">Հաստատված արտադրությունը My Apri-ից գալիս է ինքնաշխատ՝ 3 րոպեն մեկ։ Ամբողջ տուփերը ավելանում են փաթեթավորվածին, մնացորդը՝ առանձին հատերին։</span></div>
 
 <div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px"><h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545; font-size: 22px">📈 Օրական արտադրություն <span style="font-size: 13px; color: #6B756F; font-family: Manrope, sans-serif">(հատ)</span></h2><div class="cu-seg cu-seg2"><sc-for list="{{whRanges}}" as="x" hint-placeholder-count="3"><button type="button" onClick="{{x.pick}}" class="{{x.cls}}">{{x.l}}</button></sc-for></div></div>
@@ -1082,6 +1106,11 @@ var d7 = ymdL(new Date(day0.getTime() - 6 * 864e5)); var made7 = [0, 0, 0, 0, 0,
 var whF = st.whF || { d: ymdL(day0), p: 4, q: "", pack: true };
 var whTotPk = 0, whTotL = 0, whTotPcs = 0; stockQ.forEach(function (q, i) { whTotPk += q; whTotL += looseQ[i]; whTotPcs += q * PPK[i] + looseQ[i]; });
 var unitOf = function (i) { return i === 0 || i === 5 ? "տոպրակ" : (i >= 1 && i <= 3 ? "տարա" : "տուփ"); };
+var apS = {}; try { apS = JSON.parse(window.localStorage.getItem("noa-apri-st") || "{}") || {}; } catch (e) { apS = {}; }
+var apVals = { apC: apS.ok ? "#2FBF71" : (apS.at ? "#E0A030" : "#B9C2BE"), apSt: apS.ok ? "✓ Միացված է · վերջին թարմացում " + new Date(apS.at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) + (apS.unk && apS.unk.length ? " · չճանաչված ապրանք՝ " + apS.unk.join(", ") : "") : (apS.err || "Միացված չէ"), apTok: st.apTok || "",
+  apSetTok: function (e) { self.setState({ apTok: e.target.value }); },
+  apSave: function () { var tk = String(st.apTok || "").trim(); if (tk.length < 16) { window.alert("Տեղադրեք Supabase-ից ստացած բանալին։"); return; } if (!window.nofaApriSave) { window.alert("Սերվերը դեռ միացված չէ։"); return; } window.nofaApriSave(tk).then(function () { self.setState({ apTok: "", apT: Date.now() }); window.location.reload(); }, function () { window.alert("Չհաջողվեց պահել բանալին։"); }); },
+  apNow: function () { if (window.nofaApriSync) { window.nofaApriSync().then(function () { window.location.reload(); }); } } };
 var whVals = { whK: [[whTotPk.toLocaleString("en-US"), "տուփ փաթեթավորված"], [whTotL.toLocaleString("en-US"), "հատ չփաթեթավորված"], [whTotPcs.toLocaleString("en-US"), "հատ ընդամենը"]].map(function (x) { return { v: x[0], l: x[1] }; }),
   whTabs: [["stock", "📦 Մնացորդ"], ["plan", "🏭 Պլան"], ["prod", "📈 Արտադրություն"]].map(function (x) { return { l: x[1], cls: (st.whT || "stock") === x[0] ? "on" : "", pick: function () { self.setState({ whT: x[0] }); } }; }),
   whTStock: (st.whT || "stock") === "stock", whTPlan: st.whT === "plan", whTProd: st.whT === "prod",
@@ -1480,7 +1509,7 @@ var sgX = { ageBars: ageB.map(function (b) { return { l: b.l, n: String(b.r + b.
  sgCh: [["🌐 Կայք", chA.site], ["📞 Հեռախոս", chA.phone], ["📒 Գրքից", chA.book]].map(function (x) { return { l: x[0], n: String(x[1].n), v: money0(x[1].v), w: (X.rev ? x[1].v / X.rev * 100 : 0).toFixed(1) + "%" }; }),
  sgPaid: money0(X.paid), sgUn: money0(X.un), sgPaidW: (X.rev ? X.paid / X.rev * 100 : 0).toFixed(1) + "%" };
 Object.assign(sgVals, sgX);
-return Object.assign(sgVals, whVals, smVals, scVals, scVals2, cuVals, drvMgr, drvVals, { adBack: function () { try { window.history.back(); } catch (e) {} }, adFwd: function () { try { window.history.forward(); } catch (e) {} }, homeL: lang === "en" ? "Back to website" : "Վերադառնալ գլխավոր էջ", pkT: pkT, fullN: FULL, setFull: setFull, lvLegend: [["full", pkT.lFull, "≥ " + FULL], ["ok", pkT.lOk, LV_OK + "–" + (FULL - 1)], ["mid", pkT.lMid, (LV_LOW + 1) + "–" + (LV_OK - 1)], ["low", pkT.lLow, "1–" + LV_LOW], ["out", pkT.lOut, "0"]].map(function (x) { return { cls: x[0], name: x[1], range: x[2] + " " + pkT.unit }; }) }, dsVals, invVals, { regs: regs, noRegs: regs.length === 0, hasPendRegs: pendingApps > 0, t: t, langs: langs, navs: navs, kpis: kpis, tab0: tab === 0, tab1: tab === 1, tab2: tab === 2, tab3: tab === 3, tab4: tab === 4, tab5: tab === 5, tab6: tab === 6, tab7: tab === 7, tab8: tab === 8, tab9: tab === 9,
+return Object.assign(sgVals, apVals, whVals, smVals, scVals, scVals2, cuVals, drvMgr, drvVals, { adBack: function () { try { window.history.back(); } catch (e) {} }, adFwd: function () { try { window.history.forward(); } catch (e) {} }, homeL: lang === "en" ? "Back to website" : "Վերադառնալ գլխավոր էջ", pkT: pkT, fullN: FULL, setFull: setFull, lvLegend: [["full", pkT.lFull, "≥ " + FULL], ["ok", pkT.lOk, LV_OK + "–" + (FULL - 1)], ["mid", pkT.lMid, (LV_LOW + 1) + "–" + (LV_OK - 1)], ["low", pkT.lLow, "1–" + LV_LOW], ["out", pkT.lOut, "0"]].map(function (x) { return { cls: x[0], name: x[1], range: x[2] + " " + pkT.unit }; }) }, dsVals, invVals, { regs: regs, noRegs: regs.length === 0, hasPendRegs: pendingApps > 0, t: t, langs: langs, navs: navs, kpis: kpis, tab0: tab === 0, tab1: tab === 1, tab2: tab === 2, tab3: tab === 3, tab4: tab === 4, tab5: tab === 5, tab6: tab === 6, tab7: tab === 7, tab8: tab === 8, tab9: tab === 9,
 recent: orders.slice(0, 6).map(view), hasLow: lowIdx.length > 0, lowNames: lowIdx.map(function (i) { return t.pn[i]; }).join(", "), goStock: go(1),
 alerts: alerts, alertCount: alerts.length, hasAlerts: alerts.length > 0, bellOpen: !!st.bell, toggleBell: function () { self.setState({ bell: !st.bell }); },
 stock: stock, typeChips: typeChips, pfSum: pfSum, pfFx: pfFx, pfNet: pfNet, pfNetC: pfNetC, pfCnt: pfCnt, orderList: olist.map(view), hasCustFilter: cf >= 0, custFilter: cf >= 0 ? CUST[cf][0] : "", custCount: olist.length, custTotal: money(cfTot), clearCust: function () { self.setState({ cf: -1 }); },
