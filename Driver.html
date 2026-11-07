@@ -37,4 +37,18 @@ document.getElementById("go").onclick=function(){var v=function(i){return docume
  document.getElementById("c").innerHTML='<div class="ok"><b>✅</b><h1>Շնորհակալություն, '+esc(rec.name)+'</h1><p class="s">Ձեր գրանցումը ստացվել է։ Մենք կկապվենք ձեզ հետ, և առաքման ցուցակները կստանաք SMS-ով։</p><p class="s">Հարցերի դեպքում՝ <a href="tel:+15155885555">(515) 588-5555</a></p></div>';};}
 function err(t){document.getElementById("er").textContent=t;}
 form();
-</script></body></html>
+</script><script id="nofa-priv">
+(function () { if (window.__nofaPV) { return; } window.__nofaPV = 1;
+  var st = document.createElement("style"); st.textContent = "html.nofa-priv .nofa-pv{filter:blur(8px)!important;user-select:none;transition:filter .2s}html.nofa-priv .nofa-pv:hover{filter:blur(8px)!important}"; (document.head || document.documentElement).appendChild(st);
+  var RX = /[−-]?\$\s?\d[\d,]*(\.\d+)?/;
+  function on() { try { return localStorage.getItem("noa-priv") === "1"; } catch (e) { return false; } }
+  function mark() { if (!document.body) { return; } var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null); var n; while ((n = w.nextNode())) { var p = n.parentElement; if (!p || p.tagName === "SCRIPT" || p.tagName === "STYLE" || p.closest("[data-priv]")) { continue; } if (RX.test(n.nodeValue)) { if (!p.classList.contains("nofa-pv")) { p.classList.add("nofa-pv"); } } }  var I = document.querySelectorAll('input[type="number"]'); for (var j = 0; j < I.length; j++) { var el = I[j], pr = el.previousSibling, txt = ""; while (pr && !txt.trim()) { txt = pr.textContent || ""; pr = pr.previousSibling; } if (/\$\s*$/.test(txt) || /\$/.test((el.parentElement && el.parentElement.firstChild && el.parentElement.firstChild.textContent) || "")) { el.classList.add("nofa-pv"); } } }
+  function apply() { document.documentElement.classList.toggle("nofa-priv", on()); var b = document.querySelectorAll("[data-priv]"); for (var i = 0; i < b.length; i++) { b[i].classList.toggle("on", on()); b[i].textContent = on() ? "🙈 Թաքցված" : "👁 Գումարներ"; b[i].title = on() ? "Ցույց տալ գումարները" : "Թաքցնել գումարները"; } }
+  document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest("[data-priv]"); if (!b) { return; } e.preventDefault(); e.stopPropagation(); try { localStorage.setItem("noa-priv", on() ? "0" : "1"); } catch (x) {} apply(); }, true);
+  window.addEventListener("storage", function (e) { if (e.key === "noa-priv") { apply(); } });
+  var t = null; function sched() { clearTimeout(t); t = setTimeout(function () { mark(); apply(); }, 120); }
+  function start() { mark(); apply(); try { new MutationObserver(sched).observe(document.body, { childList: true, subtree: true, characterData: true }); } catch (e) {} setInterval(function () { mark(); }, 1500); }
+  if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", start); } else { start(); }
+})();
+</script>
+</body></html>
