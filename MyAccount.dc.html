@@ -35,10 +35,13 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
   aside.sum-card[style*="position: sticky"], aside.card3d[style*="position: sticky"] { overflow-y: auto; overscroll-behavior: contain; padding-bottom: 18px !important; scrollbar-width: thin; scrollbar-color: rgba(235,169,58,.55) transparent; }
   aside[style*="top: 145px"][style*="position: sticky"] { max-height: calc(100vh - 160px); }
   aside[style*="top: 170px"][style*="position: sticky"] { max-height: calc(100vh - 186px); }
-  .ms-arrow { position: fixed; z-index: 70; width: 44px; height: 44px; border-radius: 50%; border: 2px solid #EBA93A; background: rgba(19,59,48,.92); color: #F6C35A; font-size: 26px; line-height: 1; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,.25); padding: 0 0 6px; }
-  .ms-arrow.ms-up { padding: 8px 0 0; }
-  .ms-arrow.ms-dn { animation: msb 1.6s ease-in-out infinite; }
-  @keyframes msb { 0%,100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+  .ms-arrow { position: fixed; z-index: 70; width: 22px; height: 18px; border: 0; background: none; padding: 0; cursor: pointer; color: #C9922E; opacity: .9; display: flex; align-items: center; justify-content: center; }
+  .ms-arrow svg { width: 18px; height: 10px; display: block; }
+  .ms-arrow:hover { opacity: 1; color: #EBA93A; }
+  .ms-arrow.ms-dn { animation: msb 1.8s ease-in-out infinite; }
+  .ms-arrow.ms-up { animation: msu 1.8s ease-in-out infinite; }
+  @keyframes msb { 0%,100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+  @keyframes msu { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
   aside.sum-card::-webkit-scrollbar { width: 6px; } aside.sum-card::-webkit-scrollbar-thumb { background: rgba(235,169,58,.55); border-radius: 9px; }
 }
 </style>
@@ -1140,12 +1143,12 @@ return Object.assign(plVals, extVals, dzVals, lgVals, chVals, avVals, ivVals, rd
   function zf(el) { return (el.getBoundingClientRect().height / (el.offsetHeight || 1)) || 1; }
   function fit(el) { if (window.innerWidth < 900) { el.style.maxHeight = ""; return; } var z = zf(el); var top = parseFloat(el.style.top) || 0; var mh = Math.max(200, Math.floor((window.innerHeight - top * z - 18) / z)); if (el.style.maxHeight !== mh + "px") { el.style.maxHeight = mh + "px"; } }
   var ind = {};
-  function mk(dir) { var d = document.createElement("button"); d.type = "button"; d.className = "ms-arrow ms-" + dir; d.setAttribute("aria-label", dir === "dn" ? "Թերթել ներքև" : "Թերթել վերև"); d.innerHTML = dir === "dn" ? "&#8964;" : "&#8963;"; d.style.display = "none"; document.body.appendChild(d); return d; }
+  function mk(dir) { var d = document.createElement("button"); d.type = "button"; d.className = "ms-arrow ms-" + dir; d.setAttribute("aria-label", dir === "dn" ? "Թերթել ներքև" : "Թերթել վերև"); d.innerHTML = dir === "dn" ? '<svg viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1.5l8 7 8-7"/></svg>' : '<svg viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 8.5l8-7 8 7"/></svg>'; d.style.display = "none"; document.body.appendChild(d); return d; }
   function aside() { return document.querySelector('aside.sum-card[style*="position: sticky"]') || document.querySelector('aside[style*="position: sticky"]'); }
   function upd() { var el = aside(); if (!el) { return; } fit(el); if (!ind.dn) { ind.dn = mk("dn"); ind.up = mk("up"); ind.dn.onclick = function () { var a = aside(); if (a) { a.scrollBy({ top: a.clientHeight * 0.6, behavior: "smooth" }); } }; ind.up.onclick = function () { var a = aside(); if (a) { a.scrollBy({ top: -a.clientHeight * 0.6, behavior: "smooth" }); } }; }
     var r = el.getBoundingClientRect(); var more = el.scrollHeight - el.clientHeight - el.scrollTop > 4; var less = el.scrollTop > 4; var on = window.innerWidth >= 900 && r.height > 0;
     ind.dn.style.display = on && more ? "flex" : "none"; ind.up.style.display = on && less ? "flex" : "none";
-    var hz = parseFloat(getComputedStyle(document.documentElement).zoom) || 1; if (document.body) { hz *= parseFloat(getComputedStyle(document.body).zoom) || 1; } ind.dn.style.left = ind.up.style.left = ((r.left + r.width / 2) / hz - 22) + "px"; ind.dn.style.top = (r.bottom / hz - 52) + "px"; ind.up.style.top = (r.top / hz + 6) + "px"; }
+    var hz = parseFloat(getComputedStyle(document.documentElement).zoom) || 1; if (document.body) { hz *= parseFloat(getComputedStyle(document.body).zoom) || 1; } ind.dn.style.left = ind.up.style.left = (r.right / hz + 3) + "px"; ind.dn.style.top = (r.bottom / hz - 30) + "px"; ind.up.style.top = (r.top / hz + 12) + "px"; }
   window.addEventListener("resize", upd); window.addEventListener("scroll", upd, { passive: true }); document.addEventListener("scroll", function (e) { if (e.target && e.target.tagName === "ASIDE") { upd(); } }, true);
   setInterval(upd, 600); setTimeout(upd, 300);
 })();
