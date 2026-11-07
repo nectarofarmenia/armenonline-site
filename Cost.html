@@ -114,7 +114,7 @@ input:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
 .tabs{padding:9px 12px}.tab{min-height:34px;font-size:13.5px}.tab i{width:26px;height:26px;font-size:13px}
 .sumk{gap:10px;margin-top:12px}.sk{padding:9px 12px;border-radius:14px;gap:10px;box-shadow:none}.sk i{width:34px;height:34px;font-size:17px;border-radius:11px}.sk b{font-size:16px}
 .pl{margin-top:12px;background:#fff;border-radius:20px;border:1px solid #ECE3CF;box-shadow:0 8px 24px rgba(29,85,69,.07);overflow:hidden}
-.lg{display:grid;grid-template-columns:minmax(170px,1.3fr) repeat(4,minmax(64px,.62fr)) repeat(3,minmax(104px,1fr)) 34px;gap:8px;align-items:center;padding:8px 14px}
+.lg{display:grid;grid-template-columns:minmax(150px,1.2fr) repeat(4,minmax(58px,.6fr)) repeat(3,minmax(96px,1fr)) 30px;gap:8px;align-items:center;padding:8px 14px}
 .lh{background:#F3EBD7;border-bottom:1px solid #E4DCC8;font-size:11px;font-weight:800;color:#7A5A12;text-transform:uppercase;letter-spacing:.04em;line-height:1.2}
 .lh .cg{grid-column:2/6;display:flex;justify-content:center;border-bottom:1.5px solid #D9C79C;padding-bottom:3px;color:#1D5545}
 .lh .pg{grid-column:6/9;display:flex;justify-content:center;border-bottom:1.5px solid #D9C79C;padding-bottom:3px;color:#1D5545}
@@ -136,9 +136,24 @@ input:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
 .tg{width:30px;height:30px;border-radius:50%;border:1.5px solid #E4DCC8;background:#fff;color:var(--g);cursor:pointer;font-weight:800}
 .lr.on .tg,.tg:hover{background:#F3EBD7;border-color:#EBA93A}
 .lrec{padding:12px 16px 16px;background:#FCFAF5;border-bottom:1px solid #F0E8D6}
-@media (max-width:1000px){.lh{display:none}.lg.lr{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:8px;padding:12px}.lr .li{grid-column:1/4}.lr .tg{grid-column:4;justify-self:end}
+@media (max-width:860px){.lh{display:none}.lg.lr{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:8px;padding:12px}.lr .li{grid-column:1/4}.lr .tg{grid-column:4;justify-self:end}
  .lr .lc{display:flex;flex-direction:column;gap:2px}.lr .lc:before{content:attr(data-l);font-size:10.5px;font-weight:800;color:#8A7A55}
  .lr .lp{grid-column:span 4;flex-direction:row;align-items:center;gap:10px;border-top:1px dashed #EDE3CC;padding-top:6px}.lr .lp:before{content:attr(data-l);font-size:11px;font-weight:800;color:#7A5A12;flex:0 0 110px}.lr .lp .pp{flex:0 0 100px}.lr .lp .pr{flex:1}.lr .lp .bar{display:none}}
+
+.lq-l{grid-column:1;font-size:12px;font-weight:800;color:#7A5A12;display:flex;flex-direction:column;padding-left:48px;line-height:1.2;padding-left:0!important}.lq-l small{font-weight:600;color:var(--mut)}
+.lq-s{grid-column:2/6;display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:baseline;gap:5px;padding:4px 10px;border-radius:999px;background:#F6F1E4;font-size:12.5px;font-weight:700;color:#5E6A63;white-space:nowrap}
+.chip b{font-size:13.5px;color:#1E2A24;font-variant-numeric:tabular-nums}
+.chip.pf{background:#E3F2E8}.chip.pf b{color:#2F7A55}.chip.ng{background:#FBE3E0}.chip.ng b{color:#B03A2E}
+.lq-i input.n{min-height:30px;background:#FFFBEF;border-style:dashed}
+.lr{row-gap:8px;padding-top:10px;padding-bottom:10px}
+.lt{background:linear-gradient(135deg,#246350,#1D5545 50%,#133B30);color:#F6E3B4;padding:14px}
+.lt-l{font-family:Fraunces,'Noto Serif Armenian',Lora,serif;font-size:18px;font-weight:600;display:flex;flex-direction:column;line-height:1.15}.lt-l small{font-family:Manrope,'Noto Sans Armenian',sans-serif;font-size:11.5px;color:#BFD6CB;font-weight:600}
+.lt-s{grid-column:2/6;display:flex;flex-wrap:wrap;gap:6px}
+.lt .chip{background:rgba(255,255,255,.1);color:#BFD6CB}.lt .chip b{color:#F7F3EA}.lt .chip.pf{background:#EBA93A;color:#133B30}.lt .chip.pf b{color:#133B30}.lt .chip.ng{background:#B03A2E;color:#fff}.lt .chip.ng b{color:#fff}
+.lt-c{font-size:12px;color:#BFD6CB;line-height:1.35;font-weight:600}.lt-c b{color:#F7F3EA;font-size:13.5px}
+@media (max-width:860px){.lq-l{grid-column:1/-1;padding-left:0;flex-direction:row;gap:6px}.lq-s{grid-column:1/-1}.lq-i{grid-column:span 4;display:flex;align-items:center;gap:10px}.lq-i:before{content:attr(data-l);font-size:11px;font-weight:800;color:#7A5A12;flex:0 0 110px}.lq-i input.n{width:100px}
+ .lg.lt{grid-template-columns:1fr;gap:8px}.lt-s{grid-column:1}.lt-c:before{content:attr(data-l)": ";font-weight:800}}
 @media (max-width:640px){h1{font-size:22px}.card{padding:14px;border-radius:18px}}
 @media print{.tabs,.btn,.x,.standalone{display:none}}
 </style>
@@ -213,8 +228,12 @@ function viewProd(){var h='<div class="sumk">'+[["📈","Միջին շահութ
     h+='<div class="lc lv" data-l="Հումք">'+out("mat."+i)+'</div><div class="lc" data-l="Աշխատավարձ">'+inp("p."+i+".labor",p.labor)+'</div><div class="lc" data-l="Տուփ">'+inp("p."+i+".pack",p.pack)+'</div><div class="lc lv tot" data-l="Ինքնարժեք">'+out("cost."+i)+'</div>';
     CH.forEach(function(c,j){if(noWs(p)&&j>0){h+='<div class="lp na" data-l="'+LBL[j]+'">մեծածախ չկա</div>';return;}
       h+='<div class="lp" data-l="'+LBL[j]+'"><div class="pp"><em>$</em>'+inp("p."+i+".pr."+j,p.pr[j])+'</div><div class="pr">'+out("pf."+i+"."+j)+out("mp."+i+"."+j)+'</div><div class="bar">'+out("bar."+i+"."+j)+'</div></div>';});
-    h+='<button type="button" class="tg" title="Բաղադրություն" data-act="open" data-p="'+i+'">'+(open?"▴":"▾")+'</button></div>';
+    h+='<button type="button" class="tg" title="Բաղադրություն" data-act="open" data-p="'+i+'">'+(open?"▴":"▾")+'</button>';
+    h+='<div class="lq-l">Վաճառված<small>քանակը, '+esc(p.unit)+'</small></div><div class="lq-s">'+out("qs."+i)+'</div>';
+    CH.forEach(function(c,j){h+='<div class="lq-i" data-l="'+LBL[j]+'">'+(noWs(p)&&j>0?'':inp("mo."+p.id+"."+j,S.month[p.id+"."+j]||0,"",1))+'</div>';});
+    h+='<span></span></div>';
     if(open){h+='<div class="lrec">'+recipe(p,i)+'</div>';}});
+  h+='<div class="lg lt"><div class="lt-l">Ընդհանուր<small>բոլոր ապրանքները</small></div><div class="lt-s">'+out("TS")+'</div>'+[0,1,2].map(function(j){return '<div class="lt-c" data-l="'+LBL[j]+'">'+out("TC."+j)+'</div>';}).join("")+'<span></span></div>';
   h+='</div><div class="legend"><span>Սեղմեք ապրանքի անվան կամ ▾-ի վրա՝ բաղադրությունը բացելու համար։</span><span>Շահույթ = գին − (հումք + աշխատավարձ) × հատ − տուփ/լեյբլ («առանց փաթեթի» գնի մեջ տուփ չկա)</span></div>';
   return h;}
 function recipe(p,i){var M=ingMap();
@@ -262,7 +281,7 @@ function set(k,html){var els=document.querySelectorAll('[data-o="'+k+'"]');for(v
 function pf(v){return '<span class="'+(v>=0?"pos":"neg")+'">'+m(v)+'</span>';}
 function update(){var M=ingMap();
   S.ing.forEach(function(g,k){set("ik."+k,m(perG(g)*1000));});
-  var T={q:0,r:0,mat:0,lab:0,pack:0};
+  var T={q:0,r:0,mat:0,lab:0,pack:0};var TC=[{q:0,r:0,p:0},{q:0,r:0,p:0},{q:0,r:0,p:0}];
   S.prod.forEach(function(p,i){var c=calc(p);set("mat."+i,m3(c.mat));set("mat2."+i,m3(c.mat));set("tc."+i,m(c.batchCost));set("tg."+i,Math.round(c.batchG).toLocaleString("en-US")+" գ");
     set("cost."+i,m(c.cost[0]));
     CH.forEach(function(ch,j){var pr=p.pr[j];var mg=pr>0?c.profit[j]/pr:0;var cl=mg>=0.35?"g":(mg>=0.2?"y":"r");var col={g:"#2F7A55",y:"#E0A030",r:"#B03A2E"}[cl];
@@ -275,10 +294,14 @@ function update(){var M=ingMap();
     p.rec.forEach(function(r,k){var g=M[r[0]];var cost=r[1]*perG(g);set("rk."+i+"."+k,m(perG(g)*1000));set("rc."+i+"."+k,m(cost));set("rp."+i+"."+k,m3(cost/(p.batch||1)));});
     var q=0,rev=0,pk=0;CH.forEach(function(ch,j){var n=num(S.month[p.id+"."+j]);q+=n;rev+=n*p.pr[j];if(ch[1]!=="wu"){pk+=n*p.pack;}});
     var pcs=q*p.unitPcs;var mat=pcs*c.mat,lab=pcs*p.labor;var prof=rev-mat-lab-pk;
+    CH.forEach(function(ch,j){var n=noWs(p)&&j>0?0:num(S.month[p.id+"."+j]);TC[j].q+=n*p.unitPcs;TC[j].r+=n*p.pr[j];TC[j].p+=n*c.profit[j];});
+    set("qs."+i,q?'<span class="chip">Ընդ. քանակ <b>'+pcs.toLocaleString("en-US")+' հատ</b></span><span class="chip">Ընդ. արժեք <b>'+m(rev)+'</b></span><span class="chip">Ծախս <b>'+m(mat+lab+pk)+'</b></span><span class="chip '+(prof>=0?"pf":"ng")+'">Օգուտ <b>'+m(prof)+'</b></span>':'<span class="mini">Գրեք վաճառված քանակը՝ օգուտը տեսնելու համար</span>');
     set("mq."+i,pcs?pcs.toLocaleString("en-US"):"—");set("mr."+i,m(rev));set("ml."+i,m(lab));set("mp."+i,pf(prof));
     T.q+=pcs;T.r+=rev;T.mat+=mat;T.lab+=lab;T.pack+=pk;});
   var rk=S.prod.map(function(p){var c=calc(p);return {n:p.name,mg:p.pr[0]>0?c.profit[0]/p.pr[0]:null};}).filter(function(x){return x.mg!==null;});
   if(rk.length){var av=0;rk.forEach(function(x){av+=x.mg;});rk.sort(function(a,b){return b.mg-a.mg;});set("S1",pct(av/rk.length));set("S2",esc(rk[0].n)+' <span class="mp g">'+pct(rk[0].mg)+'</span>');set("S3",esc(rk[rk.length-1].n)+' <span class="mp '+(rk[rk.length-1].mg>=0.2?"y":"r")+'">'+pct(rk[rk.length-1].mg)+'</span>');}
+  var tp=T.r-T.mat-T.lab-T.pack;set("TS",'<span class="chip">Ընդ. քանակ <b>'+T.q.toLocaleString("en-US")+' հատ</b></span><span class="chip">Ընդ. արժեք <b>'+m(T.r)+'</b></span><span class="chip">Հումք <b>'+m(T.mat)+'</b></span><span class="chip">Աշխատավարձ <b>'+m(T.lab)+'</b></span><span class="chip">Տուփ <b>'+m(T.pack)+'</b></span><span class="chip '+(tp>=0?"pf":"ng")+'">Օգուտ <b>'+m(tp)+'</b></span>');
+  TC.forEach(function(x,j){set("TC."+j,x.q?'<b>'+x.q.toLocaleString("en-US")+'</b> հատ · <b>'+m(x.r)+'</b><br>օգուտ <b>'+m(x.p)+'</b>':'—');});
   var fx=0;S.fixed.forEach(function(f){fx+=num(f[1]);});var net=T.r-T.mat-T.lab-T.pack-fx;
   set("MQ",T.q.toLocaleString("en-US"));set("MR",m(T.r));set("ML",m(T.lab));set("MP",pf(T.r-T.mat-T.lab-T.pack));
   set("K1",m(T.r));set("K2",m(T.mat));set("K3",m(T.lab));set("K4",m(T.pack));set("K5",m(fx));set("K6",pf(net));set("K7",T.r?pct(net/T.r):"—");
