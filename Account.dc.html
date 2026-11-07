@@ -36,7 +36,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
   var TOP = window.top === window;
   var API = "api/api.php";
   var ADMIN_PAGE = /(Admin\.dc|Cost|Invoices|Map|Invite)\.html$/i.test(location.pathname);
-  var SHARED = /^noa-(accounts|orders|ws-orders(\|.*)?|chat(\|.*)?|cost-v2|inv2|invites(\|.*)?|drivers|paycfg|admin-ov|stock|stock-full|stock-pcs|prod|theme-sel|theme-dates|notify|cities|city-req|members\|.*|deposit\|.*|depsign\|.*|rewards\|.*|refs|geo|invoices)$/;
+  var SHARED = /^noa-(accounts|orders|ws-orders(\|.*)?|chat(\|.*)?|cost-v2|inv2|invites(\|.*)?|drivers|paycfg|admin-ov|stock|stock-full|stock-pcs|prod|theme-sel|theme-dates|notify|cities|city-req|members\|.*|deposit\|.*|depsign\|.*|rewards\|.*|refs|geo|invoices|dlv)$/;
   var META = "noa-sync-meta";
   function LG(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function LS(k, v) { try { if (v === null) { localStorage.removeItem(k); } else { localStorage.setItem(k, v); } } catch (e) {} }
@@ -124,6 +124,50 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
       if (changed) { LS("noa-prod", JSON.stringify(L)); LS("noa-stock", JSON.stringify(S)); LS("noa-stock-pcs", JSON.stringify(Lo)); }
       return changed; }).catch(function () { LS("noa-apri-st", JSON.stringify({ ok: false, err: "Կապի սխալ", at: new Date().toISOString() })); return false; });
   }
+  /* Drivers (My Apri Work): push open stops assigned to My Apri drivers, pull delivery results. */
+  var drvBusy = false;
+  function drvPush() {
+    var S = window.__nofaStops; if (!S || !S.ready) { return Promise.resolve(false); }
+    var body = JSON.stringify(S.rows || []); var hh = h(body); if (LG("noa-dlv-ph") === hh && Date.now() - (+LG("noa-dlv-pt") || 0) < 600000) { return Promise.resolve(false); }
+    return req("apri_push", { rows: S.rows || [] }).then(function (j) { if (j.ok) { LS("noa-dlv-ph", hh); LS("noa-dlv-pt", String(Date.now())); } return !!j.ok; });
+  }
+  function today0() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  function invTot(v) { var sub = 0; (v.lines || []).forEach(function (l) { sub += (+l.q || 0) * (+l.pr || 0); }); var base = Math.max(0, sub - (+v.disc || 0)); return base + base * (+v.tax || 0) / 100 + (+v.ship || 0); }
+  function applyDelivered(id, r) {
+    var ch = false, paid = (+r.cash || 0) + (+r.zelle || 0);
+    // website wholesale orders: mark delivered so the customer sees it in their account
+    for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (!k || k.indexOf("noa-ws-orders|") !== 0) { continue; } var L = J(k, []); var hit = false;
+      (L || []).forEach(function (o) { if (o && String(o.no || "").replace(/^NOA-/, "NofA-") === id && o.st !== 2) { o.st = 2; o.deliveredAt = r.at || new Date().toISOString(); if (paid > 0 && !o.chargedAt) { o.chargedAt = r.at || new Date().toISOString(); } hit = true; } });
+      if (hit) { LS(k, JSON.stringify(L)); ch = true; } }
+    // phone / book orders: mark served, record payment on the order and its invoice
+    var C = J("noa-cost-v2", null); var call = null;
+    if (C && Array.isArray(C.calls)) { C.calls.forEach(function (c) { if ("NofA-T-" + String(c.id || "").slice(-5) === id) { call = c; } }); }
+    if (call) { var cc = false; if (!call.past) { call.past = true; cc = true; } if (paid > 0 && !call.paid) { call.paid = true; cc = true; } if (cc) { LS("noa-cost-v2", JSON.stringify(C)); ch = true; } }
+    if (call && paid > 0) { var D = J("noa-inv2", null); if (D && Array.isArray(D.list)) { var dch = false;
+      D.list.forEach(function (v) { if (!v || (v.ord || []).indexOf(call.id) < 0 || v.st === "paid" || v.st === "void") { return; } var tag = "dlv:" + id; if ((v.log || []).some(function (x) { return x[2] === tag; })) { return; }
+        var amt = Math.min(paid, Math.max(0, invTot(v) - (+((v.paid || {}).amt) || 0))); if (amt <= 0) { return; }
+        var m = (+r.zelle || 0) > (+r.cash || 0) ? "Zelle" : "Կանխիկ"; var tot = (+((v.paid || {}).amt) || 0) + amt;
+        v.paid = { d: today0(), m: m, amt: tot }; if (tot >= invTot(v) - 0.005) { v.st = "paid"; } else if (v.st === "draft") { v.st = "sent"; }
+        (v.log = v.log || []).push([new Date().toISOString(), "Վճարում " + "$" + amt.toFixed(2) + " · " + m + " · վարորդը ստացավ առաքման ժամանակ", tag]); dch = true; });
+      if (dch) { LS("noa-inv2", JSON.stringify(D)); ch = true; } } }
+    return ch;
+  }
+  function drvPull() {
+    var D = J("noa-dlv", {}); var since = D.__t || "";
+    return req("apri_dstatus" + (since ? "&since=" + encodeURIComponent(since) : "")).then(function (j) {
+      if (!j.ok || !Array.isArray(j.data)) { return 0; } var n = 0, news = [];
+      j.data.forEach(function (r) { var res = r.result || {}; var old = D[r.id];
+        if (r.status === "assigned") { if (old) { delete D[r.id]; n++; } }
+        else { var rec = { s: r.status, at: res.at || r.updated_at, cash: +res.cash || 0, zelle: +res.zelle || 0, reason: res.reason || "", note: res.note || "", signer: res.signer || "", ph: !!r.has_photo, sig: !!r.has_sig };
+          if (!old || old.s !== rec.s || old.at !== rec.at) { D[r.id] = rec; n++; if (r.status === "delivered") { applyDelivered(r.id, rec); news.push(r.id); } } }
+        if (!D.__t || String(r.updated_at) > D.__t) { D.__t = String(r.updated_at); } });
+      if (n || j.data.length) { LS("noa-dlv", JSON.stringify(D)); }
+      if (news.length) { toast("🚚 Առաքված է՝ " + news.join(", ")); }
+      return n; });
+  }
+  function drvSync() { if (drvBusy) { return Promise.resolve(0); } drvBusy = true; return drvPush().catch(function () {}).then(drvPull).catch(function () { return 0; }).finally(function () { drvBusy = false; }); }
+  window.nofaDrvSync = drvSync;
+  window.nofaApriDrivers = function () { return req("apri_drivers").then(function (j) { if (!j.ok) { throw j; } return j.data || []; }); };
   window.nofaApriSave = function (tok) { return req("apri_cfg", { token: tok }).then(function (j) { if (!j.ok) { throw j; } return apriSync(); }); };
   window.nofaApriSync = apriSync;
   function startAdmin() {
@@ -133,6 +177,8 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
     setInterval(function () { adminInbox().then(function (n) { if (n) { toast("📥 Նոր տվյալներ հաճախորդներից"); return adminPush().then(function () { if (idle()) { location.reload(); } }); } }).catch(function () {}); }, 30000);
     setTimeout(function () { apriSync().then(function (c) { if (c) { return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 2500);
     setInterval(function () { apriSync().then(function (c) { if (c) { toast("🏭 Նոր արտադրություն My Apri-ից"); return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 180000);
+    setTimeout(function () { drvSync().then(function (n) { if (n) { return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 6000);
+    setInterval(function () { drvSync().then(function (n) { if (n) { return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 60000);
     setInterval(function () { if (!idle()) { return; } adminPull(false).then(function (c) { if (c && idle()) { location.reload(); } }).catch(function () {}); }, 45000);
     window.addEventListener("beforeunload", function () { try { var m = meta(), items = []; sharedKeys().forEach(function (k) { var v = LG(k); if (!m[k] || m[k].h !== h(v)) { items.push({ k: k, v: v }); } }); if (items.length) { fetch(API + "?a=put", { method: "POST", credentials: "same-origin", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items: items }) }); } } catch (e) {} });
   }
