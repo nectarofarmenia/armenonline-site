@@ -253,6 +253,10 @@ td.k input.n{border-color:#8CC5A2;background:#F1F7F3;font-weight:800}
 .pst.ok{border-color:#8CC5A2;background:#E3F2E8;color:#2F7A55}
 .psel{min-height:30px!important;padding:2px 6px!important;font-size:12.5px}
 @media (max-width:860px){.mgg,.mg2{grid-template-columns:1fr}.pof{grid-template-columns:1fr 1fr}.pll{grid-template-columns:1fr 90px 70px;}.pll span.mini{display:none}}
+
+.persel{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.persel select{min-height:38px;border-radius:999px;padding:4px 12px;font-weight:800;color:#1D5545}
+.pnow{padding:7px 14px!important;font-size:13px!important}
+.perl{display:inline-block;margin-top:10px;padding:5px 12px;border-radius:999px;background:#E8F1EC;color:#1D5545;font-weight:800;font-size:13.5px}
 @media (max-width:860px){.lh{display:none}.lg.lr{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:8px;padding:12px}.lr .li{grid-column:1/4}.lr .tg{grid-column:4;justify-self:end}
  .lr .lc{display:flex;flex-direction:column;gap:2px}.lr .lc:before{content:attr(data-l);font-size:10.5px;font-weight:800;color:#8A7A55}
  .lr .lp{grid-column:span 4;flex-direction:row;align-items:center;gap:10px;border-top:1px dashed #EDE3CC;padding-top:6px}.lr .lp:before{content:attr(data-l);font-size:11px;font-weight:800;color:#7A5A12;flex:0 0 110px}.lr .lp .pp{flex:0 0 100px}.lr .lp .pr{flex:1}.lr .lp .bar{display:none}}
@@ -330,7 +334,7 @@ function per(j,p){return j%2===0?p.unit:"հատ";}
 var TABS=[["prod","📦","Ապրանքներ"],["sum","📋","Ամփոփում"],["ing","🥩","Հումքի գներ"],["bag","🛍","Տոպրակներ"],["month","🧾","Հաշվարկ"],["notes","⚠️","Ուշադրություն"]];
 var ICO={khinkali:"🥟",pelmeni:"🥟",blinchik:"🌯",kufta:"🧆",kiev:"🍗",chcut:"🍗",beefcut:"🥩",gata:"🥐",khash:"🍲"};
 function renderTabs(){$("#tabs").innerHTML=TABS.map(function(t){return '<button type="button" class="tab'+(S.tab===t[0]?" on":"")+'" data-tab="'+t[0]+'"><i>'+t[1]+'</i>'+t[2]+'</button>';}).join("");}
-document.addEventListener("click",function(e){var pe=e.target.closest("[data-per]");if(pe){S.per=pe.getAttribute("data-per");save();render();return;}
+document.addEventListener("click",function(e){var pe=e.target.closest("[data-per]");if(pe){var pv=pe.getAttribute("data-per");if(pv==="now"){var nn=new Date();S.per="m";S.pm=nn.getMonth();S.py=nn.getFullYear();}else{S.per=pv;}save();render();return;}
   var dt=e.target.closest("[data-dt]");if(dt){S.draft.type=dt.getAttribute("data-dt");if(S.draft.type==="w"){S.draft.lines=S.draft.lines.filter(function(l){return avail(S.prod[+l[0]],2);});if(!S.draft.lines.length){S.draft.lines=[[pidx("khinkali"),0,1]];}}save();render();return;}
   var dp=e.target.closest("[data-dp]");if(dp){S.draft.pay=dp.getAttribute("data-dp");save();render();return;}
   var iv=e.target.closest("[data-iv]");if(iv){S.ingView=iv.getAttribute("data-iv");save();render();return;}var u=e.target.closest("[data-unit]");if(u){S.wu=u.getAttribute("data-unit");save();render();return;}var t=e.target.closest("[data-tab]");if(t){S.tab=t.getAttribute("data-tab");save();render();return;}
@@ -360,11 +364,12 @@ document.addEventListener("input",function(e){var el=e.target;var k=el.getAttrib
   else if(a[0]==="ub"){S.prod[+a[1]].useBag=el.checked;save();render();return;}
   else if(a[0]==="dr"){S.draft[a[1]]=a[1]==="paid"?el.checked:el.value;save();return;}
   else if(a[0]==="dl"){var ln=S.draft.lines[+a[1]];ln[+a[2]]=a[2]==="2"?v:+el.value;save();if(a[2]==="2"){var dtot=document.getElementById("dtot");if(dtot){dtot.textContent=m(draftTotal());}}return;}
+  else if(a[0]==="pm"||a[0]==="py"){S[a[0]]=+el.value;save();render();return;}
   else if(a[0]==="cp"){S.calls[+a[1]].pay=el.value;save();return;}
   else if(a[0]==="mo"){S.month[a[1]+"."+a[2]]=v;}
   else if(a[0]==="fx"){S.fixed[+a[1]][+a[2]]=v;}
   save();update();});
-document.addEventListener("change",function(e){var k=e.target.getAttribute("data-k")||"";if(e.target.tagName==="SELECT"&&k&&k.indexOf("ingu.")!==0&&k.indexOf("cp.")!==0){render();}});
+document.addEventListener("change",function(e){var k=e.target.getAttribute("data-k")||"";if(e.target.tagName==="SELECT"&&k&&k.indexOf("ingu.")!==0&&k.indexOf("cp.")!==0&&k!=="pm"&&k!=="py"){render();}});
 
 function inp(k,v,cls,step){return '<input type="number" inputmode="decimal" step="'+(step||"any")+'" min="0" class="n '+(cls||"")+'" data-k="'+k+'" value="'+v+'">';}
 function out(k){return '<span data-o="'+k+'"></span>';}
@@ -467,8 +472,11 @@ function sales(){var out=[];
   try{for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(!key||key.indexOf("noa-ws-orders|")!==0||key==="noa-ws-orders|demo"){continue;}(JSON.parse(localStorage.getItem(key)||"[]")||[]).forEach(function(o){if(!o||o.ap!=="approved"){return;}var ls=[];(o.items||[]).forEach(function(x){var pi=pidx(SITE2ID[x[0]]);if(pi>=0){ls.push({pi:pi,j:2,q:num(x[1])});}});out.push({src:"site",type:"w",date:String(o.date||"").slice(0,10),name:key.slice(14),pay:"site",paid:!!o.chargedAt,lines:ls,total:null});});}}catch(e){}
   out.forEach(function(s){var cost=0,rev=0,pcs=0;s.lines.forEach(function(l){var p=S.prod[l.pi];if(!p){return;}var c=calc(p);rev+=l.q*p.pr[l.j];cost+=l.q*c.cost[l.j];pcs+=l.q*(l.j%2===0?p.packPcs:1);l.rev=l.q*p.pr[l.j];l.cost=l.q*c.cost[l.j];l.pcs=l.q*(l.j%2===0?p.packPcs:1);});if(s.total==null){s.total=rev;}s.cost=cost;s.profit=s.total-cost;s.pcs=pcs;});
   return out;}
-function inPeriod(d){var P=S.per||"month";if(P==="all"||!d){return P==="all"||!d?true:true;}var now=new Date();var y=now.getFullYear(),mo=now.getMonth();var dt=new Date(d+"T12:00:00");if(isNaN(dt)){return P==="all";}
-  if(P==="month"){return dt.getFullYear()===y&&dt.getMonth()===mo;}if(P==="prev"){var pm=new Date(y,mo-1,1);return dt.getFullYear()===pm.getFullYear()&&dt.getMonth()===pm.getMonth();}if(P==="year"){return dt.getFullYear()===y;}return true;}
+var MOS=["Հունվար","Փետրվար","Մարտ","Ապրիլ","Մայիս","Հունիս","Հուլիս","Օգոստոս","Սեպտեմբեր","Հոկտեմբեր","Նոյեմբեր","Դեկտեմբեր"];
+function perInit(){var n=new Date();if(S.per!=="m"&&S.per!=="y"&&S.per!=="all"){S.per="m";}if(S.pm==null){S.pm=n.getMonth();}if(S.py==null){S.py=n.getFullYear();}}
+function inPeriod(d){perInit();if(S.per==="all"){return true;}var dt=new Date(String(d||"").slice(0,10)+"T12:00:00");if(isNaN(dt)){return false;}
+  if(dt.getFullYear()!==+S.py){return false;}return S.per==="y"||dt.getMonth()===+S.pm;}
+function perLabel(){perInit();return S.per==="all"?"Բոլոր ժամանակները":S.per==="y"?S.py+" թ.":MOS[+S.pm]+" "+S.py;}
 function draftTotal(){var d=S.draft;var t=0;d.lines.forEach(function(l){var p=S.prod[+l[0]];if(p){t+=num(l[2])*p.pr[chOf(d.type,+l[1])];}});return t;}
 function viewCalc(){if(!S.draft){S.draft=newDraft();}if(!S.calls){S.calls=[];}var d=S.draft;
   var all=sales().filter(function(s){return inPeriod(s.date);});
@@ -477,8 +485,9 @@ function viewCalc(){if(!S.draft){S.draft=newDraft();}if(!S.calls){S.calls=[];}va
     s.lines.forEach(function(l){var b=BYP[l.pi];if(!b){return;}b[s.type==="w"?"w":"r"]+=l.pcs;b.rev+=l.rev||0;b.pf+=(l.rev||0)-(l.cost||0);});});
   var T={n:G.r.n+G.w.n,rev:G.r.rev+G.w.rev,cost:G.r.cost+G.w.cost,pf:G.r.pf+G.w.pf,pcs:G.r.pcs+G.w.pcs};
   var fx=0;(S.fixed||[]).forEach(function(f){fx+=num(f[1]);});
-  var PER=[["month","Այս ամիս"],["prev","Նախորդ ամիս"],["year","Այս տարի"],["all","Բոլորը"]];
-  var h='<div class="card"><div class="row"><div><h2>📊 Վաճառքի մոնիտորինգ</h2><p class="sub">Կայքի պատվերները և հեռախոսով ընդունված պատվերները՝ մանրածախ և մեծածախ, մեկ տեղում։</p></div><div class="usw">'+PER.map(function(p){return '<button type="button" data-per="'+p[0]+'" class="'+((S.per||"month")===p[0]?"on":"")+'">'+p[1]+'</button>';}).join("")+'</div></div>';
+  perInit();var ny=new Date().getFullYear();var yrs=[];for(var yy=ny+1;yy>=2024;yy--){yrs.push(yy);}
+  var PSEL='<div class="persel"><div class="usw">'+[["m","Ամիս"],["y","Տարի"],["all","Բոլորը"]].map(function(p){return '<button type="button" data-per="'+p[0]+'" class="'+(S.per===p[0]?"on":"")+'">'+p[1]+'</button>';}).join("")+'</div>'+(S.per==="m"?'<select data-k="pm">'+MOS.map(function(n,i){return '<option value="'+i+'"'+(i===+S.pm?" selected":"")+'>'+n+'</option>';}).join("")+'</select>':'')+(S.per!=="all"?'<select data-k="py">'+yrs.map(function(y){return '<option'+(y===+S.py?" selected":"")+'>'+y+'</option>';}).join("")+'</select>':'')+'<button type="button" class="btn l pnow" data-per="now" title="Այս ամիսը">Այսօր</button></div>';
+  var h='<div class="card"><div class="row"><div><h2>📊 Վաճառքի մոնիտորինգ</h2><p class="sub">Կայքի պատվերները և հեռախոսով ընդունված պատվերները՝ մանրածախ և մեծածախ, մեկ տեղում։</p></div>'+PSEL+'</div><div class="perl">📅 '+perLabel()+'</div>';
   var kg=function(t,g,cls){return '<div class="mg '+cls+'"><div class="mg-h">'+t+'<span>'+g.n+' պատվեր · '+Math.round(g.pcs).toLocaleString("en-US")+' հատ</span></div><div class="mg-r"><div><small>Վաճառք</small><b>'+m(g.rev)+'</b></div><div><small>Ինքնարժեք</small><b>'+m(g.cost)+'</b></div><div><small>Օգուտ</small><b class="'+(g.pf>=0?"pos":"neg")+'">'+m(g.pf)+'</b></div><div><small>%</small><b>'+(g.rev?pct(g.pf/g.rev):"—")+'</b></div></div></div>';};
   h+='<div class="mgg">'+kg("🛒 Մանրածախ",G.r,"r")+kg("🏪 Մեծածախ",G.w,"w")+kg("Σ Ընդհանուր",T,"t")+'</div>';
   h+='<div class="mg2"><div class="mgp"><h3>Վճարումներ</h3>'+[["cash","💵 Կանխիկ"],["zelle","⚡ Zelle"],["card","💳 Քարտ"],["site","🌐 Կայքում"],["unpaid","⏳ Չվճարված"]].map(function(x){var v=PAY[x[0]]||0;var w=T.rev?Math.round(v/T.rev*100):0;return '<div class="pyr'+(x[0]==="unpaid"&&v>0?" un":"")+'"><span>'+x[1]+'</span><div class="bar"><i style="width:'+w+'%"></i></div><b>'+m(v)+'</b></div>';}).join("")+'<p class="mini" style="margin:8px 0 0">Աղբյուր՝ կայք '+SRC.site+' · հեռախոս '+SRC.phone+' պատվեր</p></div>';
