@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="hy"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
 <title>Nectar of Armenia — Invoice</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+Armenian:wght@400;600;700&family=Noto+Serif+Armenian:wght@600&family=Fraunces:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+Armenian:wght@400;600;700&family=Noto+Serif+Armenian:wght@600&family=Fraunces:wght@600&family=Oswald:wght@500&family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}html,body{margin:0;background:#F7F3EA;font:14.5px/1.45 Manrope,'Noto Sans Armenian',system-ui,sans-serif;color:#1E2A24}
 .wrap{max-width:1180px;margin:0 auto;padding:18px}html.emb .wrap{padding:0 0 10px}html.emb .sa{display:none}
@@ -28,16 +28,34 @@ a.cn,button.cn{border:0;background:none;padding:0;font:inherit;font-weight:800;c
 .ok{padding:10px 12px;border-radius:12px;background:#E8F1EC;border:1px solid #8CC5A2;font-size:13px;color:#1D5545;font-weight:700}
 .vgrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}.side{display:flex;flex-direction:column;gap:10px;position:sticky;top:10px}.side .btn{justify-content:center;width:100%}
 .log{font-size:12px;color:#6B756F;display:flex;flex-direction:column;gap:3px}
-/* invoice document */
-.doc{background:#fff;border-radius:6px;border:1px solid #E6DCC3;padding:44px 48px;box-shadow:0 10px 30px rgba(29,85,69,.08);color:#1E2A24;font-family:Manrope,'Noto Sans Armenian',sans-serif;max-width:850px;margin:0 auto}
-.doc .hd{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.doc .lg img{width:190px;display:block}.doc .co{font-size:12.5px;color:#5E6A63;margin-top:8px;line-height:1.5}
-.doc .ti{text-align:right}.doc .ti h1{margin:0;font-family:Fraunces,'Noto Serif Armenian',serif;font-weight:600;letter-spacing:.12em;color:#B8862B;font-size:32px}.doc .ti .mt{font-size:13px;margin-top:6px;line-height:1.7}.doc .ti .mt b{color:#1D5545}
-.doc .bill{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:26px}.doc .bx{background:#FBF9F4;border-radius:10px;padding:12px 14px;font-size:13.5px;line-height:1.55}.doc .bx small{display:block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:#8A7A55;margin-bottom:3px}
-.doc table{margin-top:22px;font-size:13.5px}.doc th{background:#1D5545;color:#F6E3B4;font-size:10.5px}.doc td{padding:9px 8px}
-.doc .sum{display:flex;justify-content:flex-end;margin-top:12px}.doc .sum .tot{font-size:13.5px}
-.doc .pay{margin-top:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.doc .pay div{border:1px solid #ECE3CF;border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.55}.doc .pay b{color:#1D5545}
-.doc .stamp{display:inline-block;margin-top:8px;padding:4px 12px;border:2px solid #22704A;color:#22704A;border-radius:8px;font-weight:800;letter-spacing:.1em;transform:rotate(-3deg)}
-.doc .ft{margin-top:26px;text-align:center;font-size:12px;color:#8A8F86;border-top:1px solid #F0E8D6;padding-top:12px}
+/* invoice document — NofA template */
+.doc{--g:#1F4A42;--gd:#B8913F;--gl:#F4EFE3;background:#fff;color:#1E2A24;font-family:Manrope,'Noto Sans Armenian',sans-serif;max-width:816px;margin:0 auto;position:relative;overflow:hidden;box-shadow:0 10px 34px rgba(29,85,69,.10);border-radius:4px;padding:0 0 26px}
+.doc .top{padding:30px 56px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.doc .top img{width:200px;display:block}
+.doc .top .st{margin-top:14px}
+.doc .band{display:grid;grid-template-columns:1fr auto 64px;align-items:center;gap:18px;margin-top:6px}.doc .band i{display:block;height:44px;background:var(--g)}.doc .band i:last-child{border-radius:0}
+.doc .band h1{margin:0;font-family:Oswald,'Noto Sans Armenian',sans-serif;font-weight:500;font-size:62px;line-height:1;letter-spacing:.04em;color:var(--gd)}
+.doc .meta{display:grid;grid-template-columns:1.35fr 1fr;gap:18px 46px;padding:26px 56px 0}
+.doc .fl{display:flex;flex-direction:column;gap:3px}.doc .fl small{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#1E2A24}.doc .fl span{border-bottom:1.5px solid #B9B9B9;padding:2px 0 5px;font-size:14.5px;min-height:26px}
+.doc .fl.r{flex-direction:row;align-items:flex-end;gap:12px}.doc .fl.r small{min-width:96px;letter-spacing:.12em;padding-bottom:6px;color:#3A4540}.doc .fl.r span{flex:1;font-variant-numeric:tabular-nums}
+.doc .tb{margin:26px 56px 0;border:2px solid var(--g);border-collapse:collapse;width:calc(100% - 112px);font-size:14px}
+.doc .tb th{background:var(--g);color:#fff;font-weight:700;font-size:13px;letter-spacing:.06em;padding:13px 10px;text-align:left;text-transform:none}.doc .tb th.n,.doc .tb td.n{text-align:right}
+.doc .tb td{padding:11px 10px;border:0;border-left:2px solid var(--g);height:44px}.doc .tb td:first-child{border-left:0;width:54px;text-align:center;font-weight:800;color:#3A4540}
+.doc .tb tr:nth-child(odd) td{background:#F3F3F1}.doc .tb .u{display:block;font-size:11.5px;color:#7A847F;margin-top:1px}
+.doc .tb .cur{color:#1E2A24;font-weight:800;margin-right:4px}
+.doc .bot{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px;align-items:start}
+.doc .ct{padding-left:56px;display:flex;flex-direction:column;gap:9px;font-size:14px}.doc .ct div{display:flex;align-items:center;gap:10px}.doc .ct svg{width:17px;height:17px;flex:0 0 17px;color:var(--gd)}.doc .ct b{font-weight:800}
+.doc .tt{display:flex;flex-direction:column;align-items:stretch}.doc .tt .rows{padding:0 56px 6px 18px;font-size:13.5px;display:flex;flex-direction:column;gap:4px}.doc .tt .rows div{display:flex;justify-content:space-between}
+.doc .tt .gold{background:var(--gd);color:#1E2A24;padding:12px 56px 12px 18px;display:flex;align-items:baseline;justify-content:space-between;gap:14px}.doc .tt .gold span{font-size:15px;font-weight:700;letter-spacing:.06em}.doc .tt .gold b{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
+.doc .tt .due{padding:8px 56px 0 18px;font-size:12.5px;color:#5E6A63;text-align:right}
+.doc .pay{margin:18px 56px 0;padding:10px 14px;border-radius:8px;background:var(--gl);font-size:12.5px;line-height:1.6;color:#3A4540}.doc .pay b{color:var(--g)}
+.doc .nt{margin:12px 56px 0;font-size:13px;color:#3A4540}
+.doc .sg{display:grid;grid-template-columns:1fr 250px 64px;align-items:end;gap:18px;margin-top:30px}.doc .sg i{display:block;height:5px;background:var(--g);margin-bottom:24px}
+.doc .sg .sig{text-align:center}.doc .sg .ini{font-family:'Great Vibes',cursive;font-size:54px;line-height:1;color:#1E2A24;border-bottom:1.5px solid #333;padding:0 0 4px}.doc .sg .ini small{font-family:Manrope,sans-serif;font-size:10px;letter-spacing:.1em;color:#8A8F86;display:block}
+.doc .sg .sl{margin-top:8px;font-size:14px;font-weight:700;letter-spacing:.1em;color:#3A4540}
+.doc .thx{padding:2px 56px 0;font-family:'Great Vibes',cursive;font-size:30px;color:var(--gd);margin-top:-14px}
+.doc .stamp{display:inline-block;padding:5px 14px;border:3px solid #22704A;color:#22704A;border-radius:8px;font-weight:800;letter-spacing:.14em;transform:rotate(-6deg);font-size:16px;background:rgba(255,255,255,.85)}
+.doc .stamp.dr{border-color:#999;color:#888}
+@media (max-width:700px){.doc .top,.doc .meta{padding-left:20px;padding-right:20px}.doc .meta{grid-template-columns:1fr}.doc .band h1{font-size:40px}.doc .band{grid-template-columns:1fr auto 24px}.doc .tb{margin:20px;width:calc(100% - 40px);font-size:13px}.doc .bot{grid-template-columns:1fr}.doc .ct{padding:0 20px}.doc .tt .rows,.doc .tt .gold,.doc .tt .due{padding-left:20px;padding-right:20px}.doc .pay,.doc .nt{margin-left:20px;margin-right:20px}.doc .sg{grid-template-columns:1fr 180px 24px}.doc .thx{padding:0 20px}}
 .pub{max-width:900px;margin:0 auto;padding:18px}.pub .bar{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
 @media (max-width:860px){.vgrid{grid-template-columns:1fr}.side{position:static}.g4{grid-template-columns:1fr 1fr}.doc{padding:24px 18px}.doc .bill{grid-template-columns:1fr}.doc .hd{flex-direction:column}.doc .ti{text-align:left}}
 @media (max-width:560px){.g2{grid-template-columns:1fr}}
@@ -70,21 +88,34 @@ var PNHY={khinkali:"Խինկալի",pelmeni:"Պելմենի",blinchik:"Բլին�
 /* ---------- totals & document ---------- */
 function tots(v){var sub=0;(v.lines||[]).forEach(function(l){sub+=(+l.q||0)*(+l.pr||0);});var ds=+v.disc||0;var base=Math.max(0,sub-ds);var tx=base*(+v.tax||0)/100;var sh=+v.ship||0;var tot=base+tx+sh;var pd=v.st==="paid"?tot:(+((v.paid||{}).amt)||0);return {sub:sub,ds:ds,tx:tx,sh:sh,tot:tot,pd:Math.min(pd,tot),bal:Math.max(0,tot-pd)};}
 function termsL(n,L){n=+n||0;return n?(L.net?L.net+n:n+" օր"):L.onr;}
-function docHTML(v,pc){var lg=v.lang==="hy"?"hy":"en";var L=TL[lg];var T=tots(v);var c=v.c||{};
-  var h='<div class="doc"><div class="hd"><div class="lg"><img src="'+LOGO+'" alt="Nectar of Armenia"><div class="co"><b>'+esc(CO.n)+'</b><br>'+esc(CO.a)+'<br>'+esc(CO.p)+' · '+esc(CO.e)+'<br>'+esc(CO.w)+'</div></div>'
-   +'<div class="ti"><h1>'+L.inv+'</h1><div class="mt">'+L.no+' <b>'+esc(v.no)+'</b><br>'+L.date+': <b>'+fdate(v.d,lg)+'</b><br>'+L.terms+': <b>'+termsL(v.terms,L)+'</b><br>'+L.due+': <b>'+fdate(v.du||addDays(v.d,v.terms),lg)+'</b></div>'+(v.st==="paid"?'<div class="stamp">'+L.paid+(v.paid&&v.paid.d?' · '+fdate(v.paid.d,lg):'')+'</div>':'')+'</div></div>'
-   +'<div class="bill"><div class="bx"><small>'+L.bill+'</small><b>'+esc(c.n||"—")+'</b>'+(c.a?'<br>'+esc(c.a):'')+(c.p?'<br>'+esc(c.p):'')+(c.e?'<br>'+esc(c.e):'')+'</div><div class="bx"><small>'+L.from+'</small><b>'+esc(CO.n)+'</b><br>'+esc(CO.a)+'<br>'+esc(CO.p)+'</div></div>'
-   +'<table><thead><tr><th>'+L.item+'</th><th class="n">'+L.qty+'</th><th>'+L.unit+'</th><th class="n">'+L.price+'</th><th class="n">'+L.amt+'</th></tr></thead><tbody>'
-   +(v.lines||[]).filter(function(l){return l.desc||l.q;}).map(function(l){return '<tr><td>'+esc(l.desc)+'</td><td class="n">'+(+l.q||0)+'</td><td>'+esc(unitL(l,lg))+'</td><td class="n">'+m(l.pr)+'</td><td class="n"><b>'+m((+l.q||0)*(+l.pr||0))+'</b></td></tr>';}).join("")+'</tbody></table>'
-   +'<div class="sum"><div class="tot"><div><span>'+L.sub+'</span><span>'+m(T.sub)+'</span></div>'+(T.ds?'<div><span>'+L.disc+'</span><span>−'+m(T.ds)+'</span></div>':'')+(T.sh?'<div><span>'+L.ship+'</span><span>'+m(T.sh)+'</span></div>':'')+(T.tx?'<div><span>'+L.tax+' ('+(+v.tax)+'%)</span><span>'+m(T.tx)+'</span></div>':'')
-   +'<div class="gt"><span>'+L.total+'</span><span>'+m(T.tot)+'</span></div>'+(T.pd&&v.st!=="paid"?'<div><span>'+L.paidT+'</span><span>−'+m(T.pd)+'</span></div><div style="font-weight:800"><span>'+L.bal+'</span><span>'+m(T.bal)+'</span></div>':'')+'</div></div>'
-   +(v.note?'<p style="margin:16px 0 0;font-size:13px"><b>'+L.note+':</b> '+esc(v.note)+'</p>':'');
-  if(v.st!=="paid"){pc=pc||{};h+='<h3 style="margin-top:24px">'+L.how+'</h3><div class="pay" style="margin-top:6px">'
-   +'<div><b>⚡ '+L.zelle+'</b><br>'+L.sendTo+': <b>'+esc(pc.zelle||CFG0.zelle)+'</b>'+(pc.zphone?'<br>'+L.sendTo+': <b>'+esc(pc.zphone)+'</b>':'')+'<br>'+L.acn+': '+esc(pc.acctName||CFG0.acctName)+'</div>'
-   +(pc.routing||pc.acct?'<div><b>🏦 '+L.ach+'</b><br>'+(pc.bank?L.bank+': '+esc(pc.bank)+'<br>':'')+L.acn+': '+esc(pc.acctName||CFG0.acctName)+'<br>'+L.rt+': <b>'+esc(pc.routing)+'</b><br>'+L.ac+': <b>'+esc(pc.acct)+'</b></div>':'')
-   +(pc.wireRouting?'<div><b>🌐 '+L.wire+'</b><br>'+L.rt+': <b>'+esc(pc.wireRouting)+'</b><br>'+L.ac+': <b>'+esc(pc.acct)+'</b>'+(pc.bankAddr?'<br>'+esc(pc.bankAddr):'')+'</div>':'')
-   +'</div><p class="mut" style="margin:8px 0 0">'+L.memo+'</p>';}
-  return h+'<div class="ft">'+L.thx+' · '+esc(CO.n)+'</div></div>';}
+var ICO={ph:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z"/></svg>',
+ web:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg>',
+ ml:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+ cd:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 10h19M6 15h4"/></svg>'};
+var TX={en:{to:"Invoice to",ad:"Address",no:"Invoice#",dt:"Date",due:"Due",sl:"SL.",it:"Item Description",pr:"Price",qt:"Qty.",tt:"Total",sub:"Subtotal",ds:"Discount",sh:"Delivery",tx:"Tax",pd:"Paid",bal:"Balance due",zl:"for Zelle",sig:"Authorized Sign",thx:"Thank you for your business",paid:"PAID",draft:"DRAFT",terms:"Terms",pay:"Payment"},
+ hy:{to:"Վճարող",ad:"Հասցե",no:"Հաշիվ №",dt:"Ամսաթիվ",due:"Վճարել մինչև",sl:"№",it:"Անվանում",pr:"Գին",qt:"Քանակ",tt:"Գումար",sub:"Ենթագումար",ds:"Զեղչ",sh:"Առաքում",tx:"Հարկ",pd:"Վճարված",bal:"Մնացորդ",zl:"Zelle-ի համար",sig:"Ստորագրություն",thx:"Շնորհակալություն համագործակցության համար",paid:"ՎՃԱՐՎԱԾ",draft:"ՍԵՎԱԳԻՐ",terms:"Պայման",pay:"Վճարում"}};
+var INITIALS="A.S.";
+function docHTML(v,pc){var lg=v.lang==="hy"?"hy":"en";var L=TL[lg],X=TX[lg];var T=tots(v);var c=v.c||{};pc=pc||{};
+  var rows=(v.lines||[]).filter(function(l){return l.desc||l.q;});var pad=Math.max(0,6-rows.length);
+  var qty=function(l){var u=l.u===0?(lg==="hy"?" տուփ":" pk"):(l.u===1?(lg==="hy"?" հատ":" pc"):(l.un?" "+l.un:""));return (+l.q||0)+u;};
+  var h='<div class="doc"><div class="top"><img src="'+LOGO+'" alt="Nectar of Armenia"><div class="st">'+(v.st==="paid"?'<span class="stamp">'+X.paid+(v.paid&&v.paid.d?' · '+fdate(v.paid.d,lg):'')+'</span>':(v.st==="draft"?'<span class="stamp dr">'+X.draft+'</span>':''))+'</div></div>'
+   +'<div class="band"><i></i><h1>'+(lg==="hy"?"ՀԱՇԻՎ":"INVOICE")+'</h1><i></i></div>'
+   +'<div class="meta"><div class="fl"><small>'+X.to+':</small><span><b>'+esc(c.n||"—")+'</b>'+(c.p?' · '+esc(c.p):'')+'</span></div><div class="fl r"><small>'+X.no+'</small><span>'+esc(v.no)+'</span></div>'
+   +'<div class="fl"><small>'+X.ad+':</small><span>'+esc(c.a||"")+'</span></div><div class="fl r"><small>'+X.dt+'</small><span>'+fdate(v.d,lg)+'</span></div></div>'
+   +'<table class="tb"><thead><tr><th style="text-align:center">'+X.sl+'</th><th>'+X.it+'</th><th class="n">'+X.pr+'</th><th class="n">'+X.qt+'</th><th class="n">'+X.tt+'</th></tr></thead><tbody>'
+   +rows.map(function(l,i){return '<tr><td>'+(i+1)+'.</td><td>'+esc(l.desc)+(l.u===0&&l.pp?'<span class="u">'+(lg==="hy"?"տուփ՝ "+l.pp+" հատ":"pack of "+l.pp)+'</span>':'')+'</td><td class="n"><span class="cur">$</span>'+(+l.pr||0).toFixed(2)+'</td><td class="n">'+esc(qty(l))+'</td><td class="n"><span class="cur">$</span><b>'+((+l.q||0)*(+l.pr||0)).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+'</b></td></tr>';}).join("")
+   +new Array(pad+1).join('<tr><td></td><td></td><td></td><td></td><td></td></tr>').replace(/<tr><td><\/td>/g,function(){return '<tr><td>&nbsp;</td>';})
+   +'</tbody></table>';
+  var extra=(T.ds||T.sh||T.tx||(T.pd&&v.st!=="paid"));
+  h+='<div class="bot"><div class="ct"><div>'+ICO.ph+'<b>515-588-5555</b></div><div>'+ICO.web+'<b>nectarofarmenia.com</b></div><div>'+ICO.ml+'<b>nofaorder@gmail.com</b></div><div>'+ICO.cd+'<span><b>'+esc(pc.zphone||"515-588-5555").replace(/[()]/g,"").replace(/\s/g,"-").replace(/--/g,"-")+'</b> '+X.zl+'</span></div></div>'
+   +'<div class="tt">'+(extra?'<div class="rows"><div><span>'+X.sub+'</span><span>'+m(T.sub)+'</span></div>'+(T.ds?'<div><span>'+X.ds+'</span><span>−'+m(T.ds)+'</span></div>':'')+(T.sh?'<div><span>'+X.sh+'</span><span>'+m(T.sh)+'</span></div>':'')+(T.tx?'<div><span>'+X.tx+' '+(+v.tax)+'%</span><span>'+m(T.tx)+'</span></div>':'')+'</div>':'')
+   +'<div class="gold"><span>'+X.tt+':</span><b>'+m(T.tot)+'</b></div>'
+   +(T.pd&&v.st!=="paid"?'<div class="rows" style="padding-top:6px"><div><span>'+X.pd+'</span><span>−'+m(T.pd)+'</span></div><div style="font-weight:800"><span>'+X.bal+'</span><span>'+m(T.bal)+'</span></div></div>':'')
+   +(v.st!=="paid"?'<div class="due">'+X.terms+': <b>'+termsL(v.terms,L)+'</b> · '+X.due+': <b>'+fdate(v.du||addDays(v.d,v.terms),lg)+'</b></div>':'')+'</div></div>';
+  if(v.st!=="paid"&&(pc.routing||pc.acct||pc.wireRouting)){h+='<div class="pay"><b>'+X.pay+':</b> Zelle — '+esc(pc.zelle||CFG0.zelle)+(pc.routing||pc.acct?' · ACH — '+(pc.bank?esc(pc.bank)+', ':'')+'Routing '+esc(pc.routing)+', Acct '+esc(pc.acct):'')+(pc.wireRouting?' · Wire — Routing '+esc(pc.wireRouting):'')+' · '+esc(pc.acctName||CFG0.acctName)+'. '+L.memo+'</div>';}
+  if(v.note){h+='<p class="nt"><b>'+L.note+':</b> '+esc(v.note)+'</p>';}
+  h+='<div class="sg"><i></i><div class="sig"><div class="ini">'+INITIALS+'</div><div class="sl">'+X.sig+'</div></div><i></i></div><div class="thx">'+X.thx+'</div></div>';
+  return h;}
 function unitL(l,lg){var L=TL[lg];if(l.u===0){return L.pack+(l.pp?" ("+l.pp+" "+L.pc+")":"");}if(l.u===1){return L.pc;}return l.un||"";}
 
 /* ---------- PUBLIC VIEW ---------- */
