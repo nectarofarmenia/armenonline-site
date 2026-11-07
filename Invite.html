@@ -15,7 +15,7 @@ h2{font-family:'Noto Serif Armenian',serif;font-weight:600;color:#1D5545;margin:
 .pk.w{background:linear-gradient(135deg,#1D5545,#133B30);color:#F7F3EA}.pk.w i{background:rgba(235,169,58,.2);border:1px solid rgba(235,169,58,.5)}
 .pk.r{background:linear-gradient(135deg,#FFF6E0,#F7E7BE);color:#5B4A22;border:1px solid #F1D9A6}.pk.r i{background:#fff}
 .pk.on{outline:3px solid #EBA93A}
-.g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.g .w2{grid-column:span 2}.g .full{grid-column:1/-1}
+.g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.g .w2{grid-column:span 2}.g .full{grid-column:1/-1}.g.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:800;color:#8A7A55}
 input.t,select.t{font:inherit;font-size:14px;padding:9px 11px;border:1.5px solid #E4DCC8;border-radius:10px;background:#FFFDF8;min-width:0;width:100%}input.t:focus,select.t:focus{outline:2px solid #8CC5A2;border-color:#8CC5A2}input.bad{border-color:#C0392B}
 .btn{border:1.5px solid #E4DCC8;background:#fff;color:#1D5545;border-radius:999px;padding:9px 16px;font:800 13.5px Manrope,'Noto Sans Armenian',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
@@ -23,7 +23,7 @@ input.t,select.t{font:inherit;font-size:14px;padding:9px 11px;border:1.5px solid
 .send{margin-top:14px;padding:14px;border-radius:16px;background:#E8F1EC;border:1px solid #8CC5A2}.send .lk{font-size:12px;color:#33403A;word-break:break-all;background:#fff;border-radius:8px;padding:6px 8px;margin:8px 0}
 table{width:100%;border-collapse:collapse;font-size:13.5px}th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#1D5545;background:#E8F1EC;text-align:left;padding:8px}td{padding:8px;border-bottom:1px solid #F0E8D6;vertical-align:middle}
 .bd{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:800;white-space:nowrap}.b-s{background:#E3EEF9;color:#2C5E93}.b-d{background:#DDF1E4;color:#22704A}.b-n{background:#EEE;color:#555}
-@media (max-width:760px){.pick{grid-template-columns:1fr}.g{grid-template-columns:1fr 1fr}.g .w2{grid-column:1/-1}}
+@media (max-width:760px){.pick{grid-template-columns:1fr}.g.g4{grid-template-columns:1fr 1fr}.g{grid-template-columns:1fr 1fr}.g .w2{grid-column:1/-1}}
 </style>
 <script>if(/[?&]embed=1/.test(location.search)){document.documentElement.className+=" emb";}</script>
 </head><body><div id="app"></div>
@@ -41,11 +41,9 @@ function msg(x){var lk=linkOf(x);var n=x.first||nameOf(x);if(x.lg==="en"){return
 function done(x){if(x.done){return true;}var A=J("noa-accounts",{});var em=String(x.email||"").toLowerCase();return !!(em&&A[em+"|"+(x.t==="w"?"biz":"retail")]&&A[em+"|"+(x.t==="w"?"biz":"retail")].via==="invite");}
 function fld(k,l,typ,cls,ph){return '<label class="f'+(cls?' '+cls:'')+'">'+l+'<input class="t" id="f_'+k+'" type="'+(typ||"text")+'" value="'+esc(V.f[k]||"")+'" placeholder="'+esc(ph||"")+'"></label>';}
 function render(){var app=document.getElementById("app");var h='<div class="wrap"><div class="sa" style="margin-bottom:8px"><a href="Admin.dc.html" style="color:#1D5545;font-weight:800;text-decoration:none">← Ադմին</a></div><div class="card">';
-  h+='<div class="row"><div><h2>✉️ Գրանցել և հրավիրել հաճախորդ</h2><p class="sub">Բոլոր դաշտերը ոչ պարտադիր են․ լրացրեք այն, ինչ գիտեք, և ուղարկեք հրավերը։ Հաճախորդը կբացի հղումը, կստուգի և կլրացնի մնացածը, և նրա էջը կստեղծվի։</p></div></div>';
+  h+='<div class="row"><div><h2>✉️ Գրանցել և հրավիրել հաճախորդ</h2><p class="sub">Գրեք անունը և հեռախոսը կամ email-ը (ոչ պարտադիր) և ուղարկեք հրավերը։ Հաճախորդը կբացի հղումը, կստուգի և կլրացնի մնացածը, և նրա էջը կստեղծվի։</p></div></div>';
   h+='<div class="pick"><button type="button" class="pk w'+(V.t==="w"?' on':'')+'" data-t="w"><i>🏪</i><span><b>Մեծածախ գործընկեր</b>Խանութ, սուպերմարկետ, ռեստորան՝ դեպոզիտով աշխատանքի հրավեր</span></button><button type="button" class="pk r'+(V.t==="r"?' on':'')+'" data-t="r"><i>👤</i><span><b>Մանրածախ հաճախորդ</b>Անհատ՝ անձնական էջ պատվերների և առաքման համար</span></button></div>';
-  if(V.t){var W=V.t==="w";h+='<div class="g">'+(W?fld("biz","Բիզնեսի անվանումը","text","w2","Օր.՝ Voskevaz Market")+'<label class="f">Տեսակը<select class="t" id="f_bizType">'+["Մթերային խանութ","Սուպերմարկետ","Ռեստորան / սրճարան","Հացատուն","Այլ"].map(function(x){return '<option'+(V.f.bizType===x?' selected':'')+'>'+x+'</option>';}).join("")+'</select></label>':"")
-     +fld("first",W?"Կոնտակտային անձ՝ անուն":"Անուն")+fld("last","Ազգանուն")+fld("phone","Հեռախոս (SMS-ի համար)","tel","","+1 (818) ...")+fld("email","Email","email","","name@example.com")+fld("addr","Հասցե","text","w2","Փողոց, տուն")+fld("city","Քաղաք","text","","Glendale")+fld("zip","ZIP")
-     +(W?fld("permit","Seller's Permit №"):"")+'<label class="f">Հրավերի լեզուն<select class="t" id="f_lg"><option value="hy"'+(V.f.lg!=="en"?' selected':'')+'>Հայերեն</option><option value="en"'+(V.f.lg==="en"?' selected':'')+'>English</option></select></label></div>'
+  if(V.t){var W=V.t==="w";h+='<div class="g g4">'+fld("first","Անուն")+fld("last","Ազգանուն")+fld("phone","Հեռախոս","tel","","+1 (818) ...")+fld("email","Email","email","","name@example.com")+'</div><div class="rowl" style="margin-top:8px"><span class="mut">Հրավերի լեզուն</span><select class="t" id="f_lg" style="width:auto"><option value="hy"'+(V.f.lg!=="en"?' selected':'')+'>Հայերեն</option><option value="en"'+(V.f.lg==="en"?' selected':'')+'>English</option></select><span class="mut">· Մնացածը հաճախորդը կլրացնի ինքը։</span></div>'
      +(V.err?'<p style="color:#A1362A;font-weight:700;margin:10px 0 0">'+esc(V.err)+'</p>':'')+'<div class="rowl" style="margin-top:12px;justify-content:flex-end"><button type="button" class="btn s" data-a="cancel">Չեղարկել</button><button type="button" class="btn g" data-a="create">✓ Գրանցել և ստեղծել հրավեր</button></div>';}
   if(V.sent&&V.fresh){var x=invs().filter(function(i){return i.id===V.sent;})[0];if(x){h+=sendBox(x,true);}}
   h+='</div>';
@@ -69,7 +67,7 @@ document.addEventListener("click",function(e){var b;
   else if(a==="show"){V.t="";V.fresh=false;V.sent=V.sent===b.getAttribute("data-id")?null:b.getAttribute("data-id");render();}
   else if(a==="del"){if(!confirm("Ջնջե՞լ հրավերը։")){return;}saveInvs(invs().filter(function(x){return x.id!==b.getAttribute("data-id");}));if(V.sent===b.getAttribute("data-id")){V.sent=null;}render();}
   else if(a==="copy"){var x=invs().filter(function(i){return i.id===b.getAttribute("data-id");})[0];if(!x){return;}var lk=linkOf(x);var ok=function(){mark(x.id,"հղում");b.textContent="✓ Պատճենվեց";setTimeout(render,1200);};try{navigator.clipboard.writeText(lk).then(ok,function(){prompt("Պատճենեք հղումը",lk);ok();});}catch(z){prompt("Պատճենեք հղումը",lk);ok();}}
-  else if(a==="create"){grab();var W=V.t==="w";var f=V.f;if(!(W?(f.biz||f.first):f.first)){var nN=invs().length+1;if(W){f.biz="Նոր գործընկեր #"+nN;}else{f.first="Նոր հաճախորդ #"+nN;}}if(f.email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email)){V.err="Email-ը սխալ է։";render();return;}
+  else if(a==="create"){grab();var W=V.t==="w";var f=V.f;if(!(f.first||f.last)){var nN=invs().length+1;if(W){f.biz="Նոր գործընկեր #"+nN;}else{f.first="Նոր հաճախորդ #"+nN;}}if(f.email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email)){V.err="Email-ը սխալ է։";render();return;}
     var x=Object.assign({id:"inv"+Date.now().toString(36),t:V.t,at:new Date().toISOString()},f);var L=invs();L.push(x);saveInvs(L);
     try{var S=J("noa-cost-v2",{});if(!S.cprof){S.cprof={};}var ck=nrm(nameOf(x))+"|"+x.t;var p=S.cprof[ck]||(S.cprof[ck]={});p.name=nameOf(x);if(x.phone&&!p.phone){p.phone=x.phone;}if(x.email&&!p.email){p.email=x.email;}var ad=[x.addr,x.city,x.zip].filter(Boolean).join(", ");if(ad&&!p.addr){p.addr=ad;}p.invited=x.at;localStorage.setItem("noa-cost-v2",JSON.stringify(S));}catch(z){}
     V={t:"",f:{},sent:x.id,err:"",fresh:true};render();}});
