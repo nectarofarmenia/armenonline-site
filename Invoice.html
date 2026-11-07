@@ -114,6 +114,19 @@ function nextNo(d){var y=String(d||today()).slice(0,4);var n=(DB.seq[y]||0)+1;re
 function byId(id){return DB.list.filter(function(v){return v.id===id;})[0];}
 function logAdd(v,t){(v.log=v.log||[]).push([new Date().toISOString(),t]);}
 
+
+/* ---- invoices for already-served orders ---- */
+var PMN={cash:"Կանխիկ",zelle:"Zelle",card:"Քարտ",site:"Կայքում",book:"Վաճառքի գիրք"};
+function servedNoInv(){var used={};DB.list.forEach(function(x){(x.ord||[]).forEach(function(o){used[o]=1;});});var td=today();
+  return (CS.calls||[]).filter(function(c){var d=String(c.ddate||c.date||"");return c.id&&!used[c.id]&&c.name&&d&&d<=td&&(c.lines||[]).length;});}
+function genFromOrders(){var L=servedNoInv().slice().sort(function(a,b){return String(a.ddate||a.date).localeCompare(String(b.ddate||b.date));});var P=CS.prod||[];var prof=CS.cprof||{};var n=0;
+  L.forEach(function(o){var t=o.type==="w"?"w":"r";var ck=ckey(o.name,t);var pf=prof[ck]||{};var d=String(o.ddate||o.date).slice(0,10);var y=d.slice(0,4);DB.seq[y]=(DB.seq[y]||0)+1;
+    var lines=[];(o.lines||[]).forEach(function(l){var p=P[+l[0]];if(!p){return;}var u=+l[1]===1?1:0;lines.push({pid:p.id,desc:pName(p.id,"en"),u:u,pp:+p.packPcs||10,q:+l[2]||0,pr:l[3]!=null?+l[3]:priceFor(p.id,u,t),un:"",ord:o.id});});
+    if(!lines.length){return;}var terms=t==="w"?7:0;
+    var v={id:"inv"+Date.now().toString(36)+n,no:"NofA-INV-"+y+"-"+("000"+DB.seq[y]).slice(-4),ck:ck,c:{n:o.name,t:t,a:pf.addr||o.addr||"",e:pf.email||o.email||"",p:pf.phone||o.phone||""},d:d,du:addDays(d,terms),terms:terms,lang:"en",pt:t,lines:lines,disc:0,tax:0,ship:0,note:"",st:o.paid?"paid":"sent",ord:[o.id],created:new Date().toISOString(),auto:1,log:[[new Date().toISOString(),"Ստեղծվեց պատվերից ("+(o.book?"վաճառքի գիրք":"հեռախոսային պատվեր")+")"]]};
+    if(o.paid){var tt=tots(v).tot;v.paid={d:d,m:PMN[o.pay]||"",amt:tt};}
+    DB.list.push(v);n++;});
+  DB.autoImp=1;saveDB();return n;}
 /* ---- views ---- */
 function render(){load();var app=document.getElementById("app");var h='<div class="wrap"><div class="sa np" style="margin-bottom:8px"><a href="Admin.dc.html" style="color:#1D5545;font-weight:800;text-decoration:none">← Ադմին</a></div>';
   h+='<div class="card np"><div class="row"><div><h2>📄 Հաշիվներ (Invoices)</h2><p class="sub">Կազմեք հաշիվ, պահեք այն հաճախորդի անվան տակ և ուղարկեք SMS-ով, email-ով կամ կայքի նամակով։ Հաճախորդը ստանում է հղում, որով կարող է բացել, տպել կամ PDF պահել։</p></div><button type="button" class="btn y" data-a="new">➕ Նոր հաշիվ</button></div>';
@@ -130,7 +143,8 @@ function viewAll(){var q=nrm(V.q);var L=sorted(DB.list).filter(function(v){var s
   var mos={};DB.list.forEach(function(v){mos[String(v.d).slice(0,7)]=1;});
   var h='<div class="card"><div class="row"><input class="t" style="max-width:380px" type="search" id="q" data-k="q" placeholder="🔎 Որոնել՝ հաճախորդ, հաշվի №, հեռախոս" value="'+esc(V.q)+'"><select class="t" style="max-width:200px" data-k="mo"><option value="">Բոլոր ամիսները</option>'+Object.keys(mos).sort().reverse().map(function(k){return '<option value="'+k+'"'+(V.mo===k?' selected':'')+'>'+MON[+k.slice(5)-1]+' '+k.slice(0,4)+'</option>';}).join("")+'</select></div>';
   h+='<div class="chips" style="margin-top:10px">'+[["all","Բոլորը"],["unpaid","Չվճարված"],["over","Ժամկետանց"],["draft","Սևագիր"],["paid","Վճարված"],["void","Չեղարկված"]].map(function(x){return '<button type="button" class="chip'+(V.sf===x[0]?' on':'')+'" data-sf="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>';
-  if(!DB.list.length){h+='<div class="note" style="margin-top:12px">Դեռ հաշիվ չկա։ Սեղմեք «➕ Նոր հաշիվ» կամ բացեք «👥 Ըստ հաճախորդների» և ընտրեք հաճախորդին։</div>';}
+  var pend=servedNoInv();if(pend.length){h+='<div class="note" style="margin-top:12px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span>🧾 <b>'+pend.length+'</b> սպասարկված պատվեր դեռ հաշիվ չունի։</span><button type="button" class="btn g s" data-a="gen">Ստեղծել հաշիվները</button></div>';}
+  if(!DB.list.length&&!pend.length){h+='<div class="note" style="margin-top:12px">Դեռ հաշիվ չկա։ Սեղմեք «➕ Նոր հաշիվ» կամ բացեք «👥 Ըստ հաճախորդների» և ընտրեք հաճախորդին։</div>';}
   return h+invRows(L,true)+'</div>';}
 function custStats(){var S={};DB.list.forEach(function(v){if(v.st==="void"){return;}var x=S[v.ck]||(S[v.ck]={n:0,billed:0,bal:0,over:0,last:""});var T=tots(v);var s=status(v);x.n++;if(s!=="draft"){x.billed+=T.tot;}if(s!=="paid"&&s!=="draft"){x.bal+=T.bal;}if(s==="over"){x.over++;}if(v.d>x.last){x.last=v.d;}});return S;}
 function viewCust(){var S=custStats();var q=nrm(V.cq);var C=customers().filter(function(c){return !q||nrm(c.n+" "+c.p+" "+c.e+" "+c.a).indexOf(q)>=0;}).sort(function(a,b){var x=S[a.k]||{bal:0,n:0},y=S[b.k]||{bal:0,n:0};return y.bal-x.bal||y.n-x.n||a.n.localeCompare(b.n);});
@@ -218,6 +232,7 @@ document.addEventListener("click",function(e){var t=e.target;var b;
   if(!(b=t.closest("[data-a]"))){return;}var a=b.getAttribute("data-a");var v=byId(V.id);
   if(a==="new"){newInv("");hpush();render();}
   else if(a==="newfor"){newInv(b.getAttribute("data-ck"));hpush();render();window.scrollTo(0,0);}
+  else if(a==="gen"){var k=genFromOrders();V.flash="";alert(k+" հաշիվ ստեղծվեց։");render();}
   else if(a==="ladd"){ED.lines.push(blankLine());render();}
   else if(a==="ldel"){ED.lines.splice(+b.getAttribute("data-i"),1);if(!ED.lines.length){ED.lines=[blankLine()];}render();}
   else if(a==="cancel"){ED=null;V.tab=V.id&&byId(V.id)?"view":"all";render();}
@@ -254,6 +269,6 @@ function hpush(){try{history.pushState({iv:1,tab:V.tab,id:V.id,ck:V.ck},"");}cat
 window.addEventListener("popstate",function(e){var s=e.state;if(s&&s.iv){V.tab=s.tab==="edit"&&!ED?"all":s.tab;V.id=s.id;V.ck=s.ck;render();}});
 var lastH=0;function post(){if(!/emb/.test(document.documentElement.className)){return;}var w=document.querySelector(".wrap");if(!w){return;}var h=Math.ceil(w.getBoundingClientRect().bottom+window.scrollY);if(Math.abs(h-lastH)>4){lastH=h;try{parent.postMessage({nofaH:h,page:"Invoices.html"},"*");}catch(x){}}}
 if(/emb/.test(document.documentElement.className)){document.documentElement.style.overflow="hidden";setInterval(post,500);window.addEventListener("wheel",function(e){if(Math.abs(e.deltaY)<=Math.abs(e.deltaX)){return;}e.preventDefault();var k=e.deltaMode===1?32:(e.deltaMode===2?600:1);try{parent.postMessage({nofaWheel:e.deltaY*k},"*");}catch(x){}},{passive:false});}
-(function(){var qs=location.search;var mc=qs.match(/[?&]ck=([^&]+)/);var mn=qs.match(/[?&]new=([^&]+)/);load();if(mc){V.ck=decodeURIComponent(mc[1]);V.tab="cone";}if(mn){newInv(decodeURIComponent(mn[1]));}try{history.replaceState({iv:1,tab:V.tab,id:V.id,ck:V.ck},"");}catch(x){}render();})();
+(function(){var qs=location.search;var mc=qs.match(/[?&]ck=([^&]+)/);var mn=qs.match(/[?&]new=([^&]+)/);load();if(!DB.autoImp&&servedNoInv().length){genFromOrders();}if(mc){V.ck=decodeURIComponent(mc[1]);V.tab="cone";}if(mn){newInv(decodeURIComponent(mn[1]));}try{history.replaceState({iv:1,tab:V.tab,id:V.id,ck:V.ck},"");}catch(x){}render();})();
 }
 </script></body></html>
