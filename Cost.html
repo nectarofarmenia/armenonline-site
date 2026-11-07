@@ -322,6 +322,8 @@ button.cn{border:0;background:none;padding:0;font:inherit;font-weight:800;color:
 .cmch{border:1.5px solid #E4DCC8;background:#fff;color:#1D5545;border-radius:999px;padding:6px 12px;font:700 13px Manrope,'Noto Sans Armenian',sans-serif;cursor:pointer}.cmch.on{color:#fff}
 .cmpt th{vertical-align:bottom;min-width:150px}.cmpt td{min-width:150px}.cmpt td.bst{background:#F1F9F4;font-weight:800;color:#1D5545}
 .lgd{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:6px;font-size:13px;font-weight:700}.lgd i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+.ofb label.ofq{flex:1 1 220px}.ofb label.ofq input.t{min-height:38px;border-radius:999px;padding-left:14px;min-width:0}
 @media (max-width:860px){.lh{display:none}.lg.lr{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:8px;padding:12px}.lr .li{grid-column:1/4}.lr .tg{grid-column:4;justify-self:end}
  .lr .lc{display:flex;flex-direction:column;gap:2px}.lr .lc:before{content:attr(data-l);font-size:10.5px;font-weight:800;color:#8A7A55}
  .lr .lp{grid-column:span 4;flex-direction:row;align-items:center;gap:10px;border-top:1px dashed #EDE3CC;padding-top:6px}.lr .lp:before{content:attr(data-l);font-size:11px;font-weight:800;color:#7A5A12;flex:0 0 110px}.lr .lp .pp{flex:0 0 100px}.lr .lp .pr{flex:1}.lr .lp .bar{display:none}}
@@ -403,7 +405,7 @@ document.addEventListener("click",function(e){var cmc=e.target.closest("[data-cm
   var cpb=e.target.closest("[data-cp]");if(cpb){S.prof=cpb.getAttribute("data-cp");S.profBack=S.tab;S.tab="prof";hpush();save();render();window.scrollTo(0,0);try{parent.postMessage({nofaWheel:-99999},"*");}catch(x){}return;}
   if(e.target.closest("[data-pback]")){if(history.state&&history.state.ct==="prof"){history.back();return;}S.tab=S.profBack||"orders";S.prof=null;save();render();return;}
   var hx=e.target.closest("[data-hx]");if(hx){if(!S.hx){S.hx={};}var hk=hx.getAttribute("data-hx");S.hx[hk]=!S.hx[hk];save();render();return;}
-  var oft=e.target.closest("[data-oft]");if(oft){var fv=oft.getAttribute("data-oft");ofInit();if(fv==="reset"){S.of={t:"all",y:"all",m:"all"};}else{S.of.t=fv;}save();render();return;}
+  var oft=e.target.closest("[data-oft]");if(oft){var fv=oft.getAttribute("data-oft");ofInit();if(fv==="reset"){S.of={t:"all",y:"all",m:"all",q:""};}else{S.of.t=fv;}save();render();return;}
   var pe=e.target.closest("[data-per]");if(pe){var pv=pe.getAttribute("data-per");if(pv==="now"){var nn=new Date();S.per="m";S.pm=nn.getMonth();S.py=nn.getFullYear();}else{S.per=pv;}save();render();return;}
   var pmb=e.target.closest("[data-pm]");if(pmb){S.draft.past=pmb.getAttribute("data-pm")==="1";if(S.draft.past){S.draft.paid=true;}else{S.draft.ddate=plusDays(2);S.draft.date=today();}save();render();return;}
   var dt=e.target.closest("[data-dt]");if(dt){S.draft.type=dt.getAttribute("data-dt");if(S.draft.type==="w"){S.draft.lines=S.draft.lines.filter(function(l){return avail(S.prod[+l[0]],2);});if(!S.draft.lines.length){S.draft.lines=[[pidx("khinkali"),0,1]];}}save();render();return;}
@@ -446,6 +448,7 @@ document.addEventListener("input",function(e){var el=e.target;var k=el.getAttrib
   else if(a[0]==="cpf"){if(!S.cprof){S.cprof={};}var cp=S.cprof[S.prof]||(S.cprof[S.prof]={});cp[a[1]]=el.value;save();return;}
   else if(a[0]==="q"){S.q=el.value;save();clearTimeout(window.__qt);window.__qt=setTimeout(function(){var pos=el.selectionStart;render();var qi=document.getElementById("qin");if(qi){qi.focus();try{qi.setSelectionRange(pos,pos);}catch(x){}}},180);return;}
   else if(a[0]==="cpy"||a[0]==="cpm"){S[a[0]]=el.value;save();render();return;}
+  else if(a[0]==="ofq"){ofInit();S.of.q=el.value;save();clearTimeout(window.__oqt);window.__oqt=setTimeout(function(){var pos=el.selectionStart;render();var qi=document.getElementById("ofqin");if(qi){qi.focus();try{qi.setSelectionRange(pos,pos);}catch(x){}}},200);return;}
   else if(a[0]==="ofy"||a[0]==="ofm"){ofInit();S.of[a[0]==="ofy"?"y":"m"]=el.value;save();render();return;}
   else if(a[0]==="pm"||a[0]==="py"){S[a[0]]=+el.value;save();render();return;}
   else if(a[0]==="cp"){S.calls[+a[1]].pay=el.value;save();return;}
@@ -569,14 +572,16 @@ function smsText(c){var tot=0;var its=c.lines.map(function(l){var p=S.prod[+l[0]
   return "Բարև"+(c.name?" "+c.name:"")+"։ Ձեր պատվերը Nectar of Armenia-ում ընդունված է՝ "+its+"։ Ընդամենը՝ $"+tot.toFixed(2)+(c.addr?"։ Առաքում՝ "+c.addr:"")+"։ Շնորհակալություն։ Հարցերի դեպքում՝ (515) 588-5555";}
 function smsHref(c){var d=String(c.phone||"").replace(/\D/g,"");if(d.length===10){d="1"+d;}return "sms:+"+d+"?&body="+encodeURIComponent(smsText(c));}
 function ofInit(){if(!S.of){S.of={t:"all",y:"all",m:"all"};}return S.of;}
+function ofHit(name,phone,addr){var q=String((S.of||{}).q||"").trim();if(!q){return true;}var qn=String(q).toLowerCase().replace(/[^a-z0-9\u0531-\u0587]+/g,""),qd=q.replace(/\D/g,"");var n=function(x){return String(x||"").toLowerCase().replace(/[^a-z0-9\u0531-\u0587]+/g,"");};return (qn&&(n(name).indexOf(qn)>=0||n(addr).indexOf(qn)>=0))||(qd.length>=3&&String(phone||"").replace(/\D/g,"").indexOf(qd)>=0);}
 function ofBar(){var f=ofInit();var ys={};(S.calls||[]).forEach(function(c){var y=String(c.date||"").slice(0,4);if(y){ys[y]=1;}});ys[String(new Date().getFullYear())]=1;var yl=Object.keys(ys).sort().reverse();
   var lst=ofList();var tot=0;lst.forEach(function(x){tot+=callTot(x[0]);});
   return '<div class="ofb"><div class="usw">'+[["all","Բոլորը"],["r","🛒 Մանրածախ"],["w","🏪 Մեծածախ"]].map(function(t){return '<button type="button" data-oft="'+t[0]+'" class="'+(f.t===t[0]?"on":"")+'">'+t[1]+'</button>';}).join("")+'</div>'+
+  '<label class="ofq">Որոնել<input class="t" id="ofqin" data-k="ofq" value="'+esc(f.q||"")+'" placeholder="🔎 Անուն, հեռախոս, հասցե" autocomplete="off"></label>'+
   '<label>Տարի<select data-k="ofy"><option value="all"'+(f.y==="all"?" selected":"")+'>Բոլոր տարիները</option>'+yl.map(function(y){return '<option'+(f.y===y?" selected":"")+'>'+y+'</option>';}).join("")+'</select></label>'+
   '<label>Ամիս<select data-k="ofm"><option value="all"'+(f.m==="all"?" selected":"")+'>Բոլոր ամիսները</option>'+MOS.map(function(n,i){return '<option value="'+i+'"'+(String(f.m)===String(i)?" selected":"")+'>'+n+'</option>';}).join("")+'</select></label>'+
-  '<div class="ofs"><span class="chip">Պատվերներ <b>'+lst.length+'</b></span><span class="chip pf">Գումար <b>'+m(tot)+'</b></span>'+((f.t!=="all"||f.y!=="all"||f.m!=="all")?'<button type="button" class="btn l pnow" data-oft="reset">✕ Մաքրել</button>':'')+'</div></div>'+custMon();}
+  '<div class="ofs"><span class="chip">Պատվերներ <b>'+lst.length+'</b></span><span class="chip pf">Գումար <b>'+m(tot)+'</b></span>'+((f.t!=="all"||f.y!=="all"||f.m!=="all"||f.q)?'<button type="button" class="btn l pnow" data-oft="reset">✕ Մաքրել</button>':'')+'</div></div>'+custMon();}
 function custMon(){var f=ofInit();var C={};
-  sales().forEach(function(s){var dt=String(s.date||"");if(f.t!=="all"&&s.type!==f.t){return;}if(f.y!=="all"&&dt.slice(0,4)!==String(f.y)){return;}if(f.m!=="all"&&+dt.slice(5,7)-1!==+f.m){return;}
+  sales().forEach(function(s){var dt=String(s.date||"");if(!ofHit(s.name,s.phone,s.addr)){return;}if(f.t!=="all"&&s.type!==f.t){return;}if(f.y!=="all"&&dt.slice(0,4)!==String(f.y)){return;}if(f.m!=="all"&&+dt.slice(5,7)-1!==+f.m){return;}
     var k=(s.name||"—").trim().toLowerCase()+"|"+s.type;var c=C[k]||(C[k]={n:s.name||"—",t:s.type,o:0,pcs:0,rev:0,pf:0,un:0,last:"",ph:s.phone||""});c.o++;c.pcs+=s.pcs;c.rev+=s.total;c.pf+=s.profit;if(!s.paid){c.un+=s.total;}if(dt>c.last){c.last=dt;}if(s.phone){c.ph=s.phone;}});
   var L=Object.keys(C).map(function(k){return C[k];}).sort(function(a,b){return b.rev-a.rev;});var T={o:0,pcs:0,rev:0,pf:0,un:0};L.forEach(function(c){T.o+=c.o;T.pcs+=c.pcs;T.rev+=c.rev;T.pf+=c.pf;T.un+=c.un;});var mx=L.length?L[0].rev:1;
   var h='<div class="cmh"><b>👥 Մոնիտորինգ ըստ հաճախորդների</b><span>'+L.filter(function(c){return c.t==="w";}).length+' կազմակերպություն · '+L.filter(function(c){return c.t==="r";}).length+' անհատ</span></div>';
@@ -587,7 +592,7 @@ function custMon(){var f=ofInit();var C={};
   h+='</tbody><tfoot><tr><td></td><td></td><td>Ընդամենը</td><td></td><td class="num">'+T.o+'</td><td class="num">'+Math.round(T.pcs).toLocaleString("en-US")+'</td><td style="text-align:right">'+m(T.rev)+'</td><td class="num">'+m(T.pf)+'</td><td class="num">'+(T.un?m(T.un):'—')+'</td><td></td></tr></tfoot></table></div>';
   return h;}
 function callTot(c){var t=0;(c.lines||[]).forEach(function(l){var p=S.prod[+l[0]];if(p){t+=num(l[2])*(l[3]!=null?num(l[3]):p.pr[chOf(c.type,+l[1])]);}});return t;}
-function ofList(){var f=ofInit();return (S.calls||[]).map(function(c,k){return [c,k];}).filter(function(x){var c=x[0];var dt=String(c.date||"");if(f.t!=="all"&&c.type!==f.t){return false;}if(f.y!=="all"&&dt.slice(0,4)!==String(f.y)){return false;}if(f.m!=="all"&&+dt.slice(5,7)-1!==+f.m){return false;}return true;}).sort(function(a,b){return a[0].date<b[0].date?1:-1;});}
+function ofList(){var f=ofInit();return (S.calls||[]).map(function(c,k){return [c,k];}).filter(function(x){var c=x[0];var dt=String(c.date||"");if(!ofHit(c.name,c.phone,c.addr)){return false;}if(f.t!=="all"&&c.type!==f.t){return false;}if(f.y!=="all"&&dt.slice(0,4)!==String(f.y)){return false;}if(f.m!=="all"&&+dt.slice(5,7)-1!==+f.m){return false;}return true;}).sort(function(a,b){return a[0].date<b[0].date?1:-1;});}
 function nrm(x){return String(x||"").toLowerCase().replace(/[^a-z0-9\u0531-\u0587]+/g,"");}
 function ckey(name,type){return nrm(name)+"|"+type;}
 var CCOL=["#1D5545","#E0A030","#B03A2E","#3B6FB6"];
