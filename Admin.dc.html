@@ -48,6 +48,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
 }
 </style>
 <style id="nofa-mobile">
+.nm-bar { display: none; }
 @media (max-width: 760px) {
   html { zoom: 1 !important; }
   .hdr-stick > div[aria-hidden="true"] { display: none !important; }
@@ -56,16 +57,18 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
   .hdr-stick header > div > div:last-child { zoom: .68; flex-wrap: nowrap !important; gap: 8px !important; }
   .two-col { flex-direction: column !important; align-items: stretch !important; gap: 12px !important; padding-left: 10px !important; padding-right: 10px !important; }
   .two-col > main { width: 100% !important; max-width: 100% !important; flex: 1 1 auto !important; gap: 14px !important; }
-  aside.sum-card { position: sticky !important; top: 50px !important; z-index: 40 !important; flex: 0 0 auto !important; width: 100% !important; max-height: none !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; overflow-x: auto !important; overflow-y: hidden !important; padding: 6px !important; gap: 4px !important; border-radius: 16px !important; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-  aside.sum-card::-webkit-scrollbar { display: none; }
-  aside.sum-card .wa-nav { flex: 0 0 auto !important; width: auto !important; white-space: nowrap !important; padding: 8px 12px !important; margin: 0 !important; font-size: 13.5px !important; border-radius: 999px !important; min-height: 0 !important; }
-  aside.sum-card .wa-nav br { display: none; }
-  aside.sum-card > div:not(.as-ttl), aside.sum-card hr { display: none !important; }
-  aside.sum-card .as-ttl { position: static !important; margin: 0 !important; padding: 4px 8px !important; border: 0 !important; border-radius: 999px !important; flex: 0 0 auto !important; flex-wrap: nowrap !important; background: rgba(0,0,0,.18) !important; }
-  aside.sum-card .as-ttl > span:nth-child(2), aside.sum-card .as-ttl .as-dot { display: none !important; }
-  aside.sum-card .as-ttl small { width: auto !important; font-size: 0 !important; }
-  aside.sum-card .as-ttl small button { font-size: 11px !important; }
-  aside.sum-card .as-eye { margin: 0 !important; }
+  aside.sum-card { display: none !important; }
+  html.nm-open aside.sum-card { display: grid !important; position: fixed !important; inset: 114px 10px auto 10px !important; z-index: 9000 !important; max-height: calc(100vh - 130px) !important; overflow-y: auto !important; grid-template-columns: 1fr 1fr !important; gap: 6px !important; padding: 10px !important; border-radius: 20px !important; width: auto !important; box-shadow: 0 24px 60px rgba(0,0,0,.45) !important; }
+  html.nm-open aside.sum-card .as-ttl { grid-column: 1 / -1; position: static !important; margin: 0 0 4px !important; border-radius: 14px !important; padding: 10px 12px !important; }
+  html.nm-open aside.sum-card .wa-nav { width: auto !important; margin: 0 !important; padding: 10px !important; font-size: 13.5px !important; border-radius: 14px !important; background: rgba(255,255,255,.06); min-height: 52px; }
+  html.nm-open aside.sum-card a.wa-nav { grid-column: 1 / -1; }
+  html.nm-open aside.sum-card > div:not(.as-ttl) { display: none !important; }
+  html.nm-open::after { content: ""; position: fixed; inset: 0; background: rgba(10,30,24,.55); z-index: 8999; }
+  .nm-bar { display: flex !important; position: sticky; top: 50px; z-index: 9001; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 16px; background: linear-gradient(180deg,#36806B,#245F4D); box-shadow: 0 8px 18px rgba(19,59,48,.25); }
+  .nm-bar button { border: 0; cursor: pointer; font: 800 14px Manrope,'Noto Sans Armenian',sans-serif; border-radius: 999px; }
+  .nm-bar .nm-btn { background: linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22); color: #133B30; padding: 9px 14px; flex: 0 0 auto; }
+  .nm-bar .nm-cur { flex: 1; min-width: 0; color: #F6E3B4; font-weight: 800; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nm-bar .nm-eye { background: rgba(0,0,0,.18); color: #F6E3B4; padding: 8px 10px; border: 1px solid rgba(246,195,90,.5) !important; font-size: 12px; }
   .ms-arrow { display: none !important; }
   .pgx .az, .pgx button[aria-label="Back"], .pgx button[aria-label="Forward"] { display: none !important; }
   .pgx button { width: 44px !important; height: 44px !important; }
@@ -93,7 +96,11 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
   main strong[style*="font-size: 3"], main strong[style*="font-size: 4"] { font-size: 26px !important; }
 }
 </style>
-<script id="nofa-mobile-js">(function(){var last=null;setInterval(function(){if(window.innerWidth>=760){return;}var a=document.querySelector('aside.sum-card');var on=a&&a.querySelector('.wa-nav.on');if(on&&on!==last){last=on;var r=on.getBoundingClientRect(),ar=a.getBoundingClientRect();a.scrollTo({left:a.scrollLeft+(r.left-ar.left)-(ar.width-r.width)/2,behavior:'smooth'});}},400);})();</script>
+<script id="nofa-mobile-js">(function(){
+function bar(){var main=document.querySelector('.two-col > main');if(!main){return null;}var b=document.getElementById('nm-bar');if(!b){b=document.createElement('div');b.id='nm-bar';b.className='nm-bar';b.innerHTML='<button type="button" class="nm-btn">☰ Մենյու</button><span class="nm-cur"></span><button type="button" class="nm-eye" data-priv="1">👁</button>';main.parentNode.insertBefore(b,main);b.querySelector('.nm-btn').onclick=function(e){e.stopPropagation();document.documentElement.classList.toggle('nm-open');};}return b;}
+function upd(){var b=bar();if(!b){return;}var on=document.querySelector('aside.sum-card .wa-nav.on');var c=b.querySelector('.nm-cur');var t=on?on.innerText.replace(/\s+\d+\s*$/,'').replace(/\s+/g,' ').trim():'';if(c.textContent!==t){c.textContent=t;}var o=document.documentElement.classList.contains('nm-open');b.querySelector('.nm-btn').textContent=o?'✕ Փակել':'☰ Մենյու';}
+document.addEventListener('click',function(e){var h=document.documentElement;if(!h.classList.contains('nm-open')){return;}var a=e.target.closest&&e.target.closest('aside.sum-card');if(a&&!e.target.closest('.wa-nav')){return;}if(e.target.closest&&e.target.closest('.nm-btn')){return;}setTimeout(function(){h.classList.remove('nm-open');window.scrollTo(0,0);upd();},60);},true);
+setInterval(upd,400);setTimeout(upd,300);})();</script>
 <script id="nofa-sync">
 (function () {
   if (window.__nofaSync) { return; } window.__nofaSync = 1;
