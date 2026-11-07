@@ -58,13 +58,16 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
   .two-col { flex-direction: column !important; align-items: stretch !important; gap: 12px !important; padding-left: 10px !important; padding-right: 10px !important; }
   .two-col > main { width: 100% !important; max-width: 100% !important; flex: 1 1 auto !important; gap: 14px !important; }
   aside.sum-card { display: none !important; }
-  html.nm-open aside.sum-card { display: grid !important; position: fixed !important; inset: 114px 10px auto 10px !important; z-index: 9000 !important; max-height: calc(100vh - 130px) !important; overflow-y: auto !important; grid-template-columns: 1fr 1fr !important; gap: 6px !important; padding: 10px !important; border-radius: 20px !important; width: auto !important; box-shadow: 0 24px 60px rgba(0,0,0,.45) !important; }
+  html.nm-open aside.sum-card { display: grid !important; position: fixed !important; top: 112px !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 9000 !important; max-height: none !important; overflow-y: auto !important; grid-template-columns: 1fr 1fr !important; grid-auto-rows: min-content; align-content: start; gap: 8px !important; padding: 12px 12px 40px !important; border-radius: 0 !important; width: auto !important; background: #1F5545 !important; box-shadow: none !important; border: 0 !important; animation: none !important; transform: none !important; }
   html.nm-open aside.sum-card .as-ttl { grid-column: 1 / -1; position: static !important; margin: 0 0 4px !important; border-radius: 14px !important; padding: 10px 12px !important; }
-  html.nm-open aside.sum-card .wa-nav { width: auto !important; margin: 0 !important; padding: 10px !important; font-size: 13.5px !important; border-radius: 14px !important; background: rgba(255,255,255,.06); min-height: 52px; }
+  html.nm-open aside.sum-card .wa-nav { width: auto !important; margin: 0 !important; padding: 10px !important; font-size: 13.5px !important; border-radius: 14px !important; background: rgba(255,255,255,.08) !important; min-height: 56px; box-shadow: none !important; }
   html.nm-open aside.sum-card a.wa-nav { grid-column: 1 / -1; }
   html.nm-open aside.sum-card > div:not(.as-ttl) { display: none !important; }
-  html.nm-open::after { content: ""; position: fixed; inset: 0; background: rgba(10,30,24,.55); z-index: 8999; }
-  .nm-bar { display: flex !important; position: sticky; top: 50px; z-index: 9001; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 16px; background: linear-gradient(180deg,#36806B,#245F4D); box-shadow: 0 8px 18px rgba(19,59,48,.25); }
+  html.nm-open::after { content: ""; position: fixed; inset: 0; background: #1F5545; z-index: 8999; } html.nm-open body { overflow: hidden !important; }
+  html.nm-open aside.sum-card .as-eye { display: none !important; }
+  html.nm-open .hdr-stick { z-index: 9002 !important; }
+  html.nm-open aside.sum-card .wa-nav.on { outline: 2px solid #EBA93A; outline-offset: -2px; background: rgba(235,169,58,.16) !important; }
+  .nm-bar { display: flex !important; position: sticky; top: 50px; z-index: 9001; border-radius: 16px; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 16px; background: linear-gradient(180deg,#36806B,#245F4D); box-shadow: 0 8px 18px rgba(19,59,48,.25); }
   .nm-bar button { border: 0; cursor: pointer; font: 800 14px Manrope,'Noto Sans Armenian',sans-serif; border-radius: 999px; }
   .nm-bar .nm-btn { background: linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22); color: #133B30; padding: 9px 14px; flex: 0 0 auto; }
   .nm-bar .nm-cur { flex: 1; min-width: 0; color: #F6E3B4; font-weight: 800; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
