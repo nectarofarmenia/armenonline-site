@@ -30,6 +30,14 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
   select::picker-icon { color: #1D5545; }
 }
 </style>
+<style id="nofa-menuscroll">
+@media (min-width: 900px) {
+  aside.sum-card[style*="position: sticky"], aside.card3d[style*="position: sticky"] { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: rgba(235,169,58,.55) transparent; }
+  aside[style*="top: 145px"][style*="position: sticky"] { max-height: calc(100vh - 160px); }
+  aside[style*="top: 170px"][style*="position: sticky"] { max-height: calc(100vh - 186px); }
+  aside.sum-card::-webkit-scrollbar { width: 6px; } aside.sum-card::-webkit-scrollbar-thumb { background: rgba(235,169,58,.55); border-radius: 9px; }
+}
+</style>
 </head>
 <body>
 <x-dc>
@@ -1122,5 +1130,11 @@ return Object.assign(plVals, extVals, dzVals, lgVals, chVals, avVals, ivVals, rd
 })();
 </script>
 <style id="pg-arr-css">.pgx{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;gap:8px}.pgx button{width:46px;height:46px;border-radius:50%;border:1.5px solid #EBA93A;background:#1D5545;color:#F6E3B4;font:800 22px/1 Manrope,system-ui,sans-serif;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;padding:0}.pgx button:hover{background:#133B30}.pgx .up{background:linear-gradient(180deg,#FCDB82,#EDB040 50%,#D38A22);color:#133B30;border-color:#D38A22}.pgx.main{bottom:88px;flex-direction:column}.pg-arrows{display:none !important}@media print{.pgx{display:none}}</style><div class="pgx" id="pgx"><button type="button" aria-label="Back" onclick="history.back()">‹</button><button type="button" aria-label="Forward" onclick="history.forward()">›</button><button type="button" class="up" aria-label="Top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button></div>
+<script id="nofa-menuscroll-js">
+(function () { if (window.__nofaMS) { return; } window.__nofaMS = 1;
+  /* keep the menu's own scroll independent: wheel over the menu scrolls only the menu, wheel over the page scrolls the page */
+  document.addEventListener("wheel", function (e) { var a = e.target && e.target.closest ? e.target.closest("aside") : null; if (!a || a.scrollHeight <= a.clientHeight + 2) { return; } var st = getComputedStyle(a).overflowY; if (st !== "auto" && st !== "scroll") { return; } var dy = e.deltaY * (e.deltaMode === 1 ? 32 : (e.deltaMode === 2 ? 600 : 1)); a.scrollTop += dy; e.preventDefault(); }, { passive: false });
+})();
+</script>
 </body>
 </html>
