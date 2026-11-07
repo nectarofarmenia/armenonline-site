@@ -291,6 +291,10 @@ html.solo .tabs,html.solo .hero{display:none}html.solo #view>.card:first-child{m
 
 .pmode{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px;padding:10px;border-radius:14px;background:#FBF8F1;border:1px dashed #D9C79C}
 .pmh{font-size:12.5px;color:#7A5A12;font-weight:700}
+
+.ofb{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-top:12px;padding-top:12px;border-top:1px solid #F0E8D6}
+.ofb label{display:flex;flex-direction:column;gap:3px;font-size:11.5px;font-weight:800;color:#8A7A55}.ofb select{min-height:38px;border-radius:999px;padding:4px 12px;font-weight:800;color:#1D5545}
+.ofs{display:flex;gap:6px;align-items:center;margin-left:auto;flex-wrap:wrap}
 @media (max-width:860px){.lh{display:none}.lg.lr{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:8px;padding:12px}.lr .li{grid-column:1/4}.lr .tg{grid-column:4;justify-self:end}
  .lr .lc{display:flex;flex-direction:column;gap:2px}.lr .lc:before{content:attr(data-l);font-size:10.5px;font-weight:800;color:#8A7A55}
  .lr .lp{grid-column:span 4;flex-direction:row;align-items:center;gap:10px;border-top:1px dashed #EDE3CC;padding-top:6px}.lr .lp:before{content:attr(data-l);font-size:11px;font-weight:800;color:#7A5A12;flex:0 0 110px}.lr .lp .pp{flex:0 0 100px}.lr .lp .pr{flex:1}.lr .lp .bar{display:none}}
@@ -368,7 +372,8 @@ function per(j,p){return j%2===0?p.unit:"հատ";}
 var TABS=[["prod","📦","Ապրանքներ"],["sum","📋","Ամփոփում"],["ing","🥩","Հումքի գներ"],["bag","🛍","Տոպրակներ"],["orders","📞","Պատվերներ"],["month","🧾","Հաշվարկ"],["notes","⚠️","Ուշադրություն"]];
 var ICO={khinkali:"🥟",pelmeni:"🥟",blinchik:"🌯",kufta:"🧆",kiev:"🍗",chcut:"🍗",beefcut:"🥩",gata:"🥐",khash:"🍲"};
 function renderTabs(){$("#tabs").innerHTML=TABS.map(function(t){return '<button type="button" class="tab'+(S.tab===t[0]?" on":"")+'" data-tab="'+t[0]+'"><i>'+t[1]+'</i>'+t[2]+'</button>';}).join("");}
-document.addEventListener("click",function(e){var pe=e.target.closest("[data-per]");if(pe){var pv=pe.getAttribute("data-per");if(pv==="now"){var nn=new Date();S.per="m";S.pm=nn.getMonth();S.py=nn.getFullYear();}else{S.per=pv;}save();render();return;}
+document.addEventListener("click",function(e){var oft=e.target.closest("[data-oft]");if(oft){var fv=oft.getAttribute("data-oft");ofInit();if(fv==="reset"){S.of={t:"all",y:"all",m:"all"};}else{S.of.t=fv;}save();render();return;}
+  var pe=e.target.closest("[data-per]");if(pe){var pv=pe.getAttribute("data-per");if(pv==="now"){var nn=new Date();S.per="m";S.pm=nn.getMonth();S.py=nn.getFullYear();}else{S.per=pv;}save();render();return;}
   var pmb=e.target.closest("[data-pm]");if(pmb){S.draft.past=pmb.getAttribute("data-pm")==="1";if(S.draft.past){S.draft.paid=true;}else{S.draft.ddate=plusDays(2);S.draft.date=today();}save();render();return;}
   var dt=e.target.closest("[data-dt]");if(dt){S.draft.type=dt.getAttribute("data-dt");if(S.draft.type==="w"){S.draft.lines=S.draft.lines.filter(function(l){return avail(S.prod[+l[0]],2);});if(!S.draft.lines.length){S.draft.lines=[[pidx("khinkali"),0,1]];}}save();render();return;}
   var dp=e.target.closest("[data-dp]");if(dp){S.draft.pay=dp.getAttribute("data-dp");save();render();return;}
@@ -402,13 +407,14 @@ document.addEventListener("input",function(e){var el=e.target;var k=el.getAttrib
   else if(a[0]==="ub"){S.prod[+a[1]].useBag=el.checked;save();render();return;}
   else if(a[0]==="dr"){S.draft[a[1]]=(a[1]==="paid"||a[1]==="promo")?el.checked:el.value;save();return;}
   else if(a[0]==="dl"){var ln=S.draft.lines[+a[1]];ln[+a[2]]=a[2]==="2"?v:+el.value;save();if(a[2]==="2"){var dtot=document.getElementById("dtot");if(dtot){dtot.textContent=m(draftTotal());}}return;}
+  else if(a[0]==="ofy"||a[0]==="ofm"){ofInit();S.of[a[0]==="ofy"?"y":"m"]=el.value;save();render();return;}
   else if(a[0]==="pm"||a[0]==="py"){S[a[0]]=+el.value;save();render();return;}
   else if(a[0]==="cp"){S.calls[+a[1]].pay=el.value;save();return;}
   else if(a[0]==="cd"){S.calls[+a[1]].drv=+el.value;save();render();return;}
   else if(a[0]==="mo"){S.month[a[1]+"."+a[2]]=v;}
   else if(a[0]==="fx"){S.fixed[+a[1]][+a[2]]=v;}
   save();update();});
-document.addEventListener("change",function(e){var k=e.target.getAttribute("data-k")||"";if(e.target.tagName==="SELECT"&&k&&k.indexOf("ingu.")!==0&&k.indexOf("cp.")!==0&&k.indexOf("cd.")!==0&&k.indexOf("dr.")!==0&&k!=="pm"&&k!=="py"){render();}});
+document.addEventListener("change",function(e){var k=e.target.getAttribute("data-k")||"";if(e.target.tagName==="SELECT"&&k&&k.indexOf("ingu.")!==0&&k.indexOf("cp.")!==0&&k.indexOf("cd.")!==0&&k.indexOf("dr.")!==0&&k!=="pm"&&k!=="py"&&k!=="ofy"&&k!=="ofm"){render();}});
 
 function inp(k,v,cls,step){return '<input type="number" inputmode="decimal" step="'+(step||"any")+'" min="0" class="n '+(cls||"")+'" data-k="'+k+'" value="'+v+'">';}
 function out(k){return '<span data-o="'+k+'"></span>';}
@@ -523,8 +529,17 @@ function draftTotal(){var d=S.draft;var t=0;d.lines.forEach(function(l){var p=S.
 function smsText(c){var tot=0;var its=c.lines.map(function(l){var p=S.prod[+l[0]];if(!p){return "";}tot+=num(l[2])*(l[3]!=null?num(l[3]):p.pr[chOf(c.type,+l[1])]);return p.name+" × "+num(l[2])+" "+(+l[1]===1?"հատ":p.unit);}).filter(Boolean).join(", ");
   return "Բարև"+(c.name?" "+c.name:"")+"։ Ձեր պատվերը Nectar of Armenia-ում ընդունված է՝ "+its+"։ Ընդամենը՝ $"+tot.toFixed(2)+(c.addr?"։ Առաքում՝ "+c.addr:"")+"։ Շնորհակալություն։ Հարցերի դեպքում՝ (515) 588-5555";}
 function smsHref(c){var d=String(c.phone||"").replace(/\D/g,"");if(d.length===10){d="1"+d;}return "sms:+"+d+"?&body="+encodeURIComponent(smsText(c));}
+function ofInit(){if(!S.of){S.of={t:"all",y:"all",m:"all"};}return S.of;}
+function ofBar(){var f=ofInit();var ys={};(S.calls||[]).forEach(function(c){var y=String(c.date||"").slice(0,4);if(y){ys[y]=1;}});ys[String(new Date().getFullYear())]=1;var yl=Object.keys(ys).sort().reverse();
+  var lst=ofList();var tot=0;lst.forEach(function(x){tot+=callTot(x[0]);});
+  return '<div class="ofb"><div class="usw">'+[["all","Բոլորը"],["r","🛒 Մանրածախ"],["w","🏪 Մեծածախ"]].map(function(t){return '<button type="button" data-oft="'+t[0]+'" class="'+(f.t===t[0]?"on":"")+'">'+t[1]+'</button>';}).join("")+'</div>'+
+  '<label>Տարի<select data-k="ofy"><option value="all"'+(f.y==="all"?" selected":"")+'>Բոլոր տարիները</option>'+yl.map(function(y){return '<option'+(f.y===y?" selected":"")+'>'+y+'</option>';}).join("")+'</select></label>'+
+  '<label>Ամիս<select data-k="ofm"><option value="all"'+(f.m==="all"?" selected":"")+'>Բոլոր ամիսները</option>'+MOS.map(function(n,i){return '<option value="'+i+'"'+(String(f.m)===String(i)?" selected":"")+'>'+n+'</option>';}).join("")+'</select></label>'+
+  '<div class="ofs"><span class="chip">Պատվերներ <b>'+lst.length+'</b></span><span class="chip pf">Գումար <b>'+m(tot)+'</b></span>'+((f.t!=="all"||f.y!=="all"||f.m!=="all")?'<button type="button" class="btn l pnow" data-oft="reset">✕ Մաքրել</button>':'')+'</div></div>';}
+function callTot(c){var t=0;(c.lines||[]).forEach(function(l){var p=S.prod[+l[0]];if(p){t+=num(l[2])*(l[3]!=null?num(l[3]):p.pr[chOf(c.type,+l[1])]);}});return t;}
+function ofList(){var f=ofInit();return (S.calls||[]).map(function(c,k){return [c,k];}).filter(function(x){var c=x[0];var dt=String(c.date||"");if(f.t!=="all"&&c.type!==f.t){return false;}if(f.y!=="all"&&dt.slice(0,4)!==String(f.y)){return false;}if(f.m!=="all"&&+dt.slice(5,7)-1!==+f.m){return false;}return true;}).sort(function(a,b){return a[0].date<b[0].date?1:-1;});}
 function viewOrders(){if(!S.draft){S.draft=newDraft();}if(!S.calls){S.calls=[];}var d=S.draft;if(!d.ddate){d.ddate=plusDays(2);}if(!d.slot){d.slot=SLOTS[0];}if(d.drv==null){d.drv=-1;}
-  perInit();var h='<div class="card"><div class="row"><div><h2>📞 Հեռախոսային պատվերներ</h2><p class="sub">Զանգով ստացված պատվերները՝ առանց հաճախորդի գրանցման։ Նշեք առաքման օրը, ժամը և վարորդը. պատվերը կհայտնվի ադմինի «Առաքումներ» բաժնում։</p></div></div></div>';
+  perInit();var h='<div class="card"><div class="row"><div><h2>📞 Հեռախոսային պատվերներ</h2><p class="sub">Զանգով ստացված պատվերները՝ առանց հաճախորդի գրանցման։ Նշեք առաքման օրը, ժամը և վարորդը. պատվերը կհայտնվի ադմինի «Առաքումներ» բաժնում։</p></div></div>'+ofBar()+'</div>';
   // phone order form
   var pOpts=function(sel){return S.prod.map(function(p,i){return '<option value="'+i+'"'+(i===+sel?" selected":"")+'>'+esc(p.name)+'</option>';}).join("");};
   h+='<div class="card"><div class="row"><div><h2>📞 '+(d.past?'Նախկինում արված պատվեր':'Նոր հեռախոսային պատվեր')+'</h2><p class="sub">Հաճախորդներ, ովքեր պատվիրում են զանգով և չեն ցանկանում գրանցվել։ Պատվերը կմտնի մոնիտորինգի մեջ։</p></div></div>';
@@ -538,9 +553,9 @@ function viewOrders(){if(!S.draft){S.draft=newDraft();}if(!S.calls){S.calls=[];}
   h+='</div><div class="row" style="margin-top:10px"><button type="button" class="btn l" data-act="dladd">+ Ապրանք</button><div style="display:flex;align-items:center;gap:12px"><span class="mini">Ընդամենը</span><b style="font-size:22px;color:var(--g)" id="dtot">'+m(draftTotal())+'</b><button type="button" class="btn gold" data-act="dsave">✓ Պահպանել պատվերը</button></div></div></div>';
   if(S.justSaved!=null&&S.calls[S.justSaved]){var js=S.calls[S.justSaved];h+='<div class="card svd"><div><b>✓ Պատվերը պահպանված է</b><span>Ուղարկեք հաստատման SMS հաճախորդին՝ '+esc(js.phone)+'</span><p class="smsp">'+esc(smsText(js))+'</p></div><div class="svd-a"><a class="btn gold" href="'+smsHref(js)+'" data-act="smsdone">📱 Ուղարկել SMS</a><button type="button" class="btn l" data-act="smsdone">Փակել</button></div></div>';}
   // list
-  var list=(S.calls||[]).map(function(c,k){return [c,k];}).sort(function(a,b){return a[0].date<b[0].date?1:-1;});
+  var list=ofList();
   h+='<div class="card"><div class="row"><h2>Հեռախոսային պատվերներ</h2><div class="dch">'+DRV.map(function(n,i){var c=list.filter(function(x){return +x[0].drv===i;}).length;return '<span class="chip">🚚 '+n+' <b>'+c+'</b></span>';}).join("")+'<span class="chip'+(list.some(function(x){return x[0].drv==null||+x[0].drv<0;})?' ng':'')+'">Առանց վարորդի <b>'+list.filter(function(x){return x[0].drv==null||+x[0].drv<0;}).length+'</b></span></div></div><div class="scroll" style="margin-top:10px"><table class="mtb"><thead><tr><th>Ամսաթիվ</th><th>Հաճախորդ</th><th>Ապրանքներ</th><th>Առաքում</th><th>Վարորդ</th><th class="num">Գումար</th><th>Վճարում</th><th></th></tr></thead><tbody>';
-  if(!list.length){h+='<tr><td colspan="8" class="mini" style="text-align:center;padding:18px">Դեռ հեռախոսով պատվեր չկա։</td></tr>';}
+  if(!list.length){h+='<tr><td colspan="8" class="mini" style="text-align:center;padding:18px">'+((S.calls||[]).length?'Ընտրված ֆիլտրով պատվեր չկա։':'Դեռ հեռախոսով պատվեր չկա։')+'</td></tr>';}
   list.forEach(function(x){var c=x[0],k=x[1];var tot=0;var its=c.lines.map(function(l){var p=S.prod[+l[0]];if(!p){return "";}var j=chOf(c.type,+l[1]);tot+=num(l[2])*(l[3]!=null?num(l[3]):p.pr[j]);return esc(p.name)+" × "+num(l[2])+" "+(+l[1]===1?"հատ":esc(p.unit));}).join("<br>");
     h+='<tr><td>'+esc(c.date)+'</td><td style="white-space:normal;min-width:170px"><b>'+esc(c.name||"—")+'</b>'+(c.book?' <span class="mp y">📒 գրքից</span>':(c.past?' <span class="mp y">🕘 նախկին</span>':''))+'<br><span class="mini">'+esc(c.phone||"")+(c.addr?" · "+esc(c.addr):"")+(c.email?" · ✉ "+esc(c.email)+(c.promo?" (առաջարկներ)":""):"")+'</span><br><span class="mp '+(c.type==="w"?"y":"g")+'">'+(c.type==="w"?"Մեծածախ":"Մանրածախ")+'</span></td><td class="mini" style="white-space:normal">'+its+'</td><td class="mini">'+(c.ddate?'<b>'+esc(c.ddate)+'</b><br>'+esc(c.slot||""):'—')+'</td><td><select class="psel" data-k="cd.'+k+'"><option value="-1"'+(c.drv==null||+c.drv<0?" selected":"")+'>—</option>'+DRV.map(function(n,i){return '<option value="'+i+'"'+(+c.drv===i?" selected":"")+'>'+n+'</option>';}).join("")+'</select></td><td class="num"><b>'+m(tot)+'</b></td><td><select class="psel" data-k="cp.'+k+'">'+[["cash","Կանխիկ"],["zelle","Zelle"],["card","Քարտ"]].concat(c.pay==="book"?[["book","Գրքից"]]:[]).map(function(o){return '<option value="'+o[0]+'"'+(c.pay===o[0]?" selected":"")+'>'+o[1]+'</option>';}).join("")+'</select> '+(c.paid?'<button type="button" class="pst ok" data-act="cpaid" data-r="'+k+'">✓ Վճարված</button>':'<button type="button" class="pst" data-act="cpaid" data-r="'+k+'">Հաստատել վճարումը</button>')+'</td><td style="white-space:nowrap">'+(c.phone?'<a class="smsb" href="'+smsHref(c)+'" title="Ուղարկել SMS">📱</a> ':'')+'<button type="button" class="x" data-act="cdel" data-r="'+k+'" title="Ջնջել">✕</button></td></tr>';});
   h+='</tbody></table></div></div>';
