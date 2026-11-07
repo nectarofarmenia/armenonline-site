@@ -1197,10 +1197,20 @@ function ap(){document.documentElement.style.zoom=z;try{localStorage.setItem(K,z
 window.azSet=function(d){z=Math.round(Math.min(1.6,Math.max(0.9,z+d))*100)/100;ap()};ap();})();</script>
 <script id="nofa-menuscroll-js">
 (function () { if (window.__nofaMS) { return; } window.__nofaMS = 1;
-  /* keep the menu's own scroll independent: wheel over the menu scrolls only the menu, wheel over the page scrolls the page */
-  function fit() { if (window.innerWidth < 900) { return; } var L = document.querySelectorAll('aside[style*="position: sticky"]'); for (var i = 0; i < L.length; i++) { var el = L[i]; var oh = el.offsetHeight || 1; var z = el.getBoundingClientRect().height / oh || 1; var top = parseFloat(el.style.top) || 0; var avail = window.innerHeight - top * z - 18; var mh = Math.max(200, Math.floor(avail / z)); if (el.style.maxHeight !== mh + "px") { el.style.maxHeight = mh + "px"; } } }
-  window.addEventListener("resize", fit); setInterval(fit, 700); setTimeout(fit, 300);
-  document.addEventListener("wheel", function (e) { var a = e.target && e.target.closest ? e.target.closest("aside") : null; if (!a || a.scrollHeight <= a.clientHeight + 2) { return; } var st = getComputedStyle(a).overflowY; if (st !== "auto" && st !== "scroll") { return; } var dy = e.deltaY * (e.deltaMode === 1 ? 32 : (e.deltaMode === 2 ? 600 : 1)); a.scrollTop += dy; e.preventDefault(); }, { passive: false });
+  /* The menu scrolls on its own, one whole row at a time, and its visible height always ends on a whole row. */
+  function zf(el) { return (el.getBoundingClientRect().height / (el.offsetHeight || 1)) || 1; }
+  function rows(el) { var z = zf(el), r0 = el.getBoundingClientRect(), out = []; var L = el.querySelectorAll("button, a, label"); for (var i = 0; i < L.length; i++) { var b = L[i]; if (!b.offsetHeight || b.offsetHeight < 22) { continue; } var p = b.parentElement, nested = false; while (p && p !== el) { if (p.tagName === "BUTTON" || p.tagName === "A") { nested = true; break; } p = p.parentElement; } if (nested) { continue; } var r = b.getBoundingClientRect(); var top = (r.top - r0.top) / z + el.scrollTop, bot = (r.bottom - r0.top) / z + el.scrollTop; if (out.length && Math.abs(out[out.length - 1].t - top) < 4) { continue; } out.push({ t: top, b: bot }); } return out; }
+  function avail(el) { var z = zf(el); var top = parseFloat(el.style.top) || 0; return Math.max(200, Math.floor((window.innerHeight - top * z - 18) / z)); }
+  function fit(el) { if (window.innerWidth < 900) { return; } var A = avail(el); var st0 = el.scrollTop, SH0 = el.scrollHeight; if (SH0 <= A + 2) { el.style.maxHeight = A + "px"; return; } if (st0 > 0 && SH0 - st0 <= A) { el.style.maxHeight = (SH0 - st0) + "px"; return; } el.style.maxHeight = A + "px"; var R = rows(el), st = el.scrollTop, best = 0, nxt = 1e9; for (var i = 0; i < R.length; i++) { if (R[i].b - st <= A - 4) { best = Math.max(best, R[i].b); } } for (var j = 0; j < R.length; j++) { if (R[j].t > best - 1 && R[j].t < nxt) { nxt = R[j].t; } } if (best > st) { var pad = nxt < 1e9 ? Math.max(1, Math.min(12, nxt - best - 1)) : 12; var h = Math.min(A, Math.floor(best - st + pad)); el.style.maxHeight = h + "px"; } }
+  function all() { var L = document.querySelectorAll('aside[style*="position: sticky"]'); for (var i = 0; i < L.length; i++) { fit(L[i]); } }
+  window.addEventListener("resize", all); setInterval(all, 900); setTimeout(all, 300);
+  var acc = 0, lastT = 0;
+  document.addEventListener("wheel", function (e) { var a = e.target && e.target.closest ? e.target.closest('aside[style*="position: sticky"]') : null; if (!a || window.innerWidth < 900) { return; } if (a.scrollHeight <= a.clientHeight + 2) { return; } e.preventDefault();
+    var dy = e.deltaY * (e.deltaMode === 1 ? 32 : (e.deltaMode === 2 ? 600 : 1)); var now = Date.now(); if (now - lastT > 250) { acc = 0; } lastT = now; acc += dy; if (Math.abs(acc) < 30) { return; } var dir = acc > 0 ? 1 : -1; acc = 0;
+    a.style.maxHeight = avail(a) + "px"; var R = rows(a), st = a.scrollTop, k = 0; for (var i = 0; i < R.length; i++) { if (R[i].t <= st + 6) { k = i; } } var n = Math.max(0, Math.min(R.length - 1, k + dir)); var tOf = function (q) { if (q <= 0) { return 0; } var g = R[q].t - R[q - 1].b; return R[q].t - Math.max(0, Math.min(8, g - 1)); }; var A = avail(a), SH = a.scrollHeight; var target = tOf(n);
+    if (SH - target < A) { for (var q = 0; q < R.length; q++) { if (SH - tOf(q) <= A) { target = tOf(q); break; } } if (dir > 0 && target < st + 1) { return; } }
+    a.style.maxHeight = Math.min(A, SH - target) + "px"; a.scrollTop = target; fit(a); }, { passive: false });
+  document.addEventListener("scroll", function (e) { var el = e.target; if (el && el.tagName === "ASIDE") { clearTimeout(el.__ft); el.__ft = setTimeout(function () { fit(el); }, 120); } }, true);
 })();
 </script>
 </body>
