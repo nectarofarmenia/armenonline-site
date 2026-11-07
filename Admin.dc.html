@@ -245,6 +245,9 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </div>
 </sc-if>
 
+<sc-if value="{{tab15}}" hint-placeholder-val="{{false}}">
+<iframe class="ext-frame" src="Cost.html?embed=1&amp;tab=orders" title="Phone orders" style="display: block; width: 100%; height: 1400px; border: 0; background: transparent"></iframe>
+</sc-if>
 <sc-if value="{{tab14}}" hint-placeholder-val="{{false}}">
 <iframe class="ext-frame" src="Cost.html?embed=1" title="Cost" style="display: block; width: 100%; height: 1400px; border: 0; background: transparent"></iframe>
 </sc-if>
@@ -540,11 +543,15 @@ var day0 = new Date(); day0.setHours(0, 0, 0, 0);
 var RAW = [];
 try { (JSON.parse(window.localStorage.getItem("noa-orders") || "[]") || []).forEach(function (o) { if (!o || !o.items) { return; } RAW.push({ no: String(o.no || "").replace(/^NOA-/, "NofA-"), ci: custOf(o.email, "R"), items: o.items, total: parseFloat(String(o.total || "0").replace(/[^0-9.]/g, "")) || 0, pay: "paid", st: 0, d: new Date(o.day || Date.now()) }); }); } catch (e) {}
 try { for (var ki = 0; ki < window.localStorage.length; ki++) { var kk0 = window.localStorage.key(ki); if (!kk0 || kk0.indexOf("noa-ws-orders|") !== 0 || kk0 === "noa-ws-orders|demo") { continue; } var em0 = kk0.slice(14); (JSON.parse(window.localStorage.getItem(kk0) || "[]") || []).forEach(function (o) { if (!o || !(o.ap === "approved" || o.ap === "pending")) { return; } var tw = 0; (o.items || []).forEach(function (x) { tw += x[1] * (WP[x[0]] || 0); }); RAW.push({ no: String(o.no || "").replace(/^NOA-/, "NofA-"), ci: custOf(em0, "W"), items: o.items || [], total: tw, pay: o.chargedAt ? "paid" : "unpaid", st: o.ap === "pending" ? 0 : (o.st === 2 ? 4 : (o.st === 1 ? 3 : 1)), d: new Date(o.date || Date.now()) }); }); } } catch (e) {}
+try { var CST = JSON.parse(window.localStorage.getItem("noa-cost-v2") || "null"); var SI = { gata: 0, khash: 1, khinkali: 4, pelmeni: 5, blinchik: 6, kufta: 7, kiev: 8, chcut: 9, beefcut: 10 };
+  if (CST && Array.isArray(CST.calls)) { CST.calls.forEach(function (c) { var ty = c.type === "w" ? "W" : "R"; var key = "tel:" + String(c.phone || "").replace(/\D/g, ""); var ix = cIdx[key + "|" + ty]; if (ix == null) { CUST.push([c.name || c.phone || "—", ty, (c.addr || "").split(",").slice(-2, -1)[0] ? String((c.addr || "").split(",").slice(-2, -1)[0]).trim() : (c.addr || ""), key, c.phone || ""]); ix = CUST.length - 1; cIdx[key + "|" + ty] = ix; }
+    var tot = 0; var its = []; (c.lines || []).forEach(function (l) { var pr = (CST.prod || [])[+l[0]]; if (!pr) { return; } var j = (c.type === "w" ? 2 : 0) + (+l[1] === 1 ? 1 : 0); tot += (+l[2] || 0) * (+(pr.pr || [])[j] || 0); var si = SI[pr.id]; if (si != null) { its.push([si, +l[2] || 0]); } });
+    RAW.push({ no: "NofA-T-" + String(c.id || "").slice(-5), ci: ix, items: its, total: tot, pay: c.paid ? "paid" : "unpaid", st: 1, drv: c.drv != null && +c.drv >= 0 ? +c.drv : -1, d: new Date((c.ddate || c.date || "") + "T12:00:00") }); }); } } catch (e) {}
 RAW.sort(function (a, b) { return b.d - a.d; });
 var ov = st.ov || (function () { try { return JSON.parse(window.localStorage.getItem("noa-admin-ov") || "{}") || {}; } catch (e) { return {}; } })();
 var orders = RAW.map(function (b, i) {
 var o = ov[b.no] || {}; var c = CUST[b.ci]; var isW = c[1] === "W"; var bd = new Date(b.d); bd.setHours(0, 0, 0, 0);
-return { i: i, no: b.no, ci: b.ci, cust: c[0], city: c[2] || "—", isW: isW, items: b.items, total: b.total, pay: o.pay || b.pay, st: typeof o.st === "number" ? o.st : b.st, drv: typeof o.drv === "number" ? o.drv : -1, dayOff: Math.round((bd - day0) / 864e5), inv: !!o.inv };
+return { i: i, no: b.no, ci: b.ci, cust: c[0], city: c[2] || "—", isW: isW, items: b.items, total: b.total, pay: o.pay || b.pay, st: typeof o.st === "number" ? o.st : b.st, drv: typeof o.drv === "number" ? o.drv : (typeof b.drv === "number" ? b.drv : -1), dayOff: Math.round((bd - day0) / 864e5), inv: !!o.inv };
 });
 var setO = function (i, patch) { var key = (orders[i] || {}).no; var n = Object.assign({}, ov); n[key] = Object.assign({}, n[key] || {}, patch); try { window.localStorage.setItem("noa-admin-ov", JSON.stringify(n)); } catch (e) {} self.setState({ ov: n }); };
 var now = new Date();
@@ -672,10 +679,10 @@ var chValsA = Object.assign(bcVals, { crGroups: crGroups, crNone: crGroups.lengt
  chToLine: chMemObj ? (chStoreObj && chStoreObj.retail ? chStoreObj.sub + " · " + (lang === "hy" ? "Մանրածախ հաճախորդ" : "Retail customer") : chMemObj[0] + " · " + chMemObj[1] + " · " + (chStoreObj ? chStoreObj.name : "")) : "",
  chMsgs: chView(chThrA), chEmpty: !(chThrA && chThrA.msgs && chThrA.msgs.length), chDraft: st.chDraft || "", chSetDraft: function (e) { self.setState({ chDraft: e.target.value }); },
  chKey: function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); chSendA(); } }, chSend: chSendA });
-var icons = ["📊", "📦", "🧾", "👥", "🏪", "🚚", "✉️", "🏭", "📈", "🆕", "📑", "💬", "🎨", "📉", "🧮"];
+var icons = ["📊", "📦", "🧾", "👥", "🏪", "🚚", "✉️", "🏭", "📈", "🆕", "📑", "💬", "🎨", "📉", "🧮", "📞"];
 var badges = [0, lowIdx.length, newCnt, 0, 0, orders.filter(function (o) { return o.drv < 0 && o.st < 4; }).length, 0, 0, 0];
-badges[9] = pendingApps; badges[10] = 0; badges[11] = chUnreadAdmin; badges[2] = badges[2] + wqPendN; var navL = t.nav.concat([t.regNav, t.invNav, (lang === "en" ? "Messages" : "Նամակներ"), (lang === "en" ? "Design & holidays" : "Դիզայն և տոներ"), (lang === "en" ? "Statistics" : "Ստատիստիկա"), (lang === "en" ? "Cost & profit" : "Ինքնարժեք և շահույթ")]);
-var navs = [0, 9, 1, 2, 13, 14, 10, 11, 3, 4, 5, 6, 7, 8, 12].map(function (i) { var lb = navL[i]; return { label: lb, icon: icons[i], cls: i === tab ? "on" : "", hasBadge: badges[i] > 0, badge: badges[i], pick: go(i) }; });
+badges[9] = pendingApps; badges[10] = 0; badges[11] = chUnreadAdmin; badges[2] = badges[2] + wqPendN; var navL = t.nav.concat([t.regNav, t.invNav, (lang === "en" ? "Messages" : "Նամակներ"), (lang === "en" ? "Design & holidays" : "Դիզայն և տոներ"), (lang === "en" ? "Statistics" : "Ստատիստիկա"), (lang === "en" ? "Cost & profit" : "Ինքնարժեք և շահույթ"), (lang === "en" ? "Phone orders" : "Հեռախոսային պատվերներ")]);
+var navs = [0, 9, 1, 2, 15, 13, 14, 10, 11, 3, 4, 5, 6, 7, 8, 12].map(function (i) { var lb = navL[i]; return { label: lb, icon: icons[i], cls: i === tab ? "on" : "", hasBadge: badges[i] > 0, badge: badges[i], pick: go(i) }; });
 
 function invYmd(d) { var m = d.getMonth() + 1, dd = d.getDate(); return d.getFullYear() + "-" + (m < 10 ? "0" : "") + m + "-" + (dd < 10 ? "0" : "") + dd; }
 var INV_TODAY = new Date(); var invToday = invYmd(INV_TODAY);
@@ -835,7 +842,7 @@ var sgMax = 1; sgGroups.forEach(function (g) { sgMax = Math.max(sgMax, sgVal(g.s
 var sgTot = sgSum(sgGroups.map(function (g) { return g.s; })); var sgN = sgVal(sgTot); var sgRev = (sgTy === "w" ? 0 : sgTot.rv) + (sgTy === "r" ? 0 : sgTot.wv);
 var sgBest = sgGroups.slice().sort(function (a, b) { return sgVal(b.s) - sgVal(a.s); })[0];
 var sgCut = (sgMode === "month" || sgMode === "quarter") ? 2 : 1; var sgLast = sgGroups[sgGroups.length - sgCut], sgPrev = sgGroups[sgGroups.length - sgCut - 1]; var sgCh = sgPrev && sgVal(sgPrev.s) ? Math.round((sgVal(sgLast.s) - sgVal(sgPrev.s)) / sgVal(sgPrev.s) * 100) : 0;
-var sgVals = { tab14: tab === 14, tab13: tab === 13, sgT: sgT, sgMinW: Math.max(520, sgGroups.length * 34) + "px",
+var sgVals = { tab15: tab === 15, tab14: tab === 14, tab13: tab === 13, sgT: sgT, sgMinW: Math.max(520, sgGroups.length * 34) + "px",
  sgModes: [["day", sgT.day], ["month", sgT.month], ["quarter", sgT.quarter], ["hol", "🎄 " + sgT.hol]].map(function (x) { return { label: x[1], cls: x[0] === sgMode ? "on" : "", pick: function () { self.setState({ sgM: x[0] }); } }; }),
  sgTypes: [["all", sgT.all], ["r", sgT.retail], ["w", sgT.ws]].map(function (x) { return { label: x[1], cls: x[0] === sgTy ? "on" : "", pick: function () { self.setState({ sgT: x[0] }); } }; }),
  sgKpis: [[sgT.orders, String(sgN), "#1D5545", ""], [sgT.rev, "$" + Math.round(sgRev).toLocaleString("en-US"), "#1D5545", ""], [sgT.avg, "$" + (sgN ? (sgRev / sgN).toFixed(2) : "0"), "#1D5545", ""], [sgT.best, sgBest ? sgBest.l : "—", "#9A6A00", sgBest ? String(sgVal(sgBest.s)) : ""], [sgLast ? sgLast.l : "", sgLast ? String(sgVal(sgLast.s)) : "0", "#1D5545", sgMode === "hol" ? "" : ((sgCh >= 0 ? "▲ +" : "▼ ") + sgCh + "% " + sgT.vs)]].map(function (k) { return { l: k[0], v: k[1], c: k[2], d: k[3], dc: /▼/.test(k[3]) ? "#B03A2E" : "#2F7A55" }; }),
