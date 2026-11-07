@@ -35,14 +35,16 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
   aside.sum-card[style*="position: sticky"], aside.card3d[style*="position: sticky"] { overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding-bottom: 18px !important; }
   aside[style*="top: 145px"][style*="position: sticky"] { max-height: calc(100vh - 160px); }
   aside[style*="top: 170px"][style*="position: sticky"] { max-height: calc(100vh - 186px); }
-  .ms-arrow { position: fixed; z-index: 70; width: 14px; height: 12px; border: 0; background: none; padding: 0; cursor: pointer; color: #C9922E; opacity: .9; display: flex; align-items: center; justify-content: center; }
-  .ms-arrow svg { width: 12px; height: 7px; display: block; }
-  .ms-arrow:hover { opacity: 1; color: #EBA93A; }
+  aside.card3d-dark[style*="flex: 0 0 250px"][style*="position: sticky"] { flex: 0 0 268px !important; padding-right: 30px !important; }
+  aside.card3d-dark[style*="flex: 0 0 280px"][style*="position: sticky"] { flex: 0 0 298px !important; padding-right: 38px !important; }
+  .ms-arrow { position: fixed; z-index: 70; width: 16px; height: 12px; border: 0; background: none; padding: 0; cursor: pointer; color: #EBA93A; opacity: .95; display: flex; align-items: center; justify-content: center; }
+  .ms-arrow svg { width: 13px; height: 8px; display: block; }
+  .ms-arrow:hover { opacity: 1; color: #FCDB82; }
   .ms-arrow.ms-dn { animation: msb 1.8s ease-in-out infinite; }
   .ms-arrow.ms-up { animation: msu 1.8s ease-in-out infinite; }
   @keyframes msb { 0%,100% { transform: translateY(0); } 50% { transform: translateY(2px); } }
   @keyframes msu { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
-  aside[style*="position: sticky"]::-webkit-scrollbar { width: 6px; height: 0; } aside[style*="position: sticky"]::-webkit-scrollbar-track { background: transparent; margin: 26px 0; } aside[style*="position: sticky"]::-webkit-scrollbar-thumb { background: rgba(235,169,58,.6); border-radius: 9px; }
+  aside[style*="position: sticky"]::-webkit-scrollbar { width: 6px; height: 0; } aside[style*="position: sticky"]::-webkit-scrollbar-track { background: transparent; margin: 34px 0; } aside[style*="position: sticky"]::-webkit-scrollbar-thumb { background: rgba(235,169,58,.6); border-radius: 9px; }
 }
 </style>
 </head>
@@ -1148,7 +1150,7 @@ return Object.assign(plVals, extVals, dzVals, lgVals, chVals, avVals, ivVals, rd
   function upd() { var el = aside(); if (!el) { return; } fit(el); if (!ind.dn) { ind.dn = mk("dn"); ind.up = mk("up"); ind.dn.onclick = function () { var a = aside(); if (a) { a.scrollBy({ top: a.clientHeight * 0.6, behavior: "smooth" }); } }; ind.up.onclick = function () { var a = aside(); if (a) { a.scrollBy({ top: -a.clientHeight * 0.6, behavior: "smooth" }); } }; }
     var r = el.getBoundingClientRect(); var more = el.scrollHeight - el.clientHeight - el.scrollTop > 4; var less = el.scrollTop > 4; var on = window.innerWidth >= 900 && r.height > 0;
     ind.dn.style.display = on && more ? "flex" : "none"; ind.up.style.display = on && less ? "flex" : "none";
-    var hz = parseFloat(getComputedStyle(document.documentElement).zoom) || 1; if (document.body) { hz *= parseFloat(getComputedStyle(document.body).zoom) || 1; } var sbw = (el.offsetWidth - el.clientWidth) || 6; ind.dn.style.left = ind.up.style.left = (r.right / hz - sbw / 2 - 7) + "px"; ind.dn.style.top = (r.bottom / hz - 22) + "px"; ind.up.style.top = (r.top / hz + 10) + "px"; }
+    var hz = parseFloat(getComputedStyle(document.documentElement).zoom) || 1; if (document.body) { hz *= parseFloat(getComputedStyle(document.body).zoom) || 1; } var dk = /card3d-dark/.test(el.className); var inset = dk ? 15 : 10; ind.dn.style.left = ind.up.style.left = (r.right / hz - inset - 8) + "px"; ind.dn.style.top = (r.bottom / hz - 30) + "px"; ind.up.style.top = (r.top / hz + 16) + "px"; }
   window.addEventListener("resize", upd); window.addEventListener("scroll", upd, { passive: true }); document.addEventListener("scroll", function (e) { if (e.target && e.target.tagName === "ASIDE") { upd(); } }, true);
   setInterval(upd, 600); setTimeout(upd, 300);
 })();
