@@ -235,6 +235,7 @@ function linkOf(v){var pay={};["zelle","zphone","acctName","bank","routing","acc
 function msgText(v,short){var T=tots(v);var lk=linkOf(v);var hy=v.lang==="hy";var nm=v.c.t==="w"?(v.c.n||""):(v.c.n||"").split(" ")[0];
   if(v.st==="paid"){return hy?"Բարև Ձեզ, "+nm+"։ Շնորհակալություն վճարման համար։ Ձեր "+v.no+" հաշիվը ("+m(T.tot)+") վճարված է։ Անդորրագիր՝ "+lk+" — Nectar of Armenia":"Hello "+nm+", thank you for your payment! Invoice "+v.no+" ("+m(T.tot)+") is paid in full. Receipt: "+lk+" — Nectar of Armenia";}
   return hy?"Բարև Ձեզ, "+nm+"։ Ձեր հաշիվը Nectar of Armenia-ից՝ "+v.no+", գումարը՝ "+m(T.bal)+", վճարել մինչև "+fdate(v.du,"hy")+"։ Դիտել / տպել՝ "+lk+(short?"":" Zelle՝ "+(PC.zelle||CFG0.zelle)+"։ Շնորհակալություն։"):"Hello "+nm+", here is your invoice "+v.no+" from Nectar of Armenia: "+m(T.bal)+" due "+fdate(v.du)+". View / print: "+lk+(short?"":" Pay by Zelle to "+(PC.zelle||CFG0.zelle)+". Thank you!");}
+function mailHref(v){return "mailto:"+encodeURIComponent(v.c.e||"").replace(/%40/g,"@")+"?subject="+encodeURIComponent((v.lang==="hy"?"Հաշիվ #":"Invoice #")+v.no+" — Nectar of Armenia")+"&body="+encodeURIComponent(msgText(v)+"\n\n"+(v.lang==="hy"?"Հարգանքով՝\nNectar of Armenia Inc\n(515) 588-5555":"Best regards,\nNectar of Armenia Inc\n(515) 588-5555"));}
 function chatTarget(v){var c=custOf(v.ck);if(c&&c.acc&&c.acc.em){return c.acc.w?{sk:c.acc.em,th:c.acc.em}:{sk:"retail:"+c.acc.em,th:"me"};}var em=String(v.c.e||"").toLowerCase();if(!em){return null;}var hit=null;Object.keys(ACC).forEach(function(k){var a=ACC[k];if(a&&String(a.email||"").toLowerCase()===em){var w=a.type==="biz"||/\|biz$/.test(k);hit=w?{sk:em,th:em}:{sk:"retail:"+em,th:"me"};}});return hit;}
 function markSent(v,how){var x=byId(v.id);if(!x){return;}if(x.st==="draft"){x.st="sent";}x.sentAt=x.sentAt||new Date().toISOString();logAdd(x,"Ուղարկվեց՝ "+how);saveDB();}
 function viewInv(){var v=byId(V.id);if(!v){V.tab="all";return viewAll();}var T=tots(v);var s=status(v);var ct=chatTarget(v);var digits=String(v.c.p||"").replace(/[^\d+]/g,"");
@@ -242,7 +243,7 @@ function viewInv(){var v=byId(V.id);if(!v){V.tab="all";return viewAll();}var T=t
   h+='<div class="card" style="margin:0"><div class="row"><b style="color:#1D5545">'+esc(v.no)+'</b>'+badge(v)+'</div><p class="sub" style="margin:6px 0 0"><button type="button" class="cn" data-cust="'+esc(v.ck)+'">'+esc(v.c.n)+'</button> · '+m(T.tot)+(s!=="paid"&&T.pd?' · մնացորդ '+m(T.bal):'')+'</p></div>';
   h+='<div class="card" style="margin:0;display:flex;flex-direction:column;gap:8px"><h3>📤 Ուղարկել հաճախորդին</h3>'
    +(digits?'<a class="btn y" data-send="sms" href="sms:'+esc(digits)+'?&body='+encodeURIComponent(msgText(v))+'">📱 SMS-ով ('+esc(v.c.p)+')</a>':'<div class="note">📱 SMS ուղարկելու համար ավելացրեք հեռախոսը (✏ Խմբագրել)։</div>')
-   +(v.c.e?'<a class="btn" data-send="email" href="mailto:'+esc(v.c.e)+'?subject='+encodeURIComponent((v.lang==="hy"?"Հաշիվ ":"Invoice ")+v.no+" — Nectar of Armenia")+'&body='+encodeURIComponent(msgText(v)+"\n\n"+(v.lang==="hy"?"Հարգանքով՝\nNectar of Armenia Inc\n(515) 588-5555":"Best regards,\nNectar of Armenia Inc\n(515) 588-5555"))+'">✉ Email-ով ('+esc(v.c.e)+')</a>':'<div class="note">✉ Email ուղարկելու համար ավելացրեք email-ը։</div>')
+   +(V.askEm?'<div style="display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:12px;background:#FBF9F4;border:1px solid #ECE3CF"><label class="f">Հաճախորդի email-ը<input class="t" type="email" id="emIn" placeholder="name@example.com" value="'+esc(v.c.e||"")+'"></label><div class="rowl"><button type="button" class="btn g s" data-a="emgo">✉ Ուղարկել</button><button type="button" class="btn s" data-a="emx">Չեղարկել</button></div><span class="mut">Email-ը կպահվի հաճախորդի էջում հաջորդ անգամների համար։</span></div>':(v.c.e?'<a class="btn" data-send="email" href="'+esc(mailHref(v))+'">✉ Email-ով ('+esc(v.c.e)+')</a><button type="button" class="cn" style="font-size:12px;align-self:center" data-a="emask">Ուղարկել այլ email-ի</button>':'<button type="button" class="btn" data-a="emask">✉ Ուղարկել email-ով</button>'))
    +(ct?'<button type="button" class="btn" data-a="chat">💬 Կայքի նամակով</button>':'<p class="mut" style="margin:0">💬 Կայքի նամակ՝ հնարավոր է միայն կայքում գրանցված հաճախորդների համար։</p>')
    +'<button type="button" class="btn" data-a="copy">🔗 Պատճենել հղումը</button><button type="button" class="btn" data-a="print">🖨 Տպել / PDF պահել</button></div>';
   h+='<div class="card" style="margin:0;display:flex;flex-direction:column;gap:8px"><h3>💵 Վճարում</h3>';
@@ -263,11 +264,18 @@ document.addEventListener("click",function(e){var t=e.target;var b;
   if((b=t.closest("[data-ord]"))&&ED){addOrder(b.getAttribute("data-ord"));render();return;}
   if((b=t.closest("[data-prof]"))){var pk=b.getAttribute("data-prof");if(window.parent!==window){try{parent.postMessage({nofaProf:pk},"*");}catch(x){}}else{location.href="Cost.html?cp="+encodeURIComponent(pk);}return;}
   if((b=t.closest("[data-cust]"))){e.stopPropagation();V.ck=b.getAttribute("data-cust");V.tab="cone";hpush();render();window.scrollTo(0,0);return;}
-  if((b=t.closest("[data-open]"))){V.id=b.getAttribute("data-open");V.tab="view";hpush();render();window.scrollTo(0,0);return;}
+  if((b=t.closest("[data-open]"))){V.askEm=0;V.id=b.getAttribute("data-open");V.tab="view";hpush();render();window.scrollTo(0,0);return;}
   if(!(b=t.closest("[data-a]"))){return;}var a=b.getAttribute("data-a");var v=byId(V.id);
   if(a==="new"){newInv("");hpush();render();}
   else if(a==="newfor"){newInv(b.getAttribute("data-ck"));hpush();render();window.scrollTo(0,0);}
   else if(a==="gen"){var k=genFromOrders();V.flash="";alert(k+" հաշիվ ստեղծվեց։");render();}
+  else if(a==="emask"){V.askEm=1;render();var ei=document.getElementById("emIn");if(ei){ei.focus();ei.select();}}
+  else if(a==="emx"){V.askEm=0;render();}
+  else if(a==="emgo"&&v){var em=(document.getElementById("emIn").value||"").trim();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){var ei2=document.getElementById("emIn");ei2.style.borderColor="#C0392B";ei2.focus();return;}
+    v.c.e=em;try{var S2=J("noa-cost-v2",{});if(!S2.cprof){S2.cprof={};}var pp=S2.cprof[v.ck]||(S2.cprof[v.ck]={});pp.email=em;localStorage.setItem("noa-cost-v2",JSON.stringify(S2));}catch(x){}
+    DB.list.forEach(function(x){if(x.ck===v.ck&&!x.c.e){x.c.e=em;}});saveDB();
+    var ln=document.createElement("a");ln.href=mailHref(v);ln.style.display="none";document.body.appendChild(ln);ln.click();ln.remove();
+    V.askEm=0;markSent(v,"Email ("+em+")");V.flash="Փոստի պատուհանը բացվեց՝ "+em+" հասցեով։ Email-ը պահվեց հաճախորդի էջում։";render();}
   else if(a==="ladd"){ED.lines.push(blankLine());render();}
   else if(a==="ldel"){ED.lines.splice(+b.getAttribute("data-i"),1);if(!ED.lines.length){ED.lines=[blankLine()];}render();}
   else if(a==="cancel"){ED=null;V.tab=V.id&&byId(V.id)?"view":"all";render();}
