@@ -197,6 +197,35 @@ tr.off td{opacity:.55}
 .sw input:checked+span{background:#1D5545}.sw input:checked+span:before{transform:translateX(18px)}
 .bagv{display:flex;flex-direction:column;font-weight:800;font-size:14px;color:#33403A}.bagv small{font-size:10.5px;color:#8A7A55;font-weight:700}
 .smt td.dk,.scroll td.dk{background:#EEF5F0}
+
+.stw{margin-top:14px;overflow-x:auto;border:1px solid #E4DCC8;border-radius:16px;background:#fff}
+.st2{border-collapse:separate;border-spacing:0;width:100%;font-size:13px}
+.st2 th,.st2 td{padding:7px 6px;border-bottom:1px solid #F0E8D6;white-space:nowrap}
+.st2 thead th{background:#FBF8F1;color:#6B5A30;font-size:11px;font-weight:800;letter-spacing:.03em;text-transform:none;vertical-align:bottom;border-bottom:1px solid #E4DCC8}
+.st2 thead th small{display:block;font-weight:600;color:#9A8A65;font-size:10px}
+.st2 thead tr:first-child th{text-align:center;font-size:12px;padding:9px;border-bottom:0}
+.st2 thead tr:first-child th span{display:block;color:#1E2A24}
+.st2 th.g0{background:#E8F1EC;color:#1D5545;border-radius:0}
+.st2 th.gr{background:#E3EEE7;border-top:3px solid #2F7A55}
+.st2 th.gw{background:#FBEFD5;border-top:3px solid #EBA93A}
+.st2 thead tr:first-child th.stk{text-align:left;vertical-align:bottom;font-size:11px}
+.st2 .stk{position:sticky;left:0;z-index:2;background:#fff;box-shadow:1px 0 0 #E4DCC8}
+.st2 thead .stk{background:#FBF8F1;z-index:3}
+.st2 .k{background:#F1F7F3}.st2 td.k b{color:#1D5545;font-size:14px}
+.st2 .bl{border-left:1px solid #E4DCC8}
+.st2 td.pr{color:#6B756F}
+.st2 tbody tr:hover td{background:#FFFAEE}.st2 tbody tr:hover td.stk{background:#FFFAEE}
+.sn2{display:flex;gap:7px;align-items:center}.sn2 i{font-style:normal;width:28px;height:28px;flex:0 0 auto;border-radius:10px;background:#FFF6DF;box-shadow:inset 0 0 0 1px rgba(235,169,58,.45);display:flex;align-items:center;justify-content:center;font-size:16px}
+.sn2 b{display:block;color:var(--g);font-size:13px;white-space:normal;line-height:1.15;font-family:Fraunces,'Noto Serif Armenian',Lora,serif;font-weight:600}.sn2 small{color:var(--mut);font-size:11px}
+.pfv{display:grid;grid-template-columns:auto;justify-items:end;gap:3px;min-width:60px}
+.pfv b{font-size:14px;font-variant-numeric:tabular-nums}.pfv.g b{color:#2F7A55}.pfv.y b{color:#B87A0A}.pfv.r b{color:#B03A2E}
+.pfv span{display:block;width:100%;height:4px;border-radius:9px;background:#F0E8D6;overflow:hidden}.pfv span i{display:block;height:100%;border-radius:9px}
+.pfv.g span i{background:#2F7A55}.pfv.y span i{background:#E0A030}.pfv.r span i{background:#B03A2E}
+.pfv em{font-style:normal;font-size:10.5px;font-weight:800;color:#8A7A55}
+.st2 td.best{background:#F3FAF5}
+.st2 td.nx{text-align:center;color:#A99C7C;font-size:11.5px;font-style:italic;background:repeating-linear-gradient(135deg,#FDFBF6 0 8px,#F7F2E6 8px 16px)}
+.st2 td.np{background:#FFFBF0;color:#B87A0A;font-style:normal;font-weight:700}
+.st2 tfoot td{background:#FBF8F1;font-weight:800;color:#1D5545;border-bottom:0}.st2 tfoot td.stk{background:#FBF8F1}
 @media (max-width:860px){.lh{display:none}.lg.lr{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:8px;padding:12px}.lr .li{grid-column:1/4}.lr .tg{grid-column:4;justify-self:end}
  .lr .lc{display:flex;flex-direction:column;gap:2px}.lr .lc:before{content:attr(data-l);font-size:10.5px;font-weight:800;color:#8A7A55}
  .lr .lp{grid-column:span 4;flex-direction:row;align-items:center;gap:10px;border-top:1px dashed #EDE3CC;padding-top:6px}.lr .lp:before{content:attr(data-l);font-size:11px;font-weight:800;color:#7A5A12;flex:0 0 110px}.lr .lp .pp{flex:0 0 100px}.lr .lp .pr{flex:1}.lr .lp .bar{display:none}}
@@ -333,14 +362,22 @@ function viewBag(){var b=S.bag;
   h+='</tbody></table></div></div>';
   return h;}
 function viewSum(){
-  var h='<div class="card"><div class="row"><div><h2>Ամփոփ աղյուսակ</h2><p class="sub">Բոլոր ապրանքների ինքնարժեքը, գները և օգուտը մեկ տեղում։ Թվերը փոխելու համար օգտվեք «Ապրանքներ» և «Հումքի գներ» բաժիններից։</p></div><button class="btn l" type="button" onclick="window.print()">🖨 Տպել</button></div>';
-  h+='<div class="scroll" style="margin-top:12px"><table class="smt"><thead><tr><th rowspan="2">Ապրանք</th><th colspan="5" class="gh">Ինքնարժեք</th>'+LBLT.map(function(l){return '<th colspan="2" class="gh ch">'+l+'</th>';}).join("")+'</tr><tr><th class="num">Հումք<br>/ հատ</th><th class="num">Աշխատ.<br>/ հատ</th><th class="num">Տուփ +<br>լեյբլ</th><th class="num dk">Ինքն.<br>/ հատ</th><th class="num dk">Ինքն.<br>/ տուփ</th>'+[0,1,2,3].map(function(){return '<th class="num ch">Գին</th><th class="num">Օգուտ</th>';}).join("")+'</tr></thead><tbody>';
+  var GH=[["🛒","Մանրածախ","տուփով","r"],["🛒","Մանրածախ","հատով","r"],["🏪","Մեծածախ","տուփով","w"],["🏪","Մեծածախ","հատով","w"]];
+  var h='<div class="card sumc"><div class="row"><div><h2>Ամփոփ աղյուսակ</h2><p class="sub">Բոլոր ապրանքների ինքնարժեքը, գները և օգուտը մեկ տեղում։ Թվերը փոխվում են «Ապրանքներ», «Հումքի գներ» և «Տոպրակներ» բաժիններում։</p></div><button class="btn l" type="button" onclick="window.print()">🖨 Տպել</button></div>';
+  h+='<div class="stw"><table class="st2"><thead><tr><th rowspan="2" class="stk">Ապրանք</th><th colspan="5" class="g0">💰 Ինքնարժեք</th>'+GH.map(function(g){return '<th colspan="2" class="g'+g[3]+'"><span>'+g[0]+' '+g[1]+'</span><small>'+g[2]+'</small></th>';}).join("")+'</tr>';
+  h+='<tr class="sub2"><th class="num">Հումք<small>1 հատ</small></th><th class="num">Աշխատ.<small>1 հատ</small></th><th class="num">Տուփ<small>+ լեյբլ</small></th><th class="num k">Ընդամենը<small>1 հատ</small></th><th class="num k">Ընդամենը<small>1 տուփ</small></th>'+GH.map(function(g){return '<th class="num bl">Գին</th><th class="num">Օգուտ</th>';}).join("")+'</tr></thead><tbody>';
+  var best=[0,1,2,3].map(function(j){var b=-1,bi=-1;S.prod.forEach(function(p,i){if(!avail(p,j)||!(p.pr[j]>0)){return;}var c=calc(p);var mg=c.profit[j]/p.pr[j];if(mg>b){b=mg;bi=i;}});return bi;});
+  var agg=[0,1,2,3].map(function(){return {s:0,n:0};});
   S.prod.forEach(function(p,i){var c=calc(p);
-    h+='<tr><td><div class="sn"><span>'+(ICO[p.id]||"📦")+'</span><div><b>'+esc(p.name)+'</b><small>1 '+esc(p.unit)+' = '+p.packPcs+' հատ</small></div></div></td><td class="num">'+m3(c.mat)+'</td><td class="num">'+m(p.labor)+'</td><td class="num">'+m(pc(p))+'</td><td class="num dk"><b>'+m(c.base)+'</b></td><td class="num dk"><b>'+m(c.packC)+'</b></td>';
-    CH.forEach(function(ch,j){if(!avail(p,j)){h+='<td colspan="2" class="na ch">—</td>';return;}var pr=p.pr[j],pf0=c.profit[j],mg=pr>0?pf0/pr:0,cl=mg>=0.35?"g":(mg>=0.2?"y":"r");
-      h+='<td class="num ch">'+(pr>0?m(pr):'<span class="pill w">—</span>')+'</td><td class="num">'+(pr>0?'<b class="pt'+cl+'">'+(pf0>=0?"+":"")+m(pf0)+'</b><br><span class="mp '+cl+'">'+(mg*100).toFixed(0)+'%</span>':'')+'</td>';});
+    h+='<tr><td class="stk"><div class="sn2"><i>'+(ICO[p.id]||"📦")+'</i><div><b>'+esc(p.name)+'</b><small>'+p.packPcs+' հատ / '+esc(p.unit)+'</small></div></div></td>';
+    h+='<td class="num">'+m3(c.mat)+'</td><td class="num">'+m(p.labor)+'</td><td class="num">'+m(pc(p))+'</td><td class="num k"><b>'+m(c.base)+'</b></td><td class="num k"><b>'+m(c.packC)+'</b></td>';
+    CH.forEach(function(ch,j){if(!avail(p,j)){h+='<td colspan="2" class="bl nx">չի վաճառվում</td>';return;}var pr=p.pr[j];
+      if(!(pr>0)){h+='<td colspan="2" class="bl nx np">գինը գրված չէ</td>';return;}
+      var pf0=c.profit[j],mg=pf0/pr,cl=mg>=0.35?"g":(mg>=0.2?"y":"r");agg[j].s+=mg;agg[j].n++;
+      h+='<td class="num bl pr">'+m(pr)+'</td><td class="num pf'+(best[j]===i?" best":"")+'"><div class="pfv '+cl+'"><b>'+(pf0>=0?"+":"")+m(pf0)+'</b><span><i style="width:'+Math.max(4,Math.min(100,mg*100)).toFixed(0)+'%"></i></span><em>'+(mg*100).toFixed(0)+'%'+(best[j]===i?" ★":"")+'</em></div></td>';});
     h+='</tr>';});
-  h+='</tbody></table></div><div class="legend"><span><span class="mp g">≥35%</span> լավ</span><span><span class="mp y">20–35%</span> միջին</span><span><span class="mp r">&lt;20%</span> ցածր</span><span>Տուփով գներն ու օգուտը մեկ տուփի համար են, հատով գները՝ մեկ հատի։</span></div></div>';
+  h+='</tbody><tfoot><tr><td class="stk">Միջին օգուտ</td><td colspan="5"></td>'+agg.map(function(a){var v=a.n?a.s/a.n:0;var cl=v>=0.35?"g":(v>=0.2?"y":"r");return '<td class="bl"></td><td class="num"><span class="mp '+cl+'">'+(a.n?(v*100).toFixed(0)+"%":"—")+'</span></td>';}).join("")+'</tr></tfoot></table></div>';
+  h+='<div class="legend"><span><span class="mp g">≥35%</span> լավ</span><span><span class="mp y">20–35%</span> միջին</span><span><span class="mp r">&lt;20%</span> ցածր</span><span>★ ամենաբարձր տոկոսը այդ սյունում</span><span>Տուփով գներն ու օգուտը մեկ տուփի համար են, հատով՝ մեկ հատի։</span></div></div>';
   return h;}
 function viewIngProd(){var h='<div class="card"><div class="row"><div><h2>Հումքը ըստ ապրանքների</h2><p class="sub">Յուրաքանչյուր ապրանքի բաղադրությունը, քանակները, արժեքը մեկ խմբաքանակում և մեկ հատին, և ինքնարժեքը։ Քանակները կարող եք փոխել հենց այստեղ։</p></div><div style="display:flex;gap:10px;flex-wrap:wrap">'+ivSw()+uSw()+'</div></div></div><div class="ipg">';
   S.prod.forEach(function(p,i){h+='<div class="ipc"><div class="ipc-h"><div class="pc-ic">'+(ICO[p.id]||"📦")+'</div><div style="min-width:0;flex:1"><b>'+esc(p.name)+'</b><div class="mini">'+p.batch+' հատ մեկ խմբաքանակից · 1 '+esc(p.unit)+' = '+p.packPcs+' հատ</div></div>'+out("is."+i)+'</div><div class="ipc-b">'+recipe(p,i)+'</div></div>';});
