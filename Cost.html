@@ -185,6 +185,18 @@ input:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
 .sn{display:flex;gap:8px;align-items:center;white-space:nowrap}.sn>span{font-size:18px}.sn b{display:block;color:var(--g);font-size:13.5px}.sn small{color:var(--mut);font-size:11px}
 .ptg{color:#2F7A55}.pty{color:#C08410}.ptr{color:#B03A2E}
 @media print{body{background:#fff}.hero,.legend .btn{display:none}.card{box-shadow:none}.smt{font-size:10px}}
+
+.bagf{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;margin-top:14px}
+.bf{display:flex;flex-direction:column;gap:4px;background:#FBF8F1;border:1px solid #ECE3CF;border-radius:14px;padding:10px 12px}
+.bf label{font-size:12px;font-weight:800;color:#8A7A55}.bf input.n{width:130px;font-size:17px;font-weight:800;text-align:left}
+.bf.res{background:linear-gradient(135deg,#246350,#1D5545);border-color:#1D5545;min-width:170px}.bf.res label{color:#BFD6CB}.bf.res b{font-family:Fraunces,Lora,serif;font-size:26px;color:#F6E3B4;line-height:1.1}.bf.res small{color:#BFD6CB;font-size:11.5px}
+.op{font-size:22px;font-weight:800;color:#C9B78E;padding-bottom:14px}
+tr.off td{opacity:.55}
+.sw{position:relative;display:inline-block;width:42px;height:24px;vertical-align:middle}.sw input{opacity:0;width:0;height:0}
+.sw span{position:absolute;inset:0;border-radius:99px;background:#D8CDB4;transition:.2s;cursor:pointer}.sw span:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw input:checked+span{background:#1D5545}.sw input:checked+span:before{transform:translateX(18px)}
+.bagv{display:flex;flex-direction:column;font-weight:800;font-size:14px;color:#33403A}.bagv small{font-size:10.5px;color:#8A7A55;font-weight:700}
+.smt td.dk,.scroll td.dk{background:#EEF5F0}
 @media (max-width:860px){.lh{display:none}.lg.lr{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:8px;padding:12px}.lr .li{grid-column:1/4}.lr .tg{grid-column:4;justify-self:end}
  .lr .lc{display:flex;flex-direction:column;gap:2px}.lr .lc:before{content:attr(data-l);font-size:10.5px;font-weight:800;color:#8A7A55}
  .lr .lp{grid-column:span 4;flex-direction:row;align-items:center;gap:10px;border-top:1px dashed #EDE3CC;padding-top:6px}.lr .lp:before{content:attr(data-l);font-size:11px;font-weight:800;color:#7A5A12;flex:0 0 110px}.lr .lp .pp{flex:0 0 100px}.lr .lp .pr{flex:1}.lr .lp .bar{display:none}}
@@ -234,6 +246,7 @@ function load(){try{var s=localStorage.getItem(KEY);if(s){var o=JSON.parse(s);if
   try{var o1=JSON.parse(localStorage.getItem("noa-cost-v1")||"null");if(o1&&o1.ing&&o1.prod){d.ing=o1.ing;if(o1.fixed){d.fixed=o1.fixed;}d.prod.forEach(function(p){var q=o1.prod.filter(function(x){return x.id===p.id;})[0];if(!q){return;}["labor","batch","pieceG","rec"].forEach(function(k){if(q[k]!=null){p[k]=q[k];}});if(q.pack>=0.5){p.packCost=q.pack;}});}}catch(e){}
   return d;}
 S=load();if(!S.month){S.month={};}
+if(!S.bag){S.bag={qty:7000,paid:4100,extra:0};S.prod.forEach(function(p){if(p.useBag==null){p.useBag=p.id!=="khash";p.label=0;}});}
 if(!S.wv1){var WG={khinkali:86,pelmeni:15,blinchik:85,kufta:80,kiev:120,chcut:120,beefcut:120};S.prod.forEach(function(p){if(WG[p.id]){p.pieceG=WG[p.id];}});S.wv1=1;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}if(!S.fixed){S.fixed=clone(DEF.fixed);}
 var saveT;function save(){try{localStorage.setItem(KEY,JSON.stringify(S));var el=document.getElementById("save");el.textContent="✓ Պահպանված է";clearTimeout(saveT);saveT=setTimeout(function(){el.textContent="";},1600);}catch(e){}}
 function $(s,r){return (r||document).querySelector(s);}
@@ -248,11 +261,13 @@ var LB=453.592;function isLb(){return S.wu==="lb";}function UL(){return isLb()?"
 function wfmt(gr){return isLb()?(gr/LB).toLocaleString("en-US",{maximumFractionDigits:2})+" lb":(gr/1000).toLocaleString("en-US",{maximumFractionDigits:2})+" կգ";}
 function uSw(){return '<div class="usw" role="group" aria-label="Միավոր"><button type="button" data-unit="kg" class="'+(isLb()?"":"on")+'">կգ</button><button type="button" data-unit="lb" class="'+(isLb()?"on":"")+'">lb</button></div>';}
 function calc(p){var M=ingMap();var tot=0,g=0;p.rec.forEach(function(r){tot+=r[1]*perG(M[r[0]]);g+=r[1];});var b=p.batch>0?p.batch:1;var mat=tot/b;
-  var base=mat+p.labor;var unit=function(j){return j%2===0?p.packPcs*base+p.packCost:base;};
-  return {batchCost:tot,batchG:g,gPc:g/b,mat:mat,base:base,packC:p.packPcs*base+p.packCost,cost:CH.map(function(c,j){return unit(j);}),profit:CH.map(function(c,j){return p.pr[j]-unit(j);})};}
+  var base=mat+p.labor;var PC=pc(p);var unit=function(j){return j%2===0?p.packPcs*base+PC:base;};
+  return {batchCost:tot,batchG:g,gPc:g/b,mat:mat,base:base,packC:p.packPcs*base+PC,cost:CH.map(function(c,j){return unit(j);}),profit:CH.map(function(c,j){return p.pr[j]-unit(j);})};}
+function bagU(){var b=S.bag||{};var q=num(b.qty);return q>0?(num(b.paid)+num(b.extra))/q:0;}
+function pc(p){return p.useBag?bagU()+num(p.label):num(p.packCost);}
 function avail(p,j){return !((j>=2&&!p.ws)||(j%2===1&&!p.pieceSale));}
 function per(j,p){return j%2===0?p.unit:"հատ";}
-var TABS=[["prod","📦","Ապրանքներ"],["sum","📋","Ամփոփում"],["ing","🥩","Հումքի գներ"],["month","📅","Ամսական հաշվարկ"],["notes","⚠️","Ուշադրություն"]];
+var TABS=[["prod","📦","Ապրանքներ"],["sum","📋","Ամփոփում"],["ing","🥩","Հումքի գներ"],["bag","🛍","Տոպրակներ"],["month","📅","Ամսական հաշվարկ"],["notes","⚠️","Ուշադրություն"]];
 var ICO={khinkali:"🥟",pelmeni:"🥟",blinchik:"🌯",kufta:"🧆",kiev:"🍗",chcut:"🍗",beefcut:"🥩",gata:"🥐",khash:"🍲"};
 function renderTabs(){$("#tabs").innerHTML=TABS.map(function(t){return '<button type="button" class="tab'+(S.tab===t[0]?" on":"")+'" data-tab="'+t[0]+'"><i>'+t[1]+'</i>'+t[2]+'</button>';}).join("");}
 document.addEventListener("click",function(e){var iv=e.target.closest("[data-iv]");if(iv){S.ingView=iv.getAttribute("data-iv");save();render();return;}var u=e.target.closest("[data-unit]");if(u){S.wu=u.getAttribute("data-unit");save();render();return;}var t=e.target.closest("[data-tab]");if(t){S.tab=t.getAttribute("data-tab");save();render();return;}
@@ -271,6 +286,8 @@ document.addEventListener("input",function(e){var el=e.target;var k=el.getAttrib
   if(a[0]==="ing"){S.ing[+a[1]][+a[2]]=v;}
   else if(a[0]==="ingw"){S.ing[+a[1]][3]=isLb()?v*LB:v*1000;}
   else if(a[0]==="p"){var p=S.prod[+a[1]];if(a[2]==="pr"){p.pr[+a[3]]=v;}else if(a[2]==="rec"){p.rec[+a[3]][+a[4]]=a[4]==="1"?v:el.value;}else{p[a[2]]=v;}}
+  else if(a[0]==="bag"){S.bag[a[1]]=v;}
+  else if(a[0]==="ub"){S.prod[+a[1]].useBag=el.checked;save();render();return;}
   else if(a[0]==="mo"){S.month[a[1]+"."+a[2]]=v;}
   else if(a[0]==="fx"){S.fixed[+a[1]][+a[2]]=v;}
   save();update();});
@@ -283,7 +300,7 @@ function viewProd(){var h='<div class="sumk">'+[["📈","Միջին շահութ
   h+='<div class="pl"><div class="lg lh"><span>Ապրանք</span><span>Հումք<br>1 հատ</span><span>Աշխատ.<br>1 հատ</span><span>Տուփ +<br>լեյբլ</span><span>Ինքնարժեք</span>'+LBL.map(function(l){return '<span>'+l+'</span>';}).join("")+'<span></span></div>';
   S.prod.forEach(function(p,i){var open=S.open===i;
     h+='<div class="lg lr'+(open?" on":"")+'"><div class="li" data-act="open" data-p="'+i+'"><div class="pc-ic">'+(ICO[p.id]||"📦")+'</div><div style="min-width:0"><b>'+esc(p.name)+'</b><div class="mini">1 '+esc(p.unit)+' = '+p.packPcs+' հատ'+out("warn."+i)+'</div></div></div>';
-    h+='<div class="lc lv" data-l="Հումք">'+out("mat."+i)+'</div><div class="lc" data-l="Աշխատավարձ">'+inp("p."+i+".labor",p.labor)+'</div><div class="lc" data-l="Տուփ + լեյբլ">'+inp("p."+i+".packCost",p.packCost)+'</div><div class="lc lv tot" data-l="Ինքնարժեք">'+out("cost."+i)+'</div>';
+    h+='<div class="lc lv" data-l="Հումք">'+out("mat."+i)+'</div><div class="lc" data-l="Աշխատավարձ">'+inp("p."+i+".labor",p.labor)+'</div><div class="lc" data-l="Տուփ + լեյբլ">'+(p.useBag?'<span class="bagv" title="Հաշվված է «Տոպրակներ» բաժնից">'+out("pcv."+i)+'<small>🛍 տոպրակ</small></span>':inp("p."+i+".packCost",p.packCost))+'</div><div class="lc lv tot" data-l="Ինքնարժեք">'+out("cost."+i)+'</div>';
     CH.forEach(function(c,j){if(!avail(p,j)){h+='<div class="lp na" data-l="'+LBLT[j]+'">'+(j>=2&&!p.ws?"մեծածախ չկա":"հատով չի վաճառվում")+'</div>';return;}
       h+='<div class="lp" data-l="'+LBLT[j]+'"><div class="pp"><em>$</em>'+inp("p."+i+".pr."+j,p.pr[j])+'<small class="per">/'+per(j,p)+'</small></div><div class="pr">'+out("pf."+i+"."+j)+out("mp."+i+"."+j)+'</div><div class="bar">'+out("bar."+i+"."+j)+'</div></div>';});
     h+='<button type="button" class="tg" title="Բաղադրություն" data-act="open" data-p="'+i+'">'+(open?"▴":"▾")+'</button>';
@@ -307,11 +324,19 @@ function recipe(p,i){var M=ingMap();
   h+='<div style="margin-top:10px"><button class="btn l" type="button" data-act="addrec" data-p="'+i+'">+ Ավելացնել հումք</button></div>';
   return h;}
 function ivSw(){var v=S.ingView==="prod";return '<div class="usw"><button type="button" data-iv="ing" class="'+(v?"":"on")+'">Ըստ հումքի</button><button type="button" data-iv="prod" class="'+(v?"on":"")+'">Ըստ ապրանքների</button></div>';}
+function viewBag(){var b=S.bag;
+  var h='<div class="card"><div class="row"><div><h2>Տոպրակների ինքնարժեք</h2><p class="sub">Գրեք քանի տոպրակ եք գնել և որքան եք վճարել։ Մեկ տոպրակի գինը ինքնաշխատ կմտնի բոլոր ապրանքների ինքնարժեքի մեջ։</p></div></div>';
+  h+='<div class="bagf"><div class="bf"><label>Գնված տոպրակներ (հատ)</label>'+inp("bag.qty",b.qty,"w",1)+'</div><span class="op">և</span><div class="bf"><label>Վճարված գումար ($)</label>'+inp("bag.paid",b.paid,"w")+'</div><span class="op">+</span><div class="bf"><label>Առաքում, մաքս, այլ ($)</label>'+inp("bag.extra",b.extra,"w")+'</div><span class="op">=</span><div class="bf res"><label>1 տոպրակի գինը</label><b>'+out("BU")+'</b><small>'+out("BUF")+'</small></div></div></div>';
+  h+='<div class="card"><h2>Ըստ ապրանքների</h2><p class="sub">Ամեն ապրանքի համար՝ քանի հատ է գնում մեկ տոպրակի մեջ և որքան է տոպրակի ծախսը մեկ հատին։ Եթե լեյբլ կամ այլ փաթեթավորում էլ կա, գրեք «Լեյբլ / այլ» սյունում։</p>';
+  h+='<div class="scroll" style="margin-top:10px"><table><thead><tr><th>Ապրանք</th><th class="num">Հատ<br>տոպրակում</th><th class="num">Տոպրակ</th><th class="num">Լեյբլ /<br>այլ ($)</th><th class="num">Փաթեթավորում<br>/ տոպրակ</th><th class="num">Փաթեթավորում<br>/ հատ</th><th class="num">Ինքնարժեք<br>/ տոպրակ</th><th>Օգտագործում է<br>այս տոպրակը</th></tr></thead><tbody>';
+  S.prod.forEach(function(p,i){h+='<tr'+(p.useBag?'':' class="off"')+'><td><div class="sn"><span>'+(ICO[p.id]||"📦")+'</span><div><b>'+esc(p.name)+'</b><small>'+esc(p.unit)+'</small></div></div></td><td class="num">'+inp("p."+i+".packPcs",p.packPcs,"",1)+'</td><td class="num">'+(p.useBag?out("BU2"):'—')+'</td><td class="num">'+(p.useBag?inp("p."+i+".label",p.label||0):'—')+'</td><td class="num"><b>'+out("bpk."+i)+'</b></td><td class="num">'+out("bpc."+i)+'</td><td class="num dk"><b>'+out("bic."+i)+'</b></td><td><label class="sw"><input type="checkbox" data-k="ub.'+i+'"'+(p.useBag?" checked":"")+'><span></span></label>'+(p.useBag?'':' <span class="mini">ձեռքով՝ «Ապրանքներ» բաժնում</span>')+'</td></tr>';});
+  h+='</tbody></table></div></div>';
+  return h;}
 function viewSum(){
   var h='<div class="card"><div class="row"><div><h2>Ամփոփ աղյուսակ</h2><p class="sub">Բոլոր ապրանքների ինքնարժեքը, գները և օգուտը մեկ տեղում։ Թվերը փոխելու համար օգտվեք «Ապրանքներ» և «Հումքի գներ» բաժիններից։</p></div><button class="btn l" type="button" onclick="window.print()">🖨 Տպել</button></div>';
   h+='<div class="scroll" style="margin-top:12px"><table class="smt"><thead><tr><th rowspan="2">Ապրանք</th><th colspan="5" class="gh">Ինքնարժեք</th>'+LBLT.map(function(l){return '<th colspan="2" class="gh ch">'+l+'</th>';}).join("")+'</tr><tr><th class="num">Հումք<br>/ հատ</th><th class="num">Աշխատ.<br>/ հատ</th><th class="num">Տուփ +<br>լեյբլ</th><th class="num dk">Ինքն.<br>/ հատ</th><th class="num dk">Ինքն.<br>/ տուփ</th>'+[0,1,2,3].map(function(){return '<th class="num ch">Գին</th><th class="num">Օգուտ</th>';}).join("")+'</tr></thead><tbody>';
   S.prod.forEach(function(p,i){var c=calc(p);
-    h+='<tr><td><div class="sn"><span>'+(ICO[p.id]||"📦")+'</span><div><b>'+esc(p.name)+'</b><small>1 '+esc(p.unit)+' = '+p.packPcs+' հատ</small></div></div></td><td class="num">'+m3(c.mat)+'</td><td class="num">'+m(p.labor)+'</td><td class="num">'+m(p.packCost)+'</td><td class="num dk"><b>'+m(c.base)+'</b></td><td class="num dk"><b>'+m(c.packC)+'</b></td>';
+    h+='<tr><td><div class="sn"><span>'+(ICO[p.id]||"📦")+'</span><div><b>'+esc(p.name)+'</b><small>1 '+esc(p.unit)+' = '+p.packPcs+' հատ</small></div></div></td><td class="num">'+m3(c.mat)+'</td><td class="num">'+m(p.labor)+'</td><td class="num">'+m(pc(p))+'</td><td class="num dk"><b>'+m(c.base)+'</b></td><td class="num dk"><b>'+m(c.packC)+'</b></td>';
     CH.forEach(function(ch,j){if(!avail(p,j)){h+='<td colspan="2" class="na ch">—</td>';return;}var pr=p.pr[j],pf0=c.profit[j],mg=pr>0?pf0/pr:0,cl=mg>=0.35?"g":(mg>=0.2?"y":"r");
       h+='<td class="num ch">'+(pr>0?m(pr):'<span class="pill w">—</span>')+'</td><td class="num">'+(pr>0?'<b class="pt'+cl+'">'+(pf0>=0?"+":"")+m(pf0)+'</b><br><span class="mp '+cl+'">'+(mg*100).toFixed(0)+'%</span>':'')+'</td>';});
     h+='</tr>';});
@@ -349,15 +374,17 @@ function viewNotes(){return '<div class="card"><h2>Ինչ գտա ձեր հաշվ
 '<li><b>Քուֆթայի գինը</b> մի տեղ $3.5 է, մյուսում՝ $4։ Վերցրել եմ $3.5։</li>'+
 '<li><b>Գաթա.</b> աշխատավարձը և վաճառքի գները ֆայլում չկային, լրացրեք։ <b>Խաշ.</b> բաղադրության թերթը դատարկ էր։</li></ul></div></div>';}
 
-function render(){renderTabs();$("#husw").innerHTML=uSw();var v=S.tab==="sum"?viewSum():S.tab==="ing"?viewIng():S.tab==="month"?viewMonth():S.tab==="notes"?viewNotes():viewProd();$("#view").innerHTML=v;update();}
+function render(){renderTabs();$("#husw").innerHTML=uSw();var v=S.tab==="bag"?viewBag():S.tab==="sum"?viewSum():S.tab==="ing"?viewIng():S.tab==="month"?viewMonth():S.tab==="notes"?viewNotes():viewProd();$("#view").innerHTML=v;update();}
 function set(k,html){var els=document.querySelectorAll('[data-o="'+k+'"]');for(var i=0;i<els.length;i++){els[i].innerHTML=html;}}
 function pf(v){return '<span class="'+(v>=0?"pos":"neg")+'">'+m(v)+'</span>';}
 function update(){var M=ingMap();
+  var bu=bagU();set("BU",m(bu,4));set("BU2",m(bu,3));set("BUF",num(S.bag.qty)?"("+m(num(S.bag.paid)+num(S.bag.extra))+" ÷ "+num(S.bag.qty).toLocaleString("en-US")+")":"");
+  S.prod.forEach(function(p,i){var c0=calc(p);var P=pc(p);set("pcv."+i,m(P));set("bpk."+i,m(P,3));set("bpc."+i,m(p.packPcs?P/p.packPcs:0,3));set("bic."+i,m(c0.packC));});
   S.ing.forEach(function(g,k){set("ik."+k,m(perU(g)));set("ik2."+k,m(perG(g)*(isLb()?1000:LB)));});
   var T={q:0,r:0,mat:0,lab:0,pack:0};var TC=[0,1,2,3].map(function(){return {q:0,n:0,r:0,p:0};});
   S.prod.forEach(function(p,i){var c=calc(p);set("mat."+i,m3(c.mat));set("mat2."+i,m3(c.mat));set("tc."+i,m(c.batchCost));set("tg."+i,Math.round(c.batchG).toLocaleString("en-US")+" գ <span class=\"mini\">("+wfmt(c.batchG)+")</span>");
     (function(){var tl=function(l,v,cl){return '<div class="it'+(cl?" "+cl:"")+'"><span>'+l+'</span><b>'+v+'</b></div>';};
-      var hh='<div class="isw"><div class="isg">'+tl("Հումք / հատ",m3(c.mat))+tl("Աշխատավարձ / հատ",m(p.labor))+tl("Տուփ + լեյբլ",m(p.packCost))+tl("Ինքնարժեք / հատ",m(c.base),"dk")+tl("Ինքնարժեք / "+esc(p.unit),m(c.packC),"dk")+'</div><div class="isc">';
+      var hh='<div class="isw"><div class="isg">'+tl("Հումք / հատ",m3(c.mat))+tl("Աշխատավարձ / հատ",m(p.labor))+tl("Տուփ + լեյբլ",m(pc(p)))+tl("Ինքնարժեք / հատ",m(c.base),"dk")+tl("Ինքնարժեք / "+esc(p.unit),m(c.packC),"dk")+'</div><div class="isc">';
       CH.forEach(function(ch,j){if(!avail(p,j)){hh+='<div class="ic na"><span>'+LBLT[j]+'</span><em>չի վաճառվում</em></div>';return;}var pr=p.pr[j];var pft=c.profit[j];var mg=pr>0?pft/pr:0;var cl=mg>=0.35?"g":(mg>=0.2?"y":"r");
         hh+='<div class="ic"><span>'+LBLT[j]+'</span><div class="ic-r"><small>Գին</small><b>'+(pr>0?m(pr):"—")+'<i>/'+per(j,p)+'</i></b></div><div class="ic-r"><small>Օգուտ</small><b class="'+(pr>0?cl:"")+'">'+(pr>0?(pft>=0?"+":"")+m(pft):"գին չկա")+'</b></div>'+(pr>0?'<div class="ic-m"><div class="bar"><i style="width:'+Math.max(0,Math.min(100,mg*100)).toFixed(0)+'%" class="'+cl+'"></i></div><span class="mp '+cl+'">'+pct(mg)+'</span></div>':'')+'</div>';});
       set("is."+i,hh+'</div></div>');})();
@@ -371,7 +398,7 @@ function update(){var M=ingMap();
     if(!p.rec.length){w=' <span class="pill r">բաղադրություն չկա</span>';}
     set("warn."+i,w);
     p.rec.forEach(function(r,k){var g=M[r[0]];var cost=r[1]*perG(g);set("rk."+i+"."+k,m(perU(g)));set("rc."+i+"."+k,m(cost));set("rp."+i+"."+k,m3(cost/(p.batch||1)));});
-    var q=0,rev=0,pk=0,pcs=0;CH.forEach(function(ch,j){if(!avail(p,j)){return;}var n=num(S.month[p.id+"."+j]);q+=n;rev+=n*p.pr[j];if(j%2===0){pk+=n*p.packCost;pcs+=n*p.packPcs;}else{pcs+=n;}});var mat=pcs*c.mat,lab=pcs*p.labor;var prof=rev-mat-lab-pk;
+    var q=0,rev=0,pk=0,pcs=0;CH.forEach(function(ch,j){if(!avail(p,j)){return;}var n=num(S.month[p.id+"."+j]);q+=n;rev+=n*p.pr[j];if(j%2===0){pk+=n*pc(p);pcs+=n*p.packPcs;}else{pcs+=n;}});var mat=pcs*c.mat,lab=pcs*p.labor;var prof=rev-mat-lab-pk;
     CH.forEach(function(ch,j){var n=avail(p,j)?num(S.month[p.id+"."+j]):0;TC[j].q+=n*(j%2===0?p.packPcs:1);TC[j].n+=n;TC[j].r+=n*p.pr[j];TC[j].p+=n*c.profit[j];});
     set("qs."+i,q?'<span class="chip">Ընդ. քանակ <b>'+pcs.toLocaleString("en-US")+' հատ</b></span><span class="chip">Ընդ. արժեք <b>'+m(rev)+'</b></span><span class="chip">Ծախս <b>'+m(mat+lab+pk)+'</b></span><span class="chip '+(prof>=0?"pf":"ng")+'">Օգուտ <b>'+m(prof)+'</b></span>':'<span class="mini">Գրեք վաճառված քանակը՝ օգուտը տեսնելու համար</span>');
     set("mq."+i,pcs?pcs.toLocaleString("en-US"):"—");set("mr."+i,m(rev));set("ml."+i,m(lab));set("mp."+i,pf(prof));
