@@ -142,7 +142,9 @@ function customers(){var C={};var get=function(n,t){if(!n){return null;}var k=ck
   var P=CS.cprof||{};Object.keys(C).forEach(function(k){var p=P[k];if(p){if(p.addr){C[k].a=p.addr;}if(p.phone){C[k].p=p.phone;}if(p.email){C[k].e=p.email;}}});
   return Object.keys(C).map(function(k){return C[k];}).sort(function(a,b){return a.n.localeCompare(b.n);});}
 function custOf(k){return customers().filter(function(c){return c.k===k;})[0]||null;}
-function nextNo(d){var y=String(d||today()).slice(0,4);var n=(DB.seq[y]||0)+1;return {y:y,n:n,no:"NofA-INV-"+y+"-"+("000"+n).slice(-4)};}
+function fmtNo(n){return ("000"+n).slice(-4);}
+function nextNo(ck){var mx=0;DB.list.forEach(function(v){if(v.ck===ck){var k=parseInt(String(v.no).replace(/\D/g,"").slice(-4),10)||0;if(k>mx){mx=k;}}});return {n:mx+1,no:fmtNo(mx+1)};}
+function renumber(){var G={};DB.list.forEach(function(v){(G[v.ck]=G[v.ck]||[]).push(v);});Object.keys(G).forEach(function(k){G[k].sort(function(a,b){return String(a.d).localeCompare(String(b.d))||String(a.created||"").localeCompare(String(b.created||""));}).forEach(function(v,i){v.no=fmtNo(i+1);});});DB.num2=1;}
 function byId(id){return DB.list.filter(function(v){return v.id===id;})[0];}
 function logAdd(v,t){(v.log=v.log||[]).push([new Date().toISOString(),t]);}
 
@@ -152,13 +154,13 @@ var PMN={cash:"Կանխիկ",zelle:"Zelle",card:"Քարտ",site:"Կայքում"
 function servedNoInv(){var used={};DB.list.forEach(function(x){(x.ord||[]).forEach(function(o){used[o]=1;});});var td=today();
   return (CS.calls||[]).filter(function(c){var d=String(c.ddate||c.date||"");return c.id&&!used[c.id]&&c.name&&d&&d<=td&&(c.lines||[]).length;});}
 function genFromOrders(){var L=servedNoInv().slice().sort(function(a,b){return String(a.ddate||a.date).localeCompare(String(b.ddate||b.date));});var P=CS.prod||[];var prof=CS.cprof||{};var n=0;
-  L.forEach(function(o){var t=o.type==="w"?"w":"r";var ck=ckey(o.name,t);var pf=prof[ck]||{};var d=String(o.ddate||o.date).slice(0,10);var y=d.slice(0,4);DB.seq[y]=(DB.seq[y]||0)+1;
+  L.forEach(function(o){var t=o.type==="w"?"w":"r";var ck=ckey(o.name,t);var pf=prof[ck]||{};var d=String(o.ddate||o.date).slice(0,10);
     var lines=[];(o.lines||[]).forEach(function(l){var p=P[+l[0]];if(!p){return;}var u=+l[1]===1?1:0;lines.push({pid:p.id,desc:pName(p.id,"en"),u:u,pp:+p.packPcs||10,q:+l[2]||0,pr:l[3]!=null?+l[3]:priceFor(p.id,u,t),un:"",ord:o.id});});
     if(!lines.length){return;}var terms=t==="w"?7:0;
-    var v={id:"inv"+Date.now().toString(36)+n,no:"NofA-INV-"+y+"-"+("000"+DB.seq[y]).slice(-4),ck:ck,c:{n:o.name,t:t,a:pf.addr||o.addr||"",e:pf.email||o.email||"",p:pf.phone||o.phone||""},d:d,du:addDays(d,terms),terms:terms,lang:"en",pt:t,lines:lines,disc:0,tax:0,ship:0,note:"",st:o.paid?"paid":"sent",ord:[o.id],created:new Date().toISOString(),auto:1,log:[[new Date().toISOString(),"Ստեղծվեց պատվերից ("+(o.book?"վաճառքի գիրք":"հեռախոսային պատվեր")+")"]]};
+    var v={id:"inv"+Date.now().toString(36)+n,no:"",ck:ck,c:{n:o.name,t:t,a:pf.addr||o.addr||"",e:pf.email||o.email||"",p:pf.phone||o.phone||""},d:d,du:addDays(d,terms),terms:terms,lang:"en",pt:t,lines:lines,disc:0,tax:0,ship:0,note:"",st:o.paid?"paid":"sent",ord:[o.id],created:new Date().toISOString(),auto:1,log:[[new Date().toISOString(),"Ստեղծվեց պատվերից ("+(o.book?"վաճառքի գիրք":"հեռախոսային պատվեր")+")"]]};
     if(o.paid){var tt=tots(v).tot;v.paid={d:d,m:PMN[o.pay]||"",amt:tt};}
     DB.list.push(v);n++;});
-  DB.autoImp=1;saveDB();return n;}
+  renumber();DB.autoImp=1;saveDB();return n;}
 /* ---- views ---- */
 function render(){load();var app=document.getElementById("app");var h='<div class="wrap"><div class="sa np" style="margin-bottom:8px"><a href="Admin.dc.html" style="color:#1D5545;font-weight:800;text-decoration:none">← Ադմին</a></div>';
   h+='<div class="card np"><div class="row"><div><h2>📄 Հաշիվներ (Invoices)</h2><p class="sub">Կազմեք հաշիվ, պահեք այն հաճախորդի անվան տակ և ուղարկեք SMS-ով, email-ով կամ կայքի նամակով։ Հաճախորդը ստանում է հղում, որով կարող է բացել, տպել կամ PDF պահել։</p></div><button type="button" class="btn y" data-a="new">➕ Նոր հաշիվ</button></div>';
@@ -193,14 +195,14 @@ function viewCustOne(){var c=custOf(V.ck)||{k:V.ck,n:V.ck.split("|")[0],t:V.ck.s
 /* ---- editor ---- */
 var ED=null;
 function blankLine(){return {pid:"",desc:"",u:0,pp:10,q:1,pr:0,un:""};}
-function newInv(ck){var c=ck?custOf(ck):null;var d=today();var t=c&&c.t==="r"?0:7;ED={id:"",no:"",ck:c?c.k:"",c:c?{n:c.n,t:c.t,a:c.a,e:c.e,p:c.p}:{n:"",t:"w",a:"",e:"",p:""},d:d,terms:t,lang:"en",pt:c?c.t:"w",lines:[blankLine()],disc:0,tax:0,ship:0,note:"",st:"draft",ord:[]};V.tab="edit";}
+function newInv(ck){var c=ck?custOf(ck):null;var d=today();var t=c&&c.t==="r"?0:7;ED={id:"",no:c?nextNo(c.k).no:"",ck:c?c.k:"",c:c?{n:c.n,t:c.t,a:c.a,e:c.e,p:c.p}:{n:"",t:"w",a:"",e:"",p:""},d:d,terms:t,lang:"en",pt:c?c.t:"w",lines:[blankLine()],disc:0,tax:0,ship:0,note:"",st:"draft",ord:[]};V.tab="edit";}
 function priceFor(pid,u,pt){var p=prods().filter(function(x){return x.id===pid;})[0];if(!p){return 0;}var j=(pt==="w"?2:0)+(u===1?1:0);var v=+(p.pr||[])[j]||0;if(!v&&u===1&&(+(p.pr||[])[j-1]||0)){v=(+p.pr[j-1])/(+p.packPcs||10);}return Math.round(v*100)/100;}
 function pName(pid,lg){var p=prods().filter(function(x){return x.id===pid;})[0];return lg==="hy"?(PNHY[pid]||(p&&p.name)||pid):(EN[pid]||(p&&p.name)||pid);}
 function viewEdit(){if(!ED){newInv("");}var v=ED;var C=customers();var T=tots(v);var P=prods();
   var h='<div class="card"><div class="row"><h2>'+(v.id?'✏ Խմբագրել '+esc(v.no):'➕ Նոր հաշիվ')+'</h2><div class="rowl"><span class="mut">Հաշվի լեզուն</span><div class="chips">'+[["en","English"],["hy","Հայերեն"]].map(function(x){return '<button type="button" class="chip'+(v.lang===x[0]?' on':'')+'" data-lang="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div></div></div>';
   h+='<h3 style="margin-top:14px">1. Հաճախորդ</h3><div class="g2"><label class="f">Ընտրել գոյություն ունեցողից<select class="t" data-k="ck"><option value="">— Նոր հաճախորդ կամ ընտրեք —</option>'+C.map(function(c){return '<option value="'+esc(c.k)+'"'+(v.ck===c.k?' selected':'')+'>'+(c.t==="w"?"🏪 ":"👤 ")+esc(c.n)+(c.p?" · "+esc(c.p):"")+'</option>';}).join("")+'</select></label><label class="f">Տեսակ (գները)<select class="t" data-k="ct"><option value="w"'+(v.c.t==="w"?' selected':'')+'>🏪 Կազմակերպություն · մեծածախ գներ</option><option value="r"'+(v.c.t!=="w"?' selected':'')+'>👤 Անհատ · մանրածախ գներ</option></select></label></div>';
   h+='<div class="g4" style="margin-top:10px"><label class="f">Անուն / ընկերություն *<input class="t" data-k="c.n" value="'+esc(v.c.n)+'"></label><label class="f">Հեռախոս (SMS-ի համար)<input class="t" type="tel" data-k="c.p" value="'+esc(v.c.p)+'"></label><label class="f">Email<input class="t" type="email" data-k="c.e" value="'+esc(v.c.e)+'"></label><label class="f">Հասցե<input class="t" data-k="c.a" value="'+esc(v.c.a)+'"></label></div>';
-  h+='<h3 style="margin-top:16px">2. Ամսաթիվ և պայմաններ</h3><div class="g4"><label class="f">Ամսաթիվ<input class="t" type="date" data-k="d" value="'+esc(v.d)+'"></label><label class="f">Վճարման պայման<select class="t" data-k="terms">'+[[0,"Ստանալիս (Due on receipt)"],[7,"7 օր (Net 7)"],[15,"15 օր (Net 15)"],[30,"30 օր (Net 30)"]].map(function(x){return '<option value="'+x[0]+'"'+(+v.terms===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join("")+'</select></label><label class="f">Վերջնաժամկետ<input class="t" type="date" value="'+addDays(v.d,v.terms)+'" disabled></label><label class="f">Հաշվի №<input class="t" value="'+esc(v.no||nextNo(v.d).no)+'" disabled></label></div>';
+  h+='<h3 style="margin-top:16px">2. Ամսաթիվ և պայմաններ</h3><div class="g4"><label class="f">Ամսաթիվ<input class="t" type="date" data-k="d" value="'+esc(v.d)+'"></label><label class="f">Վճարման պայման<select class="t" data-k="terms">'+[[0,"Ստանալիս (Due on receipt)"],[7,"7 օր (Net 7)"],[15,"15 օր (Net 15)"],[30,"30 օր (Net 30)"]].map(function(x){return '<option value="'+x[0]+'"'+(+v.terms===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join("")+'</select></label><label class="f">Վերջնաժամկետ<input class="t" type="date" value="'+addDays(v.d,v.terms)+'" disabled></label><label class="f">Հաշվի № <span class="mut" style="font-weight:600">(ըստ հաճախորդի)</span><input class="t" data-k="no" value="'+esc(v.no||(v.ck?nextNo(v.ck).no:"0001"))+'"></label></div>';
   // import from orders
   var ords=v.ck?(CS.calls||[]).filter(function(c){return ckey(c.name,c.type==="w"?"w":"r")===v.ck;}).sort(function(a,b){return String(b.date).localeCompare(String(a.date));}).slice(0,30):[];
   if(ords.length){var used={};DB.list.forEach(function(x){if(x.id!==v.id){(x.ord||[]).forEach(function(o){used[o]=x.no;});}});
@@ -219,7 +221,8 @@ function addOrder(id){var o=(CS.calls||[]).filter(function(c){return c.id===id;}
 function saveEd(to){var v=ED;if(!String(v.c.n||"").trim()){alert("Գրեք հաճախորդի անունը։");return;}v.lines=v.lines.filter(function(l){return l.desc||l.pid||+l.pr;});if(!v.lines.length){alert("Ավելացրեք գոնե մեկ ապրանք։");v.lines=[blankLine()];return;}
   v.lines.forEach(function(l){if(!l.desc&&l.pid){l.desc=pName(l.pid,v.lang);}});
   v.ck=ckey(v.c.n,v.c.t);v.du=addDays(v.d,v.terms);
-  if(!v.id){var nx=nextNo(v.d);DB.seq[nx.y]=nx.n;v.no=nx.no;v.id="inv"+Date.now().toString(36);v.created=new Date().toISOString();logAdd(v,"Ստեղծվեց");DB.list.push(JSON.parse(JSON.stringify(v)));}
+  if(!v.no||!String(v.no).trim()){v.no=nextNo(v.ck).no;}var dupl=DB.list.some(function(x){return x.id!==v.id&&x.ck===v.ck&&String(x.no)===String(v.no);});if(dupl&&!confirm(v.c.n+"-ը արդեն ունի "+v.no+" համարով հաշիվ։ Պահե՞լ նույն համարով։")){return;}
+  if(!v.id){v.id="inv"+Date.now().toString(36);v.created=new Date().toISOString();logAdd(v,"Ստեղծվեց");DB.list.push(JSON.parse(JSON.stringify(v)));}
   else{logAdd(v,"Խմբագրվեց");DB.list=DB.list.map(function(x){return x.id===v.id?JSON.parse(JSON.stringify(v)):x;});}
   // remember contact info in customer profile
   try{var S=J("noa-cost-v2",{});if(!S.cprof){S.cprof={};}var p=S.cprof[v.ck]||(S.cprof[v.ck]={});if(v.c.p&&!p.phone){p.phone=v.c.p;}if(v.c.e&&!p.email){p.email=v.c.e;}if(v.c.a&&!p.addr){p.addr=v.c.a;}localStorage.setItem("noa-cost-v2",JSON.stringify(S));}catch(e){}
@@ -275,7 +278,7 @@ document.addEventListener("click",function(e){var t=e.target;var b;
   else if(a==="pay"&&v){var amt=+document.getElementById("pa").value||0;var T=tots(v);var pd=document.getElementById("pd").value||today();var pm=document.getElementById("pm").value;var prev=+((v.paid||{}).amt)||0;var tot=prev+amt;v.paid={d:pd,m:pm,amt:tot};if(tot>=T.tot-0.005){v.st="paid";}else if(v.st==="draft"){v.st="sent";}logAdd(v,"Վճարում "+m(amt)+" · "+pm);saveDB();V.flash=v.st==="paid"?"Հաշիվը նշվեց որպես վճարված։ Կարող եք ուղարկել շնորհակալական SMS՝ վճարման հաստատումով։":"Մասնակի վճարումը գրանցվեց։";render();}
   else if(a==="unpay"&&v){v.st="sent";v.paid=null;logAdd(v,"Վճարումը հանվեց");saveDB();render();}
   else if(a==="edit"&&v){ED=JSON.parse(JSON.stringify(v));if(!ED.ord){ED.ord=[];}V.tab="edit";render();window.scrollTo(0,0);}
-  else if(a==="dup"&&v){ED=JSON.parse(JSON.stringify(v));ED.id="";ED.no="";ED.d=today();ED.st="draft";ED.paid=null;ED.log=[];ED.ord=[];ED.sentAt=null;V.tab="edit";render();window.scrollTo(0,0);}
+  else if(a==="dup"&&v){ED=JSON.parse(JSON.stringify(v));ED.id="";ED.no=nextNo(ED.ck).no;ED.d=today();ED.st="draft";ED.paid=null;ED.log=[];ED.ord=[];ED.sentAt=null;V.tab="edit";render();window.scrollTo(0,0);}
   else if(a==="void"&&v){if(!confirm("Չեղարկե՞լ "+v.no+" հաշիվը։ Այն կմնա ցուցակում՝ որպես չեղարկված։")){return;}v.st="void";logAdd(v,"Չեղարկվեց");saveDB();render();}
   else if(a==="unvoid"&&v){v.st="sent";logAdd(v,"Վերականգնվեց");saveDB();render();}
   else if(a==="del"&&v){if(!confirm("Ջնջե՞լ "+v.no+" հաշիվը ընդմիշտ։")){return;}DB.list=DB.list.filter(function(x){return x.id!==v.id;});saveDB();V.tab="all";render();}
@@ -287,11 +290,12 @@ document.addEventListener("input",function(e){var el=e.target;var k=el.getAttrib
   if(a[0]==="c"){ED.c[a[1]]=el.value;return;}
   if(a[0]==="l"){var l=ED.lines[+a[1]];var f=a[2];if(f==="q"||f==="pr"){l[f]=+el.value||0;var la=document.getElementById("la"+a[1]);if(la){la.textContent=m(l.q*l.pr);}var tb=document.getElementById("tot");if(tb){tb.innerHTML=totBox(tots(ED));}}else if(f==="desc"){l.desc=el.value;}return;}
   if(k==="disc"||k==="ship"||k==="tax"){ED[k]=+el.value||0;var tb2=document.getElementById("tot");if(tb2){tb2.innerHTML=totBox(tots(ED));}return;}
-  if(k==="note"){ED.note=el.value;return;}});
+  if(k==="note"){ED.note=el.value;return;}
+  if(k==="no"){ED.no=el.value.trim();return;}});
 document.addEventListener("change",function(e){var el=e.target;var k=el.getAttribute&&el.getAttribute("data-k");if(!k){return;}var a=k.split(".");
   if(k==="mo"){V.mo=el.value;render();return;}
   if(!ED){return;}
-  if(k==="ck"){var c=custOf(el.value);if(c){ED.ck=c.k;ED.c={n:c.n,t:c.t,a:c.a,e:c.e,p:c.p};ED.terms=c.t==="w"?7:0;}else{ED.ck="";ED.c={n:"",t:ED.c.t,a:"",e:"",p:""};}ED.ord=[];ED.lines=ED.lines.filter(function(l){return !l.ord;});if(!ED.lines.length){ED.lines=[blankLine()];}reprice();render();return;}
+  if(k==="ck"){var c=custOf(el.value);if(c){ED.ck=c.k;ED.c={n:c.n,t:c.t,a:c.a,e:c.e,p:c.p};ED.terms=c.t==="w"?7:0;if(!ED.id){ED.no=nextNo(c.k).no;}}else{ED.ck="";ED.c={n:"",t:ED.c.t,a:"",e:"",p:""};}ED.ord=[];ED.lines=ED.lines.filter(function(l){return !l.ord;});if(!ED.lines.length){ED.lines=[blankLine()];}reprice();render();return;}
   if(k==="ct"){ED.c.t=el.value;reprice();render();return;}
   if(k==="d"){ED.d=el.value||today();render();return;}
   if(k==="terms"){ED.terms=+el.value;render();return;}
@@ -301,6 +305,6 @@ function hpush(){try{history.pushState({iv:1,tab:V.tab,id:V.id,ck:V.ck},"");}cat
 window.addEventListener("popstate",function(e){var s=e.state;if(s&&s.iv){V.tab=s.tab==="edit"&&!ED?"all":s.tab;V.id=s.id;V.ck=s.ck;render();}});
 var lastH=0;function post(){if(!/emb/.test(document.documentElement.className)){return;}var w=document.querySelector(".wrap");if(!w){return;}var h=Math.ceil(w.getBoundingClientRect().bottom+window.scrollY);if(Math.abs(h-lastH)>4){lastH=h;try{parent.postMessage({nofaH:h,page:"Invoices.html"},"*");}catch(x){}}}
 if(/emb/.test(document.documentElement.className)){document.documentElement.style.overflow="hidden";setInterval(post,500);window.addEventListener("wheel",function(e){if(Math.abs(e.deltaY)<=Math.abs(e.deltaX)){return;}e.preventDefault();var k=e.deltaMode===1?32:(e.deltaMode===2?600:1);try{parent.postMessage({nofaWheel:e.deltaY*k},"*");}catch(x){}},{passive:false});}
-(function(){var qs=location.search;var mc=qs.match(/[?&]ck=([^&]+)/);var mn=qs.match(/[?&]new=([^&]+)/);load();if(!DB.autoImp&&servedNoInv().length){genFromOrders();}if(mc){V.ck=decodeURIComponent(mc[1]);V.tab="cone";}if(mn){newInv(decodeURIComponent(mn[1]));}try{history.replaceState({iv:1,tab:V.tab,id:V.id,ck:V.ck},"");}catch(x){}render();})();
+(function(){var qs=location.search;var mc=qs.match(/[?&]ck=([^&]+)/);var mn=qs.match(/[?&]new=([^&]+)/);load();if(!DB.autoImp&&servedNoInv().length){genFromOrders();}if(!DB.num2&&DB.list.length){renumber();saveDB();}if(mc){V.ck=decodeURIComponent(mc[1]);V.tab="cone";}if(mn){newInv(decodeURIComponent(mn[1]));}try{history.replaceState({iv:1,tab:V.tab,id:V.id,ck:V.ck},"");}catch(x){}render();})();
 }
 </script></body></html>
