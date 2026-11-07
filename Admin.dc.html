@@ -350,6 +350,15 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 .sx-num{display:flex;flex-direction:column}.sx-num span{font-size:11.5px;color:#8A8F86}
 .sx-pill{justify-self:end;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap}
 @media (max-width:1100px){.sx-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.sx-row{grid-template-columns:34px 1fr 1fr;}.sx-num,.sx-pill{display:none}}
+.cu-k b.pl-kv{display:block;font-family:Fraunces,Lora,serif!important;font-size:28px!important;line-height:1.15;color:#F6C35A;font-weight:600}.pl-nums b.pl-v{font-size:19px!important;color:#1D5545;font-weight:800;font-variant-numeric:tabular-nums}.pl-n{line-height:1.2}
+.pl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.pl-card{position:relative;border-radius:20px;background:#fff;border:1px solid #ECE3CF;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 6px 16px rgba(29,85,69,.06);overflow:hidden}
+.pl-card:before{content:"";position:absolute;left:0;top:0;right:0;height:5px;background:linear-gradient(90deg,#2F7A55,#8CC5A2)}.pl-card.low:before{background:linear-gradient(90deg,#D38A22,#FCDB82)}
+.pl-top{display:flex;gap:12px;align-items:center}.pl-ic{width:46px;height:46px;flex:0 0 46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;background:#F3EBD7}
+.pl-n{font-weight:800;font-size:16px;color:#133B30}.pl-s{font-size:12px;color:#6B756F}
+.pl-badge{padding:6px 12px;border-radius:999px;font-weight:800;font-size:13px;white-space:nowrap;background:#DDF1E4;color:#22704A}.pl-card.low .pl-badge{background:#FFF1D6;color:#8A5A00}
+.pl-bar{position:relative;height:10px;border-radius:9px;background:#F0E8D6}.pl-bar i{display:block;height:100%;border-radius:9px}.pl-bar b{position:absolute;top:-4px;width:2px;height:18px;background:#A1362A;border-radius:2px}
+.pl-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:10px;border-radius:14px;background:#FBF9F4}.pl-nums div{display:flex;flex-direction:column}.pl-nums > div > span{font-size:11px;color:#8A8F86}.pl-nums b .sc-interp,.cu-k b .sc-interp{font-size:inherit!important;color:inherit!important}
 .cu-hero{border-radius:24px;padding:24px 26px;margin-bottom:14px;background:radial-gradient(120% 140% at 100% 0%,rgba(235,169,58,.25),transparent 55%),linear-gradient(135deg,#1D5545,#133B30);color:#F7F3EA;box-shadow:0 14px 30px rgba(19,59,48,.25);position:relative;overflow:hidden}
 .cu-hero:after{content:"";position:absolute;right:-60px;bottom:-60px;width:220px;height:220px;border-radius:50%;border:2px solid rgba(235,169,58,.25)}
 .cu-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.12em;color:#F6C35A;padding:4px 10px;border-radius:999px;background:rgba(235,169,58,.14);border:1px solid rgba(235,169,58,.4)}
@@ -721,12 +730,15 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </sc-if>
 
 <sc-if value="{{tab7}}" hint-placeholder-val="{{false}}">
-<div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
-<h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">{{t.prodH}}</h1><p style="margin: 0; color: #5E6A63">{{t.prodP}}</p>
-<div style="overflow-x: auto"><table style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 560px"><thead><tr><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.prod}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.need}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.min}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.inStock}}</th><th style="text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #7A5A12; border-bottom: 1.5px solid #E4DCC8">{{t.toMake}}</th></tr></thead><tbody>
-<sc-for list="{{plan}}" as="p" hint-placeholder-count="11"><tr><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><strong>{{p.name}}</strong></td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle">{{p.need}}</td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle">{{p.min}}</td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle">{{p.qty}}</td><td style="padding: 10px 8px; border-bottom: 1px solid #F0E8D6; vertical-align: middle"><span class="ad-tag {{p.cls}}">{{p.make}}</span></td></tr></sc-for>
-</tbody></table></div>
+<div class="cu-hero">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 14px"><div><span class="cu-tag">ԱՐՏԱԴՐԱՄԱՍ · ՀԱՋՈՐԴ 3 ՕՐ</span><h1 class="cu-h1">🏭 Արտադրության պլան</h1><p class="cu-p">Պատվերներ + նվազագույն պաշար − պահեստի մնացորդ = որքան պետք է պատրաստել։</p></div>
+<div class="cu-kpis"><sc-for list="{{plK}}" as="k" hint-placeholder-count="3"><div class="cu-k"><b class="pl-kv">{{k.v}}</b><span>{{k.l}}</span></div></sc-for></div></div>
 </div>
+<div class="pl-grid"><sc-for list="{{plan2}}" as="p" hint-placeholder-count="11"><div class="pl-card {{p.cls}}">
+<div class="pl-top"><span class="pl-ic">{{p.ic}}</span><div style="flex: 1; min-width: 0"><div class="pl-n">{{p.name}}</div><div class="pl-s">{{p.sub}}</div></div><span class="pl-badge">{{p.make}}</span></div>
+<div class="pl-bar"><i style="width: {{p.w}}; background: {{p.bc}}"></i><b style="left: {{p.mw}}"></b></div>
+<div class="pl-nums"><div><b class="pl-v">{{p.qty}}</b><span>պահեստում</span></div><div><b class="pl-v">{{p.need}}</b><span>պատվերներ</span></div><div><b class="pl-v">{{p.min}}</b><span>նվազագույն</span></div></div>
+</div></sc-for></div>
 </sc-if>
 
 <sc-if value="{{tab9}}" hint-placeholder-val="{{false}}">
@@ -1204,6 +1216,9 @@ drvSum.push({ name: t.unassigned, n: un, cities: "", bg: un ? "#FDE7E4" : "#F0F0
 var tsel = st.tsel || 0; var autos = st.autos || [true, true, true, true, true];
 var tpls = t.tpl.map(function (lb, i) { return { label: lb, cls: i === tsel ? "on" : "", onCls: autos[i] ? "on" : "", pick: function () { self.setState({ tsel: i }); }, toggle: function () { var n = autos.slice(); n[i] = !n[i]; self.setState({ autos: n }); } }; });
 var plan = t.pn.map(function (nm, i) { var need = reserved[i]; var make = need + FULL - stockQ[i]; return { name: nm, need: need, min: mins[i], qty: stockQ[i], make: make > 0 ? "+" + make + " " + t.pcs : t.enough, cls: make > 0 ? "low" : "ok" }; });
+var plIc = ["🥮", "🍲", "🫙", "🍲", "🥟", "🥟", "🌯", "🧆", "🍗", "🍗", "🥩"];
+var plan2 = t.pn.map(function (nm, i) { var need = reserved[i]; var make = need + FULL - stockQ[i]; var mx = Math.max(1, stockQ[i], need + mins[i], FULL); return { ic: plIc[i] || "📦", name: nm, sub: make > 0 ? "Պետք է պատրաստել" : "Պաշարը բավարար է", make: make > 0 ? "+" + make + " " + t.pcs : "✓ " + t.enough, cls: make > 0 ? "low" : "ok", qty: String(stockQ[i]), need: String(need), min: String(mins[i]), w: Math.min(100, Math.round(stockQ[i] / mx * 100)) + "%", mw: Math.min(100, Math.round((need + mins[i]) / mx * 100)) + "%", bc: make > 0 ? "linear-gradient(90deg,#D38A22,#FCDB82)" : "linear-gradient(90deg,#1D5545,#8CC5A2)", mk: make }; }).sort(function (a, b) { return b.mk - a.mk; });
+var plK = [[String(plan2.filter(function (p) { return p.mk > 0; }).length), "ապրանք պատրաստել"], [String(plan2.reduce(function (a, p) { return a + Math.max(0, p.mk); }, 0)), "հատ ընդամենը"], [String(plan2.filter(function (p) { return p.mk <= 0; }).length), "բավարար"]].map(function (x) { return { v: x[0], l: x[1] }; });
 var REV = [0, 0, 0, 0, 0, 0, 0]; orders.forEach(function (o) { var k = o.dayOff + 6; if (k >= 0 && k < 7) { REV[k] += o.total; } }); REV = REV.map(function (v) { return Math.round(v); }); var mx = Math.max(1, Math.max.apply(null, REV));
 var bars = REV.map(function (v, k) { return { v: "$" + v, h: Math.round(v / mx * 150) + "px", d: fdate(k - 6).split(" ")[0] }; });
 var sold = t.pn.map(function (nm, i) { var q = 0; orders.forEach(function (o) { o.items.forEach(function (x) { if (x[0] === i) { q += x[1]; } }); }); return { name: nm, q: q }; }).sort(function (a, b) { return b.q - a.q; }).slice(0, 5);
@@ -1371,7 +1386,7 @@ stock: stock, typeChips: typeChips, pfSum: pfSum, pfFx: pfFx, pfNet: pfNet, pfNe
 custChips: custChips, custList: custList, partners: partners, byCity: byCity, drvSum: drvSum,
 apriLabel: st.apri ? t.sentApri : t.sendApri, sendApri: function () { self.setState({ apri: true }); setTimeout(function () { self.setState({ apri: false }); }, 2200); },
 tpls: tpls, tplSubj: t.tb[tsel][0], tplBody: t.tb[tsel][1], testLabel: st.tested ? t.sent : t.test, sendTest: function () { self.setState({ tested: true }); setTimeout(function () { self.setState({ tested: false }); }, 1800); },
-plan: plan, bars: bars, topP: topP, splitTxt: money(rS) + " / " + money(wS) });
+plan: plan, plan2: plan2, plK: plK, bars: bars, topP: topP, splitTxt: money(rS) + " / " + money(wS) });
 }
 }
 </script>
