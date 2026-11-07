@@ -184,7 +184,7 @@ function genFromOrders(){var L=servedNoInv().slice().sort(function(a,b){return S
     var v={id:"inv"+Date.now().toString(36)+n,no:"",ck:ck,c:{n:o.name,t:t,a:pf.addr||o.addr||"",e:pf.email||o.email||"",p:pf.phone||o.phone||""},d:d,du:addDays(d,terms),terms:terms,lang:"en",pt:t,lines:lines,disc:0,tax:0,ship:0,note:"",st:o.paid?"paid":"sent",ord:[o.id],created:new Date().toISOString(),auto:1,log:[[new Date().toISOString(),"Ստեղծվեց պատվերից ("+(o.book?"վաճառքի գիրք":"հեռախոսային պատվեր")+")"]]};
     if(o.paid){var tt=tots(v).tot;v.paid={d:d,m:PMN[o.pay]||"",amt:tt};}
     DB.list.push(v);n++;});
-  renumber();DB.autoImp=1;saveDB();return n;}
+  if(DB.num2){DB.list.filter(function(v){return v.auto&&!v.no;}).sort(function(a,b){return String(a.d).localeCompare(String(b.d));}).forEach(function(v){v.no=nextNo(v.ck).no;});}else{renumber();}DB.autoImp=1;saveDB();return n;}
 /* ---- views ---- */
 function render(){load();var app=document.getElementById("app");var h='<div class="wrap"><div class="sa np" style="margin-bottom:8px"><a href="Admin.dc.html" style="color:#1D5545;font-weight:800;text-decoration:none">← Ադմին</a></div>';
   if(!SOLO){h+='<div class="card np"><div class="row"><div><h2>📄 Հաշիվներ (Invoices)</h2><p class="sub">Կազմեք հաշիվ, պահեք այն հաճախորդի անվան տակ և ուղարկեք SMS-ով, email-ով կամ կայքի նամակով։ Հաճախորդը ստանում է հղում, որով կարող է բացել, տպել կամ PDF պահել։</p></div><button type="button" class="btn y" data-a="new">➕ Նոր հաշիվ</button></div>';
@@ -338,6 +338,6 @@ function hpush(){try{history.pushState({iv:1,tab:V.tab,id:V.id,ck:V.ck},"");}cat
 window.addEventListener("popstate",function(e){var s=e.state;if(s&&s.iv){V.tab=s.tab==="edit"&&!ED?"all":s.tab;V.id=s.id;V.ck=s.ck;render();}});
 var lastH=0;function post(){if(!/emb/.test(document.documentElement.className)){return;}var w=document.querySelector(".wrap");if(!w){return;}var h=Math.ceil(w.getBoundingClientRect().bottom+window.scrollY);if(Math.abs(h-lastH)>4){lastH=h;try{parent.postMessage({nofaH:h,page:"Invoices.html"},"*");}catch(x){}}}
 if(/emb/.test(document.documentElement.className)){document.documentElement.style.overflow="hidden";setInterval(post,500);window.addEventListener("wheel",function(e){if(Math.abs(e.deltaY)<=Math.abs(e.deltaX)){return;}e.preventDefault();var k=e.deltaMode===1?32:(e.deltaMode===2?600:1);try{parent.postMessage({nofaWheel:e.deltaY*k},"*");}catch(x){}},{passive:false});}
-(function(){var qs=location.search;var mc=qs.match(/[?&]ck=([^&]+)/);var mo=qs.match(/[?&]open=([^&]+)/);var mn=qs.match(/[?&]new=([^&]+)/);load();if(!DB.autoImp&&servedNoInv().length){genFromOrders();}if(!DB.num2&&DB.list.length){renumber();saveDB();}if(mo){V.id=decodeURIComponent(mo[1]);V.tab="view";}if(mn){newInv(decodeURIComponent(mn[1]));}try{history.replaceState({iv:1,tab:V.tab,id:V.id,ck:V.ck},"");}catch(x){}render();})();
+(function(){var qs=location.search;var mc=qs.match(/[?&]ck=([^&]+)/);var mo=qs.match(/[?&]open=([^&]+)/);var mn=qs.match(/[?&]new=([^&]+)/);load();if((!DB.autoImp&&servedNoInv().length)||servedNoInv().some(function(c){return c.book;})){genFromOrders();}if(!DB.num2&&DB.list.length){renumber();saveDB();}if(mo){V.id=decodeURIComponent(mo[1]);V.tab="view";}if(mn){newInv(decodeURIComponent(mn[1]));}try{history.replaceState({iv:1,tab:V.tab,id:V.id,ck:V.ck},"");}catch(x){}render();})();
 }
 </script></body></html>
