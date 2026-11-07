@@ -1,0 +1,4 @@
+<FilesMatch "^(config\.php|db\.php|.*\.sqlite)$">
+  Require all denied
+</FilesMatch>
+Options -Indexes

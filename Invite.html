@@ -26,6 +26,144 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th{font-size:11px;tex
 @media (max-width:760px){.pick{grid-template-columns:1fr}.g.g4{grid-template-columns:1fr 1fr}.g{grid-template-columns:1fr 1fr}.g .w2{grid-column:1/-1}}
 </style>
 <script>if(/[?&]embed=1/.test(location.search)){document.documentElement.className+=" emb";}</script>
+<script id="nofa-sync">
+(function () {
+  if (window.__nofaSync) { return; } window.__nofaSync = 1;
+  var TOP = window.top === window;
+  var API = "api/api.php";
+  var ADMIN_PAGE = /(Admin\.dc|Cost|Invoices|Map|Invite)\.html$/i.test(location.pathname);
+  var SHARED = /^noa-(accounts|orders|ws-orders(\|.*)?|chat(\|.*)?|cost-v2|inv2|invites(\|.*)?|drivers|paycfg|admin-ov|stock|stock-full|theme-sel|theme-dates|notify|cities|city-req|members\|.*|deposit\|.*|depsign\|.*|rewards\|.*|refs|geo|invoices)$/;
+  var META = "noa-sync-meta";
+  function LG(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function LS(k, v) { try { if (v === null) { localStorage.removeItem(k); } else { localStorage.setItem(k, v); } } catch (e) {} }
+  function J(k, d) { try { var v = JSON.parse(LG(k) || "null"); return v == null ? d : v; } catch (e) { return d; } }
+  function h(s) { s = String(s == null ? "" : s); var x = 5381; for (var i = 0; i < s.length; i++) { x = ((x << 5) + x + s.charCodeAt(i)) | 0; } return s.length + ":" + (x >>> 0); }
+  function req(a, body) { return fetch(API + "?a=" + a + (a === "all" ? "&since=" + (meta().__t || 0) : ""), { method: body ? "POST" : "GET", credentials: "same-origin", cache: "no-store", headers: body ? { "Content-Type": "application/json" } : {}, body: body ? JSON.stringify(body) : undefined }).then(function (r) { return r.json().then(function (j) { j.__status = r.status; return j; }); }); }
+  function meta() { return J(META, {}); }
+  function setMeta(m) { LS(META, JSON.stringify(m)); }
+  function idle() { var ae = document.activeElement; return !(ae && (ae.tagName === "INPUT" || ae.tagName === "TEXTAREA" || ae.tagName === "SELECT" || ae.isContentEditable)); }
+  function toast(t) { var d = document.getElementById("nofa-toast"); if (!d) { d = document.createElement("div"); d.id = "nofa-toast"; d.style.cssText = "position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:99999;background:#133B30;color:#F6E3B4;padding:10px 18px;border-radius:999px;font:700 13.5px Manrope,'Noto Sans Armenian',sans-serif;box-shadow:0 10px 24px rgba(0,0,0,.25);border:1px solid rgba(235,169,58,.5)"; document.body.appendChild(d); } d.textContent = t; d.style.display = "block"; clearTimeout(d.__t); d.__t = setTimeout(function () { d.style.display = "none"; }, 3500); }
+
+  /* ---------- merge helpers ---------- */
+  function uniq(a, keyf) { var seen = {}, out = []; (a || []).forEach(function (x) { var k = keyf(x); if (!seen[k]) { seen[k] = 1; out.push(x); } }); return out; }
+  function mergeChat(local, inc) { local = local || {}; inc = inc || {}; var out = JSON.parse(JSON.stringify(local)); if (!out.th) { out.th = {}; } Object.keys(inc).forEach(function (k) { if (k !== "th" && out[k] == null) { out[k] = inc[k]; } });
+    Object.keys(inc.th || {}).forEach(function (t) { var a = out.th[t] || { msgs: [] }, b = inc.th[t] || {}; var m = uniq((a.msgs || []).concat(b.msgs || []), function (x) { return (x.at || "") + "|" + (x.f || "") + "|" + (x.x || ""); }); m.sort(function (x, y) { return String(x.at).localeCompare(String(y.at)); }); var r = Object.assign({}, b, a); r.msgs = m; if (b.ra && (!a.ra || b.ra > a.ra)) { r.ra = b.ra; } if (b.rs && (!a.rs || b.rs > a.rs)) { r.rs = b.rs; } out.th[t] = r; }); return out; }
+  function byNo(x) { return String((x && (x.no || x.id)) || JSON.stringify(x)); }
+  function mergeList(local, inc, adminWins) { var L = (local || []).slice(), idx = {}; L.forEach(function (x, i) { idx[byNo(x)] = i; }); (inc || []).forEach(function (x) { var k = byNo(x); if (idx[k] == null) { idx[k] = L.length; L.push(x); } else if (!adminWins) { L[idx[k]] = Object.assign({}, L[idx[k]], x); } }); return L; }
+
+  /* ---------- login overlay for admin pages ---------- */
+  function gate(cb) {
+    var ov = document.createElement("div"); ov.id = "nofa-gate";
+    ov.style.cssText = "visibility:visible;position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 120% at 100% 0%,rgba(235,169,58,.25),transparent 55%),linear-gradient(135deg,#1F5E4C,#0F3027);font-family:Manrope,'Noto Sans Armenian',system-ui,sans-serif";
+    ov.innerHTML = '<form style="width:min(380px,92vw);background:#fff;border-radius:24px;padding:28px;box-shadow:0 24px 60px rgba(0,0,0,.35);text-align:center"><div style="font:600 26px Fraunces,\'Noto Serif Armenian\',serif;color:#1D5545">Nectar of Armenia</div><div style="font-size:12px;font-weight:800;letter-spacing:.14em;color:#B8862B;margin:4px 0 18px">ԱԴՄԻՆ · ՄՈՒՏՔ</div><input id="nofa-pw" type="password" autocomplete="current-password" placeholder="Գաղտնաբառ" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid #E4DCC8;border-radius:12px;font-size:16px;background:#FFFDF8"><div id="nofa-pe" style="color:#A1362A;font-weight:700;font-size:13px;min-height:20px;margin-top:8px"></div><button style="width:100%;padding:13px;border:0;border-radius:999px;background:linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22);color:#133B30;font:800 15px Manrope,sans-serif;cursor:pointer">Մուտք գործել →</button><a href="index.html" style="display:inline-block;margin-top:14px;color:#6B756F;font-size:13px;text-decoration:none">← Վերադառնալ կայք</a></form>';
+    document.documentElement.style.overflow = "hidden";
+    var add = function () { document.body.appendChild(ov); var i = document.getElementById("nofa-pw"); if (i) { i.focus(); } };
+    if (document.body) { add(); } else { document.addEventListener("DOMContentLoaded", add); }
+    ov.querySelector("form").addEventListener("submit", function (e) { e.preventDefault(); var pe = document.getElementById("nofa-pe"); pe.textContent = "Ստուգվում է…";
+      req("login", { pw: document.getElementById("nofa-pw").value }).then(function (j) { if (j.ok) { ov.remove(); document.documentElement.style.overflow = ""; cb(); } else { pe.textContent = "Սխալ գաղտնաբառ"; } }).catch(function () { pe.textContent = "Կապի սխալ, փորձեք նորից"; }); });
+  }
+  function logoutBtn() { var tt = document.querySelector(".as-ttl"); if (!tt || tt.querySelector("[data-nofa-out]")) { return; } var b = document.createElement("button"); b.type = "button"; b.setAttribute("data-nofa-out", "1"); b.textContent = "🔒 Ելք"; b.title = "Ելք ադմինից"; b.style.cssText = "border:0;background:none;color:#9FC2B2;font:800 11px Manrope,sans-serif;cursor:pointer;padding:0;margin-left:6px"; b.onclick = function () { req("logout", {}).then(function () { location.reload(); }); }; var sm = tt.querySelector("small"); if (sm) { sm.appendChild(b); } else { tt.appendChild(b); } }
+
+  /* ---------- ADMIN sync ---------- */
+  var busy = false, pushT = null;
+  function sharedKeys() { var out = []; for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && SHARED.test(k)) { out.push(k); } } return out; }
+  function adminPull(first) {
+    return req("all").then(function (j) { if (!j.ok) { throw j; } var m = meta(), changed = false, firstDevice = !m.__init, toPush = [];
+      Object.keys(j.kv).forEach(function (k) { if (!SHARED.test(k)) { return; } var sv = j.kv[k].v, lv = LG(k), mk = m[k] || {};
+        if (lv === sv) { m[k] = { h: h(sv), t: j.kv[k].t }; return; }
+        var localDirty = lv != null && mk.h !== h(lv);
+        if (firstDevice && lv != null) { if (String(lv).length > String(sv).length) { toPush.push({ k: k, v: lv, backup: true }); return; } }
+        else if (localDirty && mk.t && mk.t >= j.kv[k].t) { return; }
+        LS(k, sv); m[k] = { h: h(sv), t: j.kv[k].t }; changed = true; });
+      m.__t = Math.max(m.__t || 0, j.now || 0);
+      if (firstDevice) { m.__init = Date.now(); }
+      setMeta(m);
+      return (toPush.length ? req("put", { items: toPush }).then(function (r) { var m2 = meta(); Object.keys(r.t || {}).forEach(function (k) { m2[k] = { h: h(LG(k)), t: r.t[k] }; }); setMeta(m2); }) : Promise.resolve()).then(function () { return changed; }); });
+  }
+  function adminPush() {
+    if (busy) { return Promise.resolve(); } var m = meta(), items = [];
+    sharedKeys().forEach(function (k) { var v = LG(k); if (!m[k] || m[k].h !== h(v)) { items.push({ k: k, v: v }); } });
+    Object.keys(m).forEach(function (k) { if (k.indexOf("__") !== 0 && SHARED.test(k) && LG(k) == null && m[k].h) { items.push({ k: k, v: null }); } });
+    if (!items.length) { return Promise.resolve(); }
+    busy = true;
+    return req("put", { items: items }).then(function (r) { var m2 = meta(); items.forEach(function (it) { if (r.t && r.t[it.k]) { if (it.v === null) { delete m2[it.k]; } else { m2[it.k] = { h: h(it.v), t: r.t[it.k] }; } m2.__t = Math.max(m2.__t || 0, r.t[it.k]); } }); setMeta(m2); }).finally(function () { busy = false; });
+  }
+  function acctTokOk(A, key, tok) { var r = A[key]; return !r || !r.tok || r.tok === tok; }
+  function adminInbox() {
+    return req("inbox").then(function (j) { if (!j.ok || !j.items.length) { return 0; } var ids = [], n = 0;
+      j.items.forEach(function (it) { ids.push(it.id); var d = {}; try { d = JSON.parse(it.data); } catch (e) { return; } var k = String(d.k || ""), v = d.v, em = String(it.em || "").toLowerCase(); if (!SHARED.test(k)) { return; }
+        var inc; try { inc = typeof v === "string" ? JSON.parse(v) : v; } catch (e) { return; }
+        if (k === "noa-accounts") { var A = J("noa-accounts", {}); Object.keys(inc || {}).forEach(function (key) { var rec = inc[key]; if (!rec || String(rec.email || "").toLowerCase() !== em || key.indexOf(em + "|") !== 0) { return; } if (!acctTokOk(A, key, d.tok)) { return; } var old = A[key]; A[key] = Object.assign({}, old || {}, rec); if (old && old.status) { A[key].status = old.status; } if (old && old.tok) { A[key].tok = old.tok; } n++; }); LS("noa-accounts", JSON.stringify(A)); return; }
+        var A2 = J("noa-accounts", {}); if (em && !acctTokOk(A2, em + "|biz", d.tok) && !acctTokOk(A2, em + "|retail", d.tok)) { return; }
+        if (k === "noa-orders") { var cur = J(k, []); var add = (inc || []).filter(function (o) { return !o.email || String(o.email).toLowerCase() === em; }); LS(k, JSON.stringify(mergeList(cur, add, true))); n++; return; }
+        if (k.indexOf("|") > 0 && k.split("|").slice(1).join("|").replace(/^retail:/, "") !== em) { return; }
+        var curv = J(k, null);
+        if (k.indexOf("noa-chat|") === 0) { LS(k, JSON.stringify(mergeChat(curv, inc))); }
+        else if (Array.isArray(inc)) { LS(k, JSON.stringify(mergeList(curv || [], inc, true))); }
+        else if (inc && typeof inc === "object") { LS(k, JSON.stringify(Object.assign({}, inc, curv || {}))); }
+        n++; });
+      return req("ack", { ids: ids }).then(function () { return n; }); });
+  }
+  function startAdmin() {
+    logoutBtn(); setInterval(logoutBtn, 1500);
+    adminPull(true).then(function (changed) { return adminInbox().then(function (n) { return adminPush().then(function () { if (changed || n) { location.reload(); } else { toast("✓ Տվյալները համաժամեցված են սերվերի հետ"); } }); }); }).catch(function () { toast("⚠️ Սերվերի հետ կապ չկա"); });
+    setInterval(function () { adminPush().catch(function () {}); }, 4000);
+    setInterval(function () { adminInbox().then(function (n) { if (n) { toast("📥 Նոր տվյալներ հաճախորդներից"); return adminPush().then(function () { if (idle()) { location.reload(); } }); } }).catch(function () {}); }, 30000);
+    setInterval(function () { if (!idle()) { return; } adminPull(false).then(function (c) { if (c && idle()) { location.reload(); } }).catch(function () {}); }, 45000);
+    window.addEventListener("beforeunload", function () { try { var m = meta(), items = []; sharedKeys().forEach(function (k) { var v = LG(k); if (!m[k] || m[k].h !== h(v)) { items.push({ k: k, v: v }); } }); if (items.length) { fetch(API + "?a=put", { method: "POST", credentials: "same-origin", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items: items }) }); } } catch (e) {} });
+  }
+
+  /* ---------- CUSTOMER sync ---------- */
+  function me() { var u = J("noa-user", null); return u && u.email ? u : null; }
+  function ensureTok(u) { var em = String(u.email).toLowerCase(); var A = J("noa-accounts", {}); var key = em + "|" + (u.type === "biz" ? "biz" : "retail"); var tok = (A[key] && A[key].tok) || u.tok || LG("noa-sync-tok|" + em);
+    if (!tok) { var a = new Uint8Array(16); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(a) : a.forEach(function (_, i) { a[i] = Math.random() * 256; }); tok = Array.prototype.map.call(a, function (b) { return ("0" + b.toString(16)).slice(-2); }).join(""); }
+    LS("noa-sync-tok|" + em, tok); if (A[key] && A[key].tok !== tok) { A[key].tok = tok; LS("noa-accounts", JSON.stringify(A)); } if (u.tok !== tok) { u.tok = tok; LS("noa-user", JSON.stringify(u)); } return tok; }
+  function custSubmit() {
+    var u = me(); var items = [], em = "", tok = "";
+    if (u) { em = String(u.email).toLowerCase(); tok = ensureTok(u); var A = J("noa-accounts", {}), mine = {}; Object.keys(A).forEach(function (k) { if (k.indexOf(em + "|") === 0) { mine[k] = Object.assign({}, A[k], { tok: A[k].tok || tok }); } }); if (Object.keys(mine).length) { items.push({ k: "noa-accounts", v: JSON.stringify(mine) }); }
+      ["noa-ws-orders|" + em, "noa-chat|" + em, "noa-chat|retail:" + em, "noa-members|" + em, "noa-deposit|" + em, "noa-depsign|" + em, "noa-rewards|" + em].forEach(function (k) { var v = LG(k); if (v != null) { items.push({ k: k, v: v }); } }); }
+    var O = J("noa-orders", []); if (O.length) { items.push({ k: "noa-orders", v: JSON.stringify(u ? O.filter(function (o) { return !o.email || String(o.email).toLowerCase() === em; }) : O) }); }
+    var sent = J("noa-sync-sent", {}), send = items.filter(function (it) { return sent[it.k] !== h(it.v); });
+    if (!send.length) { return Promise.resolve(); }
+    return req("submit", { em: em, tok: tok, items: send }).then(function (r) { if (r.ok) { send.forEach(function (it) { sent[it.k] = h(it.v); }); LS("noa-sync-sent", JSON.stringify(sent)); } });
+  }
+  function custPull() {
+    var u = me(); var p1 = req("pub").then(function (j) { if (!j.ok) { return false; } var ch = false; Object.keys(j.kv || {}).forEach(function (k) { if (LG(k) !== j.kv[k]) { LS(k, j.kv[k]); ch = true; } }); return ch; }).catch(function () { return false; });
+    if (!u) { return p1; }
+    var em = String(u.email).toLowerCase(), tok = ensureTok(u);
+    var p2 = req("my", { em: em, tok: tok }).then(function (j) { if (!j.ok || j.pending) { return false; } var ch = false, sent = J("noa-sync-sent", {});
+      var A = J("noa-accounts", {}); Object.keys(j.accounts || {}).forEach(function (key) { var nv = Object.assign({}, A[key] || {}, j.accounts[key]); if (JSON.stringify(nv) !== JSON.stringify(A[key])) { A[key] = nv; ch = true; } }); if (ch) { LS("noa-accounts", JSON.stringify(A)); if (A[em + "|" + (u.type === "biz" ? "biz" : "retail")]) { var nu = Object.assign({}, u, { status: A[em + "|" + (u.type === "biz" ? "biz" : "retail")].status }); LS("noa-user", JSON.stringify(nu)); } }
+      Object.keys(j.keys || {}).forEach(function (k) { var lv = LG(k), sv = j.keys[k]; if (lv === sv) { return; } var inc = JSON.parse(sv), cur = J(k, null), nv;
+        if (k.indexOf("noa-chat|") === 0) { nv = JSON.stringify(mergeChat(cur, inc)); }
+        else if (Array.isArray(inc)) { var mm = mergeList(cur || [], [], true); nv = JSON.stringify(mergeList(inc, mm, true)); }
+        else { nv = lv != null && sent[k] !== h(lv) ? lv : sv; }
+        if (nv !== lv) { LS(k, nv); ch = true; } });
+      var inv = JSON.stringify({ list: j.inv || [] }); if (LG("noa-inv2") !== inv) { LS("noa-inv2", inv); ch = true; }
+      if (j.cprof && Object.keys(j.cprof).length) { var C = J("noa-cost-v2", {}); C.cprof = Object.assign({}, C.cprof || {}, j.cprof); LS("noa-cost-v2", JSON.stringify(C)); }
+      return ch; }).catch(function () { return false; });
+    return Promise.all([p1, p2]).then(function (r) { return r[0] || r[1]; });
+  }
+  function startCustomer() {
+    var first = !sessionStorage.getItem("noa-sync-once");
+    custSubmit().catch(function () {}).then(custPull).then(function (ch) { sessionStorage.setItem("noa-sync-once", "1"); if (ch && first && idle()) { location.reload(); } });
+    setInterval(function () { custSubmit().catch(function () {}); }, 5000);
+    setInterval(function () { custPull().then(function (ch) { if (ch && idle()) { location.reload(); } }); }, 40000);
+    window.addEventListener("beforeunload", function () { custSubmit(); });
+  }
+
+  /* ---------- start ---------- */
+  if (!TOP) { return; }
+  fetch(API + "?a=ping", { credentials: "same-origin", cache: "no-store" }).then(function (r) { return r.json(); }).then(function (p) {
+    if (!p || !p.configured) { return; } // server not set up yet: site works as before
+    LS("noa-sync-on", "1");
+    if (ADMIN_PAGE) { if (p.admin) { startAdmin(); } else { gate(function () { startAdmin(); }); } return; }
+    if (p.admin) { return; } // admin browsing public pages: admin pages do the syncing
+    startCustomer();
+  }).catch(function () {});
+  if (ADMIN_PAGE && LG("noa-sync-on") === "1") { var hide = document.createElement("style"); hide.id = "nofa-prehide"; hide.textContent = "body{visibility:hidden}"; (document.head || document.documentElement).appendChild(hide); var unhide = function () { var x = document.getElementById("nofa-prehide"); if (x) { x.remove(); } }; setTimeout(unhide, 4000); fetch(API + "?a=ping", { credentials: "same-origin", cache: "no-store" }).then(function (r) { return r.json(); }).then(function (p) { if (!p.configured || p.admin) { unhide(); } else { var iv = setInterval(function () { if (document.getElementById("nofa-gate")) { unhide(); clearInterval(iv); } }, 50); } }).catch(unhide); }
+})();
+
+</script>
 </head><body><div id="app"></div>
 <script>
 function J(k,d){try{var v=JSON.parse(localStorage.getItem(k)||"null");return v==null?d:v;}catch(e){return d;}}
