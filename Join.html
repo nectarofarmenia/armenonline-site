@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="hy"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nectar of Armenia — Invitation</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+Armenian:wght@400;600;700&family=Noto+Serif+Armenian:wght@600&family=Fraunces:wght@600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#F7F3EA;font:15px/1.5 Manrope,'Noto Sans Armenian',system-ui,sans-serif;color:#1E2A24}
+.hero{background:linear-gradient(160deg,#1D5545,#133B30);color:#F7F3EA;padding:22px 18px 70px;position:relative;overflow:hidden}
+.hero .in{max-width:880px;margin:0 auto;display:grid;grid-template-columns:1fr 210px;gap:18px;align-items:center}
+.hero img.lg{width:180px}
+.hero h1{font-family:Fraunces,'Noto Serif Armenian',serif;font-weight:600;font-size:32px;line-height:1.15;margin:14px 0 8px;color:#fff}
+.hero h1 b{color:#F6C35A;font-weight:600}.hero p{margin:0;color:#CFE2D9;font-size:15.5px;max-width:520px}
+.hero .ap{width:200px;justify-self:end;filter:drop-shadow(0 12px 20px rgba(0,0,0,.35))}
+.hero .tag{display:inline-block;padding:5px 12px;border-radius:999px;background:rgba(235,169,58,.18);border:1px solid rgba(235,169,58,.5);color:#F6C35A;font-weight:800;font-size:12.5px;letter-spacing:.04em}
+.lang{position:absolute;top:16px;right:16px;display:flex;gap:4px;background:rgba(0,0,0,.2);border-radius:999px;padding:3px}.lang button{border:0;background:none;color:#CFE2D9;font:800 12px Manrope,sans-serif;padding:5px 10px;border-radius:999px;cursor:pointer}.lang button.on{background:#EBA93A;color:#133B30}
+.wrap{max-width:880px;margin:-46px auto 0;padding:0 16px 40px;position:relative}
+.card{background:#fff;border-radius:22px;padding:22px;box-shadow:0 14px 34px rgba(29,85,69,.10);margin-bottom:14px}
+.ben{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.ben div{padding:12px 14px;border-radius:14px;background:#FBF9F4;border:1px solid #ECE3CF;font-size:13.5px}.ben b{display:block;color:#1D5545;font-size:14.5px;margin-bottom:2px}
+h2{font-family:'Noto Serif Armenian',serif;font-weight:600;color:#1D5545;margin:0 0 4px;font-size:21px}.sub{color:#5E6A63;font-size:13.5px;margin:0 0 14px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:12px}.g .full{grid-column:1/-1}
+label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:800;color:#5B4A22}
+input,select,textarea{font:inherit;font-size:15px;padding:11px 12px;border:1.5px solid #E4DCC8;border-radius:12px;background:#FFFDF8;color:#1E2A24;width:100%}
+input:focus,select:focus{outline:2px solid #8CC5A2;border-color:#8CC5A2}input.bad{border-color:#C0392B;background:#FFF5F3}
+.pf{font-size:11px;color:#2F7A55;font-weight:700}
+.agree{display:flex;flex-direction:row;gap:10px;align-items:flex-start;font-weight:600;font-size:13.5px;color:#33403A;margin-top:12px}.agree input{width:auto;margin-top:4px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:14px 24px;font:800 15.5px Manrope,'Noto Sans Armenian',sans-serif;cursor:pointer;background:linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22);color:#133B30;box-shadow:0 8px 18px rgba(211,138,34,.35);width:100%;margin-top:16px}
+.err{color:#A1362A;font-weight:700;font-size:13.5px;margin-top:10px}
+.done{text-align:center;padding:30px 20px}.done .ic{font-size:54px}.done h2{font-size:26px}
+.ft{text-align:center;color:#8A8F86;font-size:12.5px;margin-top:10px}
+@media (max-width:640px){.hero .in{grid-template-columns:1fr}.hero .ap{display:none}.hero h1{font-size:26px}.g{grid-template-columns:1fr}}
+</style></head><body><div id="app"></div>
+<script>
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function b64d(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4){s+="=";}return JSON.parse(decodeURIComponent(escape(atob(s))));}
+function J(k,d){try{var v=JSON.parse(localStorage.getItem(k)||"null");return v==null?d:v;}catch(e){return d;}}
+var I={};try{var mm=location.hash.match(/[#&]i=([^&]+)/);if(mm){I=b64d(mm[1]);}}catch(e){I={};}
+var W=I.t!=="r";var LG=(I.lg==="en")?"en":"hy";var F={};["biz","first","last","phone","email","addr","city","zip","permit","dob"].forEach(function(k){F[k]=I[k]||"";});F.bizType=I.bizType||"";F.branches=I.branches||"1";
+var T={hy:{tagW:"ՄԵԾԱԾԱԽ ԳՈՐԾԸՆԿԵՐՈՒԹՅԱՆ ՀՐԱՎԵՐ",tagR:"ԱՆՁՆԱԿԱՆ ՀՐԱՎԵՐ",hW:"Բարի գալուստ, <b>{n}</b>",hR:"Բարև, <b>{n}</b>",pW:"Nectar of Armenia-ն հրավիրում է Ձեզ դառնալ մեր մեծածախ գործընկերը։ Մենք արդեն լրացրել ենք Ձեր տվյալների մի մասը. ստուգեք, լրացրեք մնացածը և ուղարկեք։",pR:"Nectar of Armenia-ն հրավիրում է Ձեզ ստեղծել անձնական էջ՝ արագ պատվերների, առաքման և Ձեր հաշիվների համար։ Ստուգեք տվյալները և լրացրեք մնացածը։",
+  bW:[["Վաճառեք, հետո վճարեք","Ապրանքը տրվում է դեպոզիտով, առանց կանխավճարի"],["6 ամիս պիտանելիություն","Բոլոր ապրանքները սառեցված են"],["Սառնարանային առաքում","Մեր սեփական ֆուրգոնով"],["Ճկուն վերադարձ","Չվաճառվածը՝ 3+ ամիս ժամկետով"]],
+  bR:[["Թարմ սառեցված","Խինկալի, պելմենի, բլինչիկ, քուֆթա, կոտլետներ, գաթա, խաշ"],["Առաքում տուն","Ընտրեք Ձեզ հարմար օրն ու ժամը"],["Ձեր հաշիվները","Բոլորը մեկ տեղում՝ տպելու և PDF-ի համար"]],
+  fh:"Ձեր տվյալները",fs:"✓ նշանով դաշտերը արդեն լրացրել ենք մենք։ Կարող եք ուղղել։",biz:"Բիզնեսի անվանումը *",btype:"Բիզնեսի տեսակը",btypes:["Մթերային խանութ","Սուպերմարկետ","Ռեստորան / սրճարան","Հացատուն","Այլ"],first:"Անուն *",last:"Ազգանուն",phone:"Հեռախոս *",email:"Email *",addr:"Հասցե (փողոց, տուն)",city:"Քաղաք",zip:"ZIP",permit:"Seller's Permit №",branches:"Մասնաճյուղերի քանակ",dob:"Ծննդյան օր (ըստ ցանկության)",agree:"Համաձայն եմ Nectar of Armenia-ի գործընկերության պայմաններին և գաղտնիության քաղաքականությանը։",agreeR:"Համաձայն եմ գաղտնիության քաղաքականությանը։",go:"Ուղարկել և ստեղծել էջը →",pre:"✓ լրացված է",eReq:"Լրացրեք նշված դաշտերը։",eAgree:"Խնդրում ենք նշել համաձայնությունը։",dW:"Շնորհակալություն, Ձեր հայտն ուղարկված է",dWs:"Մեր թիմը կստուգի տվյալները և 1 աշխատանքային օրվա ընթացքում կակտիվացնի Ձեր մեծածախ էջը։ Հարցերի համար՝ (515) 588-5555։",dR:"Ձեր էջը պատրաստ է",dRs:"Այժմ կարող եք պատվիրել և հետևել Ձեր պատվերներին։",open:"Բացել իմ էջը →",nf:"Հրավերը չի գտնվել",nfs:"Հղումը թերի է։ Խնդրում ենք զանգահարել (515) 588-5555։",ft:"Nectar of Armenia Inc · Glendale, CA · (515) 588-5555 · nectarofarmenia.com"},
+ en:{tagW:"WHOLESALE PARTNER INVITATION",tagR:"PERSONAL INVITATION",hW:"Welcome, <b>{n}</b>",hR:"Hello, <b>{n}</b>",pW:"Nectar of Armenia invites you to become our wholesale partner. We have pre-filled some of your details — please check them, complete the rest and submit.",pR:"Nectar of Armenia invites you to create your personal account for quick orders, delivery and your invoices. Please check your details and complete the rest.",
+  bW:[["Sell first, pay later","Goods on consignment, no upfront payment"],["6-month shelf life","All products are frozen"],["Refrigerated delivery","With our own van"],["Flexible returns","Unsold goods with 3+ months left"]],
+  bR:[["Freshly frozen","Khinkali, pelmeni, blinchiki, kufta, cutlets, gata, khash"],["Home delivery","Choose a convenient day and time"],["Your invoices","All in one place, printable as PDF"]],
+  fh:"Your details",fs:"Fields marked ✓ were pre-filled by us. Feel free to correct them.",biz:"Business name *",btype:"Business type",btypes:["Grocery store","Supermarket","Restaurant / café","Bakery","Other"],first:"First name *",last:"Last name",phone:"Phone *",email:"Email *",addr:"Address (street)",city:"City",zip:"ZIP",permit:"Seller's Permit #",branches:"Number of locations",dob:"Birthday (optional)",agree:"I agree to the Nectar of Armenia partnership terms and privacy policy.",agreeR:"I agree to the privacy policy.",go:"Submit and create my account →",pre:"✓ pre-filled",eReq:"Please fill in the highlighted fields.",eAgree:"Please confirm your agreement.",dW:"Thank you, your application has been sent",dWs:"Our team will review your details and activate your wholesale account within 1 business day. Questions: (515) 588-5555.",dR:"Your account is ready",dRs:"You can now order and track your deliveries.",open:"Open my account →",nf:"Invitation not found",nfs:"The link is incomplete. Please call (515) 588-5555.",ft:"Nectar of Armenia Inc · Glendale, CA · (515) 588-5555 · nectarofarmenia.com"}};
+var DONE=false,ERR="";
+function fld(k,l,typ,full){var pre=!!I[k];return '<label'+(full?' class="full"':'')+'>'+l+(pre?' <span class="pf">'+T[LG].pre+'</span>':'')+'<input id="f_'+k+'" type="'+(typ||"text")+'" value="'+esc(F[k])+'"'+(k==="phone"?' autocomplete="tel"':'')+(k==="email"?' autocomplete="email"':'')+'></label>';}
+function render(){var t=T[LG];var app=document.getElementById("app");
+  var nm=W?(I.biz||((I.first||"")+" "+(I.last||"")).trim()):((I.first||"")+" "+(I.last||"")).trim();
+  var h='<div class="hero"><div class="lang">'+["hy","en"].map(function(l){return '<button type="button" data-lg="'+l+'" class="'+(LG===l?'on':'')+'">'+(l==="hy"?"ՀԱՅ":"EN")+'</button>';}).join("")+'</div><div class="in"><div><img class="lg" src="vendor/inv/logo_w.webp" alt="Nectar of Armenia"><div style="margin-top:10px"><span class="tag">'+(W?t.tagW:t.tagR)+'</span></div><h1>'+(W?t.hW:t.hR).replace("{n}",esc(nm||(LG==="hy"?"բարեկամ":"friend")))+'</h1><p>'+(W?t.pW:t.pR)+'</p></div><img class="ap" src="vendor/inv/apri.webp" alt=""></div></div><div class="wrap">';
+  if(!I.t){app.innerHTML=h+'<div class="card done"><div class="ic">🔗</div><h2>'+t.nf+'</h2><p class="sub">'+t.nfs+'</p></div></div>';return;}
+  if(DONE){app.innerHTML=h+'<div class="card done"><div class="ic">'+(W?'🤝':'🎉')+'</div><h2>'+(W?t.dW:t.dR)+'</h2><p class="sub">'+(W?t.dWs:t.dRs)+'</p><a class="btn" style="max-width:340px;text-decoration:none" href="'+(W?'PartnerAccount.dc.html':'MyAccount.dc.html')+'">'+t.open+'</a></div><p class="ft">'+t.ft+'</p></div>';return;}
+  h+='<div class="card"><div class="ben">'+(W?t.bW:t.bR).map(function(b){return '<div><b>'+b[0]+'</b>'+b[1]+'</div>';}).join("")+'</div></div>';
+  h+='<div class="card"><h2>'+t.fh+'</h2><p class="sub">'+t.fs+'</p><div class="g">';
+  if(W){h+=fld("biz",t.biz,"text",true)+'<label>'+t.btype+'<select id="f_bizType">'+t.btypes.map(function(x){return '<option'+(F.bizType===x?' selected':'')+'>'+esc(x)+'</option>';}).join("")+'</select></label>'+fld("branches",t.branches,"number");}
+  h+=fld("first",t.first)+fld("last",t.last)+fld("phone",t.phone,"tel")+fld("email",t.email,"email")+fld("addr",t.addr,"text",true)+fld("city",t.city)+fld("zip",t.zip);
+  if(W){h+=fld("permit",t.permit,"text",true);}else{h+=fld("dob",t.dob,"date",true);}
+  h+='</div><label class="agree"><input type="checkbox" id="agree"> <span>'+(W?t.agree:t.agreeR)+'</span></label>'+(ERR?'<div class="err">'+ERR+'</div>':'')+'<button type="button" class="btn" id="go">'+t.go+'</button></div><p class="ft">'+t.ft+'</p></div>';
+  app.innerHTML=h;}
+function grab(){Object.keys(F).forEach(function(k){var el=document.getElementById("f_"+k);if(el){F[k]=el.value;}});}
+document.addEventListener("click",function(e){var b=e.target.closest("[data-lg]");if(b){grab();LG=b.getAttribute("data-lg");render();return;}
+  if(e.target.id==="go"){grab();var t=T[LG];var need=["first","phone","email"].concat(W?["biz"]:[]);var bad=need.filter(function(k){return !String(F[k]||"").trim()||(k==="email"&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(F[k]))||(k==="phone"&&String(F[k]).replace(/\D/g,"").length<10);});
+    if(bad.length){ERR=t.eReq;render();bad.forEach(function(k){var el=document.getElementById("f_"+k);if(el){el.classList.add("bad");}});return;}
+    if(!document.getElementById("agree").checked){ERR=t.eAgree;render();return;}
+    var em=F.email.trim().toLowerCase();var u={type:W?"biz":"retail",first:F.first.trim(),last:F.last.trim(),email:F.email.trim(),phone:F.phone.trim(),zip:F.zip.trim(),addr:F.addr.trim(),city:F.city.trim(),biz:W?F.biz.trim():"",bizType:F.bizType||"",branches:Math.max(1,parseInt(F.branches||"1",10)||1),permit:F.permit.trim(),dob:F.dob||"",year:new Date().getFullYear(),via:"invite",invite:I.id||"",pid:"W-"+(1100+Math.floor(Math.random()*800)),status:W?"pending":"approved",emailVerified:true,phoneVerified:true,createdAt:new Date().toISOString()};
+    try{var A=J("noa-accounts",{});A[em+"|"+(W?"biz":"retail")]=Object.assign({},A[em+"|"+(W?"biz":"retail")]||{},u);localStorage.setItem("noa-accounts",JSON.stringify(A));localStorage.setItem("noa-user",JSON.stringify(u));
+      var IV=J("noa-invites",[]);IV.forEach(function(x){if(x.id===I.id){x.done=new Date().toISOString();x.email=u.email;}});localStorage.setItem("noa-invites",JSON.stringify(IV));}catch(x){}
+    DONE=true;render();window.scrollTo(0,0);}});
+render();
+</script></body></html>

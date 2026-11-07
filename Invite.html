@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="hy"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>Nectar of Armenia — Invite customer</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+Armenian:wght@400;600;700&family=Noto+Serif+Armenian:wght@600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#F7F3EA;font:14.5px/1.45 Manrope,'Noto Sans Armenian',system-ui,sans-serif;color:#1E2A24}
+.wrap{max-width:1180px;margin:0 auto;padding:18px}html.emb .wrap{padding:0 0 6px}html.emb .sa{display:none}html.emb body{background:transparent}
+.card{background:#fff;border-radius:22px;padding:18px;box-shadow:0 10px 30px rgba(29,85,69,.07);margin-bottom:14px}
+h2{font-family:'Noto Serif Armenian',serif;font-weight:600;color:#1D5545;margin:0;font-size:20px}h3{margin:0 0 6px;font-size:15px;color:#1D5545}.sub{color:#5E6A63;font-size:13.5px;margin:4px 0 0}.mut{color:#6B756F;font-size:12.5px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}.rowl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.pk{border:0;border-radius:18px;padding:16px 18px;text-align:left;cursor:pointer;font:inherit;display:flex;gap:14px;align-items:center;transition:transform .15s,box-shadow .15s}
+.pk:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(29,85,69,.18)}.pk i{font-style:normal;font-size:30px;width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex:0 0 54px}
+.pk b{display:block;font-size:16px}.pk span{font-size:12.5px;opacity:.85}
+.pk.w{background:linear-gradient(135deg,#1D5545,#133B30);color:#F7F3EA}.pk.w i{background:rgba(235,169,58,.2);border:1px solid rgba(235,169,58,.5)}
+.pk.r{background:linear-gradient(135deg,#FFF6E0,#F7E7BE);color:#5B4A22;border:1px solid #F1D9A6}.pk.r i{background:#fff}
+.pk.on{outline:3px solid #EBA93A}
+.g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.g .w2{grid-column:span 2}.g .full{grid-column:1/-1}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:800;color:#8A7A55}
+input.t,select.t{font:inherit;font-size:14px;padding:9px 11px;border:1.5px solid #E4DCC8;border-radius:10px;background:#FFFDF8;min-width:0;width:100%}input.t:focus,select.t:focus{outline:2px solid #8CC5A2;border-color:#8CC5A2}input.bad{border-color:#C0392B}
+.btn{border:1.5px solid #E4DCC8;background:#fff;color:#1D5545;border-radius:999px;padding:9px 16px;font:800 13.5px Manrope,'Noto Sans Armenian',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn.g{background:#1D5545;border-color:#1D5545;color:#F6E3B4}.btn.y{background:linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22);border:0;color:#133B30}.btn.s{padding:5px 11px;font-size:12px}.btn.r{color:#A1362A}
+.send{margin-top:14px;padding:14px;border-radius:16px;background:#E8F1EC;border:1px solid #8CC5A2}.send .lk{font-size:12px;color:#33403A;word-break:break-all;background:#fff;border-radius:8px;padding:6px 8px;margin:8px 0}
+table{width:100%;border-collapse:collapse;font-size:13.5px}th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#1D5545;background:#E8F1EC;text-align:left;padding:8px}td{padding:8px;border-bottom:1px solid #F0E8D6;vertical-align:middle}
+.bd{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:800;white-space:nowrap}.b-s{background:#E3EEF9;color:#2C5E93}.b-d{background:#DDF1E4;color:#22704A}.b-n{background:#EEE;color:#555}
+@media (max-width:760px){.pick{grid-template-columns:1fr}.g{grid-template-columns:1fr 1fr}.g .w2{grid-column:1/-1}}
+</style>
+<script>if(/[?&]embed=1/.test(location.search)){document.documentElement.className+=" emb";}</script>
+</head><body><div id="app"></div>
+<script>
+function J(k,d){try{var v=JSON.parse(localStorage.getItem(k)||"null");return v==null?d:v;}catch(e){return d;}}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function nrm(x){return String(x||"").toLowerCase().replace(/[^a-z0-9Ա-և]+/g,"");}
+function b64e(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
+var V={t:"",f:{},sent:null,err:"",open:false};
+function invs(){return J("noa-invites",[]);}function saveInvs(L){try{localStorage.setItem("noa-invites",JSON.stringify(L));}catch(e){}}
+function linkOf(x){var base=location.href.split("#")[0].split("?")[0].replace(/[^\/]*$/,"");var o={id:x.id,t:x.t,lg:x.lg||"hy"};["biz","first","last","phone","email","addr","city","zip","permit","bizType"].forEach(function(k){if(x[k]){o[k]=x[k];}});return base+"Join.html#i="+b64e(o);}
+function nameOf(x){return x.t==="w"?(x.biz||((x.first||"")+" "+(x.last||"")).trim()):((x.first||"")+" "+(x.last||"")).trim();}
+function msg(x){var lk=linkOf(x);var n=x.first||nameOf(x);if(x.lg==="en"){return x.t==="w"?"Hello "+n+", Nectar of Armenia invites "+(x.biz||"you")+" to become our wholesale partner (goods on consignment, refrigerated delivery). Please complete your details here: "+lk+" — (515) 588-5555":"Hello "+n+", Nectar of Armenia invites you to create your account for quick orders and delivery: "+lk;}
+  return x.t==="w"?"Բարև Ձեզ, "+n+"։ Nectar of Armenia-ն հրավիրում է "+(x.biz||"Ձեզ")+"-ին դառնալ մեր մեծածախ գործընկերը (ապրանք դեպոզիտով, սառնարանային առաքում)։ Խնդրում ենք լրացնել տվյալները այստեղ՝ "+lk+" — (515) 588-5555":"Բարև Ձեզ, "+n+"։ Nectar of Armenia-ն հրավիրում է Ձեզ ստեղծել անձնական էջ՝ արագ պատվերների և առաքման համար՝ "+lk;}
+function done(x){if(x.done){return true;}var A=J("noa-accounts",{});var em=String(x.email||"").toLowerCase();return !!(em&&A[em+"|"+(x.t==="w"?"biz":"retail")]&&A[em+"|"+(x.t==="w"?"biz":"retail")].via==="invite");}
+function fld(k,l,typ,cls,ph){return '<label class="f'+(cls?' '+cls:'')+'">'+l+'<input class="t" id="f_'+k+'" type="'+(typ||"text")+'" value="'+esc(V.f[k]||"")+'" placeholder="'+esc(ph||"")+'"></label>';}
+function render(){var app=document.getElementById("app");var h='<div class="wrap"><div class="sa" style="margin-bottom:8px"><a href="Admin.dc.html" style="color:#1D5545;font-weight:800;text-decoration:none">← Ադմին</a></div><div class="card">';
+  h+='<div class="row"><div><h2>✉️ Գրանցել և հրավիրել հաճախորդ</h2><p class="sub">Լրացրեք այն, ինչ գիտեք, և ուղարկեք հրավերը։ Հաճախորդը կբացի հղումը, կստուգի և կլրացնի մնացածը, և նրա էջը կստեղծվի։</p></div></div>';
+  h+='<div class="pick"><button type="button" class="pk w'+(V.t==="w"?' on':'')+'" data-t="w"><i>🏪</i><span><b>Մեծածախ գործընկեր</b>Խանութ, սուպերմարկետ, ռեստորան՝ դեպոզիտով աշխատանքի հրավեր</span></button><button type="button" class="pk r'+(V.t==="r"?' on':'')+'" data-t="r"><i>👤</i><span><b>Մանրածախ հաճախորդ</b>Անհատ՝ անձնական էջ պատվերների և առաքման համար</span></button></div>';
+  if(V.t){var W=V.t==="w";h+='<div class="g">'+(W?fld("biz","Բիզնեսի անվանումը *","text","w2","Օր.՝ Voskevaz Market")+'<label class="f">Տեսակը<select class="t" id="f_bizType">'+["Մթերային խանութ","Սուպերմարկետ","Ռեստորան / սրճարան","Հացատուն","Այլ"].map(function(x){return '<option'+(V.f.bizType===x?' selected':'')+'>'+x+'</option>';}).join("")+'</select></label>':"")
+     +fld("first",W?"Կոնտակտային անձ՝ անուն":"Անուն *")+fld("last","Ազգանուն")+fld("phone","Հեռախոս (SMS-ի համար)","tel","","+1 (818) ...")+fld("email","Email","email","","name@example.com")+fld("addr","Հասցե","text","w2","Փողոց, տուն")+fld("city","Քաղաք","text","","Glendale")+fld("zip","ZIP")
+     +(W?fld("permit","Seller's Permit №"):"")+'<label class="f">Հրավերի լեզուն<select class="t" id="f_lg"><option value="hy"'+(V.f.lg!=="en"?' selected':'')+'>Հայերեն</option><option value="en"'+(V.f.lg==="en"?' selected':'')+'>English</option></select></label></div>'
+     +(V.err?'<p style="color:#A1362A;font-weight:700;margin:10px 0 0">'+esc(V.err)+'</p>':'')+'<div class="rowl" style="margin-top:12px;justify-content:flex-end"><button type="button" class="btn s" data-a="cancel">Չեղարկել</button><button type="button" class="btn g" data-a="create">✓ Գրանցել և ստեղծել հրավեր</button></div>';}
+  if(V.sent&&V.fresh){var x=invs().filter(function(i){return i.id===V.sent;})[0];if(x){h+=sendBox(x,true);}}
+  h+='</div>';
+  var L=invs().slice().reverse();if(L.length){h+='<div class="card"><div class="row"><h3>📨 Ուղարկված հրավերներ ('+L.length+')</h3><span class="mut">'+L.filter(done).length+' գրանցվել են</span></div><div style="overflow-x:auto"><table><thead><tr><th>Հաճախորդ</th><th>Տեսակ</th><th>Կոնտակտ</th><th>Ստեղծվել է</th><th>Կարգավիճակ</th><th></th></tr></thead><tbody>'
+    +L.map(function(x){var d=done(x);return '<tr><td><b>'+esc(nameOf(x)||"—")+'</b>'+(x.t==="w"&&x.first?'<br><span class="mut">'+esc(x.first+" "+(x.last||""))+'</span>':'')+'</td><td>'+(x.t==="w"?"🏪 Մեծածախ":"👤 Մանրածախ")+'</td><td class="mut">'+esc([x.phone,x.email].filter(Boolean).join(" · "))+'</td><td class="mut">'+esc(String(x.at||"").slice(0,10))+'</td><td>'+(d?'<span class="bd b-d">✓ Գրանցվել է</span>':(x.sentVia?'<span class="bd b-s">Ուղարկված · '+esc(x.sentVia)+'</span>':'<span class="bd b-n">Չի ուղարկվել</span>'))+'</td><td><div class="rowl">'+(d?'':'<button type="button" class="btn s" data-a="show" data-id="'+x.id+'">📤 Ուղարկել</button>')+'<button type="button" class="btn s" data-prof="'+esc(nrm(nameOf(x))+"|"+x.t)+'">Էջը</button><button type="button" class="btn s r" data-a="del" data-id="'+x.id+'">✕</button></div></td></tr>'+(V.sent===x.id&&!V.t&&!V.fresh?'<tr><td colspan="6">'+sendBox(x,false)+'</td></tr>':'');}).join("")+'</tbody></table></div></div>';}
+  app.innerHTML=h+'</div>';post();}
+function sendBox(x,fresh){var lk=linkOf(x);var ph=String(x.phone||"").replace(/[^\d+]/g,"");var m=msg(x);
+  return '<div class="send"><div class="row"><b style="color:#1D5545">'+(fresh?'✓ '+esc(nameOf(x))+'-ը գրանցված է։ Հիմա ուղարկեք հրավերը.':'📤 Ուղարկել հրավերը՝ '+esc(nameOf(x)))+'</b><button type="button" class="btn s" data-a="close">✕</button></div><div class="lk">'+esc(lk)+'</div><div class="rowl">'
+   +(ph?'<a class="btn y" data-via="SMS" data-id="'+x.id+'" href="sms:'+esc(ph)+'?&body='+encodeURIComponent(m)+'">📱 SMS</a><a class="btn" data-via="WhatsApp" data-id="'+x.id+'" target="_blank" rel="noopener" href="https://wa.me/'+esc(ph.replace(/\D/g,"").replace(/^(\d{10})$/,"1$1"))+'?text='+encodeURIComponent(m)+'">💬 WhatsApp</a>':'<span class="mut">Հեռախոս չկա SMS-ի համար</span>')
+   +(x.email?'<a class="btn" data-via="Email" data-id="'+x.id+'" href="mailto:'+esc(x.email)+'?subject='+encodeURIComponent(x.lg==="en"?"Invitation from Nectar of Armenia":"Հրավեր Nectar of Armenia-ից")+'&body='+encodeURIComponent(m)+'">✉ Email</a>':'')
+   +'<button type="button" class="btn" data-a="copy" data-id="'+x.id+'">🔗 Պատճենել</button><a class="btn s" target="_blank" rel="noopener" href="'+esc(lk)+'">👁 Դիտել</a></div></div>';}
+function grab(){["biz","bizType","first","last","phone","email","addr","city","zip","permit","lg"].forEach(function(k){var el=document.getElementById("f_"+k);if(el){V.f[k]=el.value.trim();}});}
+function mark(id,via){var L=invs();L.forEach(function(x){if(x.id===id){x.sentVia=via;x.sentAt=new Date().toISOString();}});saveInvs(L);}
+document.addEventListener("click",function(e){var b;
+  if((b=e.target.closest("[data-t]"))){grab();V.t=b.getAttribute("data-t");V.sent=null;V.err="";render();var f=document.getElementById(V.t==="w"?"f_biz":"f_first");if(f){f.focus();}return;}
+  if((b=e.target.closest("[data-via]"))){var id=b.getAttribute("data-id"),via=b.getAttribute("data-via");setTimeout(function(){mark(id,via);render();},300);return;}
+  if((b=e.target.closest("[data-prof]"))){var pk=b.getAttribute("data-prof");if(window.parent!==window){try{parent.postMessage({nofaProf:pk},"*");}catch(x){}}else{location.href="Cost.html?cp="+encodeURIComponent(pk);}return;}
+  if(!(b=e.target.closest("[data-a]"))){return;}var a=b.getAttribute("data-a");
+  if(a==="cancel"){V={t:"",f:{},sent:null,err:""};render();}
+  else if(a==="close"){V.sent=null;render();}
+  else if(a==="show"){V.t="";V.fresh=false;V.sent=V.sent===b.getAttribute("data-id")?null:b.getAttribute("data-id");render();}
+  else if(a==="del"){if(!confirm("Ջնջե՞լ հրավերը։")){return;}saveInvs(invs().filter(function(x){return x.id!==b.getAttribute("data-id");}));if(V.sent===b.getAttribute("data-id")){V.sent=null;}render();}
+  else if(a==="copy"){var x=invs().filter(function(i){return i.id===b.getAttribute("data-id");})[0];if(!x){return;}var lk=linkOf(x);var ok=function(){mark(x.id,"հղում");b.textContent="✓ Պատճենվեց";setTimeout(render,1200);};try{navigator.clipboard.writeText(lk).then(ok,function(){prompt("Պատճենեք հղումը",lk);ok();});}catch(z){prompt("Պատճենեք հղումը",lk);ok();}}
+  else if(a==="create"){grab();var W=V.t==="w";var f=V.f;if(W&&!f.biz){V.err="Գրեք բիզնեսի անվանումը։";render();return;}if(!W&&!f.first){V.err="Գրեք անունը։";render();return;}if(!f.phone&&!f.email){V.err="Գրեք հեռախոսը կամ email-ը, որ կարողանաք ուղարկել հրավերը։";render();return;}if(f.email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email)){V.err="Email-ը սխալ է։";render();return;}
+    var x=Object.assign({id:"inv"+Date.now().toString(36),t:V.t,at:new Date().toISOString()},f);var L=invs();L.push(x);saveInvs(L);
+    try{var S=J("noa-cost-v2",{});if(!S.cprof){S.cprof={};}var ck=nrm(nameOf(x))+"|"+x.t;var p=S.cprof[ck]||(S.cprof[ck]={});p.name=nameOf(x);if(x.phone&&!p.phone){p.phone=x.phone;}if(x.email&&!p.email){p.email=x.email;}var ad=[x.addr,x.city,x.zip].filter(Boolean).join(", ");if(ad&&!p.addr){p.addr=ad;}p.invited=x.at;localStorage.setItem("noa-cost-v2",JSON.stringify(S));}catch(z){}
+    V={t:"",f:{},sent:x.id,err:"",fresh:true};render();}});
+var lastH=0;function post(){if(!/emb/.test(document.documentElement.className)){return;}var w=document.querySelector(".wrap");if(!w){return;}var h=Math.ceil(w.getBoundingClientRect().bottom+window.scrollY);if(Math.abs(h-lastH)>4){lastH=h;try{parent.postMessage({nofaH:h,page:"Invite.html"},"*");}catch(x){}}}
+if(/emb/.test(document.documentElement.className)){document.documentElement.style.overflow="hidden";setInterval(post,500);window.addEventListener("wheel",function(e){if(Math.abs(e.deltaY)<=Math.abs(e.deltaX)){return;}e.preventDefault();var k=e.deltaMode===1?32:(e.deltaMode===2?600:1);try{parent.postMessage({nofaWheel:e.deltaY*k},"*");}catch(x){}},{passive:false});}
+window.addEventListener("storage",function(){if(!V.t){render();}});
+render();
+</script></body></html>
