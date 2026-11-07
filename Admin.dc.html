@@ -58,15 +58,18 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
   .two-col { flex-direction: column !important; align-items: stretch !important; gap: 12px !important; padding-left: 10px !important; padding-right: 10px !important; }
   .two-col > main { width: 100% !important; max-width: 100% !important; flex: 1 1 auto !important; gap: 14px !important; }
   aside.sum-card { display: none !important; }
-  html.nm-open aside.sum-card { display: grid !important; position: fixed !important; top: 112px !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 9000 !important; max-height: none !important; overflow-y: auto !important; grid-template-columns: 1fr 1fr !important; grid-auto-rows: min-content; align-content: start; gap: 8px !important; padding: 12px 12px 40px !important; border-radius: 0 !important; width: auto !important; background: #1F5545 !important; box-shadow: none !important; border: 0 !important; animation: none !important; transform: none !important; }
-  html.nm-open aside.sum-card .as-ttl { grid-column: 1 / -1; position: static !important; margin: 0 0 4px !important; border-radius: 14px !important; padding: 10px 12px !important; }
-  html.nm-open aside.sum-card .wa-nav { width: auto !important; margin: 0 !important; padding: 10px !important; font-size: 13.5px !important; border-radius: 14px !important; background: rgba(255,255,255,.08) !important; min-height: 56px; box-shadow: none !important; }
-  html.nm-open aside.sum-card a.wa-nav { grid-column: 1 / -1; }
-  html.nm-open aside.sum-card > div:not(.as-ttl) { display: none !important; }
-  html.nm-open::after { content: ""; position: fixed; inset: 0; background: #1F5545; z-index: 8999; } html.nm-open body { overflow: hidden !important; }
-  html.nm-open aside.sum-card .as-eye { display: none !important; }
-  html.nm-open .hdr-stick { z-index: 9002 !important; }
-  html.nm-open aside.sum-card .wa-nav.on { outline: 2px solid #EBA93A; outline-offset: -2px; background: rgba(235,169,58,.16) !important; }
+  #nm-panel { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; height: 100dvh; z-index: 10000; background: #1F5545; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 0 12px 40px; box-sizing: border-box; }
+  #nm-panel .nm-top { position: sticky; top: 0; display: flex; align-items: center; gap: 10px; padding: 14px 0 12px; background: #1F5545; z-index: 1; }
+  #nm-panel .nm-top b { flex: 1; color: #F6C35A; font: 600 22px Fraunces,'Noto Serif Armenian',serif; }
+  #nm-panel .nm-x { border: 0; border-radius: 999px; padding: 10px 16px; font: 800 14px Manrope,'Noto Sans Armenian',sans-serif; background: linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22); color: #133B30; }
+  #nm-panel .nm-g { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  #nm-panel .nm-i { display: flex; align-items: center; gap: 8px; min-height: 58px; padding: 10px 12px; border: 0; border-radius: 14px; background: rgba(255,255,255,.08); color: #F7F3EA; font: 700 14px Manrope,'Noto Sans Armenian',sans-serif; text-align: left; box-sizing: border-box; width: 100%; min-width: 0; }
+  #nm-panel .nm-i.on { background: rgba(235,169,58,.18); box-shadow: inset 0 0 0 2px #EBA93A; color: #F6C35A; }
+  #nm-panel .nm-i.full { grid-column: 1 / -1; color: #F6C35A; }
+  #nm-panel .nm-i span:nth-child(2) { min-width: 0; overflow-wrap: anywhere; font-size: 13.5px; }
+  #nm-panel .nm-i em { font-style: normal; margin-left: auto; background: #EBA93A; color: #133B30; border-radius: 999px; padding: 1px 8px; font-size: 12px; }
+  #nm-panel .nm-out { margin-top: 14px; width: 100%; border: 1px solid rgba(246,195,90,.4); background: none; color: #CFE2D9; border-radius: 14px; padding: 12px; font: 800 13px Manrope,sans-serif; }
+  html.nm-lock, html.nm-lock body { overflow: hidden !important; }
   .nm-bar { display: flex !important; position: sticky; top: 50px; z-index: 9001; border-radius: 16px; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 16px; background: linear-gradient(180deg,#36806B,#245F4D); box-shadow: 0 8px 18px rgba(19,59,48,.25); }
   .nm-bar button { border: 0; cursor: pointer; font: 800 14px Manrope,'Noto Sans Armenian',sans-serif; border-radius: 999px; }
   .nm-bar .nm-btn { background: linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22); color: #133B30; padding: 9px 14px; flex: 0 0 auto; }
@@ -100,9 +103,16 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
 }
 </style>
 <script id="nofa-mobile-js">(function(){
-function bar(){var main=document.querySelector('.two-col > main');if(!main){return null;}var b=document.getElementById('nm-bar');if(!b){b=document.createElement('div');b.id='nm-bar';b.className='nm-bar';b.innerHTML='<button type="button" class="nm-btn">☰ Մենյու</button><span class="nm-cur"></span><button type="button" class="nm-eye" data-priv="1">👁</button>';main.parentNode.insertBefore(b,main);b.querySelector('.nm-btn').onclick=function(e){e.stopPropagation();document.documentElement.classList.toggle('nm-open');};}return b;}
-function upd(){var b=bar();if(!b){return;}var on=document.querySelector('aside.sum-card .wa-nav.on');var c=b.querySelector('.nm-cur');var t=on?on.innerText.replace(/\s+\d+\s*$/,'').replace(/\s+/g,' ').trim():'';if(c.textContent!==t){c.textContent=t;}var o=document.documentElement.classList.contains('nm-open');b.querySelector('.nm-btn').textContent=o?'✕ Փակել':'☰ Մենյու';}
-document.addEventListener('click',function(e){var h=document.documentElement;if(!h.classList.contains('nm-open')){return;}var a=e.target.closest&&e.target.closest('aside.sum-card');if(a&&!e.target.closest('.wa-nav')){return;}if(e.target.closest&&e.target.closest('.nm-btn')){return;}setTimeout(function(){h.classList.remove('nm-open');window.scrollTo(0,0);upd();},60);},true);
+function navs(){return Array.prototype.slice.call(document.querySelectorAll('aside.sum-card .wa-nav'));}
+function parts(n){var kids=Array.prototype.filter.call(n.children,function(x){return x.innerText.trim();});var ic=kids[0]?kids[0].innerText.trim():'';var tx=kids[1]?kids[1].innerText.trim():n.innerText.trim();var bd=kids[2]&&/^\d+$/.test(kids[2].innerText.trim())?kids[2].innerText.trim():'';return [ic,tx.replace(/\s+/g,' '),bd];}
+function close(){var p=document.getElementById('nm-panel');if(p){p.remove();}document.documentElement.classList.remove('nm-lock');}
+function open(){close();var p=document.createElement('div');p.id='nm-panel';var h='<div class="nm-top"><b>Ադմին</b><button type="button" class="nm-x">✕ Փակել</button></div><div class="nm-g">';
+navs().forEach(function(n,i){var p2=parts(n);h+='<button type="button" class="nm-i'+(n.classList.contains('on')?' on':'')+(n.tagName==='A'?' full':'')+'" data-i="'+i+'"><span>'+p2[0]+'</span><span>'+p2[1].replace(/</g,'&lt;')+'</span>'+(p2[2]?'<em>'+p2[2]+'</em>':'')+'</button>';});
+h+='</div><button type="button" class="nm-out">🔒 Ելք ադմինից</button>';p.innerHTML=h;document.body.appendChild(p);document.documentElement.classList.add('nm-lock');
+p.querySelector('.nm-x').onclick=close;p.querySelector('.nm-out').onclick=function(){fetch('api/api.php?a=logout',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:'{}'}).then(function(){location.reload();},function(){location.reload();});};
+Array.prototype.forEach.call(p.querySelectorAll('.nm-i'),function(b){b.onclick=function(){var n=navs()[+b.getAttribute('data-i')];close();if(n){n.click();}window.scrollTo(0,0);};});}
+function bar(){var main=document.querySelector('.two-col > main');if(!main){return null;}var b=document.getElementById('nm-bar');if(!b){b=document.createElement('div');b.id='nm-bar';b.className='nm-bar';b.innerHTML='<button type="button" class="nm-btn">☰ Մենյու</button><span class="nm-cur"></span><button type="button" class="nm-eye" data-priv="1">👁</button>';main.parentNode.insertBefore(b,main);b.querySelector('.nm-btn').onclick=function(e){e.stopPropagation();open();};}return b;}
+function upd(){if(window.innerWidth>=760){close();return;}var b=bar();if(!b){return;}var on=document.querySelector('aside.sum-card .wa-nav.on');var c=b.querySelector('.nm-cur');var pp=on?parts(on):['',''];var t=on?(pp[0]+' '+pp[1]).trim():'';if(c.textContent!==t){c.textContent=t;}}
 setInterval(upd,400);setTimeout(upd,300);})();</script>
 <script id="nofa-sync">
 (function () {
