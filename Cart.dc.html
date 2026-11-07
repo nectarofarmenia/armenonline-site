@@ -32,7 +32,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
 </style>
 <style id="nofa-menuscroll">
 @media (min-width: 900px) {
-  aside.sum-card[style*="position: sticky"], aside.card3d[style*="position: sticky"] { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: rgba(235,169,58,.55) transparent; }
+  aside.sum-card[style*="position: sticky"], aside.card3d[style*="position: sticky"] { overflow-y: auto; overscroll-behavior: contain; padding-bottom: 18px !important; scrollbar-width: thin; scrollbar-color: rgba(235,169,58,.55) transparent; }
   aside[style*="top: 145px"][style*="position: sticky"] { max-height: calc(100vh - 160px); }
   aside[style*="top: 170px"][style*="position: sticky"] { max-height: calc(100vh - 186px); }
   aside.sum-card::-webkit-scrollbar { width: 6px; } aside.sum-card::-webkit-scrollbar-thumb { background: rgba(235,169,58,.55); border-radius: 9px; }
@@ -496,6 +496,8 @@ return { t: t, langs: langs, items: items, count: count, hasCount: count > 0, su
 <script id="nofa-menuscroll-js">
 (function () { if (window.__nofaMS) { return; } window.__nofaMS = 1;
   /* keep the menu's own scroll independent: wheel over the menu scrolls only the menu, wheel over the page scrolls the page */
+  function fit() { if (window.innerWidth < 900) { return; } var L = document.querySelectorAll('aside[style*="position: sticky"]'); for (var i = 0; i < L.length; i++) { var el = L[i]; var oh = el.offsetHeight || 1; var z = el.getBoundingClientRect().height / oh || 1; var top = parseFloat(el.style.top) || 0; var avail = window.innerHeight - top * z - 18; var mh = Math.max(200, Math.floor(avail / z)); if (el.style.maxHeight !== mh + "px") { el.style.maxHeight = mh + "px"; } } }
+  window.addEventListener("resize", fit); setInterval(fit, 700); setTimeout(fit, 300);
   document.addEventListener("wheel", function (e) { var a = e.target && e.target.closest ? e.target.closest("aside") : null; if (!a || a.scrollHeight <= a.clientHeight + 2) { return; } var st = getComputedStyle(a).overflowY; if (st !== "auto" && st !== "scroll") { return; } var dy = e.deltaY * (e.deltaMode === 1 ? 32 : (e.deltaMode === 2 ? 600 : 1)); a.scrollTop += dy; e.preventDefault(); }, { passive: false });
 })();
 </script>
