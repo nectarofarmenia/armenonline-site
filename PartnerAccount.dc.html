@@ -589,18 +589,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </sc-if>
 
 <sc-if value="{{tabInv}}" hint-placeholder-val="{{false}}">
-<div class="card3d" style="border-radius: 26px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
-<h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">{{t.invH}}</h1>
-<sc-if value="{{noInvs}}" hint-placeholder-val="{{false}}"><p style="margin: 0; color: #5E6A63">{{t.noInvs}}</p></sc-if>
-<sc-for list="{{invs}}" as="iv" hint-placeholder-count="3">
-<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; padding: 12px 0; border-top: 1px solid #ECE3CF">
-<div style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column"><strong style="color: #1D5545">{{iv.no}}</strong><span style="font-size: 13px; color: #6B756F">{{iv.date}}</span></div>
-<span style="font-size: 13px; font-weight: 800; color: #2F7A55; background: #E2F0E7; padding: 5px 12px; border-radius: 999px">✓ {{t.paid}}</span>
-<strong style="min-width: 90px; text-align: right; font-family: Fraunces, Lora, serif; font-size: 18px; color: #1D5545">{{iv.total}}</strong>
-<button type="button" class="social" style="width: auto; min-height: 40px; padding: 0 16px">⬇ {{t.pdf}}</button>
-</div>
-</sc-for>
-</div>
+<iframe class="ext-frame" src="{{myInvSrc}}" title="Invoices" style="display: block; width: 100%; height: 420px; border: 0; background: transparent"></iframe>
 </sc-if>
 </div>
 </div>
@@ -659,7 +648,7 @@ var hashTab = 5; try { if (window.location.hash === "#order") { hashTab = 0; } }
 var tab = typeof st.tab === "number" ? st.tab : hashTab;
 var icons = ["⚡", "🚚", "👥", "📍", "🧾", "📊", "📦", "🏪", "⚙️", "🤝", "📁", "💬", "🎁"];
 var navL = t.nav.concat([t.navDash, t.navOrders, t.navStore, t.navSet, t.navDep, t.navDocs, (({ hy: "Նամակներ", en: "Messages", ru: "Сообщения", es: "Mensajes" })[lang] || "Messages"), (lang === "hy" ? "Հրավիրել · +$200" : "Invite · +$200")]);
-var navs = [5, 0, 6, 1, 10, 9, 11, 7, 2, 12, 8].map(function (i) { return { label: navL[i], icon: icons[i], cls: i === tab ? "on" : "", pick: function () { self.setState({ tab: i }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }; });
+var navs = [5, 0, 6, 1, 10, 9, 4, 11, 7, 2, 12, 8].map(function (i) { return { label: navL[i], icon: icons[i], cls: i === tab ? "on" : "", pick: function () { self.setState({ tab: i }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }; });
  var XL = ({ hy: ["Ինչպես պատրաստել", "Պատրաստում", "Մշակույթ", "Պատմություն"], en: ["How to cook", "How it’s made", "Culture", "History"], ru: ["Как приготовить", "Как мы готовим", "Культура", "История"], es: ["Cómo cocinar", "Cómo se hace", "Cultura", "Historia"] })[lang] || ["How to cook", "How it’s made", "Culture", "History"];
 var XP = ["Made", "Culture", "History", "", "", "", "", "", "", "Cook"];
 navs = navs.concat([{ label: lang === "hy" ? "Գնացուցակ" : "Price list", icon: "🏷", cls: tab === 30 ? "on" : "", pick: function () { self.setState({ tab: 30 }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} } }]);
@@ -1018,7 +1007,7 @@ return Object.assign(plVals, extVals, coVals, fsVals, dashVals, docVals, dzVals,
  closeLocQ: function () { self.setState({ qlf: false, qlfErr: false }); },
  addLocQ: function () { var l = self._lf || {}; if (!(l.name || "").trim() || !(l.addr || "").trim()) { self.setState({ qlfErr: true }); return; } var a = curLocs.concat([{ name: l.name.trim(), addr: l.addr.trim(), hours: (l.hours || "").trim() }]); saveLocs(a); self.setState({ qLoc: a.length - 1, qlf: false, qlfErr: false }); },
  yrOpenOpts: (function () { var y0 = new Date().getFullYear(); var cur = String(sf.opened || y0); var out = []; for (var y = y0; y >= 1950; y--) { out.push({ v: String(y), sel: String(y) === cur }); } return out; })(), btOpts: (function () { var cur = sf.bizType || ""; var l = t.btList.slice(); if (cur && l.indexOf(cur) < 0) { l.unshift(cur); } if (!cur) { l.unshift(""); } return l.map(function (v) { return { v: v, sel: v === cur }; }); })(), hideImg: function (e) { try { e.target.style.display = "none"; } catch (x) {} }, dpRules: t.dpRules.map(function (r) { return { i: r[0], h: r[1], p: r[2] }; }), dpSteps: t.dpSteps.map(function (x, i) { return { n: String(i + 1), x: x, arrow: i < t.dpSteps.length - 1 }; }), hasProp: propCount > 0, goProp: function () { self.setState({ tab: 6, stF: "all", per: 3 }); }, goPropO: function () { self.setState({ stF: "all", per: 3 }); }, hasSw: isU && !!swOther, doSwitch: doSwitch, bizName: bizN, pidTxt: !isU ? t.pid : (ust === "approved" ? t.pid.replace("W-1027", user.pid || "W-1100") : t.pidPend), isPend: isU && ust === "pending", isOkNew: isU && ust === "approved", isRej: isU && ust === "rejected", pSteps: pSteps, canOrder: ust === "approved", canPayNow: ust === "approved" && (!actor || actor.perm.p), canSend: ust === "approved" && !!actor && actor.perm.o && !actor.perm.p, noPerm: ust === "approved" && !!actor && !actor.perm.o, locked: ust !== "approved", doneH: st.sentAwait ? t.sentH : t.okH2, doneP: st.sentAwait ? t.sentP : t.okP2, needPm: !!st.needPm, holdNote: t.holdNote, flowSteps: t.flow.map(function (x, i) { return { n: String(i + 1), x: x }; }), noDels: dels.length === 0, noInvs: invs.length === 0,
-t: t, langs: langs, count: 0, hasCount: false, navs: navs, tabQO: tab === 0, tabDel: tab === 1, tabTeam: tab === 2, tabLoc: tab === 7, tabInv: tab === 4,
+myInvSrc: (function () { var u = {}; try { u = JSON.parse(window.localStorage.getItem("noa-user") || "{}") || {}; } catch (e) { u = {}; } var A0 = {}; try { A0 = JSON.parse(window.localStorage.getItem("noa-accounts") || "{}") || {}; } catch (e) {} var em0 = String(u.email || "").toLowerCase(); Object.keys(A0).forEach(function (k) { var a = A0[k]; if (a && String(a.email || "").toLowerCase() === em0 && (a.type === "biz" || k.slice(-4) === "|biz")) { u = Object.assign({}, a, u.biz ? { biz: u.biz } : {}); } }); return "MyInvoices.html?embed=1&lang=" + (lang === "en" ? "en" : "hy") + "&ck=" + encodeURIComponent(String(u.biz || ((u.first || "") + " " + (u.last || ""))).toLowerCase().replace(/[^a-z0-9Ա-և]+/g, "") + "|w") + "&em=" + encodeURIComponent(em0); })(), t: t, langs: langs, count: 0, hasCount: false, navs: navs, tabQO: tab === 0, tabDel: tab === 1, tabTeam: tab === 2, tabLoc: tab === 7, tabInv: tab === 4,
 rows: rows, total: money(sum), units: units, days: days, dayList: dayList, nDel: sel.length, locs: locs, dels: dels, members: members, roleOpts: roleOpts, roleInfo: roleInfo, invs: invs,
 oneCls: split ? "" : "on", splitCls: split ? "on" : "", planOne: function () { self.setState({ split: false, sel: [sel[0]] }); }, planSplit: function () { self.setState({ split: true }); },
 done: done, notDone: !done, sendForPay: function () { var ro = RO.slice(); var its = []; IDX.forEach(function (pi, k) { if (q[k] > 0) { its.push([pi, q[k]]); } }); sel.forEach(function (di) { ro.push({ no: "NofA-W-" + (3000 + ro.length + 1), date: dates[di].toISOString(), loc: qLocI, locName: (LOCS[qLocI] || [""])[0], locAddr: (LOCS[qLocI] || ["", ""])[1], items: its, st: 0, await: true, by: actor ? actor.name : "" }); }); saveRO(ro); self.setState({ done: true, sentAwait: true }); try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {} },
