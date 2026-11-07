@@ -245,6 +245,10 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </div>
 </sc-if>
 
+<sc-if value="{{tab14}}" hint-placeholder-val="{{false}}">
+<iframe class="ext-frame" src="Cost.html?embed=1" title="Cost" style="display: block; width: 100%; height: 1400px; border: 0; background: transparent"></iframe>
+</sc-if>
+
 <sc-if value="{{tab3}}" hint-placeholder-val="{{false}}">
 <div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px"><h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">{{t.custH}}</h1><div style="display: flex; flex-wrap: wrap; gap: 8px"><sc-for list="{{custChips}}" as="cc" hint-placeholder-count="3"><button type="button" onClick="{{cc.pick}}" class="ad-chip {{cc.cls}}">{{cc.label}}</button></sc-for></div></div>
@@ -528,15 +532,21 @@ var FULL = typeof st.full === "number" ? st.full : (function () { try { var v = 
 var LV_OK = Math.round(FULL * 0.6), LV_LOW = Math.round(FULL * 0.3);
 var mins = stockQ.map(function () { return LV_LOW; });
 var DRV = ["Arsen", "Gor", "Narek"];
-var CUST = [["Ani Petrosyan", "R", "Glendale", "ani@example.com", "+1 (818) 555 0142"], ["Karen Hakobyan", "R", "Pasadena", "karen@example.com", "+1 (626) 555 0190"], ["Lusine Mkrtchyan", "R", "Burbank", "lusine@example.com", "+1 (818) 555 0177"], ["Sona Grigoryan", "R", "Los Angeles", "sona@example.com", "+1 (323) 555 0121"], ["Ararat Market", "W", "Glendale", "owner@araratmarket.com", "+1 (818) 555 0101"], ["Tumanyan Deli", "W", "Burbank", "orders@tumanyandeli.com", "+1 (818) 555 0133"], ["Sevan Catering", "W", "North Hollywood", "hello@sevancatering.com", "+1 (747) 555 0188"]];
-var BASE = [["NofA-10512", 0, [[4, 2], [2, 1]], "paid", 0, -1, 2], ["NofA-W-2231", 4, [[1, 12], [4, 20], [8, 10]], "inv", 0, -1, 2], ["NofA-10511", 1, [[3, 1]], "paid", 1, 0, 2], ["NofA-W-2228", 5, [[5, 10], [6, 6], [7, 6]], "unpaid", 1, 1, 3], ["NofA-10509", 2, [[6, 1], [8, 2]], "paid", 2, 1, 2], ["NofA-10508", 3, [[1, 2], [4, 1]], "unpaid", 0, -1, 3], ["NofA-W-2225", 4, [[2, 6], [1, 12]], "paid", 3, 0, 2], ["NofA-10505", 0, [[5, 1]], "paid", 4, 2, -5], ["NofA-W-2219", 6, [[1, 24], [3, 2], [4, 30]], "paid", 4, 2, -3]];
-var ov = st.ov || {};
-var orders = BASE.map(function (b, i) {
-var o = ov[i] || {}; var c = CUST[b[1]]; var isW = c[1] === "W";
-var tot = 0; b[2].forEach(function (x) { tot += x[1] * (isW ? WP[x[0]] : RP[x[0]]); });
-return { i: i, no: b[0], ci: b[1], cust: c[0], city: c[2], isW: isW, items: b[2], total: tot, pay: o.pay || b[3], st: typeof o.st === "number" ? o.st : b[4], drv: typeof o.drv === "number" ? o.drv : b[5], dayOff: b[6], inv: !!o.inv };
+var RACC = {}; try { var A0 = JSON.parse(window.localStorage.getItem("noa-accounts") || "{}") || {}; Object.keys(A0).forEach(function (k) { var a = A0[k]; if (a && a.email) { RACC[a.email.toLowerCase() + "|" + (a.type === "biz" || k.slice(-4) === "|biz" ? "W" : "R")] = a; } }); var cu1 = JSON.parse(window.localStorage.getItem("noa-user") || "null"); if (cu1 && cu1.email) { var k1 = cu1.email.toLowerCase() + "|" + (cu1.type === "biz" ? "W" : "R"); if (!RACC[k1]) { RACC[k1] = cu1; } } } catch (e) {}
+var CUST = []; var cIdx = {};
+var custOf = function (email, ty) { var em = (email || "").toLowerCase(); var key = (em || "guest") + "|" + ty; if (cIdx[key] == null) { var a = RACC[em + "|" + ty] || null; var nm = a ? (ty === "W" ? (a.biz || ((a.first || "") + " " + (a.last || "")).trim()) : ((a.first || "") + " " + (a.last || "")).trim()) : ""; CUST.push([nm || em || (lang === "en" ? "Guest" : "Հյուր"), ty, (a && (a.city || a.zip)) || "", em, (a && a.phone) || ""]); cIdx[key] = CUST.length - 1; } return cIdx[key]; };
+Object.keys(RACC).sort(function (a, b) { return String(RACC[a].createdAt || "") < String(RACC[b].createdAt || "") ? -1 : 1; }).forEach(function (k) { custOf(RACC[k].email, k.slice(-1)); });
+var day0 = new Date(); day0.setHours(0, 0, 0, 0);
+var RAW = [];
+try { (JSON.parse(window.localStorage.getItem("noa-orders") || "[]") || []).forEach(function (o) { if (!o || !o.items) { return; } RAW.push({ no: String(o.no || "").replace(/^NOA-/, "NofA-"), ci: custOf(o.email, "R"), items: o.items, total: parseFloat(String(o.total || "0").replace(/[^0-9.]/g, "")) || 0, pay: "paid", st: 0, d: new Date(o.day || Date.now()) }); }); } catch (e) {}
+try { for (var ki = 0; ki < window.localStorage.length; ki++) { var kk0 = window.localStorage.key(ki); if (!kk0 || kk0.indexOf("noa-ws-orders|") !== 0 || kk0 === "noa-ws-orders|demo") { continue; } var em0 = kk0.slice(14); (JSON.parse(window.localStorage.getItem(kk0) || "[]") || []).forEach(function (o) { if (!o || !(o.ap === "approved" || o.ap === "pending")) { return; } var tw = 0; (o.items || []).forEach(function (x) { tw += x[1] * (WP[x[0]] || 0); }); RAW.push({ no: String(o.no || "").replace(/^NOA-/, "NofA-"), ci: custOf(em0, "W"), items: o.items || [], total: tw, pay: o.chargedAt ? "paid" : "unpaid", st: o.ap === "pending" ? 0 : (o.st === 2 ? 4 : (o.st === 1 ? 3 : 1)), d: new Date(o.date || Date.now()) }); }); } } catch (e) {}
+RAW.sort(function (a, b) { return b.d - a.d; });
+var ov = st.ov || (function () { try { return JSON.parse(window.localStorage.getItem("noa-admin-ov") || "{}") || {}; } catch (e) { return {}; } })();
+var orders = RAW.map(function (b, i) {
+var o = ov[b.no] || {}; var c = CUST[b.ci]; var isW = c[1] === "W"; var bd = new Date(b.d); bd.setHours(0, 0, 0, 0);
+return { i: i, no: b.no, ci: b.ci, cust: c[0], city: c[2] || "—", isW: isW, items: b.items, total: b.total, pay: o.pay || b.pay, st: typeof o.st === "number" ? o.st : b.st, drv: typeof o.drv === "number" ? o.drv : -1, dayOff: Math.round((bd - day0) / 864e5), inv: !!o.inv };
 });
-var setO = function (i, patch) { var n = Object.assign({}, ov); n[i] = Object.assign({}, n[i] || {}, patch); self.setState({ ov: n }); };
+var setO = function (i, patch) { var key = (orders[i] || {}).no; var n = Object.assign({}, ov); n[key] = Object.assign({}, n[key] || {}, patch); try { window.localStorage.setItem("noa-admin-ov", JSON.stringify(n)); } catch (e) {} self.setState({ ov: n }); };
 var now = new Date();
 var MO = lang === "hy" ? ["հունվ", "փետր", "մարտ", "ապր", "մայիս", "հունիս", "հուլիս", "օգոստ", "սեպտ", "հոկտ", "նոյեմբ", "դեկտ"] : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 var fdate = function (off) { var d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + off); return d.getDate() + " " + MO[d.getMonth()]; };
@@ -575,14 +585,14 @@ try { var cu0 = JSON.parse(window.localStorage.getItem("noa-user") || "null"); i
 var realBiz = Object.keys(ACC).map(function (k) { return ACC[k]; }).filter(function (u) { return u && u.type === "biz"; });
 var setReal = function (email, stt) { try { var A = JSON.parse(window.localStorage.getItem("noa-accounts") || "{}") || {}; var key = (email || "").toLowerCase() + "|biz"; var A2 = {}; Object.keys(A).forEach(function (k) { if (A[k] && A[k].email) { A2[KEYA(A[k])] = A[k]; } }); A = A2; var u = A[key] || ACC[key]; if (u) { u.status = stt; u.decidedAt = new Date().toISOString(); A[key] = u; window.localStorage.setItem("noa-accounts", JSON.stringify(A)); var cu = JSON.parse(window.localStorage.getItem("noa-user") || "null"); if (cu && KEYA(cu) === key) { window.localStorage.setItem("noa-user", JSON.stringify(u)); } } } catch (e) {} self.setState({ rtick: (st.rtick || 0) + 1 }); };
 var rPend = realBiz.filter(function (u) { return (u.status || "pending") === "pending"; });
-var sevSt = (st.approved || []).indexOf(6) >= 0 ? "approved" : ((st.rejected || []).indexOf(6) >= 0 ? "rejected" : "pending");
+var sevSt = "none";
 var pendingApps = (sevSt === "pending" ? 1 : 0) + rPend.length;
 var alerts = lowIdx.map(function (i) { return { icon: stockQ[i] <= 0 ? "⛔" : "⚠️", text: t.pn[i] + " — " + t.inStock + ": " + stockQ[i] + " " + pkT[(PK[i] || [0, 0, "bag"])[2]] + " (" + t.min + " " + mins[i] + ")" }; });
 rPend.forEach(function (u) { alerts.push({ icon: "🆕", text: (u.biz || u.first || "—") + " — " + t.pending }); });
 if (sevSt === "pending") { alerts.push({ icon: "🏪", text: "Sevan Catering — " + t.pending }); }
 var newCnt = orders.filter(function (o) { return o.st === 0; }).length;
 var unpaid = orders.filter(function (o) { return o.pay !== "paid"; });
-var todayOrders = orders.filter(function (o) { return o.dayOff >= 2 && o.i < 3; });
+var todayOrders = orders.filter(function (o) { return o.dayOff === 0; });
 var revToday = 0; todayOrders.forEach(function (o) { revToday += o.total; });
 var tab = st.tab || 0;
 var go = function (n, extra) { return function () { self.setState(Object.assign({ tab: n, bell: false }, extra || {})); }; };
@@ -592,16 +602,16 @@ var stMap = { pending: [t.pending, "pend", "#F2B05E", "#FFFAF0"], approved: [t.a
 var regRows = [];
 realBiz.forEach(function (ru) { regRows.push({ isReal: true, st: ru.status || "pending", biz: ru.biz || "—", name: ((ru.first || "") + " " + (ru.last || "")).trim() || "—", email: ru.email || "—", phone: ru.phone || "—", ev: !!ru.emailVerified, pv: !!ru.phoneVerified, bizType: ru.bizType || "—", branches: ru.branches || 1, permit: ru.permit || "—", zip: ru.zip || "—", date: fdt(ru.createdAt),
 approve: function () { setReal(ru.email, "approved"); }, reject: function () { setReal(ru.email, "rejected"); }, undo: function () { setReal(ru.email, "pending"); } }); });
-regRows.push({ isReal: false, st: sevSt, biz: "Sevan Catering", name: "Mariam Hovhannisyan", email: CUST[6][3], phone: CUST[6][4], ev: true, pv: true, bizType: lang === "hy" ? "Քեյթրինգ" : "Catering", branches: 1, permit: "SP-131-77410", zip: "91601", date: fdt(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1).toISOString()),
+if (sevSt !== "none") regRows.push({ isReal: false, st: sevSt, biz: "Sevan Catering", name: "Mariam Hovhannisyan", email: CUST[6][3], phone: CUST[6][4], ev: true, pv: true, bizType: lang === "hy" ? "Քեյթրինգ" : "Catering", branches: 1, permit: "SP-131-77410", zip: "91601", date: fdt(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1).toISOString()),
 approve: function () { self.setState({ approved: (st.approved || []).concat([6]), rejected: (st.rejected || []).filter(function (x) { return x !== 6; }) }); }, reject: function () { self.setState({ rejected: (st.rejected || []).concat([6]) }); }, undo: function () { self.setState({ approved: (st.approved || []).filter(function (x) { return x !== 6; }), rejected: (st.rejected || []).filter(function (x) { return x !== 6; }) }); } });
 regRows.sort(function (a, b) { return (a.st === "pending" ? 0 : 1) - (b.st === "pending" ? 0 : 1); });
 var regs = regRows.map(function (g) { var m = stMap[g.st]; return Object.assign({}, g, { stL: m[0], stCls: m[1], border: m[2], bg: m[3], isPending: g.st === "pending", isDone: g.st !== "pending", isOk: g.st === "approved", eVer: g.ev ? t.verified : t.notVer, pVer: g.pv ? t.verified : t.notVer, eCol: g.ev ? "#2F7A55" : "#B03A2E", pCol: g.pv ? "#2F7A55" : "#B03A2E" }); });
-var kpis = [["🧾", t.k[0], String(todayOrders.length), "#1D5545", 2], ["💵", t.k[1], money(revToday), "#1D5545", 8], ["⏳", t.k[2], String(newCnt + pendingApps), "#B03A2E", 2], ["💳", t.k[3], money(unpaidSum), "#9A6A00", 2], ["🚚", t.k[4], String(orders.filter(function (o) { return o.dayOff === 2; }).length), "#1D5545", 5], ["⚠️", t.k[5], String(lowIdx.length), lowIdx.length ? "#B03A2E" : "#2F7A55", 1]].map(function (k) { return { icon: k[0], label: k[1], val: k[2], color: k[3], go: go(k[4]) }; });
+var kpis = [["🧾", t.k[0], String(todayOrders.length), "#1D5545", 2], ["💵", t.k[1], money(revToday), "#1D5545", 8], ["⏳", t.k[2], String(newCnt + pendingApps), "#B03A2E", 2], ["💳", t.k[3], money(unpaidSum), "#9A6A00", 2], ["🚚", t.k[4], String(orders.filter(function (o) { return o.dayOff === 0 && o.st < 4; }).length), "#1D5545", 5], ["⚠️", t.k[5], String(lowIdx.length), lowIdx.length ? "#B03A2E" : "#2F7A55", 1]].map(function (k) { return { icon: k[0], label: k[1], val: k[2], color: k[3], go: go(k[4]) }; });
 
 var pushN = function (to, kind, title, body, url) { try { var a = JSON.parse(window.localStorage.getItem("noa-notify") || "[]") || []; a.push({ id: "n" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), to: to, kind: kind, title: title, body: body || "", url: url || "", at: new Date().toISOString() }); if (a.length > 150) { a = a.slice(-150); } window.localStorage.setItem("noa-notify", JSON.stringify(a)); } catch (e) {} };
 var bizTo = function (key) { return "biz:" + String(key).replace(/^noa-ws-orders\|/, "").replace(/^noa-chat\|/, ""); };
 var wsAll = (function () { var out = []; try { var A = {}; try { A = JSON.parse(window.localStorage.getItem("noa-accounts") || "{}") || {}; } catch (e) { A = {}; }
- for (var i = 0; i < window.localStorage.length; i++) { var k = window.localStorage.key(i); if (!k || k.indexOf("noa-ws-orders|") !== 0) { continue; } var em = k.slice(14); var arr = []; try { arr = JSON.parse(window.localStorage.getItem(k) || "[]") || []; } catch (e) { arr = []; }
+ for (var i = 0; i < window.localStorage.length; i++) { var k = window.localStorage.key(i); if (!k || k.indexOf("noa-ws-orders|") !== 0 || k === "noa-ws-orders|demo") { continue; } var em = k.slice(14); var arr = []; try { arr = JSON.parse(window.localStorage.getItem(k) || "[]") || []; } catch (e) { arr = []; }
   var acc = null; Object.keys(A).forEach(function (kk) { var a = A[kk]; if (a && (a.email || "").toLowerCase() === em && (a.type === "biz" || kk.slice(-4) === "|biz")) { acc = a; } });
   var biz = em === "demo" ? "Արարատ Մարկետ (demo)" : ((acc && (acc.biz || ((acc.first || "") + " " + (acc.last || "")).trim())) || em);
   arr.forEach(function (o, ix) { if (o && o.ap) { out.push({ key: k, ix: ix, o: o, biz: biz }); } }); } } catch (e) {} return out; })();
@@ -631,7 +641,7 @@ var chTime = function (iso) { var d = new Date(iso); return d.toLocaleString(lan
 var chUnread = function (thr, side) { if (!thr) { return 0; } var r = side === "s" ? thr.rs : thr.ra; var other = side === "s" ? "n" : "s"; return (thr.msgs || []).filter(function (m) { return m.f === other && (!r || m.at > r); }).length; };
 var chView = function (thr) { return (thr && thr.msgs ? thr.msgs : []).slice().reverse().map(function (m) { var mine = m.f === "n"; return { cls: mine ? "mine" : "", theirs: !mine, isN: m.f === "n", notN: m.f !== "n", avTxt: String(m.by || "?").charAt(0).toUpperCase(), jc: mine ? "flex-end" : "flex-start", bg: mine ? "#1D5545" : "#FFFFFF", fg: mine ? "#F6E3B4" : "#1E2A24", who: m.f === "n" ? ch.nofa : m.by, text: m.x, time: chTime(m.at) }; }); };
 
-var chStoresRaw = (function () { var out = [{ sk: "demo", name: "Արարատ Մարկետ (demo)", sub: "Glendale", mem: [["Armen Sargsyan", "owner@araratmarket.com", 0], ["Lilit", "lilit@araratmarket.com", 1], ["David", "receiving@araratmarket.com", 2]] }];
+var chStoresRaw = (function () { var out = [];
  try { var A = JSON.parse(window.localStorage.getItem("noa-accounts") || "{}") || {}; Object.keys(A).forEach(function (k) { var a = A[k]; if (!a || !a.email || !(a.type === "biz" || k.slice(-4) === "|biz")) { return; } var em = a.email.toLowerCase(); var mem = [[((a.first || "") + " " + (a.last || "")).trim() || a.biz || em, em, 0]].concat((a.team || []).map(function (m) { return [m[0], String(m[1] || "").toLowerCase(), m[2]]; })); out.push({ sk: em, name: a.biz || em, sub: em, mem: mem }); }); } catch (e) {}
  try { var A2 = JSON.parse(window.localStorage.getItem("noa-accounts") || "{}") || {}; Object.keys(A2).forEach(function (k) { var a = A2[k]; if (!a || !a.email || a.type === "biz" || k.slice(-4) === "|biz") { return; } var em = a.email.toLowerCase(); var nm = ((a.first || "") + " " + (a.last || "")).trim() || em; out.push({ sk: "retail:" + em, name: "🛒 " + nm, sub: em, retail: true, mem: [[nm, "me", 4]] }); }); } catch (e) {}
  try { for (var i = 0; i < window.localStorage.length; i++) { var kk = window.localStorage.key(i); if (kk && kk.indexOf("noa-chat|retail:") === 0) { var sk = kk.slice(9); if (!out.some(function (x) { return x.sk === sk; })) { var d0 = null; try { d0 = JSON.parse(window.localStorage.getItem(kk) || "null"); } catch (e) {} var nm2 = (d0 && d0.name) || sk.slice(7); out.push({ sk: sk, name: "🛒 " + nm2, sub: sk.slice(7) === "guest" ? (lang === "hy" ? "Հյուր" : "Guest") : sk.slice(7), retail: true, mem: [[nm2, "me", 4]] }); } } } } catch (e) {}
@@ -662,14 +672,14 @@ var chValsA = Object.assign(bcVals, { crGroups: crGroups, crNone: crGroups.lengt
  chToLine: chMemObj ? (chStoreObj && chStoreObj.retail ? chStoreObj.sub + " · " + (lang === "hy" ? "Մանրածախ հաճախորդ" : "Retail customer") : chMemObj[0] + " · " + chMemObj[1] + " · " + (chStoreObj ? chStoreObj.name : "")) : "",
  chMsgs: chView(chThrA), chEmpty: !(chThrA && chThrA.msgs && chThrA.msgs.length), chDraft: st.chDraft || "", chSetDraft: function (e) { self.setState({ chDraft: e.target.value }); },
  chKey: function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); chSendA(); } }, chSend: chSendA });
-var icons = ["📊", "📦", "🧾", "👥", "🏪", "🚚", "✉️", "🏭", "📈", "🆕", "📑", "💬", "🎨", "📉"];
+var icons = ["📊", "📦", "🧾", "👥", "🏪", "🚚", "✉️", "🏭", "📈", "🆕", "📑", "💬", "🎨", "📉", "🧮"];
 var badges = [0, lowIdx.length, newCnt, 0, 0, orders.filter(function (o) { return o.drv < 0 && o.st < 4; }).length, 0, 0, 0];
-badges[9] = pendingApps; badges[10] = 0; badges[11] = chUnreadAdmin; badges[2] = badges[2] + wqPendN; var navL = t.nav.concat([t.regNav, t.invNav, (lang === "en" ? "Messages" : "Նամակներ"), (lang === "en" ? "Design & holidays" : "Դիզայն և տոներ"), (lang === "en" ? "Statistics" : "Ստատիստիկա")]);
-var navs = [0, 9, 1, 2, 13, 10, 11, 3, 4, 5, 6, 7, 8, 12].map(function (i) { var lb = navL[i]; return { label: lb, icon: icons[i], cls: i === tab ? "on" : "", hasBadge: badges[i] > 0, badge: badges[i], pick: go(i) }; });
+badges[9] = pendingApps; badges[10] = 0; badges[11] = chUnreadAdmin; badges[2] = badges[2] + wqPendN; var navL = t.nav.concat([t.regNav, t.invNav, (lang === "en" ? "Messages" : "Նամակներ"), (lang === "en" ? "Design & holidays" : "Դիզայն և տոներ"), (lang === "en" ? "Statistics" : "Ստատիստիկա"), (lang === "en" ? "Cost & profit" : "Ինքնարժեք և շահույթ")]);
+var navs = [0, 9, 1, 2, 13, 14, 10, 11, 3, 4, 5, 6, 7, 8, 12].map(function (i) { var lb = navL[i]; return { label: lb, icon: icons[i], cls: i === tab ? "on" : "", hasBadge: badges[i] > 0, badge: badges[i], pick: go(i) }; });
 
 function invYmd(d) { var m = d.getMonth() + 1, dd = d.getDate(); return d.getFullYear() + "-" + (m < 10 ? "0" : "") + m + "-" + (dd < 10 ? "0" : "") + dd; }
 var INV_TODAY = new Date(); var invToday = invYmd(INV_TODAY);
-function invNetOf(ci) { if (!PART) { return ({ 4: 15, 5: 7 })[ci] || 0; } var p = PART.filter(function (x) { return x[0] === ci; })[0]; return p && /\d/.test(p[5]) ? parseInt(p[5].replace(/\D/g, ""), 10) : 0; }
+function invNetOf(ci) { if (!PART) { return 0; } var p = PART.filter(function (x) { return x[0] === ci; })[0]; return p && /\d/.test(p[5]) ? parseInt(p[5].replace(/\D/g, ""), 10) : 0; }
 function invSeed() { var out = []; var W = [4, 5, 6]; var nets = { 4: 15, 5: 7, 6: 0 }; var meths = ["zelle", "ach", "wire"]; var k = 0;
 for (var back = 14; back >= 0; back--) { var d0 = new Date(INV_TODAY.getFullYear(), INV_TODAY.getMonth() - back, 1); var y = d0.getFullYear(), m = d0.getMonth() + 1;
 W.forEach(function (ci, j) { if ((back + j) % 3 === 2) { return; } var dt = new Date(y, m - 1, Math.min(4 + j * 8 + (back % 4), 27)); if (dt > INV_TODAY) { dt = new Date(INV_TODAY.getFullYear(), INV_TODAY.getMonth(), Math.max(1, INV_TODAY.getDate() - j)); } k++;
@@ -677,14 +687,14 @@ var items = [[1 + (k % 8), 6 + (k * 3) % 14], [1 + ((k + 3) % 8), 4 + (k * 5) % 
 var due = new Date(dt.getTime() + nets[ci] * 864e5); var paid = back >= 1 ? !(back === 1 && j === 0) : (j === 0); var mm = (m < 10 ? "0" : "") + m;
 out.push({ no: "NofA-INV-" + String(y).slice(2) + mm + "-" + (10 + j), ci: ci, date: invYmd(dt), net: nets[ci], items: items, status: paid ? "paid" : "unpaid", method: paid ? meths[k % 3] : "", paidAt: paid ? invYmd(new Date(Math.min(due.getTime(), INV_TODAY.getTime()))) : "", note: "" }); }); }
 return out; }
-function invLoad() { try { var s0 = window.localStorage.getItem("noa-invoices"); if (s0) { var a0 = JSON.parse(s0); if (Array.isArray(a0)) { return a0; } } } catch (e) {} var a1 = invSeed(); try { window.localStorage.setItem("noa-invoices", JSON.stringify(a1)); } catch (e) {} return a1; }
+function invLoad() { try { if (!window.localStorage.getItem("noa-clean-1")) { window.localStorage.removeItem("noa-invoices"); window.localStorage.removeItem("noa-ws-orders|demo"); window.localStorage.setItem("noa-clean-1", "1"); } } catch (e) {} try { var s0 = window.localStorage.getItem("noa-invoices"); if (s0) { var a0 = JSON.parse(s0); if (Array.isArray(a0)) { return a0; } } } catch (e) {} var a1 = []; try { window.localStorage.setItem("noa-invoices", JSON.stringify(a1)); } catch (e) {} return a1; }
 function invSave(a) { try { window.localStorage.setItem("noa-invoices", JSON.stringify(a)); } catch (e) {} self.setState({ itick: Date.now(), invMem: a }); }
 function invNextNo(a) { var pre = "NofA-INV-" + invToday.slice(2, 4) + invToday.slice(5, 7) + "-"; var mx = 9; a.forEach(function (v) { if (v.no.indexOf(pre) === 0) { var q = parseInt(v.no.slice(pre.length), 10); if (q > mx) { mx = q; } } }); return pre + (mx + 1); }
-function addInvFromOrder(o) { var a = invLoad(); if (a.some(function (v) { return v.order === o.no; })) { return; } a.push({ no: invNextNo(a), order: o.no, ci: o.ci, date: invToday, net: invNetOf(o.ci), items: o.items, status: o.pay === "paid" ? "paid" : "unpaid", method: "", paidAt: o.pay === "paid" ? invToday : "", note: "Order " + o.no }); invSave(a); }
+function addInvFromOrder(o) { var a = invLoad(); if (a.some(function (v) { return v.order === o.no; })) { return; } a.push({ no: invNextNo(a), order: o.no, ci: o.ci, cem: (CUST[o.ci] || [])[3] || "", date: invToday, net: invNetOf(o.ci), items: o.items, status: o.pay === "paid" ? "paid" : "unpaid", method: "", paidAt: o.pay === "paid" ? invToday : "", note: "Order " + o.no }); invSave(a); }
 var MON = t.months;
 var invSrc = st.invMem || invLoad();
 var invFd = function (s0) { var p = s0.split("-"); return MON[parseInt(p[1], 10) - 1].slice(0, lang === "en" ? 3 : 20) + " " + parseInt(p[2], 10) + ", " + p[0]; };
-var invAll = invSrc.map(function (v) { var c = CUST[v.ci] || ["—", "W", "", "", ""]; var tot = 0; v.items.forEach(function (x) { tot += x[1] * (WP[x[0]] || 0); }); var due = new Date(new Date(v.date + "T12:00:00").getTime() + (v.net || 0) * 864e5); var dueS = invYmd(due); return Object.assign({}, v, { cust: c[0], city: c[2], email: c[3], phone: c[4], tot: tot, dueS: dueS, over: v.status !== "paid" && dueS < invToday, y: v.date.slice(0, 4), m: parseInt(v.date.slice(5, 7), 10) }); });
+var invAll = invSrc.map(function (v) { var c = (v.cem && CUST[cIdx[v.cem + "|W"]]) || CUST[v.ci] || ["—", "W", "", "", ""]; var tot = 0; v.items.forEach(function (x) { tot += x[1] * (WP[x[0]] || 0); }); var due = new Date(new Date(v.date + "T12:00:00").getTime() + (v.net || 0) * 864e5); var dueS = invYmd(due); return Object.assign({}, v, { cust: c[0], city: c[2], email: c[3], phone: c[4], tot: tot, dueS: dueS, over: v.status !== "paid" && dueS < invToday, y: v.date.slice(0, 4), m: parseInt(v.date.slice(5, 7), 10) }); });
 invAll.sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : (a.no < b.no ? 1 : -1); });
 var invSt = function (v) { return v.status === "paid" ? ["paid", t.invPaid] : (v.over ? ["unpaid", t.invOver] : ["inv", t.invUnpaid]); };
 var iy = st.iy || ""; var im = st.im || 0; var isf = st.isf || "all";
@@ -719,7 +729,7 @@ var cfgSaved0 = cfgLoad(); var cfg = st.cfgDraft || cfgSaved0;
 var cfgFields = [["zelle", t.fZelle, "name@example.com"], ["zphone", t.fZphone, "+1 (555) 555 5555"], ["bank", t.fBank, "Chase, Bank of America…"], ["acctName", t.fAcctName, "Nectar of Armenia LLC"], ["routing", t.fRouting, "9 digits"], ["acct", t.fAcct, "•••• •••• ••••"], ["wireRouting", t.fWireRouting, t.sameAsAch], ["bankAddr", t.fBankAddr, "Street, City, State ZIP"]].map(function (f) { return { label: f[1], v: cfg[f[0]] || "", ph: f[2], set: function (e) { var n = Object.assign({}, cfg); n[f[0]] = e.target.value; self.setState({ cfgDraft: n }); } }; });
 var dash = function (v) { return v ? v : "—"; };
 var pc = { zelle: dash(cfgSaved0.zelle), zphone: dash(cfgSaved0.zphone), bank: dash(cfgSaved0.bank), acctName: dash(cfgSaved0.acctName), routing: dash(cfgSaved0.routing), acct: dash(cfgSaved0.acct), wireRouting: dash(cfgSaved0.wireRouting || cfgSaved0.routing), bankAddr: dash(cfgSaved0.bankAddr) };
-var nf = st.nf || { ci: 4, net: invNetOf(4), lines: [[1, 10]], note: "" };
+var nfC0 = CUST.map(function (c, i) { return c[1] === "W" ? i : -1; }).filter(function (i) { return i >= 0; })[0]; var nf = st.nf || { ci: nfC0 == null ? -1 : nfC0, net: 0, lines: [[1, 10]], note: "" };
 var setNf = function (p) { self.setState({ nf: Object.assign({}, nf, p) }); };
 var nfCustOpts = CUST.map(function (c, i) { return [i, c]; }).filter(function (x) { return x[1][1] === "W"; }).map(function (x) { return { v: String(x[0]), label: x[1][0] + " · " + x[1][2], sel: x[0] === nf.ci }; });
 var nfNetOpts = [0, 7, 15, 30].map(function (n) { return { v: String(n), label: n ? "Net " + n : t.onReceipt, sel: n === nf.net }; });
@@ -733,7 +743,7 @@ cfgSave: function () { try { window.localStorage.setItem("noa-paycfg", JSON.stri
 invNewOn: !!st.inew, invNewOpen: function () { self.setState({ inew: true, iv: "", nf: null }); }, invNewClose: function () { self.setState({ inew: false, nf: null }); },
 nfCustOpts: nfCustOpts, nfSetCust: function (e) { var ci = parseInt(e.target.value, 10); setNf({ ci: ci, net: invNetOf(ci) }); }, nfNetOpts: nfNetOpts, nfSetNet: function (e) { setNf({ net: parseInt(e.target.value, 10) || 0 }); },
 nfLines: nfLines, nfAdd: function () { setNf({ lines: nf.lines.concat([[1, 1]]) }); }, nfNote: nf.note || "", nfSetNote: function (e) { setNf({ note: e.target.value }); }, nfTotal: money(nfTot),
-nfCreate: function () { var lines = nf.lines.filter(function (l) { return l[1] > 0; }); if (!lines.length) { return; } var a = invLoad(); var no = invNextNo(a); a.push({ no: no, ci: nf.ci, date: invToday, net: nf.net, items: lines, status: "unpaid", method: "", paidAt: "", note: nf.note || "" }); invSave(a); self.setState({ inew: false, nf: null, iv: no, iy: invToday.slice(0, 4), im: parseInt(invToday.slice(5, 7), 10) }); },
+nfCreate: function () { var lines = nf.lines.filter(function (l) { return l[1] > 0; }); if (!lines.length) { return; } var a = invLoad(); var no = invNextNo(a); a.push({ no: no, ci: nf.ci, cem: (CUST[nf.ci] || [])[3] || "", date: invToday, net: nf.net, items: lines, status: "unpaid", method: "", paidAt: "", note: nf.note || "" }); invSave(a); self.setState({ inew: false, nf: null, iv: no, iy: invToday.slice(0, 4), im: parseInt(invToday.slice(5, 7), 10) }); },
 invViewOn: !!curInv && !st.inew, invClose: function () { self.setState({ iv: "" }); }, invPrint: function () { try { window.print(); } catch (e) {} }, iv: iv, pc: pc,
 invBrowse: !curInv && !st.inew, crumbs: crumbs, invLvl0: !iy, invLvl1: !!iy && !im, invLvl2: !!iy && !!im, yearFolders: yearFolders, monthFolders: monthFolders, invRows: invRows, noInvRows: invRows.length === 0, invChips: invChips });
 var tf = st.tf || "all";
@@ -755,10 +765,10 @@ var ctf = st.ctf || "all";
 var custChips = [["all", t.all], ["r", t.retail], ["w", t.ws]].map(function (x) { return { label: x[1], cls: x[0] === ctf ? "on" : "", pick: function () { self.setState({ ctf: x[0] }); } }; });
 var custList = CUST.map(function (c, ci) { var mine = orders.filter(function (o) { return o.ci === ci; }); var s = 0; mine.forEach(function (o) { s += o.total; }); return { ci: ci, name: c[0], typeCls: c[1] === "W" ? "w" : "r", typeL: c[1] === "W" ? t.ws : t.retail, city: c[2], email: c[3], phone: c[4], n: mine.length, total: money(s), isW: c[1] === "W", view: go(2, { cf: ci, tf: "all" }) }; }).filter(function (c) { return ctf === "all" || (ctf === "w") === c.isW; });
 var appr = st.approved || [];
-var PART = [[4, "Armen Sargsyan", "SP-102-55871", 2, 4, "Net 15"], [5, "Tigran Avetisyan", "SP-118-20934", 1, 2, "Net 7"], [6, "Mariam Hovhannisyan", "SP-131-77410", 1, 1, "—"]];
-var partners = PART.map(function (p) { var c = CUST[p[0]]; var pend = p[0] === 6 && appr.indexOf(6) < 0; var mine = orders.filter(function (o) { return o.ci === p[0]; }); var s = 0; mine.forEach(function (o) { s += o.total; });
-return { name: c[0], contact: p[1], phone: c[4], email: c[3], city: c[2], permit: p[2], locs: p[3], team: p[4], terms: p[5], spent: money(s), isPending: pend, isActive: !pend, stCls: pend ? "pend" : "act", stL: pend ? t.pending : t.active, border: pend ? "#F2B05E" : "#E4DCC8", bg: pend ? "#FFFAF0" : "#FFFFFF",
-approve: function () { self.setState({ approved: appr.concat([6]) }); }, view: go(2, { cf: p[0], tf: "all" }) }; });
+var PART = realBiz.map(function (u) { return [custOf(u.email, "W"), ((u.first || "") + " " + (u.last || "")).trim() || "—", u.permit || "—", u.branches || 1, (u.team || []).length + 1, u.terms || "—", u.status || "pending", u.email]; });
+var partners = PART.map(function (p) { var c = CUST[p[0]]; var pend = p[6] === "pending"; var mine = orders.filter(function (o) { return o.ci === p[0]; }); var s = 0; mine.forEach(function (o) { s += o.total; });
+return { name: c[0], contact: p[1], phone: c[4] || "—", email: c[3], city: c[2] || "—", permit: p[2], locs: p[3], team: p[4], terms: p[5], spent: money(s), isPending: pend, isActive: !pend, stCls: pend ? "pend" : "act", stL: pend ? t.pending : t.active, border: pend ? "#F2B05E" : "#E4DCC8", bg: pend ? "#FFFAF0" : "#FFFFFF",
+approve: function () { setReal(p[7], "approved"); }, view: go(2, { cf: p[0], tf: "all" }) }; });
 var active = orders.filter(function (o) { return o.st < 4; });
 var cities = []; active.forEach(function (o) { if (cities.indexOf(o.city) < 0) { cities.push(o.city); } });
 var byCity = cities.map(function (c) { var os = active.filter(function (o) { return o.city === c; }).map(view); return { city: c, n: os.length, orders: os }; });
@@ -768,7 +778,7 @@ drvSum.push({ name: t.unassigned, n: un, cities: "", bg: un ? "#FDE7E4" : "#F0F0
 var tsel = st.tsel || 0; var autos = st.autos || [true, true, true, true, true];
 var tpls = t.tpl.map(function (lb, i) { return { label: lb, cls: i === tsel ? "on" : "", onCls: autos[i] ? "on" : "", pick: function () { self.setState({ tsel: i }); }, toggle: function () { var n = autos.slice(); n[i] = !n[i]; self.setState({ autos: n }); } }; });
 var plan = t.pn.map(function (nm, i) { var need = reserved[i]; var make = need + FULL - stockQ[i]; return { name: nm, need: need, min: mins[i], qty: stockQ[i], make: make > 0 ? "+" + make + " " + t.pcs : t.enough, cls: make > 0 ? "low" : "ok" }; });
-var REV = [612, 845, 530, 1290, 980, 1475, 1120]; var mx = Math.max.apply(null, REV);
+var REV = [0, 0, 0, 0, 0, 0, 0]; orders.forEach(function (o) { var k = o.dayOff + 6; if (k >= 0 && k < 7) { REV[k] += o.total; } }); REV = REV.map(function (v) { return Math.round(v); }); var mx = Math.max(1, Math.max.apply(null, REV));
 var bars = REV.map(function (v, k) { return { v: "$" + v, h: Math.round(v / mx * 150) + "px", d: fdate(k - 6).split(" ")[0] }; });
 var sold = t.pn.map(function (nm, i) { var q = 0; orders.forEach(function (o) { o.items.forEach(function (x) { if (x[0] === i) { q += x[1]; } }); }); return { name: nm, q: q }; }).sort(function (a, b) { return b.q - a.q; }).slice(0, 5);
 var mq = sold[0] ? sold[0].q : 1; var topP = sold.map(function (s) { return { name: s.name, q: s.q, w: Math.round(s.q / mq * 100) + "%" }; });
@@ -809,11 +819,8 @@ var sgT = lang === "en" ? { H: "Order statistics", P: "Number of orders by perio
 var SG_MO = lang === "en" ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] : ["հնվ", "փտր", "մրտ", "ապր", "մյս", "հնս", "հլս", "օգս", "սպտ", "հկտ", "նմբ", "դկտ"];
 var sgRand = function (n) { var x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
 var sgToday = new Date(); sgToday.setHours(12, 0, 0, 0);
-var sgDays = []; for (var sd = 760; sd >= 0; sd--) { var dd0 = new Date(sgToday.getTime() - sd * 864e5); var m0 = dd0.getMonth(), d0 = dd0.getDate(), wd0 = dd0.getDay();
-  var boost = 1 + (m0 === 11 ? 0.9 + (d0 >= 18 ? 0.8 : 0) : 0) + (m0 === 0 && d0 <= 13 ? 0.6 : 0) + (m0 === 10 && d0 >= 20 ? 0.7 : 0) + (m0 >= 5 && m0 <= 7 ? -0.25 : 0) + (wd0 === 5 || wd0 === 6 ? 0.25 : 0);
-  var grow = 1 + (760 - sd) / 760 * 0.35; var key = dd0.getFullYear() * 10000 + (m0 + 1) * 100 + d0;
-  var r = Math.round((2 + sgRand(key) * 4) * boost * grow); var w = (sgRand(key + 7) < 0.45 * boost * grow ? 1 : 0) + (sgRand(key + 3) < 0.12 * boost ? 1 : 0);
-  sgDays.push({ d: dd0, r: r, w: w, rv: r * (48 + sgRand(key + 1) * 40), wv: w * (380 + sgRand(key + 2) * 420) }); }
+var sgByDay = {}; orders.forEach(function (o) { var od = new Date(day0.getTime() + o.dayOff * 864e5); var key = od.getFullYear() * 10000 + (od.getMonth() + 1) * 100 + od.getDate(); var e = sgByDay[key] || (sgByDay[key] = { r: 0, w: 0, rv: 0, wv: 0 }); if (o.isW) { e.w++; e.wv += o.total; } else { e.r++; e.rv += o.total; } });
+var sgDays = []; for (var sd = 760; sd >= 0; sd--) { var dd0 = new Date(sgToday.getTime() - sd * 864e5); var key = dd0.getFullYear() * 10000 + (dd0.getMonth() + 1) * 100 + dd0.getDate(); var e0 = sgByDay[key] || { r: 0, w: 0, rv: 0, wv: 0 }; sgDays.push({ d: dd0, r: e0.r, w: e0.w, rv: e0.rv, wv: e0.wv }); }
 var sgMode = st.sgM || "month"; var sgTy = st.sgT || "all";
 var sgSum = function (L0) { var o = { r: 0, w: 0, rv: 0, wv: 0 }; L0.forEach(function (x) { o.r += x.r; o.w += x.w; o.rv += x.rv; o.wv += x.wv; }); return o; };
 var sgGroups = [];
@@ -828,7 +835,7 @@ var sgMax = 1; sgGroups.forEach(function (g) { sgMax = Math.max(sgMax, sgVal(g.s
 var sgTot = sgSum(sgGroups.map(function (g) { return g.s; })); var sgN = sgVal(sgTot); var sgRev = (sgTy === "w" ? 0 : sgTot.rv) + (sgTy === "r" ? 0 : sgTot.wv);
 var sgBest = sgGroups.slice().sort(function (a, b) { return sgVal(b.s) - sgVal(a.s); })[0];
 var sgCut = (sgMode === "month" || sgMode === "quarter") ? 2 : 1; var sgLast = sgGroups[sgGroups.length - sgCut], sgPrev = sgGroups[sgGroups.length - sgCut - 1]; var sgCh = sgPrev && sgVal(sgPrev.s) ? Math.round((sgVal(sgLast.s) - sgVal(sgPrev.s)) / sgVal(sgPrev.s) * 100) : 0;
-var sgVals = { tab13: tab === 13, sgT: sgT, sgMinW: Math.max(520, sgGroups.length * 34) + "px",
+var sgVals = { tab14: tab === 14, tab13: tab === 13, sgT: sgT, sgMinW: Math.max(520, sgGroups.length * 34) + "px",
  sgModes: [["day", sgT.day], ["month", sgT.month], ["quarter", sgT.quarter], ["hol", "🎄 " + sgT.hol]].map(function (x) { return { label: x[1], cls: x[0] === sgMode ? "on" : "", pick: function () { self.setState({ sgM: x[0] }); } }; }),
  sgTypes: [["all", sgT.all], ["r", sgT.retail], ["w", sgT.ws]].map(function (x) { return { label: x[1], cls: x[0] === sgTy ? "on" : "", pick: function () { self.setState({ sgT: x[0] }); } }; }),
  sgKpis: [[sgT.orders, String(sgN), "#1D5545", ""], [sgT.rev, "$" + Math.round(sgRev).toLocaleString("en-US"), "#1D5545", ""], [sgT.avg, "$" + (sgN ? (sgRev / sgN).toFixed(2) : "0"), "#1D5545", ""], [sgT.best, sgBest ? sgBest.l : "—", "#9A6A00", sgBest ? String(sgVal(sgBest.s)) : ""], [sgLast ? sgLast.l : "", sgLast ? String(sgVal(sgLast.s)) : "0", "#1D5545", sgMode === "hol" ? "" : ((sgCh >= 0 ? "▲ +" : "▼ ") + sgCh + "% " + sgT.vs)]].map(function (k) { return { l: k[0], v: k[1], c: k[2], d: k[3], dc: /▼/.test(k[3]) ? "#B03A2E" : "#2F7A55" }; }),
@@ -977,6 +984,12 @@ plan: plan, bars: bars, topP: topP, splitTxt: money(rS) + " / " + money(wS) });
     var N = JSON.parse(localStorage.getItem("noa-notify") || "[]") || []; ["retail:", "biz:"].forEach(function (pf) { N.push({ id: "r" + Date.now().toString(36) + pf.charAt(0), to: pf + ref, kind: "promo", title: "⭐ +1 աստղ", body: nm + "-ը գրանցվեց ձեր հրավերով։", url: "", at: new Date().toISOString() }); }); localStorage.setItem("noa-notify", JSON.stringify(N.slice(-150)));
   } catch (e) {} }
   check(); setInterval(check, 1500);
+})();
+</script>
+<script id="nofa-embhost">
+(function () { if (window.__nofaEH) { return; } window.__nofaEH = 1;
+  window.addEventListener("message", function (e) { var d = e.data; if (d && typeof d.nofaWheel === "number") { window.scrollBy({ top: d.nofaWheel, left: 0, behavior: "auto" }); return; } if (!d || typeof d.nofaH !== "number") { return; }
+    var fs = document.querySelectorAll("iframe.ext-frame"); for (var i = 0; i < fs.length; i++) { if (fs[i].contentWindow === e.source) { fs[i].style.height = Math.max(400, Math.min(20000, d.nofaH)) + "px"; } } });
 })();
 </script>
 <style id="pg-arr-css">.pgx{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;gap:8px}.pgx button{width:46px;height:46px;border-radius:50%;border:1.5px solid #EBA93A;background:#1D5545;color:#F6E3B4;font:800 22px/1 Manrope,system-ui,sans-serif;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;padding:0}.pgx button:hover{background:#133B30}.pgx .up{background:linear-gradient(180deg,#FCDB82,#EDB040 50%,#D38A22);color:#133B30;border-color:#D38A22}.pgx.main{bottom:88px;flex-direction:column}.pg-arrows{display:none !important}@media print{.pgx{display:none}}</style><div class="pgx" id="pgx"><button type="button" class="az" aria-label="Smaller text" title="Փոքրացնել տառերը" onclick="azSet(-0.1)">A−</button><button type="button" class="az" aria-label="Larger text" title="Մեծացնել տառերը" onclick="azSet(0.1)">A+</button><button type="button" aria-label="Back" onclick="history.back()">‹</button><button type="button" aria-label="Forward" onclick="history.forward()">›</button><button type="button" class="up" aria-label="Top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button></div>

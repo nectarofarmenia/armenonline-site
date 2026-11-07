@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="hy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Nectar of Armenia — Ինքնարժեք</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Noto+Sans+Armenian:wght@400;600;700&family=Fraunces:wght@600&family=Noto+Serif+Armenian:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{--g:#1D5545;--g2:#133B30;--gold:#EBA93A;--bg:#F7F3EA;--line:#ECE3CF;--mut:#6B756F;--red:#B03A2E;--ok:#2F7A55}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:#1E2A24;font:15px/1.45 Manrope,'Noto Sans Armenian',system-ui,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 18px 40px}
+html.emb .wrap{padding:0 0 10px;max-width:none}
+html.emb .standalone{display:none}
+h1,h2{font-family:Fraunces,'Noto Serif Armenian',Lora,serif;font-weight:600;color:var(--g);margin:0}
+h1{font-size:26px}h2{font-size:20px}
+.sub{color:#5E6A63;font-size:14px;margin:4px 0 0}
+.card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 1px 0 rgba(0,0,0,.03),0 10px 30px rgba(29,85,69,.07);margin-top:16px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.tab{border:1.5px solid #D8CDB4;background:#fff;color:var(--g);border-radius:999px;padding:9px 16px;font:700 14px Manrope,'Noto Sans Armenian',sans-serif;cursor:pointer}
+.tab.on{background:var(--g);color:#F6E3B4;border-color:var(--g)}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{font-size:12px;letter-spacing:.3px;text-transform:uppercase;color:#7A6A45;text-align:left;padding:10px 8px;border-bottom:1.5px solid #E4DCC8;white-space:normal;font-weight:800;vertical-align:bottom}
+td{padding:8px;border-bottom:1px solid #F0E8D6;vertical-align:middle;white-space:nowrap}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.grp td{background:#FBF9F4;font-weight:800;color:var(--g)}
+input.n,input.t,select{font:inherit;border:1.5px solid #D8CDB4;border-radius:10px;padding:6px 8px;background:#FFFDF8;color:#1E2A24;min-height:36px}
+input.n{width:70px;text-align:right}
+input.n.w{width:96px}
+input.t{width:100%;min-width:150px}
+input:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(235,169,58,.25)}
+.pos{color:var(--ok);font-weight:800}.neg{color:var(--red);font-weight:800}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:800}
+.pill.w{background:#FFF1D6;color:#9A6A00}.pill.r{background:#FBE3E0;color:var(--red)}
+.btn{border:0;border-radius:999px;padding:9px 16px;font:800 14px Manrope,'Noto Sans Armenian',sans-serif;cursor:pointer;background:var(--g);color:#F6E3B4}
+.btn.l{background:#fff;color:var(--g);border:1.5px solid #D8CDB4}
+.btn.gold{background:linear-gradient(180deg,#FCDB82,#EDB040 50%,#D38A22);color:var(--g2)}
+.x{width:32px;height:32px;border-radius:999px;border:1px solid #D8CDB4;background:#fff;color:var(--red);cursor:pointer}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:14px}
+.kpi{padding:12px 14px;border-radius:14px;background:#FBF9F4;border:1px solid var(--line)}
+.kpi>span{display:block;font-size:12.5px;color:var(--mut);font-weight:700}
+.kpi strong{font-family:Fraunces,Lora,serif;font-size:22px;color:var(--g)}
+.note{background:#FFF8EA;border:1px solid #F1D9A6;border-radius:16px;padding:14px 16px;margin-top:16px;font-size:14px}
+.note b{color:#8A5A00}
+.note ul{margin:6px 0 0;padding-left:20px}.note li{margin:3px 0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.prodhead{cursor:pointer}.prodhead td:first-child{white-space:normal;min-width:150px}
+.prodhead:hover td{background:#FBF9F4}
+.chev{display:inline-block;width:18px;color:var(--gold);font-weight:800}
+.detail td{background:#FCFAF5;white-space:normal}
+.mini{font-size:12.5px;color:var(--mut)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--mut);margin-top:10px}
+.save{font-size:12.5px;color:var(--ok);font-weight:700;min-height:18px}
+@media (max-width:640px){h1{font-size:22px}.card{padding:14px;border-radius:18px}}
+@media print{.tabs,.btn,.x,.standalone{display:none}}
+</style>
+<script>
+(function(){if(/[?&]embed=1/.test(location.search)){document.documentElement.className+=" emb";}})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <div class="standalone row" style="margin-bottom:6px"><a href="Admin.dc.html" style="color:var(--g);font-weight:800;text-decoration:none">← Ադմին</a></div>
+  <div class="card" style="margin-top:0">
+    <div class="row">
+      <div><h1>🧮 Ինքնարժեք և շահույթ</h1>
+      <p class="sub">Փոխեք հումքի գինը, բաղադրությունը, աշխատավարձը կամ վաճառքի գինը․ բոլոր հաշվարկները կթարմացվեն ինքնաշխատ։</p></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="save" id="save"></span><button class="btn l" id="reset" type="button">Վերականգնել սկզբնականը</button></div>
+    </div>
+    <div class="tabs" id="tabs"></div>
+  </div>
+  <div id="view"></div>
+</div>
+<script>
+var DEF = {"ing": [["beef", "Տավարի միս", 10, 900], ["pork", "Խոզի միս", 3, 450], ["chbreast", "Հավի կրծքամիս (դոշ)", 3, 450], ["chthigh", "Հավի ազդր (բուդ)", 3, 450], ["kuftabeef", "Քյուֆթայի միս (տավար)", 17, 450], ["egg", "Ձու (24 հատ ≈ 1200 գ)", 10, 1200], ["onion", "Սոխ", 1, 450], ["garlic", "Սխտոր (թարմ)", 7, 450], ["garlicp", "Սխտորի փոշի", 7, 450], ["cil", "Համեմ (կանաչի)", 1.5, 150], ["pars", "Մաղադանոս", 1.5, 200], ["salt", "Աղ", 7.2, 11300], ["redp", "Կարմիր բիբար", 35, 2270], ["blackp", "Սև բիբար", 33, 2270], ["khmeli", "Խմելի-սունելի", 5, 50], ["cumin", "Քիմիոն", 6.6, 400], ["pepperpaste", "Բիբարի մածուկ", 3, 600], ["flour", "Ալյուր", 27, 4540], ["bulgur", "Բլղուր", 9, 600], ["bread", "Հաց", 7, 1000], ["crumbs", "Պաքսիմատ", 1.4, 450], ["milk", "Կաթ", 8, 7056], ["butter", "Կարագ", 5, 450], ["cream", "Սլիվկի", 7, 946], ["oil", "Ձեթ", 13, 920], ["soda", "Սոդա", 2, 453], ["lepni", "Լեպնի", 3, 450], ["sugar", "Դեղին շաքարավազ", 60, 22500], ["vanil", "Վանիլին", 3.7, 54], ["broth", "Բուլյոն (տավարի)", 15.5, 450], ["water", "Ջուր", 0, 1000]], "prod": [{"id": "khinkali", "name": "Խինկալի", "batch": 240, "pieceG": 85, "unit": "հատ", "unitPcs": 1, "labor": 0.75, "pack": 0.15, "pr": [2.5, 2.2, 2.0], "rec": [["beef", 2000], ["pork", 2000], ["cil", 300], ["onion", 1600], ["garlic", 50], ["salt", 210], ["redp", 20], ["blackp", 40], ["khmeli", 6], ["flour", 10000], ["water", 8130]]}, {"id": "pelmeni", "name": "Պելմենի", "batch": 290, "pieceG": 17, "unit": "տոպրակ", "unitPcs": 35, "labor": 0, "pack": 0.15, "pr": [11, 11, 11], "rec": [["beef", 1000], ["pork", 1000], ["cil", 70], ["onion", 500], ["garlic", 8], ["salt", 95], ["redp", 3], ["blackp", 7], ["pars", 10], ["flour", 3000], ["water", 1250]]}, {"id": "blinchik", "name": "Բլինչիկ", "batch": 105, "pieceG": 85, "unit": "հատ", "unitPcs": 1, "labor": 0.75, "pack": 0.15, "pr": [3.5, 3.2, 3.0], "rec": [["beef", 4500], ["onion", 1400], ["butter", 440], ["cil", 300], ["salt", 80], ["blackp", 60], ["redp", 50], ["flour", 1600], ["egg", 600], ["soda", 16], ["milk", 4000], ["oil", 184]]}, {"id": "kufta", "name": "Միջուկով քուֆթա", "batch": 110, "pieceG": 80, "unit": "հատ", "unitPcs": 1, "labor": 0.75, "pack": 0.15, "pr": [3.5, 3.3, 3.15], "rec": [["kuftabeef", 2700], ["bulgur", 1800], ["redp", 135], ["pepperpaste", 150], ["beef", 4000], ["onion", 1400], ["butter", 250], ["cil", 300], ["salt", 60], ["blackp", 25], ["cumin", 10]]}, {"id": "kiev", "name": "Կիևյան կոտլետ", "batch": 82, "pieceG": 120, "unit": "հատ", "unitPcs": 1, "labor": 1.0, "pack": 0.15, "pr": [3.5, 3.0, 2.75], "rec": [["chbreast", 2000], ["chthigh", 2000], ["egg", 1200], ["onion", 1200], ["bread", 1000], ["crumbs", 1400], ["milk", 500], ["butter", 560], ["salt", 100], ["redp", 20], ["blackp", 30], ["garlicp", 15]]}, {"id": "chcut", "name": "Հավի կոտլետ", "batch": 82, "pieceG": 120, "unit": "հատ", "unitPcs": 1, "labor": 0.5, "pack": 0.15, "pr": [2.5, 2.2, 1.9], "rec": [["chbreast", 2000], ["chthigh", 2000], ["egg", 100], ["onion", 1200], ["bread", 1000], ["milk", 500], ["butter", 560], ["salt", 100], ["redp", 20], ["blackp", 30], ["garlicp", 15]]}, {"id": "beefcut", "name": "Տավարի կոտլետ", "batch": 82, "pieceG": 120, "unit": "հատ", "unitPcs": 1, "labor": 0.5, "pack": 0.15, "pr": [3.0, 2.5, 2.1], "rec": [["beef", 2000], ["onion", 600], ["garlicp", 20], ["cil", 300], ["salt", 35], ["blackp", 16], ["redp", 12], ["bread", 500], ["egg", 100], ["cream", 140]]}, {"id": "gata", "name": "Գաթա", "batch": 35, "pieceG": 0, "unit": "հատ", "unitPcs": 1, "labor": 0, "pack": 0.15, "pr": [0, 0, 0], "rec": [["butter", 515], ["flour", 850], ["egg", 200], ["soda", 10], ["salt", 1], ["lepni", 500], ["sugar", 300], ["vanil", 18]]}, {"id": "khash", "name": "Խաշ", "batch": 1, "pieceG": 0, "unit": "բաժին", "unitPcs": 1, "labor": 0, "pack": 0, "pr": [0, 0, 0], "rec": []}], "fixed": [["Վարձավճար", 0], ["Կոմունալ", 0], ["Վառելիք (ֆուրգոն)", 0], ["Ապահովագրություն", 0], ["Այլ ծախսեր", 0]]};
+var KEY = "noa-cost-v1";
+var CH = [["Մանրածախ","r"],["Մեծածախ փաթեթավորված","wp"],["Մեծածախ առանց փաթեթավորման","wu"]];
+var S;
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function load(){try{var s=localStorage.getItem(KEY);if(s){var o=JSON.parse(s);if(o&&o.ing&&o.prod){return o;}}}catch(e){}var d=clone(DEF);d.month={};d.tab="prod";return d;}
+S=load();if(!S.month){S.month={};}if(!S.fixed){S.fixed=clone(DEF.fixed);}
+var saveT;function save(){try{localStorage.setItem(KEY,JSON.stringify(S));var el=document.getElementById("save");el.textContent="✓ Պահպանված է";clearTimeout(saveT);saveT=setTimeout(function(){el.textContent="";},1600);}catch(e){}}
+function $(s,r){return (r||document).querySelector(s);}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function num(v){var n=parseFloat(String(v).replace(",","."));return isFinite(n)?n:0;}
+function m(v,d){if(d==null){d=2;}var s=(v<0?"−$":"$")+Math.abs(v).toFixed(d);return s;}
+function m3(v){return m(v,Math.abs(v)<1?3:2);}
+function pct(v){return isFinite(v)?(v*100).toFixed(1)+"%":"—";}
+function ingMap(){var o={};S.ing.forEach(function(i){o[i[0]]=i;});return o;}
+function perG(i){return i&&i[3]>0?i[2]/i[3]:0;}
+function calc(p){var M=ingMap();var tot=0,g=0;p.rec.forEach(function(r){tot+=r[1]*perG(M[r[0]]);g+=r[1];});var b=p.batch>0?p.batch:1;var mat=tot/b;
+  var unit=function(ch){return p.unitPcs*(mat+p.labor)+(ch==="wu"?0:p.pack);};
+  return {batchCost:tot,batchG:g,gPc:g/b,mat:mat,cost:CH.map(function(c){return unit(c[1]);}),profit:CH.map(function(c,i){return p.pr[i]-unit(c[1]);})};}
+function noWs(p){return p.id==="khash";}
+var TABS=[["prod","📦 Ապրանքներ"],["ing","🥩 Հումքի գներ"],["month","📅 Ամսական հաշվարկ"],["notes","⚠️ Ուշադրություն"]];
+function renderTabs(){$("#tabs").innerHTML=TABS.map(function(t){return '<button type="button" class="tab'+(S.tab===t[0]?" on":"")+'" data-tab="'+t[0]+'">'+t[1]+'</button>';}).join("");}
+document.addEventListener("click",function(e){var t=e.target.closest("[data-tab]");if(t){S.tab=t.getAttribute("data-tab");save();render();return;}
+  var a=e.target.closest("[data-act]");if(!a){return;}var act=a.getAttribute("data-act"),pi=+a.getAttribute("data-p"),ri=+a.getAttribute("data-r");
+  if(act==="open"){S.open=S.open===pi?-1:pi;}
+  else if(act==="delrec"){S.prod[pi].rec.splice(ri,1);}
+  else if(act==="addrec"){S.prod[pi].rec.push([S.ing[0][0],0]);}
+  else if(act==="adding"){var id="i"+Date.now().toString(36);S.ing.push([id,"Նոր հումք",0,1000]);}
+  else if(act==="deling"){var id2=S.ing[ri][0];var used=S.prod.filter(function(p){return p.rec.some(function(r){return r[0]===id2;});}).map(function(p){return p.name;});if(used.length){alert("Այս հումքը օգտագործվում է՝ "+used.join(", ")+"։ Նախ հանեք բաղադրությունից։");return;}S.ing.splice(ri,1);}
+  else if(act==="addfix"){S.fixed.push(["Նոր ծախս",0]);}
+  else if(act==="delfix"){S.fixed.splice(ri,1);}
+  else if(act==="clearmonth"){S.month={};}
+  save();render();});
+document.addEventListener("input",function(e){var el=e.target;var k=el.getAttribute("data-k");if(!k){return;}var a=k.split(".");var v=el.type==="number"?num(el.value):el.value;
+  if(a[0]==="ing"){S.ing[+a[1]][+a[2]]=v;}
+  else if(a[0]==="p"){var p=S.prod[+a[1]];if(a[2]==="pr"){p.pr[+a[3]]=v;}else if(a[2]==="rec"){p.rec[+a[3]][+a[4]]=a[4]==="1"?v:el.value;}else{p[a[2]]=v;}}
+  else if(a[0]==="mo"){S.month[a[1]+"."+a[2]]=v;}
+  else if(a[0]==="fx"){S.fixed[+a[1]][+a[2]]=v;}
+  save();update();});
+document.addEventListener("change",function(e){if(e.target.tagName==="SELECT"&&e.target.getAttribute("data-k")){render();}});
+
+function inp(k,v,cls,step){return '<input type="number" inputmode="decimal" step="'+(step||"any")+'" min="0" class="n '+(cls||"")+'" data-k="'+k+'" value="'+v+'">';}
+function out(k){return '<span data-o="'+k+'"></span>';}
+
+function viewProd(){var h='<div class="card"><div class="row"><div><h2>Ապրանքների ինքնարժեքը և շահույթը</h2><p class="sub">Բոլոր գումարները վաճառքի 1 միավորի համար։ Սեղմեք ապրանքի վրա՝ բաղադրությունը տեսնելու և փոխելու համար։</p></div></div>';
+  h+='<div class="scroll" style="margin-top:12px"><table><thead><tr><th>Ապրանք</th><th class="num">Հումք<br>1 հատ</th><th class="num">Աշխատ.<br>1 հատ</th><th class="num">Տուփ +<br>լեյբլ</th>'+["Մանրածախ","Մեծածախ<br>փաթեթով","Մեծածախ առանց<br>փաթեթի"].map(function(c){return '<th class="num">'+c+'</th>';}).join("")+'</tr></thead><tbody>';
+  S.prod.forEach(function(p,i){var open=S.open===i;
+    h+='<tr class="prodhead" data-act="open" data-p="'+i+'"><td><span class="chev">'+(open?"▾":"▸")+'</span><strong>'+esc(p.name)+'</strong><div class="mini" style="padding-left:18px">1 '+esc(p.unit)+(p.unitPcs>1?" = "+p.unitPcs+" հատ":"")+out("warn."+i)+'</div></td>';
+    h+='<td class="num">'+out("mat."+i)+'</td>';
+    h+='<td class="num" onclick="event.stopPropagation()">'+inp("p."+i+".labor",p.labor)+'</td><td class="num" onclick="event.stopPropagation()">'+inp("p."+i+".pack",p.pack)+'</td>';
+    CH.forEach(function(c,j){h+='<td class="num" onclick="event.stopPropagation()">'+(noWs(p)&&j>0?'<span class="mini">մեծածախ չի վաճառվում</span>':inp("p."+i+".pr."+j,p.pr[j])+'<div style="margin-top:3px">'+out("pf."+i+"."+j)+'</div>')+'</td>';});
+    h+='</tr>';
+    if(open){h+='<tr class="detail"><td colspan="7">'+recipe(p,i)+'</td></tr>';}
+  });
+  h+='</tbody></table></div><div class="legend"><span>Յուրաքանչյուր գնի տակ՝ շահույթը և տոկոսը։</span><span>Շահույթ = գին − (հումք + աշխատավարձ) × հատերի քանակ − տուփ/լեյբլ</span><span>«Առանց փաթեթավորման» գնի մեջ տուփի ծախսը չի հաշվվում</span></div></div>';
+  return h;}
+function recipe(p,i){var M=ingMap();
+  var h='<div style="display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;margin:4px 0 12px">';
+  h+='<label class="mini">Մեկ խմբաքանակից ստացվում է '+inp("p."+i+".batch",p.batch,"",1)+' հատ</label>';
+  h+='<label class="mini">1 հատի քաշը '+inp("p."+i+".pieceG",p.pieceG,"",1)+' գ</label>';
+  h+='<label class="mini">Վաճառքի միավոր <input class="t" style="width:110px;min-width:0" data-k="p.'+i+'.unit" value="'+esc(p.unit)+'"> = '+inp("p."+i+".unitPcs",p.unitPcs,"",1)+' հատ</label></div>';
+  h+='<div class="scroll"><table style="max-width:820px"><thead><tr><th>Հումք</th><th class="num">Քանակ (գ)</th><th class="num">Գին / կգ</th><th class="num">Արժեք խմբաքանակում</th><th class="num">1 հատին</th><th></th></tr></thead><tbody>';
+  p.rec.forEach(function(r,k){h+='<tr><td><select data-k="p.'+i+'.rec.'+k+'.0">'+S.ing.map(function(g){return '<option value="'+g[0]+'"'+(g[0]===r[0]?" selected":"")+'>'+esc(g[1])+'</option>';}).join("")+'</select></td>';
+    h+='<td class="num">'+inp("p."+i+".rec."+k+".1",r[1],"w")+'</td><td class="num">'+out("rk."+i+"."+k)+'</td><td class="num">'+out("rc."+i+"."+k)+'</td><td class="num">'+out("rp."+i+"."+k)+'</td><td><button class="x" type="button" title="Հեռացնել" data-act="delrec" data-p="'+i+'" data-r="'+k+'">✕</button></td></tr>';});
+  h+='<tr class="grp"><td>Ընդամենը</td><td class="num">'+out("tg."+i)+'</td><td></td><td class="num">'+out("tc."+i)+'</td><td class="num">'+out("mat2."+i)+'</td><td></td></tr></tbody></table></div>';
+  h+='<div style="margin-top:10px"><button class="btn l" type="button" data-act="addrec" data-p="'+i+'">+ Ավելացնել հումք</button></div>';
+  return h;}
+function viewIng(){var h='<div class="card"><div class="row"><div><h2>Հումքի գներ</h2><p class="sub">Գրեք ինչքան եք վճարում մեկ տուփի/փաթեթի համար և դրա քաշը։ Գինը փոխելուց հետո բոլոր ապրանքների ինքնարժեքը կթարմացվի։</p></div><button class="btn" type="button" data-act="adding">+ Նոր հումք</button></div>';
+  h+='<div class="scroll" style="margin-top:12px"><table><thead><tr><th>Հումք</th><th class="num">Փաթեթի գին ($)</th><th class="num">Փաթեթի քաշ (գ)</th><th class="num">Գին / կգ</th><th>Որտեղ է օգտագործվում</th><th></th></tr></thead><tbody>';
+  S.ing.forEach(function(g,k){var used=S.prod.filter(function(p){return p.rec.some(function(r){return r[0]===g[0];});}).map(function(p){return p.name;});
+    h+='<tr><td><input class="t" data-k="ing.'+k+'.1" value="'+esc(g[1])+'"></td><td class="num">'+inp("ing."+k+".2",g[2])+'</td><td class="num">'+inp("ing."+k+".3",g[3],"w",1)+'</td><td class="num">'+out("ik."+k)+'</td><td class="mini" style="white-space:normal;max-width:300px">'+(used.join(", ")||"—")+'</td><td><button class="x" type="button" title="Հեռացնել" data-act="deling" data-r="'+k+'">✕</button></td></tr>';});
+  return h+'</tbody></table></div></div>';}
+function viewMonth(){var h='<div class="card"><div class="row"><div><h2>Ամսական հաշվարկ</h2><p class="sub">Գրեք ամսվա ընթացքում վաճառված քանակը (վաճառքի միավորով)։ Կհաշվվի եկամուտը, հումքը, աշխատողների աշխատավարձը և մաքուր շահույթը։</p></div><button class="btn l" type="button" data-act="clearmonth">Մաքրել քանակները</button></div>';
+  h+='<div class="scroll" style="margin-top:12px"><table><thead><tr><th>Ապրանք</th>'+["Մանրածախ","Մեծածախ<br>փաթեթով","Մեծածախ առանց<br>փաթեթի"].map(function(c){return '<th class="num">'+c+'</th>';}).join("")+'<th class="num">Հատ<br>արտադրել</th><th class="num">Եկամուտ</th><th class="num">Աշխատավարձ</th><th class="num">Շահույթ</th></tr></thead><tbody>';
+  S.prod.forEach(function(p,i){h+='<tr><td><strong>'+esc(p.name)+'</strong> <span class="mini">('+esc(p.unit)+')</span></td>';
+    CH.forEach(function(c,j){h+='<td class="num">'+(noWs(p)&&j>0?'<span class="mini">—</span>':inp("mo."+p.id+"."+j,S.month[p.id+"."+j]||0,"",1))+'</td>';});
+    h+='<td class="num">'+out("mq."+i)+'</td><td class="num">'+out("mr."+i)+'</td><td class="num">'+out("ml."+i)+'</td><td class="num">'+out("mp."+i)+'</td></tr>';});
+  h+='<tr class="grp"><td>Ընդամենը</td><td></td><td></td><td></td><td class="num">'+out("MQ")+'</td><td class="num">'+out("MR")+'</td><td class="num">'+out("ML")+'</td><td class="num">'+out("MP")+'</td></tr></tbody></table></div>';
+  h+='<h2 style="margin-top:22px">Մշտական ամսական ծախսեր</h2><div class="scroll" style="margin-top:8px"><table style="max-width:560px"><tbody>';
+  S.fixed.forEach(function(f,k){h+='<tr><td><input class="t" data-k="fx.'+k+'.0" value="'+esc(f[0])+'"></td><td class="num">$ '+inp("fx."+k+".1",f[1],"w")+'</td><td><button class="x" type="button" data-act="delfix" data-r="'+k+'">✕</button></td></tr>';});
+  h+='</tbody></table></div><div style="margin-top:10px"><button class="btn l" type="button" data-act="addfix">+ Ավելացնել ծախս</button></div>';
+  h+='<div class="kpis">'+[["Եկամուտ","K1"],["Հումք","K2"],["Աշխատողների աշխատավարձ","K3"],["Տուփ և լեյբլ","K4"],["Մշտական ծախսեր","K5"],["Մաքուր շահույթ","K6"],["Շահութաբերություն","K7"]].map(function(k){return '<div class="kpi"><span>'+k[0]+'</span><strong>'+out(k[1])+'</strong></div>';}).join("")+'</div></div>';
+  return h;}
+function viewNotes(){return '<div class="card"><h2>Ինչ գտա ձեր հաշվարկի ֆայլում</h2><p class="sub">Այս բաժնի թվերը վերցված են ձեր Excel ֆայլից։ Ստորև այն տեղերն են, որտեղ հին ֆայլում հաշվարկը սխալ կամ անհամապատասխան էր։ Ստուգեք և ուղղեք թվերը «Ապրանքներ» և «Հումքի գներ» բաժիններում։</p>'+
+'<div class="note"><b>Սխալ բանաձևեր հին ֆայլում</b><ul>'+
+'<li><b>Խինկալի և Պելմենի.</b> «Ընդամենը» գումարը սկսվում էր 6-րդ տողից, ուստի <b>տավարի միսը չէր հաշվվում</b>։ Այստեղ այն հաշվված է, և խինկալիի հումքը ≈ $0.43 է, ոչ թե $0.34։</li>'+
+'<li><b>Բլինչիկ.</b> լավաշը հաշվվում էր երկու անգամ՝ և որպես պատրաստի լավաշ ($0.30/հատ), և որպես ալյուր, ձու, կաթ։ Այստեղ թողել եմ միայն բաղադրիչները։</li>'+
+'<li><b>Միջուկով քուֆթա.</b> քիմիոնի գինը սխալ էր (10 գ = $0.70), իսկ համեմի տողում աղի գինն էր։ Այստեղ վերցված են հումքի ցուցակի գները։</li>'+
+'<li><b>Վաճառքների գրքում</b> շահույթը հաշվվում է ֆիքսված տոկոսով (82.5%, 72.73%) և <b>չի ներառում աշխատավարձը</b>։ Ճիշտ շահույթը տեսեք այստեղ։</li></ul></div>'+
+'<div class="note"><b>Ստուգեք այս թվերը</b><ul>'+
+'<li><b>Հավի և տավարի կոտլետ.</b> խմբաքանակից գրված է 82 հատ, բայց հումքի քաշով 120 գ-անոց կոտլետ ստացվում է ≈ 62 և ≈ 31 հատ։ Եթե իրականում 120 գ են, ինքնարժեքը ավելի բարձր է։ Ապրանքի կողքին ⚠️ նշանը ցույց է տալիս այս անհամապատասխանությունը։</li>'+
+'<li><b>Պելմենի.</b> գրված է 17 գ × 290 հատ, բայց հումքը 6943 գ է (≈ 408 հատ)։ Տոպրակում հատերի քանակը (35) և աշխատավարձը լրացրեք։</li>'+
+'<li><b>Հացի գինը</b> տարբեր թերթերում տարբեր էր ($7, $9.8, $12 / կգ)։ Վերցրել եմ ձեր հումքի ցուցակի գինը՝ $7 / կգ։</li>'+
+'<li><b>Քուֆթայի գինը</b> մի տեղ $3.5 է, մյուսում՝ $4։ Վերցրել եմ $3.5։</li>'+
+'<li><b>Գաթա.</b> աշխատավարձը և վաճառքի գները ֆայլում չկային, լրացրեք։ <b>Խաշ.</b> բաղադրության թերթը դատարկ էր։</li></ul></div></div>';}
+
+function render(){renderTabs();var v=S.tab==="ing"?viewIng():S.tab==="month"?viewMonth():S.tab==="notes"?viewNotes():viewProd();$("#view").innerHTML=v;update();}
+function set(k,html){var els=document.querySelectorAll('[data-o="'+k+'"]');for(var i=0;i<els.length;i++){els[i].innerHTML=html;}}
+function pf(v){return '<span class="'+(v>=0?"pos":"neg")+'">'+m(v)+'</span>';}
+function update(){var M=ingMap();
+  S.ing.forEach(function(g,k){set("ik."+k,m(perG(g)*1000));});
+  var T={q:0,r:0,mat:0,lab:0,pack:0};
+  S.prod.forEach(function(p,i){var c=calc(p);set("mat."+i,m3(c.mat));set("mat2."+i,m3(c.mat));set("tc."+i,m(c.batchCost));set("tg."+i,Math.round(c.batchG).toLocaleString("en-US")+" գ");
+    CH.forEach(function(ch,j){var pr=p.pr[j];set("pf."+i+"."+j,pr>0?pf(c.profit[j])+' <span class="mini">'+pct(c.profit[j]/pr)+'</span>':'<span class="pill w">լրացրեք գինը</span>');});
+    var w="";if(p.pieceG>0&&p.rec.length&&Math.abs(c.gPc-p.pieceG)/p.pieceG>0.15){w=' <span class="pill w" title="Հումքի քաշը / հատ = '+c.gPc.toFixed(0)+' գ, իսկ 1 հատը գրված է '+p.pieceG+' գ">⚠️ '+c.gPc.toFixed(0)+' գ / հատ</span>';}
+    if(!p.rec.length){w=' <span class="pill r">բաղադրություն չկա</span>';}
+    set("warn."+i,w);
+    p.rec.forEach(function(r,k){var g=M[r[0]];var cost=r[1]*perG(g);set("rk."+i+"."+k,m(perG(g)*1000));set("rc."+i+"."+k,m(cost));set("rp."+i+"."+k,m3(cost/(p.batch||1)));});
+    var q=0,rev=0,pk=0;CH.forEach(function(ch,j){var n=num(S.month[p.id+"."+j]);q+=n;rev+=n*p.pr[j];if(ch[1]!=="wu"){pk+=n*p.pack;}});
+    var pcs=q*p.unitPcs;var mat=pcs*c.mat,lab=pcs*p.labor;var prof=rev-mat-lab-pk;
+    set("mq."+i,pcs?pcs.toLocaleString("en-US"):"—");set("mr."+i,m(rev));set("ml."+i,m(lab));set("mp."+i,pf(prof));
+    T.q+=pcs;T.r+=rev;T.mat+=mat;T.lab+=lab;T.pack+=pk;});
+  var fx=0;S.fixed.forEach(function(f){fx+=num(f[1]);});var net=T.r-T.mat-T.lab-T.pack-fx;
+  set("MQ",T.q.toLocaleString("en-US"));set("MR",m(T.r));set("ML",m(T.lab));set("MP",pf(T.r-T.mat-T.lab-T.pack));
+  set("K1",m(T.r));set("K2",m(T.mat));set("K3",m(T.lab));set("K4",m(T.pack));set("K5",m(fx));set("K6",pf(net));set("K7",T.r?pct(net/T.r):"—");
+  post();}
+$("#reset").addEventListener("click",function(){if(!confirm("Բոլոր փոփոխությունները կջնջվեն և կվերադառնան սկզբնական թվերը։ Շարունակե՞լ")){return;}var t=S.tab;S=clone(DEF);S.month={};S.tab=t;save();render();});
+var lastH=0;function post(){if(!/emb/.test(document.documentElement.className)){return;}var h=Math.ceil(document.querySelector(".wrap").getBoundingClientRect().bottom+window.scrollY);if(Math.abs(h-lastH)>4){lastH=h;try{parent.postMessage({nofaH:h,page:"Cost.html"},"*");}catch(x){}}}
+if(/emb/.test(document.documentElement.className)){document.documentElement.style.overflow="hidden";setInterval(post,500);
+  window.addEventListener("wheel",function(e){if(Math.abs(e.deltaY)<=Math.abs(e.deltaX)){return;}var sc=e.target.closest&&e.target.closest(".scroll");e.preventDefault();var k=e.deltaMode===1?32:(e.deltaMode===2?600:1);try{parent.postMessage({nofaWheel:e.deltaY*k},"*");}catch(x){}},{passive:false});}
+if(S.open==null){S.open=-1;}
+render();
+</script>
+</body>
+</html>
