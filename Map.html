@@ -11,20 +11,22 @@
 h2{font-family:'Noto Serif Armenian',serif;font-weight:600;color:#1D5545;margin:0;font-size:21px}.sub{color:#5E6A63;font-size:13.5px;margin:4px 0 0}
 .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
 .chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border:1.5px solid #E4DCC8;background:#fff;color:#1D5545;border-radius:999px;padding:6px 12px;font:700 13px Manrope,'Noto Sans Armenian',sans-serif;cursor:pointer}.chip.on{background:#1D5545;color:#F6E3B4;border-color:#1D5545}
-#map{height:520px;border-radius:16px;margin-top:12px;border:1px solid #E4DCC8;z-index:1}
+#map{height:620px;border-radius:16px;margin-top:12px;border:1px solid #E4DCC8;z-index:1}
 .kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px}.k{padding:10px 12px;border-radius:12px;background:#FBF9F4;border:1px solid #ECE3CF}.k span{display:block;font-size:12px;font-weight:700;color:#6B756F}.k b{font-size:19px;color:#1D5545}
 table{width:100%;border-collapse:collapse;font-size:13.5px}th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#1D5545;background:#E8F1EC;text-align:left;padding:8px}td{padding:8px;border-bottom:1px solid #F0E8D6}td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .bar{height:6px;border-radius:9px;background:#F0E8D6;overflow:hidden;min-width:90px}.bar i{display:block;height:100%;background:#EBA93A}
 .lg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;margin-top:8px}.lg i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+#mapbox:fullscreen{background:#fff}#mapbox:fullscreen #map{height:100vh;border-radius:0;margin:0}#mapbox.fs{position:fixed;inset:0;z-index:9999;background:#fff}#mapbox.fs #map{height:100vh;margin:0;border-radius:0}
+.leaflet-control-layers{border-radius:12px!important;font:600 13px Manrope,"Noto Sans Armenian",sans-serif}.leaflet-bar a{width:34px!important;height:34px!important;line-height:34px!important}
 .miss{margin-top:10px;padding:10px 12px;border-radius:12px;background:#FFF6E0;border:1px solid #F1D9A6;font-size:13px;color:#6B5A30}
 .st{font-size:12.5px;color:#6B756F}.pin{font-family:Manrope,sans-serif;font-size:12.5px}.pin b{color:#1D5545}
 </style>
 <script>if(/[?&]embed=1/.test(location.search)){document.documentElement.className+=" emb";}</script>
 </head><body><div class="wrap">
 <div class="sa" style="margin-bottom:8px"><a href="Admin.dc.html" style="color:#1D5545;font-weight:800;text-decoration:none">← Ադմին</a></div>
-<div class="card"><div class="row"><div><h2>🗺 Առաքումների և հաճախորդների քարտեզ</h2><p class="sub">Որտեղ ենք առաքել և որտեղ են մեր հաճախորդները։ Կետի վրա սեղմելիս երևում են մանրամասները։</p></div><div class="chips" id="tf"></div></div>
+<div class="card"><div class="row"><div><h2>🗺 Առաքումների և հաճախորդների քարտեզ</h2><p class="sub">Որտեղ ենք առաքել և որտեղ են մեր հաճախորդները։ Մկնիկի անիվով կամ երկու մատով մեծացրեք, ⛶՝ լիէկրան, ◎՝ ցույց տալ բոլորը։</p></div><div class="chips" id="tf"></div></div>
 <div class="lg"><span><i style="background:#1D5545"></i>Մանրածախ</span><span><i style="background:#EBA93A"></i>Մեծածախ</span><span><i style="background:#fff;border:3px solid #1D5545;width:14px;height:14px"></i>Nectar of Armenia</span><span class="st" id="gst"></span></div>
-<div id="map"></div><div id="miss"></div></div>
+<div id="mapbox"><div id="map"></div></div><div id="miss"></div></div>
 <div class="card"><h2>🏙 Ստատիստիկա ըստ քաղաքների</h2><div class="kp" id="kp"></div><div style="overflow-x:auto;margin-top:12px"><table><thead><tr><th>Քաղաք</th><th class="n">Հաճախորդներ</th><th class="n">Պատվերներ</th><th>Վաճառք</th><th class="n">Մանրածախ / մեծածախ</th><th class="n">Վերջին պատվեր</th></tr></thead><tbody id="ct"></tbody></table></div></div>
 </div>
 <script>
@@ -44,11 +46,18 @@ function collect(){var C={};var prof=CS.cprof||{};
   for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(!key||key.indexOf("noa-ws-orders|")!==0||key==="noa-ws-orders|demo"){continue;}var a=accBy[key.slice(14)+"|w"]||{};J(key,[]).forEach(function(o){if(!o||o.ap!=="approved"){return;}add(a.biz||key.slice(14),"w",o.locAddr||a.addr||(a.zip?a.zip+", CA":""),String(o.date||"").slice(0,10),0);});}
   Object.keys(C).forEach(function(k){var p=prof[k];if(p&&p.addr){C[k].addr=p.addr;}});
   return Object.keys(C).map(function(k){return C[k];});}
-var HASL=typeof L!=="undefined";if(!HASL){document.getElementById("map").innerHTML='<p style="padding:20px;color:#6B756F">Քարտեզը չհաջողվեց բեռնել։</p>';window.L={map:function(){var o={setView:function(){return o;},fitBounds:function(){}};return o;},tileLayer:function(){return {addTo:function(){}};},circleMarker:function(){var o={addTo:function(){return o;},bindPopup:function(){return o;}};return o;},layerGroup:function(){var o={addTo:function(){return o;},clearLayers:function(){}};return o;}};}
-var map=L.map("map",{scrollWheelZoom:false}).setView([HOME.lat,HOME.lon],10);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap"}).addTo(map);
+var HASL=typeof L!=="undefined";if(!HASL){document.getElementById("map").innerHTML='<p style="padding:20px;color:#6B756F">Քարտեզը չհաջողվեց բեռնել։</p>';window.L={map:function(){var o={setView:function(){return o;},fitBounds:function(){}};return o;},tileLayer:function(){return {addTo:function(){}};},circleMarker:function(){var o={addTo:function(){return o;},bindPopup:function(){return o;}};return o;},layerGroup:function(){var o={addTo:function(){return o;},clearLayers:function(){}};return o;},control:Object.assign(function(){return {addTo:function(){}};},{zoom:function(){return {addTo:function(){}};},scale:function(){return {addTo:function(){}};},layers:function(){return {addTo:function(){}};}}),DomUtil:{},DomEvent:{}};}
+var map=L.map("map",{scrollWheelZoom:true,zoomSnap:0.25,zoomDelta:0.5,wheelPxPerZoomLevel:90,maxZoom:20,zoomControl:false}).setView([HOME.lat,HOME.lon],11);
+L.control.zoom({position:"topright"}).addTo(map);L.control.scale({imperial:true,metric:true}).addTo(map);
+var BASE={"🗺 Քարտեզ":L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{maxZoom:20,subdomains:"abcd",detectRetina:true,attribution:"© OpenStreetMap © CARTO"}),
+ "☀️ Բաց":L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{maxZoom:20,subdomains:"abcd",attribution:"© OpenStreetMap © CARTO"}),
+ "🛰 Արբանյակ":L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:"© Esri"}),
+ "🛣 Ճանապարհներ":L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"})};
+BASE["🗺 Քարտեզ"].addTo(map);L.control.layers(BASE,null,{position:"topleft",collapsed:false}).addTo(map);
+var FS=L.control({position:"topright"});FS.onAdd=function(){var d=L.DomUtil.create("div","leaflet-bar");d.innerHTML='<a href="#" title="Լիէկրան" role="button" style="font-size:18px;line-height:30px">⛶</a><a href="#" title="Ցույց տալ բոլորը" role="button" style="font-size:16px;line-height:30px">◎</a>';L.DomEvent.disableClickPropagation(d);var a=d.querySelectorAll("a");a[0].onclick=function(e){e.preventDefault();var el=document.getElementById("mapbox");if(document.fullscreenElement){document.exitFullscreen();}else if(el.requestFullscreen){el.requestFullscreen();}else{el.classList.toggle("fs");}setTimeout(function(){map.invalidateSize();},300);};a[1].onclick=function(e){e.preventDefault();fitAll();};return d;};FS.addTo(map);
+document.addEventListener("fullscreenchange",function(){setTimeout(function(){map.invalidateSize();},200);});
 L.circleMarker([HOME.lat,HOME.lon],{radius:10,color:"#1D5545",weight:4,fillColor:"#fff",fillOpacity:1}).addTo(map).bindPopup("<b>Nectar of Armenia</b><br>Glendale, CA");
-var layer=L.layerGroup().addTo(map);
+var layer=L.layerGroup().addTo(map);var ALLP=[[HOME.lat,HOME.lon]];function fitAll(){if(ALLP.length>1){map.fitBounds(ALLP,{padding:[40,40],maxZoom:14});}else{map.setView([HOME.lat,HOME.lon],11);}}
 function geocode(q){if(GEO[q]!==undefined){return Promise.resolve(GEO[q]);}
   return fetch("https://photon.komoot.io/api/?limit=1&lat=34.15&lon=-118.25&q="+encodeURIComponent(q)).then(function(r){return r.json();}).then(function(j){var f=(j.features||[])[0];var v=f?{lat:f.geometry.coordinates[1],lon:f.geometry.coordinates[0],city:(f.properties||{}).city||(f.properties||{}).name||""}:null;GEO[q]=v;try{localStorage.setItem("noa-geo",JSON.stringify(GEO));}catch(e){}return v;}).catch(function(){return null;});}
 function draw(){var L0=collect().filter(function(c){return TF==="all"||c.t===TF;});layer.clearLayers();
@@ -57,7 +66,7 @@ function draw(){var L0=collect().filter(function(c){return TF==="all"||c.t===TF;
   document.getElementById("miss").innerHTML=noA.length?'<div class="miss">📍 Հասցե չունեն ('+noA.length+')՝ '+noA.map(function(c){return esc(c.n);}).join(", ")+'։ Ավելացրեք հասցեն հաճախորդի էջում («Հեռախոսային պատվերներ» → անվան վրա սեղմել), և նրանք կհայտնվեն քարտեզում։</div>':'';
   var done=0,pts=[[HOME.lat,HOME.lon]];document.getElementById("gst").textContent=withA.length?"Որոնվում են հասցեները…":"";
   var mx=1;L0.forEach(function(c){mx=Math.max(mx,c.rev);});
-  Promise.all(withA.map(function(c){return geocode(c.addr).then(function(g){done++;if(g){c.city=c.city||g.city;pts.push([g.lat,g.lon]);L.circleMarker([g.lat,g.lon],{radius:7+Math.round(c.rev/mx*12),color:"#fff",weight:2,fillColor:c.t==="w"?"#EBA93A":"#1D5545",fillOpacity:.9}).addTo(layer).bindPopup('<div class="pin"><b>'+esc(c.n)+'</b><br>'+esc(c.addr)+'<br>'+(c.t==="w"?"🏪 Մեծածախ":"🛒 Մանրածախ")+' · '+c.o+' պատվեր · '+m(c.rev)+'<br>Վերջին՝ '+esc(c.last)+'</div>');}document.getElementById("gst").textContent=done<withA.length?"Որոնվում են հասցեները… "+done+"/"+withA.length:"";});})).then(function(){if(pts.length>1){map.fitBounds(pts,{padding:[30,30],maxZoom:12});}stats(L0);});
+  Promise.all(withA.map(function(c){return geocode(c.addr).then(function(g){done++;if(g){c.city=c.city||g.city;pts.push([g.lat,g.lon]);L.circleMarker([g.lat,g.lon],{radius:7+Math.round(c.rev/mx*12),color:"#fff",weight:2,fillColor:c.t==="w"?"#EBA93A":"#1D5545",fillOpacity:.9}).addTo(layer).bindPopup('<div class="pin"><b>'+esc(c.n)+'</b><br>'+esc(c.addr)+'<br>'+(c.t==="w"?"🏪 Մեծածախ":"🛒 Մանրածախ")+' · '+c.o+' պատվեր · '+m(c.rev)+'<br>Վերջին՝ '+esc(c.last)+'</div>');}document.getElementById("gst").textContent=done<withA.length?"Որոնվում են հասցեները… "+done+"/"+withA.length:"";});})).then(function(){ALLP=pts;fitAll();stats(L0);});
   stats(L0);}
 function stats(L0){var C={};L0.forEach(function(c){var ct=c.city||cityOf(c.addr)||"Անհայտ քաղաք";var x=C[ct]||(C[ct]={c:0,o:0,rev:0,r:0,w:0,last:""});x.c++;x.o+=c.o;x.rev+=c.rev;x[c.t]++;if(c.last>x.last){x.last=c.last;}});
   var K=Object.keys(C).sort(function(a,b){return (a==="Անհայտ քաղաք")-(b==="Անհայտ քաղաք")||C[b].rev-C[a].rev;});var mx=1;K.forEach(function(k){mx=Math.max(mx,C[k].rev);});
