@@ -312,6 +312,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
 .qo-t.on{background:#fff;border-color:#2F9E6B;box-shadow:0 8px 20px rgba(19,59,48,.12)}
 .qo-t.so{opacity:.6}
 .qo-top{display:flex;align-items:flex-start;gap:12px}
+.qo-img{flex:0 0 52px;width:52px;height:64px;border-radius:12px;object-fit:cover;object-position:center 55%;border:1px solid #ECE3CF;background:#F3EBD7}
 .qo-ini{flex:0 0 44px;height:44px;border-radius:14px;display:grid;place-items:center;font:700 20px Fraunces,'Noto Serif Armenian',serif;color:#F6E3B4;background:linear-gradient(160deg,#2A6B57,#1D5545 50%,#133B30);box-shadow:inset 0 2px 0 rgba(255,255,255,.2)}
 .qo-t.on .qo-ini{color:#133B30;background:linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22)}
 .qo-nm{flex:1;min-width:0;display:flex;flex-direction:column}.qo-nm strong{color:#1D5545;font-size:16px}.qo-nm span{font-size:12.5px;color:#6B756F}
@@ -801,7 +802,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 <div class="qo-grid">
 <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
 <div class="qo-t {{r.qcls}}">
-<div class="qo-top"><span class="qo-ini">{{r.ini}}</span><div class="qo-nm"><strong>{{r.name}}</strong><span>{{r.size}}</span></div><span class="qo-pr">{{r.price}}</span></div>
+<div class="qo-top"><sc-if value="{{r.hasImg}}" hint-placeholder-val="{{true}}"><img class="qo-img" src="{{r.img}}" alt="{{r.name}}" loading="lazy"></sc-if><sc-if value="{{r.noImg}}" hint-placeholder-val="{{false}}"><span class="qo-ini">{{r.ini}}</span></sc-if><div class="qo-nm"><strong>{{r.name}}</strong><span>{{r.size}}</span></div><span class="qo-pr">{{r.price}}</span></div>
 <div class="qo-bot">
 <sc-if value="{{r.notSold}}" hint-placeholder-val="{{true}}"><div class="qty" role="group" aria-label="{{t.qty}}"><button type="button" onClick="{{r.dec}}">−</button><span>{{r.q}}</span><button type="button" onClick="{{r.inc}}">+</button></div></sc-if><sc-if value="{{r.sold}}" hint-placeholder-val="{{false}}"><span class="qo-sold">⛔ {{r.soldL}}</span></sc-if>
 <span class="qo-ln">{{r.line}}</span>
@@ -1016,7 +1017,8 @@ var money = function (v) { return "$" + v.toFixed(2); };
 var sum = 0, units = 0;
 var SOLD = (function () { try { var a = JSON.parse(window.localStorage.getItem("noa-stock") || "null"); return Array.isArray(a) ? a.map(function (x) { return +x <= 0; }) : []; } catch (e) { return []; } })(); var SOLDL = ({ hy: "Սպառված է", en: "Sold out", ru: "Нет в наличии", es: "Agotado" })[lang] || "Sold out";
 q = q.map(function (v, k) { return SOLD[IDX[k]] ? 0 : v; });
-var rows = IDX.map(function (pi, k) { sum += q[k] * WP[k]; units += q[k]; return { name: t.pn[pi], ini: (t.pn[pi] || '?').charAt(0), qcls: q[k] > 0 ? 'on' : (SOLD[pi] ? 'so' : ''), size: t.ps[pi], price: money(WP[k]), q: q[k], line: money(q[k] * WP[k]), sold: !!SOLD[pi], notSold: !SOLD[pi], soldL: SOLDL,
+var PIMGW = ["img/6830d83c7ec9c8d627f12f1f2a8c5eeb.jpg", "img/c8b0737505aa785eed93371b09c8e049.jpg", "img/c8b0737505aa785eed93371b09c8e049.jpg", "img/d3fbe1930c2f9c5d58eab675b2128cfd.png", "img/65940d08dd8a527a15d113ecd1854f3a.webp", "img/9eb33fd2c3ff435a1314ecd2f69f9245.webp", "img/645bf576eb7a0134b08d93cb48d381e7.webp", "img/a6aaa8aa5db20ba68bc42c3406095e44.webp", "img/6a86ac441cd9dd29b3e3ba1a16934988.webp", "img/0f5ce6e80b23a0e775ad415e85b7ef0d.webp", "img/135d0cd80fa69f4a118392eea9b8bcd6.webp"];
+var rows = IDX.map(function (pi, k) { sum += q[k] * WP[k]; units += q[k]; return { img: PIMGW[pi] || "", hasImg: !!PIMGW[pi], noImg: !PIMGW[pi], name: t.pn[pi], ini: (t.pn[pi] || '?').charAt(0), qcls: q[k] > 0 ? 'on' : (SOLD[pi] ? 'so' : ''), size: t.ps[pi], price: money(WP[k]), q: q[k], line: money(q[k] * WP[k]), sold: !!SOLD[pi], notSold: !SOLD[pi], soldL: SOLDL,
 inc: function () { if (SOLD[pi]) { return; } var n = q.slice(); n[k] = Math.min(999, n[k] + 1); self.setState({ wq: n }); }, dec: function () { var n = q.slice(); n[k] = Math.max(0, n[k] - 1); self.setState({ wq: n }); } }; });
 var WD = { hy: ["Կիր", "Երկ", "Երք", "Չրք", "Հնգ", "Ուրբ", "Շբթ"], en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], ru: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], es: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"] };
 var MO = { hy: ["հունվ", "փետր", "մարտ", "ապր", "մայիս", "հունիս", "հուլիս", "օգոստ", "սեպտ", "հոկտ", "նոյեմբ", "դեկտ"], en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], ru: ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"], es: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"] };
