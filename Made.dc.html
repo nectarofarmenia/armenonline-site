@@ -758,6 +758,7 @@ var has = !!prices[i] && !so;
 return { img: PIMG[i], hasImg: !!PIMG[i], noImg: !PIMG[i], name: name, size: sizes[i], price: prices[i] ? prices[i] : t.priceSoon, tag: tag, hasTag: !!tag, addLabel: so ? SOLDL : !has ? t.soon : (addedIdx === i ? t.added : t.add), addCls: !has ? "btn-soon" : (addedIdx === i ? "btn-gold" : "btn-green"),
 add: function () { if (!has) { return; } var nc = cart.slice(); nc[i] = Math.min(99, (nc[i] || 0) + 1); try { window.localStorage.setItem("noa-cart-v2", JSON.stringify(nc)); } catch (e) {} self.setState({ cart: nc, added: i }); clearTimeout(self._addT); self._addT = setTimeout(function () { self.setState({ added: -1 }); }, 1500); } };
 });
+var SHOP_ORDER = [0, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3]; products = SHOP_ORDER.map(function (k) { return products[k]; }).filter(Boolean);
 var tabs = [
 { id: "khinkali", label: t.tabK },
 { id: "khash", label: t.tabH },
