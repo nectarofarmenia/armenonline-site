@@ -301,6 +301,30 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
 .tm-more[open]{display:flex;flex-direction:column;gap:12px}
 @media (max-width:700px){.tm-add{grid-template-columns:1fr}.tm-go{width:100%}}
 </style>
+<style id="nofa-qo">
+.qo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:12px}
+.qo-t{display:flex;flex-direction:column;gap:12px;padding:14px 16px;border-radius:20px;background:#FBF9F4;border:1.5px solid #EFE6D0;transition:border-color .15s,box-shadow .15s,transform .15s}
+.qo-t:hover{border-color:#EBA93A}
+.qo-t.on{background:#fff;border-color:#2F9E6B;box-shadow:0 8px 20px rgba(19,59,48,.12)}
+.qo-t.so{opacity:.6}
+.qo-top{display:flex;align-items:flex-start;gap:12px}
+.qo-ini{flex:0 0 44px;height:44px;border-radius:14px;display:grid;place-items:center;font:700 20px Fraunces,'Noto Serif Armenian',serif;color:#F6E3B4;background:linear-gradient(160deg,#2A6B57,#1D5545 50%,#133B30);box-shadow:inset 0 2px 0 rgba(255,255,255,.2)}
+.qo-t.on .qo-ini{color:#133B30;background:linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22)}
+.qo-nm{flex:1;min-width:0;display:flex;flex-direction:column}.qo-nm strong{color:#1D5545;font-size:16px}.qo-nm span{font-size:12.5px;color:#6B756F}
+.qo-pr{font-weight:800;color:#7A5A12;background:#F3EBD7;border-radius:999px;padding:4px 10px;font-size:13px;white-space:nowrap}
+.qo-bot{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.qo-ln{font:700 20px Fraunces,Lora,serif;color:#1D5545}.qo-t:not(.on) .qo-ln{color:#B9AE94}
+.qo-sold{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border-radius:999px;background:#FDE7E4;color:#B03A2E;font-weight:800;font-size:13px}
+.qo-t.on .qty{border-color:#2F9E6B}
+.qo-grid{min-width:0;max-width:100%}.card3d:has(>.qo-grid){min-width:0;max-width:100%;box-sizing:border-box}
+@media (max-width:760px){.two-col>div:has(.qo-grid){width:100%!important;max-width:100%!important}}
+.doc-empty{margin:0;padding:30px 18px;text-align:center;border:2px dashed #E4DCC8;border-radius:18px;background:#FBF9F4;font-size:14px;color:#6B756F}
+.doc-empty::before{content:"🧾";display:block;font-size:32px;margin-bottom:6px}
+.doc-row{border-radius:18px!important;border:1px solid #EFE6D0!important;background:#FBF9F4!important;padding:14px 16px!important;transition:border-color .15s,box-shadow .15s}
+.doc-row:hover{border-color:#EBA93A!important;box-shadow:0 8px 20px rgba(19,59,48,.1)}
+.inv-folder{border-radius:20px!important;border:1px solid #F0E8D6!important;background:linear-gradient(180deg,#FFFFFF 0%,#F8F3E8 100%)!important;box-shadow:inset 0 2px 0 #fff,0 10px 24px rgba(19,59,48,.1)!important}
+.inv-folder:hover{border-color:#EBA93A!important}
+</style>
 </head>
 <body>
 <x-dc>
@@ -564,7 +588,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 <sc-if value="{{dInvRowsOn}}" hint-placeholder-val="{{false}}"><div style="display: flex; flex-direction: column; gap: 8px"><sc-for list="{{dInvRows}}" as="r" hint-placeholder-count="3"><button type="button" onClick="{{r.open}}" class="doc-row"><span style="font-size: 22px">📄</span><span style="flex: 1 1 180px; text-align: left; display: flex; flex-direction: column"><strong style="color: #1D5545">{{r.no}}</strong><span style="font-size: 13px; color: #6B756F">{{r.date}}</span></span><span style="font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 999px; background: {{r.bg}}; color: {{r.fg}}">{{r.st}}</span><strong style="min-width: 90px; text-align: right">{{r.total}}</strong><span style="color: #1D5545; font-weight: 800">{{t.dOpen}} →</span></button></sc-for></div></sc-if>
 <sc-if value="{{dAgrOn}}" hint-placeholder-val="{{false}}"><button type="button" onClick="{{openAgr}}" class="doc-row"><span style="font-size: 26px">📜</span><span style="flex: 1 1 200px; text-align: left; display: flex; flex-direction: column"><strong style="color: #1D5545">{{t.termsH}}</strong><span style="font-size: 13px; color: #6B756F">{{agrSub}}</span></span><span style="font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 999px; background: {{agrBg}}; color: {{agrFg}}">{{agrSt}}</span><span style="color: #1D5545; font-weight: 800">{{t.dOpen}} →</span></button></sc-if>
 <sc-if value="{{dLicOn}}" hint-placeholder-val="{{false}}"><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px"><sc-for list="{{licList}}" as="lc" hint-placeholder-count="5"><div style="padding: 16px; border-radius: 16px; border: 1.5px solid #ECE3CF; background: #FBF9F4; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 28px">{{lc.icon}}</span><strong style="color: #1D5545">{{lc.name}}</strong><span style="font-size: 13px; color: #6B756F">{{lc.sub}}</span><span style="font-size: 12px; color: #9A6A00; font-weight: 700">{{t.licSoon}}</span><button type="button" onClick="{{lc.req}}" class="social" style="width: auto; min-height: 38px; padding: 0 14px; align-self: flex-start">{{lc.btn}}</button></div></sc-for></div><sc-if value="{{licAny}}" hint-placeholder-val="{{false}}"><p style="margin: 0; color: #2F7A55; font-weight: 700; font-size: 14px">{{t.licNote}}</p></sc-if></sc-if>
-<sc-if value="{{dEmptyOn}}" hint-placeholder-val="{{false}}"><p style="margin: 0; padding: 16px; border-radius: 14px; background: #F3EBD7; color: #5E6A63">{{t.dEmpty}}</p></sc-if>
+<sc-if value="{{dEmptyOn}}" hint-placeholder-val="{{false}}"><p class="doc-empty">{{t.dEmpty}}</p></sc-if>
 </div>
 </sc-if>
 <sc-if value="{{dvOn}}" hint-placeholder-val="{{false}}">
@@ -731,13 +755,14 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 <div class="card3d" style="border-radius: 26px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px"><h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 30px; color: #1D5545">{{t.qoH}}</h1><span style="font-size: 12px; font-weight: 800; color: #7A5A12; background: #F3EBD7; padding: 4px 10px; border-radius: 999px">{{t.demo}}</span></div>
 <p style="margin: 0; color: #5E6A63">{{t.qoP}}</p>
-<div style="display: flex; flex-direction: column">
+<div class="qo-grid">
 <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
-<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 10px 0; border-top: 1px solid #ECE3CF">
-<div style="flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column"><strong style="color: #1D5545">{{r.name}}</strong><span style="font-size: 13px; color: #6B756F">{{r.size}}</span></div>
-<span style="min-width: 80px; font-weight: 800; color: #1D5545">{{r.price}}</span>
-<sc-if value="{{r.notSold}}" hint-placeholder-val="{{true}}"><div class="qty" role="group" aria-label="{{t.qty}}"><button type="button" onClick="{{r.dec}}">−</button><span>{{r.q}}</span><button type="button" onClick="{{r.inc}}">+</button></div></sc-if><sc-if value="{{r.sold}}" hint-placeholder-val="{{false}}"><span style="display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border-radius: 999px; background: #FDE7E4; color: #B03A2E; font-weight: 800; font-size: 13.5px; letter-spacing: .02em">⛔ {{r.soldL}}</span></sc-if>
-<span style="min-width: 86px; text-align: right; font-family: Fraunces, Lora, serif; font-weight: 700; font-size: 18px; color: #1D5545">{{r.line}}</span>
+<div class="qo-t {{r.qcls}}">
+<div class="qo-top"><span class="qo-ini">{{r.ini}}</span><div class="qo-nm"><strong>{{r.name}}</strong><span>{{r.size}}</span></div><span class="qo-pr">{{r.price}}</span></div>
+<div class="qo-bot">
+<sc-if value="{{r.notSold}}" hint-placeholder-val="{{true}}"><div class="qty" role="group" aria-label="{{t.qty}}"><button type="button" onClick="{{r.dec}}">−</button><span>{{r.q}}</span><button type="button" onClick="{{r.inc}}">+</button></div></sc-if><sc-if value="{{r.sold}}" hint-placeholder-val="{{false}}"><span class="qo-sold">⛔ {{r.soldL}}</span></sc-if>
+<span class="qo-ln">{{r.line}}</span>
+</div>
 </div>
 </sc-for>
 </div>
@@ -943,7 +968,7 @@ var money = function (v) { return "$" + v.toFixed(2); };
 var sum = 0, units = 0;
 var SOLD = (function () { try { var a = JSON.parse(window.localStorage.getItem("noa-stock") || "null"); return Array.isArray(a) ? a.map(function (x) { return +x <= 0; }) : []; } catch (e) { return []; } })(); var SOLDL = ({ hy: "Սպառված է", en: "Sold out", ru: "Нет в наличии", es: "Agotado" })[lang] || "Sold out";
 q = q.map(function (v, k) { return SOLD[IDX[k]] ? 0 : v; });
-var rows = IDX.map(function (pi, k) { sum += q[k] * WP[k]; units += q[k]; return { name: t.pn[pi], size: t.ps[pi], price: money(WP[k]), q: q[k], line: money(q[k] * WP[k]), sold: !!SOLD[pi], notSold: !SOLD[pi], soldL: SOLDL,
+var rows = IDX.map(function (pi, k) { sum += q[k] * WP[k]; units += q[k]; return { name: t.pn[pi], ini: (t.pn[pi] || '?').charAt(0), qcls: q[k] > 0 ? 'on' : (SOLD[pi] ? 'so' : ''), size: t.ps[pi], price: money(WP[k]), q: q[k], line: money(q[k] * WP[k]), sold: !!SOLD[pi], notSold: !SOLD[pi], soldL: SOLDL,
 inc: function () { if (SOLD[pi]) { return; } var n = q.slice(); n[k] = Math.min(999, n[k] + 1); self.setState({ wq: n }); }, dec: function () { var n = q.slice(); n[k] = Math.max(0, n[k] - 1); self.setState({ wq: n }); } }; });
 var WD = { hy: ["Կիր", "Երկ", "Երք", "Չրք", "Հնգ", "Ուրբ", "Շբթ"], en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], ru: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], es: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"] };
 var MO = { hy: ["հունվ", "փետր", "մարտ", "ապր", "մայիս", "հունիս", "հուլիս", "օգոստ", "սեպտ", "հոկտ", "նոյեմբ", "դեկտ"], en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], ru: ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"], es: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"] };
