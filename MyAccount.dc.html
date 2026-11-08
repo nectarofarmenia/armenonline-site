@@ -35,6 +35,9 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
   aside.sum-card[style*="position: sticky"], aside.card3d[style*="position: sticky"] { overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding-bottom: 18px !important; }
   aside[style*="top: 145px"][style*="position: sticky"] { max-height: calc(100vh - 160px); }
   aside[style*="top: 170px"][style*="position: sticky"] { max-height: calc(100vh - 186px); }
+  aside[style*="top: 170px"][style*="position: sticky"]:has(> .ma-scroll) { overflow: hidden; padding-bottom: 22px !important; }
+  aside > .ma-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 14px; margin-right: -14px; padding-right: 14px; }
+  aside > .ma-scroll::-webkit-scrollbar { width: 6px; } aside > .ma-scroll::-webkit-scrollbar-thumb { background: rgba(235,169,58,.45); border-radius: 99px; }
   aside.card3d-dark[style*="flex: 0 0 250px"][style*="position: sticky"] { flex: 0 0 268px !important; padding-right: 30px !important; }
   aside.card3d-dark[style*="flex: 0 0 280px"][style*="position: sticky"] { flex: 0 0 298px !important; padding-right: 38px !important; }
   .ms-arrow { position: fixed; z-index: 70; width: 16px; height: 12px; border: 0; background: none; padding: 0; cursor: pointer; color: #EBA93A; opacity: .95; display: flex; align-items: center; justify-content: center; }
@@ -394,12 +397,14 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 <div style="display: flex; flex-direction: column; min-width: 0"><strong style="font-size: 18px">{{hi}}</strong><span style="font-size: 13px; color: #F6C35A; font-weight: 700">{{member}}</span></div>
 </div>
 <div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #D9E6DF; padding: 10px 12px; border-radius: 14px; background: rgba(255,255,255,.07)"><span>👤 <strong style="color: #F7F3EA">{{pName}}</strong></span><span style="overflow-wrap: anywhere">✉ {{pEmail}}</span><span>📞 {{pPhone}}</span><button type="button" onClick="{{stGo}}" title="{{stT.H}}" style="display: flex; align-items: center; gap: 8px; width: 100%; margin-top: 6px; padding: 8px 10px; border-radius: 12px; border: 1px solid rgba(246,195,90,.45); background: rgba(246,195,90,.12); color: #F7F3EA; font-family: inherit; font-size: 13px; cursor: pointer; text-align: left"><span style="color: #F6C35A; letter-spacing: 1px; font-size: 14px">{{stMini}}</span><span style="flex: 1 1 auto"><b style="color: #F6C35A">{{stCnt}}/5</b> {{stMiniL}}</span><sc-if value="{{stCanClaim}}" hint-placeholder-val="{{false}}"><span>🎁</span></sc-if></button></div>
+<div class="ma-scroll">
 <nav style="display: flex; flex-direction: column; gap: 4px">
 <sc-for list="{{navs}}" as="nv" hint-placeholder-count="4"><button type="button" onClick="{{nv.pick}}" class="wa-nav {{nv.cls}}"><span>{{nv.icon}}</span>{{nv.label}}</button></sc-for>
 </nav>
 <button type="button" onClick="{{goShop}}" class="btn-gold" style="display: flex; align-items: center; justify-content: center; min-height: 46px; border-radius: 999px; border: none; color: #133B30; font-family: inherit; font-size: 15px; font-weight: 800; cursor: pointer">+ {{t.shop}}</button>
 <sc-if value="{{hasSw}}" hint-placeholder-val="{{false}}"><a href="PartnerAccount.dc.html" onClick="{{doSwitch}}" class="btn-ghost" style="display: flex; align-items: center; justify-content: center; min-height: 44px; border-radius: 999px; border: 1.5px solid #EBA93A; color: #F6E3B4; font-weight: 800; font-size: 14px; text-decoration: none; text-align: center; padding: 0 12px">{{t.swToBiz}}</a></sc-if>
 <a href="Account.dc.html#logout" style="text-align: center; color: #F6C35A; font-weight: 700; font-size: 14px; text-decoration: none">{{t.out}}</a>
+</div>
 </aside>
 <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 22px">
 <div class="pg-arrows" style="position: fixed; right: 18px; bottom: 18px; z-index: 70; display: flex; gap: 8px">
@@ -728,7 +733,7 @@ var t = L[lang] || L.hy;
 var langs = [{ id: "en", label: "EN" }, { id: "hy", label: "ՀԱՅ" }, { id: "ru", label: "РУ" }, { id: "es", label: "ES" }].map(function (x) {
 return Object.assign({}, x, { selected: x.id === lang, unselected: x.id !== lang, pick: function () { try { window.localStorage.setItem("noa-lang", x.id); } catch (e) {} self.setState({ lang: x.id }); } });
 });
-var PRICES = [0, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0];
+var PRICES = [22.00, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0];
 var stored = null; try { stored = JSON.parse(window.localStorage.getItem("noa-cart-v2") || "null"); } catch (e) { stored = null; }
 if (!Array.isArray(stored) || stored.length !== 11) { stored = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; }
 var saveOrder = function (q2, sum2, dayIso) { try { var it = []; q2.forEach(function (n, i) { if (n > 0) { it.push([i, n]); } }); if (it.length) { var cu = null; try { cu = JSON.parse(window.localStorage.getItem("noa-user") || "null"); } catch (e2) { cu = null; } var rec = { no: "NofA-" + (10600 + Math.floor(Math.random() * 300)), items: it, total: "$" + sum2.toFixed(2), day: dayIso, email: cu && cu.type !== "biz" ? (cu.email || "") : "" }; window.localStorage.setItem("noa-last-order", JSON.stringify(rec)); var ol = []; try { ol = JSON.parse(window.localStorage.getItem("noa-orders") || "[]") || []; } catch (e3) { ol = []; } ol.push(rec); window.localStorage.setItem("noa-orders", JSON.stringify(ol)); } } catch (e) {} };
@@ -1370,11 +1375,11 @@ return Object.assign(plVals, extVals, dzVals, lgVals, chVals, avVals, ivVals, rd
   var ind = {};
   function mk(dir) { var d = document.createElement("button"); d.type = "button"; d.className = "ms-arrow ms-" + dir; d.setAttribute("aria-label", dir === "dn" ? "Թերթել ներքև" : "Թերթել վերև"); d.innerHTML = dir === "dn" ? '<svg viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1.5l8 7 8-7"/></svg>' : '<svg viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 8.5l8-7 8 7"/></svg>'; d.style.display = "none"; document.body.appendChild(d); return d; }
   function aside() { return document.querySelector('aside.sum-card[style*="position: sticky"]') || document.querySelector('aside[style*="position: sticky"]'); }
-  function upd() { var el = aside(); if (!el) { return; } fit(el); if (!ind.dn) { ind.dn = mk("dn"); ind.up = mk("up"); ind.dn.onclick = function () { var a = aside(); if (a) { a.scrollBy({ top: a.clientHeight * 0.6, behavior: "smooth" }); } }; ind.up.onclick = function () { var a = aside(); if (a) { a.scrollBy({ top: -a.clientHeight * 0.6, behavior: "smooth" }); } }; }
-    var r = el.getBoundingClientRect(); var more = el.scrollHeight - el.clientHeight - el.scrollTop > 4; var less = el.scrollTop > 4; var on = window.innerWidth >= 900 && r.height > 0;
+  function upd() { var el = aside(); if (!el) { return; } fit(el); if (!ind.dn) { ind.dn = mk("dn"); ind.up = mk("up"); ind.dn.onclick = function () { var a = aside(); if (a) { a = a.querySelector(".ma-scroll") || a; a.scrollBy({ top: a.clientHeight * 0.6, behavior: "smooth" }); } }; ind.up.onclick = function () { var a = aside(); if (a) { a = a.querySelector(".ma-scroll") || a; a.scrollBy({ top: -a.clientHeight * 0.6, behavior: "smooth" }); } }; }
+    var r = el.getBoundingClientRect(); var sc = el.querySelector(".ma-scroll") || el; var more = sc.scrollHeight - sc.clientHeight - sc.scrollTop > 4; var less = sc.scrollTop > 4; var on = window.innerWidth >= 900 && r.height > 0;
     ind.dn.style.display = on && more ? "flex" : "none"; ind.up.style.display = on && less ? "flex" : "none";
-    var hz = parseFloat(getComputedStyle(document.documentElement).zoom) || 1; if (document.body) { hz *= parseFloat(getComputedStyle(document.body).zoom) || 1; } var dk = /card3d-dark/.test(el.className); var inset = dk ? 15 : 10; ind.dn.style.left = ind.up.style.left = (r.right / hz - inset - 8) + "px"; ind.dn.style.top = (r.bottom / hz - 30) + "px"; var tt = el.querySelector(".as-ttl"); ind.up.style.top = (r.top / hz + (tt ? tt.offsetHeight + 4 : 16)) + "px"; }
-  window.addEventListener("resize", upd); window.addEventListener("scroll", upd, { passive: true }); document.addEventListener("scroll", function (e) { if (e.target && e.target.tagName === "ASIDE") { upd(); } }, true);
+    var hz = parseFloat(getComputedStyle(document.documentElement).zoom) || 1; if (document.body) { hz *= parseFloat(getComputedStyle(document.body).zoom) || 1; } var dk = /card3d-dark/.test(el.className); var inset = dk ? 15 : 10; ind.dn.style.left = ind.up.style.left = (r.right / hz - inset - 8) + "px"; ind.dn.style.top = (r.bottom / hz - 30) + "px"; var tt = el.querySelector(".as-ttl"); ind.up.style.top = (sc !== el ? sc.getBoundingClientRect().top / hz + 2 : r.top / hz + (tt ? tt.offsetHeight + 4 : 16)) + "px"; }
+  window.addEventListener("resize", upd); window.addEventListener("scroll", upd, { passive: true }); document.addEventListener("scroll", function (e) { if (e.target && (e.target.tagName === "ASIDE" || (e.target.classList && e.target.classList.contains("ma-scroll")))) { upd(); } }, true);
   setInterval(upd, 600); setTimeout(upd, 300);
 })();
 </script>

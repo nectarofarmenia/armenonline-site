@@ -430,7 +430,7 @@ var t = L[lang] || L.hy;
 var langs = [{ id: "en", label: "EN" }, { id: "hy", label: "ՀԱՅ" }, { id: "ru", label: "РУ" }, { id: "es", label: "ES" }].map(function (x) {
 return Object.assign({}, x, { selected: x.id === lang, unselected: x.id !== lang, pick: function () { try { window.localStorage.setItem("noa-lang", x.id); } catch (e) {} self.setState({ lang: x.id }); } });
 });
-var PRICES = [0, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0];
+var PRICES = [22.00, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0];
 var stored = null; try { stored = JSON.parse(window.localStorage.getItem("noa-cart-v2") || "null"); } catch (e) { stored = null; }
 if (!Array.isArray(stored) || stored.length !== 11) { stored = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; }
 var saveOrder = function (q2, sum2, dayIso) { try { var it = []; q2.forEach(function (n, i) { if (n > 0) { it.push([i, n]); } }); if (it.length) { var cu = null; try { cu = JSON.parse(window.localStorage.getItem("noa-user") || "null"); } catch (e2) { cu = null; } var rec = { no: "NofA-" + (10600 + Math.floor(Math.random() * 300)), items: it, total: "$" + sum2.toFixed(2), day: dayIso, email: cu && cu.type !== "biz" ? (cu.email || "") : "" }; window.localStorage.setItem("noa-last-order", JSON.stringify(rec)); var ol = []; try { ol = JSON.parse(window.localStorage.getItem("noa-orders") || "[]") || []; } catch (e3) { ol = []; } ol.push(rec); window.localStorage.setItem("noa-orders", JSON.stringify(ol)); } } catch (e) {} };

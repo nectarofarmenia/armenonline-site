@@ -1077,7 +1077,7 @@ var self = this; var st = this.state || {};
 var lang = st.lang || "hy"; var t = L[lang] || L.hy;
 var langs = [{ id: "hy", label: "ՀԱՅ" }, { id: "en", label: "EN" }].map(function (x) { return { label: x.label, cls: x.id === lang ? "on" : "", pick: function () { self.setState({ lang: x.id }); } }; });
 var money = function (v) { return "$" + v.toFixed(2); };
-var RP = [0, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0];
+var RP = [22.00, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0];
 var WP = [0, 15.00, 12.00, 45.00, 18.75, 18.75, 26.25, 26.25, 15.75, 0, 0];
 var stockQ = st.stock || (function () { try { var a = JSON.parse(window.localStorage.getItem("noa-stock") || "null"); if (Array.isArray(a) && a.length === 11) { return a; } } catch (e) {} return [40, 62, 33, 18, 55, 48, 31, 22, 12, 50, 9]; })();
 var FULL = typeof st.full === "number" ? st.full : (function () { try { var v = parseInt(window.localStorage.getItem("noa-stock-full") || "", 10); if (v > 0) { return v; } } catch (e) {} return 50; })();
