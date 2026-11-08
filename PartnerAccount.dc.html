@@ -1653,6 +1653,12 @@ invite: function () { var em = (st.inv || "").trim(); if (!em || em.indexOf("@")
 .of-hd{position:relative;padding-right:62px!important}
 .of-x{position:absolute;top:12px;right:14px}
 .of-x:hover{background:rgba(255,255,255,.22)}
+.of-zm{display:inline-flex;padding:3px;border-radius:999px;background:rgba(255,255,255,.1);border:1.5px solid rgba(235,169,58,.55)}
+.of-zm button{width:30px;height:28px;border:0;background:transparent;color:#F6E3B4;font:800 18px/1 Manrope,sans-serif;border-radius:999px;cursor:pointer}
+.of-zm button:hover{background:rgba(255,255,255,.14)}
+.of-bd img{cursor:zoom-in}.of-bd.zm{cursor:grab}.of-bd.zm img{cursor:zoom-out;margin:0}
+.of-bd{touch-action:pan-x pan-y pinch-zoom}
+
 .of-bd{overflow:auto;padding:12px 16px 16px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .of-bd img{display:block;width:auto;max-width:100%;max-height:calc(96vh - 170px);object-fit:contain;height:auto;margin:0 auto;border-radius:12px;box-shadow:0 10px 30px rgba(19,59,48,.18);background:#fff}
 @media (max-width:640px){#pgx{bottom:50px!important}.of-tab{font-size:13px;padding:8px 12px 9px;gap:6px}.of-f{display:none}.of-s{display:inline}.of-hd{padding:12px}.of-bd{padding:10px}}
@@ -1661,12 +1667,15 @@ invite: function () { var em = (st.inv || "").trim(); if (!em || em.indexOf("@")
 (function(){if(window.__nofaOffer){return;}window.__nofaOffer=1;
 var page=(location.pathname.split("/").pop()||"");var isP=/^PartnerAccount/.test(page);
 if(/[?&]embed=1/.test(location.search)){return;}
-function L(){try{var l=localStorage.getItem("noa-lang")||"hy";return l==="hy"?"hy":"en";}catch(e){return "hy";}}
+function L(){try{var l=localStorage.getItem("noa-lang")||"hy";return ({hy:1,en:1,ru:1,es:1})[l]?l:"en";}catch(e){return "hy";}}
 function U(){try{return JSON.parse(localStorage.getItem("noa-user")||"null");}catch(e){return null;}}
 var T={hy:{tab:"Մեր մեծածախ գնային առաջարկը",sh:"Գնացուցակ",h:"Մեծածախ գնային առաջարկ",s:"Ապրանքներ, գներ և գործընկերության պայմաններ",pdf:"PDF",png:"Նկար",cl:"Փակել"},
-       en:{tab:"Our wholesale price offer",sh:"Price offer",h:"Wholesale price offer",s:"Products, prices and partnership terms",pdf:"PDF",png:"Image",cl:"Close"}};
+       en:{tab:"Our wholesale price offer",sh:"Price offer",h:"Wholesale price offer",s:"Products, prices and partnership terms",pdf:"PDF",png:"Image",cl:"Close"},
+       ru:{tab:"Наше оптовое ценовое предложение",sh:"Прайс",h:"Оптовое ценовое предложение",s:"Товары, цены и условия сотрудничества",pdf:"PDF",png:"Картинка",cl:"Закрыть"},
+       es:{tab:"Nuestra oferta de precios al por mayor",sh:"Precios",h:"Oferta de precios al por mayor",s:"Productos, precios y condiciones de colaboración",pdf:"PDF",png:"Imagen",cl:"Cerrar"}};
+var ZL={hy:["Մեծացնել","Փոքրացնել"],en:["Zoom in","Zoom out"],ru:["Увеличить","Уменьшить"],es:["Ampliar","Reducir"]};var z=1;
 var cur=L();
-function src(l,ext){return "offer/NofA_Wholesale_Offer_"+(l==="hy"?"HY":"EN")+"."+ext;}
+function src(l,ext){return "offer/NofA_Wholesale_Offer_"+l.toUpperCase()+"."+ext;}
 var DL='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>';
 var tab=document.createElement("button");tab.type="button";tab.className="of-tab";
 var ov=document.createElement("div");ov.className="of-ov";
@@ -1674,13 +1683,23 @@ var pn=document.createElement("div");pn.className="of-pn";pn.setAttribute("role"
 function draw(){var t=T[cur];
   tab.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>'+'<span class="of-f">'+t.tab+'</span><span class="of-s">'+t.sh+'</span>'+(seen()?'':'<span class="of-dot" aria-hidden="true"></span>')+' <span aria-hidden="true">▲</span>';
   pn.setAttribute("aria-label",t.h);
-  pn.innerHTML='<div class="of-hd"><div><b>'+t.h+'</b><small>'+t.s+'</small></div><div class="of-ac"><div class="of-lg"><button type="button" data-l="hy" class="'+(cur==="hy"?"on":"")+'">ՀԱՅ</button><button type="button" data-l="en" class="'+(cur==="en"?"on":"")+'">EN</button></div><a class="of-bt" href="'+src(cur,"pdf")+'" download>'+DL+t.pdf+'</a><a class="of-bt" href="'+src(cur,"jpg")+'" download>'+DL+t.png+'</a><button type="button" class="of-x" aria-label="'+t.cl+'">✕</button></div></div><div class="of-bd"><img src="'+src(cur,"jpg")+'" alt="'+t.h+'" loading="lazy"></div>';}
+  pn.innerHTML='<div class="of-hd"><div><b>'+t.h+'</b><small>'+t.s+'</small></div><div class="of-ac"><div class="of-lg"><button type="button" data-l="hy" class="'+(cur==="hy"?"on":"")+'">ՀԱՅ</button><button type="button" data-l="en" class="'+(cur==="en"?"on":"")+'">EN</button><button type="button" data-l="ru" class="'+(cur==="ru"?"on":"")+'">РУ</button><button type="button" data-l="es" class="'+(cur==="es"?"on":"")+'">ES</button></div><div class="of-zm"><button type="button" data-z="-1" aria-label="'+ZL[cur][1]+'">−</button><button type="button" data-z="1" aria-label="'+ZL[cur][0]+'">+</button></div><a class="of-bt" href="'+src(cur,"pdf")+'" download>'+DL+t.pdf+'</a><a class="of-bt" href="'+src(cur,"jpg")+'" download>'+DL+t.png+'</a><button type="button" class="of-x" aria-label="'+t.cl+'">✕</button></div></div><div class="of-bd"><img src="'+src(cur,"jpg")+'" alt="'+t.h+'" loading="lazy"></div>';z=1;}
+function zoom(n,cx,cy){var bd=pn.querySelector(".of-bd"),im=bd&&bd.querySelector("img");if(!im){return;}var nz=Math.max(1,Math.min(3,Math.round(n*100)/100));if(nz===z){return;}
+  if(z===1){im.dataset.w=im.getBoundingClientRect().width;}var w=+im.dataset.w||im.clientWidth;var r=bd.getBoundingClientRect();if(cx==null){cx=r.left+r.width/2;cy=r.top+r.height/2;}
+  var fx=(bd.scrollLeft+cx-r.left)/(bd.scrollWidth||1),fy=(bd.scrollTop+cy-r.top)/(bd.scrollHeight||1);z=nz;
+  if(z===1){im.style.width="";im.style.maxWidth="";im.style.maxHeight="";bd.classList.remove("zm");}else{im.style.maxWidth="none";im.style.maxHeight="none";im.style.width=(w*z)+"px";bd.classList.add("zm");}
+  bd.scrollLeft=fx*bd.scrollWidth-(cx-r.left);bd.scrollTop=fy*bd.scrollHeight-(cy-r.top);}
 function key(){var u=U();return "noa-offer-seen|"+((u&&u.email)||"guest").toLowerCase();}
 function seen(){try{return !!localStorage.getItem(key());}catch(e){return true;}}
 function open(){draw();ov.classList.add("on");pn.classList.add("on");try{localStorage.setItem(key(),"1");}catch(e){}draw();var x=pn.querySelector(".of-x");if(x){x.focus();}}
 function close(){ov.classList.remove("on");pn.classList.remove("on");draw();}
 tab.addEventListener("click",open);ov.addEventListener("click",close);
-pn.addEventListener("click",function(e){var b=e.target.closest("[data-l]");if(b){cur=b.getAttribute("data-l");draw();return;}if(e.target.closest(".of-x")){close();}});
+pn.addEventListener("click",function(e){var b=e.target.closest("[data-l]");if(b){cur=b.getAttribute("data-l");draw();return;}if(e.target.closest(".of-x")){close();return;}var zb=e.target.closest("[data-z]");if(zb){zoom(z+(+zb.getAttribute("data-z"))*0.5);return;}
+  if(e.target.tagName==="IMG"&&e.target.closest(".of-bd")&&!pn.__drag){zoom(z>1?1:2,e.clientX,e.clientY);}});
+pn.addEventListener("wheel",function(e){if(!e.ctrlKey||!e.target.closest(".of-bd")){return;}e.preventDefault();zoom(z*(1-e.deltaY*0.01),e.clientX,e.clientY);},{passive:false});
+(function(){var d=null;pn.addEventListener("pointerdown",function(e){var bd=e.target.closest(".of-bd");if(!bd||z===1||e.pointerType!=="mouse"){return;}d={x:e.clientX,y:e.clientY,l:bd.scrollLeft,t:bd.scrollTop,bd:bd,m:0};pn.__drag=false;});
+ window.addEventListener("pointermove",function(e){if(!d){return;}var dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>4){pn.__drag=true;}d.bd.scrollLeft=d.l-dx;d.bd.scrollTop=d.t-dy;});
+ window.addEventListener("pointerup",function(){if(d){setTimeout(function(){pn.__drag=false;},0);}d=null;});})();
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&pn.classList.contains("on")){close();}});
 function mount(){draw();document.body.appendChild(tab);document.body.appendChild(ov);document.body.appendChild(pn);
   if(isP){var u=U();if(u&&u.type==="biz"&&!seen()){setTimeout(open,1800);}}}
