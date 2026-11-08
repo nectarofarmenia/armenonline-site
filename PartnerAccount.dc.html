@@ -270,6 +270,37 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
 })();
 
 </script>
+
+<style id="nofa-team">
+.tm-add{display:grid;grid-template-columns:1fr 200px auto;gap:12px;align-items:end;padding:18px;border-radius:20px;color:#F7F3EA}
+.tm-l{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#D9E6DF}
+.tm-add .fld{background:#FBF9F4;border-color:transparent;min-height:48px}
+.tm-go{min-height:48px;padding:0 22px;border-radius:999px;border:none;color:#133B30;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer;white-space:nowrap}
+.tm-list{display:flex;flex-direction:column;gap:10px}
+.tm-m{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:14px 16px;border-radius:18px;background:#FBF9F4;border:1px solid #EFE6D0}
+.tm-av{flex:0 0 44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#133B30;background:linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22);box-shadow:inset 0 2px 0 rgba(255,255,255,.6)}
+.tm-who{flex:1 1 180px;min-width:0;display:flex;flex-direction:column}.tm-who strong{color:#1D5545;font-size:16px}.tm-who span{font-size:13px;color:#6B756F;overflow:hidden;text-overflow:ellipsis}
+.tm-pill{font-size:13px;font-weight:800;padding:6px 14px;border-radius:999px}.tm-pill.own{background:#1D5545;color:#F6E3B4}
+.tm-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.tm-sel{min-height:38px!important;width:auto!important;border-radius:999px!important;padding:0 14px!important;font-weight:700}
+.tm-sw{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:#33403A;cursor:pointer}
+.tm-sw input{position:absolute;opacity:0;pointer-events:none}
+.tm-sw i{width:36px;height:20px;border-radius:999px;background:#CFC6B0;position:relative;transition:background .2s}
+.tm-sw i::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s}
+.tm-sw input:checked+i{background:#2F9E6B}.tm-sw input:checked+i::after{left:18px}
+.tm-sw input:focus-visible+i{outline:2px solid #EBA93A;outline-offset:2px}
+.tm-acts{display:inline-flex;gap:12px}
+.tm-lnk{border:0;background:none;padding:0;font:800 13px inherit;font-family:inherit;color:#1D5545;cursor:pointer;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(29,85,69,.35)}
+.tm-lnk.rm{color:#B03A2E;text-decoration-color:rgba(176,58,46,.35)}
+.tm-note{flex-basis:100%;font-size:12px;color:#9A6A00}.tm-note:empty{display:none}
+.tm-roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.tm-roles>div{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:16px;background:#F7F1E3;font-size:13px}
+.tm-roles strong{color:#1D5545;font-size:14px}.tm-roles span{color:#5E6A63}
+.tm-more{border-top:1px solid #ECE3CF;padding-top:12px}
+.tm-more summary{cursor:pointer;font-weight:800;color:#1D5545;font-size:15px}
+.tm-more[open]{display:flex;flex-direction:column;gap:12px}
+@media (max-width:700px){.tm-add{grid-template-columns:1fr}.tm-go{width:100%}}
+</style>
 </head>
 <body>
 <x-dc>
@@ -778,33 +809,41 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </sc-if>
 
 <sc-if value="{{tabTeam}}" hint-placeholder-val="{{false}}">
-<div class="card3d" style="border-radius: 26px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
-<h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">{{t.teamH}}</h1>
-<p style="margin: 0; color: #5E6A63">{{t.teamP}}</p>
-<div style="font-size: 14px; padding: 10px 14px; border-radius: 12px; background: #F3EBD7">🔐 <strong>{{t.permTitle}}:</strong> {{t.permNote}}</div>
+<div class="card3d tm" style="border-radius: 26px; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+<div><h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">{{t.teamH}}</h1>
+<p style="margin: 4px 0 0; color: #5E6A63">{{t.teamP}}</p></div>
+
+<div class="tm-add card3d-dark">
+<label class="tm-l">{{t.inviteEmail}}<input class="fld" type="email" placeholder="name@business.com" onInput="{{setInv}}" value="{{invVal}}"></label>
+<label class="tm-l tm-r">{{t.role}}<select class="fld" onChange="{{setRole}}"><sc-for list="{{roleOpts}}" as="ro" hint-placeholder-count="2"><option value="{{ro.v}}">{{ro.label}}</option></sc-for></select></label>
+<button type="button" onClick="{{invite}}" class="btn-gold tm-go">+ {{t.invite}}</button>
+</div>
+
+<div class="tm-list">
 <sc-for list="{{members}}" as="mb" hint-placeholder-count="3">
-<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 12px 0; border-top: 1px solid #ECE3CF">
-<span style="width: 42px; height: 42px; border-radius: 50%; background: #F3EBD7; color: #1D5545; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: 0 0 auto">{{mb.ini}}</span>
-<div style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column"><strong style="color: #1D5545">{{mb.name}}</strong><span style="font-size: 13px; color: #6B756F">{{mb.email}}</span></div>
-<sc-if value="{{mb.isOwner}}" hint-placeholder-val="{{false}}"><div style="display: flex; flex-direction: column; align-items: flex-end"><span style="font-size: 13px; font-weight: 800; color: #1D5545; background: #E2F0E7; padding: 4px 12px; border-radius: 999px">{{mb.role}}</span><span style="font-size: 12px; color: #6B756F; margin-top: 3px">{{mb.note}}</span></div></sc-if><sc-if value="{{mb.canEdit}}" hint-placeholder-val="{{true}}"><div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px"><span style="font-size: 12px; color: #9A6A00">{{mb.note}}</span><label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700"><input type="checkbox" checked="{{mb.pO}}" onChange="{{mb.togO}}" style="width: 18px; height: 18px; accent-color: #1D5545">{{t.pOrder}}</label><label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700"><input type="checkbox" checked="{{mb.pP}}" onChange="{{mb.togP}}" style="width: 18px; height: 18px; accent-color: #1D5545">{{t.pPay}}</label><button type="button" onClick="{{mb.actAs}}" style="border: none; background: #E8F1FB; color: #1D4E89; border-radius: 999px; min-height: 34px; padding: 0 12px; font-family: inherit; font-weight: 800; font-size: 13px; cursor: pointer">{{t.viewAs}}</button><select class="fld" style="min-height: 40px; width: auto" onChange="{{mb.setRole}}"><sc-for list="{{mb.opts}}" as="ro" hint-placeholder-count="2"><option value="{{ro.v}}" selected="{{ro.sel}}">{{ro.label}}</option></sc-for></select><button type="button" onClick="{{mb.rm}}" style="border: none; background: none; color: #B03A2E; font-family: inherit; font-weight: 700; cursor: pointer">{{t.removeB}}</button></div></sc-if>
+<div class="tm-m">
+<span class="tm-av">{{mb.ini}}</span>
+<div class="tm-who"><strong>{{mb.name}}</strong><span>{{mb.email}}</span></div>
+<sc-if value="{{mb.isOwner}}" hint-placeholder-val="{{false}}"><span class="tm-pill own">{{mb.role}} · {{mb.note}}</span></sc-if>
+<sc-if value="{{mb.canEdit}}" hint-placeholder-val="{{true}}"><div class="tm-ctl">
+<select class="fld tm-sel" onChange="{{mb.setRole}}"><sc-for list="{{mb.opts}}" as="ro" hint-placeholder-count="2"><option value="{{ro.v}}" selected="{{ro.sel}}">{{ro.label}}</option></sc-for></select>
+<label class="tm-sw"><input type="checkbox" checked="{{mb.pO}}" onChange="{{mb.togO}}"><i></i>{{t.pOrder}}</label>
+<label class="tm-sw"><input type="checkbox" checked="{{mb.pP}}" onChange="{{mb.togP}}"><i></i>{{t.pPay}}</label>
+<span class="tm-acts"><button type="button" onClick="{{mb.actAs}}" class="tm-lnk">{{t.viewAs}}</button><button type="button" onClick="{{mb.rm}}" class="tm-lnk rm">{{t.removeB}}</button></span>
+<span class="tm-note">{{mb.note}}</span>
+</div></sc-if>
 </div>
 </sc-for>
-<div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px; align-items: end; padding-top: 6px" class="wa-inv">
-<label class="lbl">{{t.inviteEmail}}<input class="fld" type="email" placeholder="name@business.com" onInput="{{setInv}}" value="{{invVal}}"></label>
-<label class="lbl">{{t.role}}<select class="fld" onChange="{{setRole}}"><sc-for list="{{roleOpts}}" as="ro" hint-placeholder-count="2"><option value="{{ro.v}}">{{ro.label}}</option></sc-for></select></label>
-<button type="button" onClick="{{invite}}" class="btn-green" style="min-height: 50px; padding: 0 20px; border-radius: 12px; border: none; color: #F6E3B4; font-family: inherit; font-weight: 800; cursor: pointer">{{t.invite}}</button>
 </div>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 4px">
-<sc-for list="{{roleInfo}}" as="ri" hint-placeholder-count="3">
-<div style="border-radius: 14px; background: #F7F1E3; padding: 12px 14px; font-size: 13px"><strong style="color: #1D5545">{{ri.r}}</strong><br><span style="color: #5E6A63">{{ri.p}}</span></div>
-</sc-for>
-</div>
-<div style="margin-top: 8px; display: flex; flex-direction: column; gap: 12px">
-<strong style="color: #1D5545; font-size: 17px">🔐 {{t.rtH}}</strong>
+
+<div class="tm-roles"><sc-for list="{{roleInfo}}" as="ri" hint-placeholder-count="4"><div><strong>{{ri.r}}</strong><span>{{ri.p}}</span></div></sc-for></div>
+
+<details class="tm-more"><summary>🔐 {{t.rtH}}</summary>
+<p style="margin: 10px 0 0; font-size: 14px; color: #5E6A63"><strong>{{t.permTitle}}:</strong> {{t.permNote}}</p>
 <div style="overflow-x: auto"><table style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 560px"><thead><tr><th style="text-align: left; padding: 10px 8px; border-bottom: 2px solid #1D5545; color: #5E6A63">{{t.rtAct}}</th><sc-for list="{{rtCols}}" as="rc" hint-placeholder-count="4"><th style="padding: 10px 8px; border-bottom: 2px solid #1D5545; color: #1D5545; text-align: center">{{rc.x}}</th></sc-for></tr></thead><tbody><sc-for list="{{rtRows}}" as="rr" hint-placeholder-count="7"><tr><td style="padding: 9px 8px; border-bottom: 1px solid #F0E8D6">{{rr.a}}</td><sc-for list="{{rr.c}}" as="cc" hint-placeholder-count="4"><td style="padding: 9px 8px; border-bottom: 1px solid #F0E8D6; text-align: center; font-weight: 800; color: {{cc.col}}">{{cc.v}}</td></sc-for></tr></sc-for></tbody></table></div>
-<strong style="color: #1D5545; font-size: 15px; margin-top: 4px">{{t.rtFlowH}}</strong>
+<strong style="color: #1D5545; font-size: 15px">{{t.rtFlowH}}</strong>
 <div style="display: flex; flex-direction: column; gap: 8px"><sc-for list="{{rtFlow}}" as="rf" hint-placeholder-count="4"><div style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: #33403A; line-height: 1.5"><span style="flex: 0 0 auto; width: 24px; height: 24px; border-radius: 999px; background: #1D5545; color: #F6E3B4; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center">{{rf.n}}</span><span>{{rf.x}}</span></div></sc-for></div>
-</div>
+</details>
 </div>
 </sc-if>
 
