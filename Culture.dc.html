@@ -838,7 +838,7 @@ var sItems = SL.items;
 var sn = sItems.length;
 var sIdx = (this.state && typeof this.state.sIdx === 'number') ? this.state.sIdx : 0;
 var sMore = !!(this.state && this.state.sMore);
-var SIMG = ['img/694aba8a1723dd6f05e5c9dc4a4b80fc.webp', 'img/f550783da0db12a4738aed9c8d1ecf2d.webp', 'img/4c3be5aa8f8c066b21e7db3bf8e1cbaf.webp', '', 'img/2571b64d12e186d54c2591031e538957.webp', 'img/d78e37aae45585ef207c38b383cf4849.webp', 'img/2e13e2a29372cd73025958546269e785.webp', '', ''];
+var SIMG = ['img/694aba8a1723dd6f05e5c9dc4a4b80fc.webp', 'img/f550783da0db12a4738aed9c8d1ecf2d.webp', 'img/4c3be5aa8f8c066b21e7db3bf8e1cbaf.webp', 'img/8a47925b65b04cee7ac978e787689593.webp', 'img/2571b64d12e186d54c2591031e538957.webp', 'img/d78e37aae45585ef207c38b383cf4849.webp', 'img/2e13e2a29372cd73025958546269e785.webp', '', ''];
 var mk = function (a) { var ii = sItems.indexOf(a); var im = SIMG[ii] || ''; return { n: a[0], s: a[1], l: a[2], img: im, hasImg: !!im, noImg: !im }; };
 var dist = function (i) { var d = Math.abs(i - sIdx); return Math.min(d, sn - d); };
 var storyNames = sItems.map(function (a, i) {
