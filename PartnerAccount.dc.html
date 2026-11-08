@@ -986,7 +986,7 @@ navs = navs.concat([["🍳", 29], ["👩‍🍳", 20], ["🏛", 21], ["📜", 22
 var extVals = { extOn: (tab >= 20 && tab <= 22) || tab === 29, extSrc: ((tab >= 20 && tab <= 22) || tab === 29) ? XP[tab - 20] + ".dc.html?embed=1&lang=" + lang : "about:blank", extTitle: tab === 29 ? XL[0] : ((tab >= 20 && tab <= 22) ? XL[tab - 19] : "") };
 var IDX = [0, 4, 5, 6, 7, 8, 9, 10];
 var WPID = ["gata", "khinkali", "pelmeni", "blinchik", "kufta", "kiev", "chcut", "beefcut"];
-var WPL = (function () { try { return JSON.parse(window.localStorage.getItem("noa-wsprices") || "null"); } catch (e) { return null; } })();
+var WPL = (function () { try { var cv = JSON.parse(window.localStorage.getItem("noa-cost-v2") || "null"); if (cv && Array.isArray(cv.prod) && cv.prod.length) { var o = {}; cv.prod.forEach(function (p) { var r = p.pr || []; o[p.id] = [r[2], r[3]]; }); return o; } var m = JSON.parse(window.localStorage.getItem("noa-prices") || "null"); if (m) { var o2 = {}; Object.keys(m).forEach(function (k) { o2[k] = [m[k][2], m[k][3]]; }); return o2; } return JSON.parse(window.localStorage.getItem("noa-wsprices") || "null"); } catch (e) { return null; } })();
 var WP0 = [18.00, 22.00, 11.00, 32.00, 33.00, 18.00, 13.20, 15.00], WH0 = [1.50, 2.00, 0, 3.00, 3.15, 2.75, 1.90, 2.10];
 var WP = WPID.map(function (id, k) { var v = WPL && WPL[id] && +WPL[id][0]; return v > 0 ? v : WP0[k]; });
 var WH = WPID.map(function (id, k) { var v = WPL && WPL[id] && +WPL[id][1]; return v > 0 ? v : (WPL && WPL[id] ? 0 : WH0[k]); });
