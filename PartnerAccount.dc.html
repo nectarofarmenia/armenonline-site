@@ -35,6 +35,9 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
   aside.sum-card[style*="position: sticky"], aside.card3d[style*="position: sticky"] { overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding-bottom: 18px !important; }
   aside[style*="top: 145px"][style*="position: sticky"] { max-height: calc(100vh - 160px); }
   aside[style*="top: 170px"][style*="position: sticky"] { max-height: calc(100vh - 186px); }
+  aside[style*="top: 170px"][style*="position: sticky"]:has(> .ma-scroll) { overflow: hidden; padding-bottom: 22px !important; }
+  aside > .ma-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 14px; margin-right: -14px; padding-right: 14px; }
+  aside > .ma-scroll::-webkit-scrollbar { width: 6px; } aside > .ma-scroll::-webkit-scrollbar-thumb { background: rgba(235,169,58,.45); border-radius: 99px; }
   aside.card3d-dark[style*="flex: 0 0 250px"][style*="position: sticky"] { flex: 0 0 268px !important; padding-right: 30px !important; }
   aside.card3d-dark[style*="flex: 0 0 280px"][style*="position: sticky"] { flex: 0 0 298px !important; padding-right: 38px !important; }
   .ms-arrow { position: fixed; z-index: 70; width: 16px; height: 12px; border: 0; background: none; padding: 0; cursor: pointer; color: #EBA93A; opacity: .95; display: flex; align-items: center; justify-content: center; }
@@ -469,6 +472,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 <div style="display: flex; flex-direction: column"><strong style="font-size: 18px">{{bizName}}</strong><span style="font-size: 13px; color: #F6C35A; font-weight: 700">{{pidTxt}}</span></div>
 </div>
 <div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #D9E6DF; padding: 10px 12px; border-radius: 14px; background: rgba(255,255,255,.07)"><span>👤 {{t.respL}}:</span><strong style="color: #F7F3EA; font-size: 14px; margin: -2px 0 2px">{{pfName}}</strong><span style="overflow-wrap: anywhere">✉ {{pfEmail}}</span><span>📞 {{pfPhone}}</span><button type="button" onClick="{{stGo}}" title="{{stT.H}}" style="display: flex; align-items: center; gap: 8px; width: 100%; margin-top: 6px; padding: 8px 10px; border-radius: 12px; border: 1px solid rgba(246,195,90,.45); background: rgba(246,195,90,.12); color: #F7F3EA; font-family: inherit; font-size: 13px; cursor: pointer; text-align: left"><span style="font-size: 15px">🎁</span><span style="flex: 1 1 auto">{{bcChip}}</span></button></div>
+<div class="ma-scroll">
 <nav style="display: flex; flex-direction: column; gap: 4px">
 <sc-for list="{{navs}}" as="nv" hint-placeholder-count="5">
 <button type="button" onClick="{{nv.pick}}" class="wa-nav {{nv.cls}}"><span>{{nv.icon}}</span>{{nv.label}}</button>
@@ -476,6 +480,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </nav>
 <sc-if value="{{hasSw}}" hint-placeholder-val="{{false}}"><a href="MyAccount.dc.html" onClick="{{doSwitch}}" class="btn-gold" style="display: flex; align-items: center; justify-content: center; min-height: 46px; border-radius: 999px; color: #133B30; font-weight: 800; font-size: 14px; text-decoration: none; text-align: center; padding: 0 12px">{{t.swToRet}}</a></sc-if>
 <a href="Account.dc.html#logout" style="text-align: center; color: #F6C35A; font-weight: 700; font-size: 14px; text-decoration: none">{{t.out}}</a>
+</div>
 </aside>
 <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 22px">
 
@@ -1740,11 +1745,11 @@ invite: function () { var em = (st.inv || "").trim(); if (!em || em.indexOf("@")
   var ind = {};
   function mk(dir) { var d = document.createElement("button"); d.type = "button"; d.className = "ms-arrow ms-" + dir; d.setAttribute("aria-label", dir === "dn" ? "Թերթել ներքև" : "Թերթել վերև"); d.innerHTML = dir === "dn" ? '<svg viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1.5l8 7 8-7"/></svg>' : '<svg viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 8.5l8-7 8 7"/></svg>'; d.style.display = "none"; document.body.appendChild(d); return d; }
   function aside() { return document.querySelector('aside.sum-card[style*="position: sticky"]') || document.querySelector('aside[style*="position: sticky"]'); }
-  function upd() { var el = aside(); if (!el) { return; } fit(el); if (!ind.dn) { ind.dn = mk("dn"); ind.up = mk("up"); ind.dn.onclick = function () { var a = aside(); if (a) { a.scrollBy({ top: a.clientHeight * 0.6, behavior: "smooth" }); } }; ind.up.onclick = function () { var a = aside(); if (a) { a.scrollBy({ top: -a.clientHeight * 0.6, behavior: "smooth" }); } }; }
-    var r = el.getBoundingClientRect(); var more = el.scrollHeight - el.clientHeight - el.scrollTop > 4; var less = el.scrollTop > 4; var on = window.innerWidth >= 900 && r.height > 0;
+  function upd() { var el = aside(); if (!el) { return; } fit(el); if (!ind.dn) { ind.dn = mk("dn"); ind.up = mk("up"); ind.dn.onclick = function () { var a = aside(); if (a) { a = a.querySelector(".ma-scroll") || a; a.scrollBy({ top: a.clientHeight * 0.6, behavior: "smooth" }); } }; ind.up.onclick = function () { var a = aside(); if (a) { a = a.querySelector(".ma-scroll") || a; a.scrollBy({ top: -a.clientHeight * 0.6, behavior: "smooth" }); } }; }
+    var r = el.getBoundingClientRect(); var sc = el.querySelector(".ma-scroll") || el; var more = sc.scrollHeight - sc.clientHeight - sc.scrollTop > 4; var less = sc.scrollTop > 4; var on = window.innerWidth >= 900 && r.height > 0;
     ind.dn.style.display = on && more ? "flex" : "none"; ind.up.style.display = on && less ? "flex" : "none";
-    var hz = parseFloat(getComputedStyle(document.documentElement).zoom) || 1; if (document.body) { hz *= parseFloat(getComputedStyle(document.body).zoom) || 1; } var dk = /card3d-dark/.test(el.className); var inset = dk ? 15 : 10; ind.dn.style.left = ind.up.style.left = (r.right / hz - inset - 8) + "px"; ind.dn.style.top = (r.bottom / hz - 30) + "px"; var tt = el.querySelector(".as-ttl"); ind.up.style.top = (r.top / hz + (tt ? tt.offsetHeight + 4 : 16)) + "px"; }
-  window.addEventListener("resize", upd); window.addEventListener("scroll", upd, { passive: true }); document.addEventListener("scroll", function (e) { if (e.target && e.target.tagName === "ASIDE") { upd(); } }, true);
+    var hz = parseFloat(getComputedStyle(document.documentElement).zoom) || 1; if (document.body) { hz *= parseFloat(getComputedStyle(document.body).zoom) || 1; } var dk = /card3d-dark/.test(el.className); var inset = dk ? 15 : 10; ind.dn.style.left = ind.up.style.left = (r.right / hz - inset - 8) + "px"; ind.dn.style.top = (r.bottom / hz - 30) + "px"; var tt = el.querySelector(".as-ttl"); ind.up.style.top = (sc !== el ? sc.getBoundingClientRect().top / hz + 2 : r.top / hz + (tt ? tt.offsetHeight + 4 : 16)) + "px"; }
+  window.addEventListener("resize", upd); window.addEventListener("scroll", upd, { passive: true }); document.addEventListener("scroll", function (e) { if (e.target && (e.target.tagName === "ASIDE" || (e.target.classList && e.target.classList.contains("ma-scroll")))) { upd(); } }, true);
   setInterval(upd, 600); setTimeout(upd, 300);
 })();
 </script>
