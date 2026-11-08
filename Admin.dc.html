@@ -1582,7 +1582,7 @@ recent: orders.slice(0, 6).map(view), hasLow: lowIdx.length > 0, lowNames: lowId
 alerts: alerts, alertCount: alerts.length, hasAlerts: alerts.length > 0, bellOpen: !!st.bell, toggleBell: function () { self.setState({ bell: !st.bell }); },
 stock: stock, typeChips: typeChips, pfSum: pfSum, pfFx: pfFx, pfNet: pfNet, pfNetC: pfNetC, pfCnt: pfCnt, orderList: olist.map(view), hasCustFilter: cf >= 0, custFilter: cf >= 0 ? CUST[cf][0] : "", custCount: olist.length, custTotal: money(cfTot), clearCust: function () { self.setState({ cf: -1 }); },
 custChips: custChips, custList: custList, partners: partners, byCity: byCity, drvSum: drvSum,
-apriLabel: st.apri ? t.sentApri : t.sendApri, sendApri: function () { self.setState({ apri: true }); setTimeout(function () { self.setState({ apri: false }); }, 2200); },
+apriLabel: st.apri === "busy" ? "Ուղարկվում է…" : (st.apri === "err" ? "⚠️ Չհաջողվեց, փորձեք նորից" : (st.apri ? t.sentApri : t.sendApri)), sendApri: function () { if (!window.nofaDrvSync) { self.setState({ apri: "err" }); return; } try { window.localStorage.removeItem("noa-dlv-ph"); } catch (e) {} self.setState({ apri: "busy" }); window.nofaDrvSync().then(function () { self.setState({ apri: (window.localStorage.getItem("noa-dlv-ph") ? true : "err") }); setTimeout(function () { self.setState({ apri: false }); }, 2500); }); },
 tpls: tpls, tplSubj: t.tb[tsel][0], tplBody: t.tb[tsel][1], testLabel: st.tested ? t.sent : t.test, sendTest: function () { self.setState({ tested: true }); setTimeout(function () { self.setState({ tested: false }); }, 1800); },
 plan: plan, plan2: plan2, plK: plK, bars: bars, topP: topP, splitTxt: money(rS) + " / " + money(wS) });
 }
