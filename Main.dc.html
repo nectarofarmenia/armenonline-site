@@ -623,12 +623,12 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 <button type="button" onClick="{{storyPrev}}" aria-label="Previous" class="btn-ghost st-arrow" style="flex: 0 0 auto; width: 54px; height: 54px; border-radius: 999px; border: 1.5px solid rgba(235,169,58,.85); background: transparent; color: #F6E3B4; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
 <div class="st-track" style="flex: 1 1 auto; min-width: 0; display: flex; align-items: flex-start; justify-content: center; gap: 22px">
 <button type="button" onClick="{{storyPrev}}" class="card3d-dark st-side" aria-label="{{storyPrevItem.n}}" style="flex: 1 1 0; max-width: 340px; min-width: 0; align-self: stretch; border: none; text-align: left; font-family: inherit; color: #F7F3EA; background: #276654; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px; cursor: pointer">
-<div class="photo3d-dark" style="aspect-ratio: 4 / 3; border-radius: 16px; background: #2F7360; display: flex; align-items: center; justify-content: center; color: #CFE2D9; font-size: 14px; text-align: center; padding: 10px">[{{t.photo}}: {{storyPrevItem.n}}]</div>
+<sc-if value="{{storyPrevItem.hasImg}}" hint-placeholder-val="{{false}}"><img class="photo3d-dark" src="{{storyPrevItem.img}}" alt="{{storyPrevItem.n}}" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; background: #2F7360"></sc-if><sc-if value="{{storyPrevItem.noImg}}" hint-placeholder-val="{{true}}"><div class="photo3d-dark" style="aspect-ratio: 4 / 3; border-radius: 16px; background: #2F7360; display: flex; align-items: center; justify-content: center; color: #CFE2D9; font-size: 14px; text-align: center; padding: 10px">[{{t.photo}}: {{storyPrevItem.n}}]</div></sc-if>
 <span style="font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 24px">{{storyPrevItem.n}}</span>
 <span style="font-size: 16px; line-height: 1.55; color: #CFE2D9">{{storyPrevItem.s}}</span>
 </button>
 <article class="card3d-dark st-main" style="flex: 1 1 0; max-width: 340px; min-width: 0; align-self: stretch; background: #276654; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px; color: #F7F3EA">
-<div class="photo3d-dark" style="aspect-ratio: 4 / 3; border-radius: 16px; background: #2F7360; display: flex; align-items: center; justify-content: center; color: #CFE2D9; font-size: 14px; text-align: center; padding: 10px">[{{t.photo}}: {{storyCur.n}}]</div>
+<sc-if value="{{storyCur.hasImg}}" hint-placeholder-val="{{false}}"><img class="photo3d-dark" src="{{storyCur.img}}" alt="{{storyCur.n}}" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; background: #2F7360"></sc-if><sc-if value="{{storyCur.noImg}}" hint-placeholder-val="{{true}}"><div class="photo3d-dark" style="aspect-ratio: 4 / 3; border-radius: 16px; background: #2F7360; display: flex; align-items: center; justify-content: center; color: #CFE2D9; font-size: 14px; text-align: center; padding: 10px">[{{t.photo}}: {{storyCur.n}}]</div></sc-if>
 <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
 <h3 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 24px">{{storyCur.n}}</h3>
 <span style="font-size: 14px; font-weight: 700; color: #F6C35A; white-space: nowrap">{{storyPos}}</span>
@@ -640,7 +640,7 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 <sc-if value="{{storyHasMore}}" hint-placeholder-val="{{true}}"><button type="button" onClick="{{toggleStory}}" style="align-self: flex-start; min-height: 44px; padding: 0 4px; border: none; background: transparent; color: #F6C35A; font-family: inherit; font-weight: 800; font-size: 16px; cursor: pointer">{{storyMoreLabel}}</button></sc-if>
 </article>
 <button type="button" onClick="{{storyNext}}" class="card3d-dark st-side" aria-label="{{storyNextItem.n}}" style="flex: 1 1 0; max-width: 340px; min-width: 0; align-self: stretch; border: none; text-align: left; font-family: inherit; color: #F7F3EA; background: #276654; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px; cursor: pointer">
-<div class="photo3d-dark" style="aspect-ratio: 4 / 3; border-radius: 16px; background: #2F7360; display: flex; align-items: center; justify-content: center; color: #CFE2D9; font-size: 14px; text-align: center; padding: 10px">[{{t.photo}}: {{storyNextItem.n}}]</div>
+<sc-if value="{{storyNextItem.hasImg}}" hint-placeholder-val="{{false}}"><img class="photo3d-dark" src="{{storyNextItem.img}}" alt="{{storyNextItem.n}}" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; background: #2F7360"></sc-if><sc-if value="{{storyNextItem.noImg}}" hint-placeholder-val="{{true}}"><div class="photo3d-dark" style="aspect-ratio: 4 / 3; border-radius: 16px; background: #2F7360; display: flex; align-items: center; justify-content: center; color: #CFE2D9; font-size: 14px; text-align: center; padding: 10px">[{{t.photo}}: {{storyNextItem.n}}]</div></sc-if>
 <span style="font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 24px">{{storyNextItem.n}}</span>
 <span style="font-size: 16px; line-height: 1.55; color: #CFE2D9">{{storyNextItem.s}}</span>
 </button>
@@ -1039,7 +1039,8 @@ var sItems = SL.items;
 var sn = sItems.length;
 var sIdx = (this.state && typeof this.state.sIdx === 'number') ? this.state.sIdx : 0;
 var sMore = !!(this.state && this.state.sMore);
-var mk = function (a) { return { n: a[0], s: a[1], l: a[2] }; };
+var SIMG = ['', '', 'img/4c3be5aa8f8c066b21e7db3bf8e1cbaf.webp', '', '', '', '', '', ''];
+var mk = function (a) { var ii = sItems.indexOf(a); var im = SIMG[ii] || ''; return { n: a[0], s: a[1], l: a[2], img: im, hasImg: !!im, noImg: !im }; };
 var dist = function (i) { var d = Math.abs(i - sIdx); return Math.min(d, sn - d); };
 var storyNames = sItems.map(function (a, i) {
 var d = dist(i);

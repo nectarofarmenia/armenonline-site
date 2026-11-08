@@ -806,7 +806,8 @@ var sItems = SL.items;
 var sn = sItems.length;
 var sIdx = (this.state && typeof this.state.sIdx === 'number') ? this.state.sIdx : 0;
 var sMore = !!(this.state && this.state.sMore);
-var mk = function (a) { return { n: a[0], s: a[1], l: a[2] }; };
+var SIMG = ['', '', 'img/4c3be5aa8f8c066b21e7db3bf8e1cbaf.webp', '', '', '', '', '', ''];
+var mk = function (a) { var ii = sItems.indexOf(a); var im = SIMG[ii] || ''; return { n: a[0], s: a[1], l: a[2], img: im, hasImg: !!im, noImg: !im }; };
 var dist = function (i) { var d = Math.abs(i - sIdx); return Math.min(d, sn - d); };
 var storyNames = sItems.map(function (a, i) {
 var d = dist(i);
