@@ -249,8 +249,27 @@ setInterval(upd,400);setTimeout(upd,300);})();</script>
       if (news.length) { toast("🚚 Առաքված է՝ " + news.join(", ")); }
       return n; });
   }
-  function drvSync() { if (drvBusy) { return Promise.resolve(0); } drvBusy = true; return drvPush().catch(function () {}).then(drvPull).catch(function () { return 0; }).finally(function () { drvBusy = false; }); }
+  function drvSync() { if (drvBusy) { return Promise.resolve(0); } drvBusy = true; var auto = 0; return drvAuto().then(function (x) { auto = x; }).then(drvPush).catch(function () {}).then(drvPull).then(function (n) { return n + auto; }).catch(function () { return 0; }).finally(function () { drvBusy = false; }); }
   window.nofaDrvSync = drvSync;
+  /* Drivers registered in My Apri join the website list on their own; matched by My Apri id, email, phone, then name. */
+  function dg10(x) { var d = String(x || "").replace(/\D/g, ""); return d.length >= 10 ? d.slice(-10) : ""; }
+  function drvMerge(L) {
+    var a = J("noa-drivers", null); if (!Array.isArray(a) || !a.length) { a = [{ name: "Arsen", phone: "", email: "", st: "demo" }, { name: "Gor", phone: "", email: "", st: "demo" }, { name: "Narek", phone: "", email: "", st: "demo" }]; }
+    var add = 0, link = 0, ch = false;
+    (L || []).forEach(function (x) { var em = String(x.email || "").toLowerCase(), ph = dg10(x.phone), nm = String(x.name || "").trim().toLowerCase();
+      var free = function (d) { return !d.apri; };
+      var hit = a.filter(function (d) { return d.apri === x.id; })[0]
+        || (em ? a.filter(function (d) { return free(d) && String(d.email || "").toLowerCase() === em; })[0] : null)
+        || (ph ? a.filter(function (d) { return free(d) && dg10(d.phone) === ph; })[0] : null)
+        || a.filter(function (d) { return free(d) && String(d.name || "").trim().toLowerCase() === nm; })[0];
+      if (hit) { if (hit.apri !== x.id) { hit.apri = x.id; hit.st = x.active === false ? "off" : "active"; link++; ch = true; }
+        else if (x.active === false && hit.st !== "off") { hit.st = "off"; ch = true; } }
+      else { a.push({ name: x.name, phone: x.phone || "", email: x.email || "", st: x.active === false ? "off" : "active", apri: x.id, at: new Date().toISOString() }); add++; ch = true; } });
+    if (ch) { LS("noa-drivers", JSON.stringify(a)); }
+    return { n: (L || []).length, add: add, link: link, ch: ch };
+  }
+  window.nofaDrvLoad = function () { return req("apri_drivers").then(function (j) { if (!j.ok) { throw j; } LS("noa-dlv-dt", String(Date.now())); return drvMerge(j.data || []); }); };
+  function drvAuto() { if (Date.now() - (+LG("noa-dlv-dt") || 0) < 300000) { return Promise.resolve(0); } return window.nofaDrvLoad().then(function (r) { if (r.add) { toast("🚚 Նոր վարորդ My Apri-ից"); } return r.ch ? 1 : 0; }).catch(function () { LS("noa-dlv-dt", String(Date.now())); return 0; }); }
   window.nofaApriDrivers = function () { return req("apri_drivers").then(function (j) { if (!j.ok) { throw j; } return j.data || []; }); };
   window.nofaApriSave = function (tok) { return req("apri_cfg", { token: tok }).then(function (j) { if (!j.ok) { throw j; } return apriSync(); }); };
   window.nofaApriSync = apriSync;
@@ -785,7 +804,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 <button type="button" onClick="{{goMap}}" class="ad-btn" style="align-self: flex-start; margin-bottom: 14px; background: linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22); color: #133B30; border: 0">🗺 Բացել առաքումների քարտեզը</button>
 <div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px">
 <h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 22px; color: #1D5545">👷 Վարորդներ</h2>
-<p style="margin: 0; color: #5E6A63; font-size: 14px">Ավելացրեք վարորդ և ուղարկեք հրավեր SMS-ով կամ email-ով. վարորդը կգրանցվի My Apri Work-ում։ Հետո My Apri-ում նրան տվեք «🚚 Վարորդ» դերը և սեղմեք ներքևի «Բեռնել» կոճակը։</p>
+<p style="margin: 0; color: #5E6A63; font-size: 14px">Ավելացրեք վարորդ և ուղարկեք հրավեր SMS-ով կամ email-ով։ Նա կգրանցվի My Apri Work-ում նույն հեռախոսով կամ email-ով, կնշի «🚚 Ես նաև վարորդ եմ», և ինքնաբերաբար կկապվի այս տողին։</p>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; align-items: end; padding: 12px; border-radius: 16px; background: #E8F1EC">
 <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 800; color: #1D5545">Անուն *<input class="fld" style="min-height: 42px" value="{{dnf.name}}" onInput="{{dnfName}}" placeholder="Օր.՝ Դավիթ"></label>
 <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 800; color: #1D5545">Հեռախոս<input class="fld" type="tel" autocomplete="tel" style="min-height: 42px" value="{{dnf.phone}}" onInput="{{dnfPhone}}" placeholder="+1 (818) ..."></label>
@@ -793,7 +812,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 <button type="button" onClick="{{addDrv}}" class="btn-green ad-btn" style="min-height: 42px">+ Ավելացնել վարորդ</button>
 </div>
 <span style="color: #B03A2E; font-size: 13px; font-weight: 700">{{dnfErr}}</span>
-<div style="display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 12px 14px; border-radius: 16px; background: #FBF4E2; border: 1px solid #ECE3CF"><button type="button" onClick="{{apriDrvLoad}}" class="ad-btn" style="background: linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22); color: #133B30; border: 0">{{apriDrvL}}</button><span style="flex: 1 1 260px; font-size: 13px; color: #5E6A63">Վարորդները գրանցվում են My Apri Work-ում։ Նրանց նշանակված պատվերները ավտոմատ գնում են իրենց հեռախոսին, իսկ «Առաքված է»-ն, նկարը, ստորագրությունը և ստացած գումարը վերադառնում են այստեղ։ Հաճախորդի հեռախոսահամարը վարորդին չի ուղարկվում։</span><strong style="font-size: 13px; color: #1D5545">{{apriDrvMsg}}</strong></div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 12px 14px; border-radius: 16px; background: #FBF4E2; border: 1px solid #ECE3CF"><button type="button" onClick="{{apriDrvLoad}}" class="ad-btn" style="background: linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22); color: #133B30; border: 0">{{apriDrvL}}</button><span style="flex: 1 1 260px; font-size: 13px; color: #5E6A63">Վարորդները գրանցվում են My Apri Work-ում՝ նշելով «🚚 Ես նաև վարորդ եմ», և ավտոմատ հայտնվում են այստեղ (կոճակը թարմացնում է անմիջապես)։ Նրանց նշանակված պատվերները ավտոմատ գնում են իրենց հեռախոսին, իսկ «Առաքված է»-ն, նկարը, ստորագրությունը և ստացած գումարը վերադառնում են այստեղ։ Հաճախորդի հեռախոսահամարը վարորդին չի ուղարկվում։</span><strong style="font-size: 13px; color: #1D5545">{{apriDrvMsg}}</strong></div>
 <div style="display: flex; flex-direction: column; gap: 8px"><sc-for list="{{drvList}}" as="d" hint-placeholder-count="3"><div style="display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 10px 14px; border: 1px solid #ECE3CF; border-radius: 14px; background: #FFFFFF">
 <strong style="min-width: 110px; color: #1D5545">🚚 {{d.name}} <span style="font-size: 11px; font-weight: 800; color: #2F7A55">{{d.apriL}}</span></strong><span style="font-size: 13px; color: #6B756F; flex: 1 1 160px">{{d.phone}} {{d.email}}</span><span style="font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: {{d.stBg}}; color: {{d.stFg}}">{{d.stL}}</span>
 <sc-if value="{{d.hasPh}}" hint-placeholder-val="{{false}}"><a href="{{d.sms}}" class="ad-btn ad-btn-l" style="text-decoration: none">📱 SMS հրավեր</a></sc-if>
@@ -1546,16 +1565,13 @@ try { var stRows = []; var ymdOf = function (off) { var d = new Date(day0.getTim
   window.__nofaStops = { ready: true, rows: stRows }; } catch (e) {}
 var dnf = st.dnf || { name: "", phone: "", email: "" };
 var invUrl = function (d) { return "https://myapriwork.com"; };
-var invTxt = function (d) { return "Բարև " + (d.name || "") + "։ Nectar of Armenia-ն հրավիրում է ձեզ միանալ որպես վարորդ։ Գրանցվեք My Apri Work-ում (ընտրեք Nectar of Armenia)՝ " + invUrl(d) + " Գրանցվելուց հետո ձեր առաքումները կհայտնվեն այնտեղ։ Հարցերի դեպքում՝ +1 (515) 588 5555"; };
+var invTxt = function (d) { return "Բարև " + (d.name || "") + "։ Nectar of Armenia-ն հրավիրում է ձեզ միանալ որպես վարորդ։ Գրանցվեք My Apri Work-ում այս հեռախոսահամարով, ընտրեք Nectar of Armenia և նշեք «🚚 Ես նաև վարորդ եմ»՝ " + invUrl(d) + " Գրանցվելուց հետո ձեր առաքումները կհայտնվեն այնտեղ։ Հարցերի դեպքում՝ +1 (515) 588 5555"; };
 var drvMgr = { dnf: dnf, setDn: function (k) { return function (e) { var n = Object.assign({}, dnf); n[k] = e.target.value; self.setState({ dnf: n }); }; },
  dnfName: function (e) { var n = Object.assign({}, dnf, { name: e.target.value }); self.setState({ dnf: n }); }, dnfPhone: function (e) { var n = Object.assign({}, dnf, { phone: e.target.value }); self.setState({ dnf: n }); }, dnfEmail: function (e) { var n = Object.assign({}, dnf, { email: e.target.value }); self.setState({ dnf: n }); },
  apriDrvMsg: st.apriDrvMsg || "", apriDrvBusy: !!st.apriDrvBusy, apriDrvL: st.apriDrvBusy ? "Բեռնվում է…" : "🔗 Բեռնել վարորդներին My Apri-ից",
- apriDrvLoad: function () { if (!window.nofaApriDrivers) { self.setState({ apriDrvMsg: "Սերվերի կապը պատրաստ չէ։" }); return; } self.setState({ apriDrvBusy: true, apriDrvMsg: "" });
-   window.nofaApriDrivers().then(function (L) { var a = DRVL.map(function (d) { return Object.assign({}, d); }); var add = 0, link = 0;
-     (L || []).forEach(function (x) { var hit = a.filter(function (d) { return d.apri === x.id; })[0] || a.filter(function (d) { return !d.apri && String(d.name || "").trim().toLowerCase() === String(x.name || "").trim().toLowerCase(); })[0];
-       if (hit) { if (!hit.apri) { link++; } hit.apri = x.id; hit.st = x.active === false ? "off" : "active"; } else { a.push({ name: x.name, phone: "", email: "", st: x.active === false ? "off" : "active", apri: x.id, at: new Date().toISOString() }); add++; } });
-     drvSave(a); self.setState({ apriDrvBusy: false, apriDrvMsg: (L || []).length ? "✓ My Apri-ում " + L.length + " վարորդ" + (add ? " · նոր՝ " + add : "") + (link ? " · կապվեց՝ " + link : "") : "My Apri-ում դեռ վարորդ չկա. My Apri → Աշխատողներ → «🚚 Դարձնել վարորդ»։" }); })
-   .catch(function (j) { self.setState({ apriDrvBusy: false, apriDrvMsg: j && j.err === "no_token" ? "Նախ միացրեք My Apri-ն («Պահեստ և արտադրություն» բաժնում)։" : "Չհաջողվեց կապվել My Apri-ի հետ։ Համոզվեք, որ deliveries.sql-ը աշխատեցված է Supabase-ում։" }); }); },
+ apriDrvLoad: function () { if (!window.nofaDrvLoad) { self.setState({ apriDrvMsg: "Սերվերի կապը պատրաստ չէ։" }); return; } self.setState({ apriDrvBusy: true, apriDrvMsg: "" });
+   window.nofaDrvLoad().then(function (r) { self.setState({ dtick: Date.now(), apriDrvBusy: false, apriDrvMsg: r.n ? "✓ My Apri-ում " + r.n + " վարորդ" + (r.add ? " · նոր՝ " + r.add : "") + (r.link ? " · կապվեց՝ " + r.link : "") : "My Apri-ում դեռ վարորդ չկա։" }); })
+   .catch(function (j) { self.setState({ apriDrvBusy: false, apriDrvMsg: j && j.err === "no_token" ? "Նախ միացրեք My Apri-ն («Պահեստ և արտադրություն» բաժնում)։" : "Չհաջողվեց կապվել My Apri-ի հետ։" }); }); },
  dnfErr: st.dnfErr || "", addDrv: function () { var nm = String(dnf.name || "").trim(); var ph = String(dnf.phone || "").replace(/\D/g, ""); if (!nm) { self.setState({ dnfErr: "Գրեք վարորդի անունը։" }); return; } if (ph.length < 10 && !/@/.test(dnf.email || "")) { self.setState({ dnfErr: "Գրեք հեռախոսահամար կամ email՝ հրավերն ուղարկելու համար։" }); return; } var a = DRVL.slice(); a.push({ name: nm, phone: dnf.phone || "", email: dnf.email || "", st: "invited", code: Math.random().toString(36).slice(2, 8).toUpperCase(), at: new Date().toISOString() }); drvSave(a); self.setState({ dnf: { name: "", phone: "", email: "" }, dnfErr: "" }); },
  drvList: DRVL.map(function (d, i) { var stL = { demo: ["Օրինակ", "#F3EBD7", "#7A5A12"], invited: ["Հրավիրված", "#FFF1D6", "#9A6A00"], active: ["✓ Գրանցված", "#E3F2E8", "#2F7A55"], off: ["Անջատված", "#F0F0F0", "#6B756F"] }[d.st || "demo"] || ["", "#fff", "#333"]; var hasPh = String(d.phone || "").replace(/\D/g, "").length >= 10; var dig = String(d.phone || "").replace(/\D/g, ""); if (dig.length === 10) { dig = "1" + dig; }
    return { apriL: d.apri ? "🔗 My Apri" : "", name: d.name, phone: d.phone || "—", email: d.email || "", stL: stL[0], stBg: stL[1], stFg: stL[2], isOff: d.st === "off", canInv: d.st !== "active" && d.st !== "off", hasPh: hasPh && d.st !== "off", hasEm: /@/.test(d.email || "") && d.st !== "off", sms: "sms:+" + dig + "?&body=" + encodeURIComponent(invTxt(d)), mail: "mailto:" + (d.email || "") + "?subject=" + encodeURIComponent("Հրավեր՝ Nectar of Armenia վարորդ") + "&body=" + encodeURIComponent(invTxt(d)), link: invUrl(d), inv: !!d.code,

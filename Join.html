@@ -162,8 +162,27 @@ input:focus,select:focus{outline:2px solid #8CC5A2;border-color:#8CC5A2}input.ba
       if (news.length) { toast("🚚 Առաքված է՝ " + news.join(", ")); }
       return n; });
   }
-  function drvSync() { if (drvBusy) { return Promise.resolve(0); } drvBusy = true; return drvPush().catch(function () {}).then(drvPull).catch(function () { return 0; }).finally(function () { drvBusy = false; }); }
+  function drvSync() { if (drvBusy) { return Promise.resolve(0); } drvBusy = true; var auto = 0; return drvAuto().then(function (x) { auto = x; }).then(drvPush).catch(function () {}).then(drvPull).then(function (n) { return n + auto; }).catch(function () { return 0; }).finally(function () { drvBusy = false; }); }
   window.nofaDrvSync = drvSync;
+  /* Drivers registered in My Apri join the website list on their own; matched by My Apri id, email, phone, then name. */
+  function dg10(x) { var d = String(x || "").replace(/\D/g, ""); return d.length >= 10 ? d.slice(-10) : ""; }
+  function drvMerge(L) {
+    var a = J("noa-drivers", null); if (!Array.isArray(a) || !a.length) { a = [{ name: "Arsen", phone: "", email: "", st: "demo" }, { name: "Gor", phone: "", email: "", st: "demo" }, { name: "Narek", phone: "", email: "", st: "demo" }]; }
+    var add = 0, link = 0, ch = false;
+    (L || []).forEach(function (x) { var em = String(x.email || "").toLowerCase(), ph = dg10(x.phone), nm = String(x.name || "").trim().toLowerCase();
+      var free = function (d) { return !d.apri; };
+      var hit = a.filter(function (d) { return d.apri === x.id; })[0]
+        || (em ? a.filter(function (d) { return free(d) && String(d.email || "").toLowerCase() === em; })[0] : null)
+        || (ph ? a.filter(function (d) { return free(d) && dg10(d.phone) === ph; })[0] : null)
+        || a.filter(function (d) { return free(d) && String(d.name || "").trim().toLowerCase() === nm; })[0];
+      if (hit) { if (hit.apri !== x.id) { hit.apri = x.id; hit.st = x.active === false ? "off" : "active"; link++; ch = true; }
+        else if (x.active === false && hit.st !== "off") { hit.st = "off"; ch = true; } }
+      else { a.push({ name: x.name, phone: x.phone || "", email: x.email || "", st: x.active === false ? "off" : "active", apri: x.id, at: new Date().toISOString() }); add++; ch = true; } });
+    if (ch) { LS("noa-drivers", JSON.stringify(a)); }
+    return { n: (L || []).length, add: add, link: link, ch: ch };
+  }
+  window.nofaDrvLoad = function () { return req("apri_drivers").then(function (j) { if (!j.ok) { throw j; } LS("noa-dlv-dt", String(Date.now())); return drvMerge(j.data || []); }); };
+  function drvAuto() { if (Date.now() - (+LG("noa-dlv-dt") || 0) < 300000) { return Promise.resolve(0); } return window.nofaDrvLoad().then(function (r) { if (r.add) { toast("🚚 Նոր վարորդ My Apri-ից"); } return r.ch ? 1 : 0; }).catch(function () { LS("noa-dlv-dt", String(Date.now())); return 0; }); }
   window.nofaApriDrivers = function () { return req("apri_drivers").then(function (j) { if (!j.ok) { throw j; } return j.data || []; }); };
   window.nofaApriSave = function (tok) { return req("apri_cfg", { token: tok }).then(function (j) { if (!j.ok) { throw j; } return apriSync(); }); };
   window.nofaApriSync = apriSync;
