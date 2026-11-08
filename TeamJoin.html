@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="hy"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>Nectar of Armenia — Team invitation</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@500;700;800&family=Noto+Sans+Armenian:wght@400;600;700;800&family=Noto+Serif+Armenian:wght@600&display=swap" rel="stylesheet">
+<style>
+/* Page a store employee sees after the owner invites them: the invitation e-mail (?view=mail) and the join page. */
+*{box-sizing:border-box}
+html,body{margin:0;background:#F7F3EA;color:#1E2A24;font:15px/1.5 Manrope,'Noto Sans Armenian',system-ui,sans-serif}
+a{color:#1D5545}
+.hdr{background:linear-gradient(180deg,#31775F 0%,#22604C 45%,#164536 100%);box-shadow:inset 0 2px 0 rgba(255,255,255,.25),0 10px 26px rgba(0,0,0,.3)}
+.hdr .in{max-width:1080px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hdr img{height:52px;display:block;filter:drop-shadow(0 2px 0 rgba(0,0,0,.5))}
+.wave{display:block;width:100%;height:40px;background:#133B30}
+.lg{display:inline-flex;gap:2px;padding:3px;border-radius:999px;background:#0E2E25}
+.lg button{min-width:42px;height:34px;border:0;border-radius:999px;background:transparent;color:#D9E6DF;font:700 13px Manrope,sans-serif;cursor:pointer}
+.lg button.on{background:linear-gradient(180deg,#FCDB82,#EDB040 50%,#D38A22);color:#133B30;font-weight:800}
+main{max-width:1080px;margin:0 auto;padding:10px 20px 60px}
+.grid{display:grid;grid-template-columns:1.05fr 1fr;gap:22px;align-items:start}
+.card{border-radius:26px;padding:26px;border:1px solid #F0E8D6;background:linear-gradient(180deg,#fff 0%,#F8F3E8 100%);box-shadow:inset 0 2px 0 #fff,0 3px 6px rgba(19,59,48,.06),0 14px 30px rgba(19,59,48,.1)}
+.hero{position:relative;overflow:hidden;border-radius:26px;padding:28px 26px 26px;color:#F7F3EA;background:radial-gradient(110% 130% at 100% 0%,rgba(235,169,58,.28),transparent 55%),linear-gradient(135deg,#1F5E4C,#133B30);box-shadow:0 16px 34px rgba(19,59,48,.28)}
+.hero::after{content:"";position:absolute;right:-70px;top:-70px;width:240px;height:240px;border-radius:50%;border:2px solid rgba(235,169,58,.22)}
+.kick{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#F6C35A}
+h1{margin:8px 0 6px;font:600 30px/1.2 Fraunces,'Noto Serif Armenian',serif;color:#fff;max-width:440px}
+.hero p{margin:0;color:#D6E3DC;max-width:420px}
+.apri{position:absolute;right:14px;bottom:-6px;width:150px;z-index:1}
+.who{display:flex;align-items:center;gap:12px;margin-top:20px;position:relative;z-index:2}
+.av{flex:0 0 52px;height:52px;border-radius:16px;display:grid;place-items:center;font:700 22px Fraunces,"Noto Serif Armenian",serif;color:#133B30;background:linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22)}
+.who b{display:block;font-size:17px;color:#fff}.who div span{font-size:13px;color:#BFD6CB}
+.role{margin-top:18px;display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.12);font-weight:800;color:#F6E3B4;position:relative;z-index:2}
+h2{margin:0 0 4px;font:600 22px Fraunces,'Noto Serif Armenian',serif;color:#1D5545}
+.sub{margin:0 0 16px;color:#5E6A63;font-size:14px}
+.perm{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.perm li{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:14px;background:#FBF9F4;border:1px solid #EFE6D0;font-weight:700}
+.perm i{flex:0 0 26px;height:26px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:900;font-size:14px}
+.perm .y i{background:#2F9E6B;color:#fff}.perm .n{color:#8A8F86}.perm .n i{background:#E8DFC9;color:#8A8F86}
+.steps{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.steps div{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:#33403A}
+.steps b{flex:0 0 28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#F6E3B4;background:linear-gradient(180deg,#34806A,#1D5545)}
+form{display:flex;flex-direction:column;gap:12px}
+label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#5E6A63}
+input{font:inherit;font-size:16px;padding:12px 14px;border:1.5px solid #E4DCC8;border-radius:14px;background:#FBF9F4;color:#1E2A24;width:100%}
+input:focus{outline:none;border-color:#EBA93A;box-shadow:0 0 0 3px rgba(235,169,58,.22);background:#fff}
+input[readonly]{color:#6B756F;background:#F3EBD7}
+.pw{position:relative}.pw button{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:none;font-size:18px;cursor:pointer;color:#6B756F}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chk{flex-direction:row;align-items:flex-start;gap:10px;font-weight:600;color:#33403A}
+.chk input{width:20px;height:20px;flex:0 0 20px;accent-color:#1D5545;margin-top:2px}
+.btn{min-height:54px;border:0;border-radius:999px;font:800 16px Manrope,'Noto Sans Armenian',sans-serif;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;padding:0 26px}
+.gold{background:linear-gradient(180deg,#FCDB82 0%,#EDB040 50%,#D38A22 100%);color:#133B30;box-shadow:inset 0 2px 0 rgba(255,255,255,.7),inset 0 -3px 0 rgba(120,70,0,.25),0 6px 14px rgba(0,0,0,.18)}
+.green{background:linear-gradient(180deg,#34806A 0%,#1D5545 55%,#133B30 100%);color:#F6E3B4;box-shadow:inset 0 2px 0 rgba(255,255,255,.25),0 6px 14px rgba(19,59,48,.3)}
+.ghost{background:#fff;color:#1D5545;border:1.5px solid #D8CDB4}
+.err{color:#B03A2E;font-weight:700;font-size:14px;min-height:0}
+.note{font-size:12.5px;color:#6B756F;text-align:center}
+.done{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;padding:34px 24px}
+.done .ok{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;font-size:36px;color:#133B30;background:linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22)}
+.bad{max-width:560px;margin:30px auto;text-align:center}
+/* e-mail view */
+.mailbg{background:#E9E4D8;padding:28px 12px 50px;min-height:100vh}
+.mail{max-width:600px;margin:0 auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.12)}
+.mhdr{background:#1D5545;padding:22px 28px;display:flex;align-items:center;justify-content:space-between}
+.mhdr img{height:46px}.mhdr span{color:#F6C35A;font-size:11px;font-weight:800;letter-spacing:.16em}
+.mbar{height:5px;background:#EBA93A}
+.mbody{padding:30px 32px 10px}
+.mbody h1{color:#1D5545;font-size:26px;margin:0 0 10px;max-width:none}
+.mbody p{margin:0 0 14px;color:#33403A;font-size:15.5px}
+.mbox{display:flex;gap:14px;align-items:center;background:#F7F3EA;border-radius:14px;padding:14px 16px;margin:6px 0 20px}
+.mbox b{color:#1D5545}
+.mcta{text-align:center;margin:24px 0 8px}
+.mfoot{margin-top:24px;padding:18px 32px 24px;background:#F7F3EA;font-size:12.5px;color:#6B756F;text-align:center;line-height:1.6}
+.mmeta{max-width:600px;margin:0 auto 12px;font-size:13px;color:#5E6A63;background:#fff;border-radius:12px;padding:10px 14px}
+.mmeta b{color:#1E2A24}
+@media (max-width:860px){.grid{grid-template-columns:1fr}.apri{width:110px}}
+@media (max-width:480px){.row2{grid-template-columns:1fr}h1{font-size:25px}.hdr img{height:40px}.mbody{padding:24px 20px 6px}.apri{display:none}}
+</style></head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+var LOGO="img/cf4f14e5b2e161eced326c4ebe8644fd.webp", APRI="img/c1999a6e0a1f0a5218be4d17335ab22d.webp";
+var T={
+hy:{kick:"Հրավեր թիմին",h1:"{s}-ը Ձեզ հրավիրում է իր թիմ",p:"Nectar of Armenia-ի մեծածախ հաշվում Դուք կկարողանաք աշխատել Ձեր խանութի անունից։",by:"Հրավիրել է՝ {o}",role:"Ձեր դերը",permH:"Ինչ կարող եք անել",permS:"Իրավունքները որոշում է խանութի սեփականատերը և կարող է փոխել ցանկացած պահի։",
+ P:["Տեսնել պատվերներն ու առաքումները","Նոր պատվեր դնել","Վճարել հաշիվները","Ընդունել առաքումները","Կառավարել թիմը"],
+ stepsH:"Ինչպես է աշխատում",steps:["Ստեղծեք Ձեր գաղտնաբառը այս էջում։","Մտեք nectarofarmenia.com-ում Ձեր email-ով։","Կտեսնեք խանութի հաշիվը՝ Ձեր իրավունքներով։"],
+ formH:"Միանալ թիմին",formS:"Լրացրեք Ձեր տվյալները և ստեղծեք գաղտնաբառ։",name:"Անուն ազգանուն",email:"Email",phone:"Հեռախոս",pw:"Գաղտնաբառ",pw2:"Կրկնեք գաղտնաբառը",agree:"Համաձայն եմ աշխատել {s}-ի անունից Nectar of Armenia-ի պայմաններով։",join:"Միանալ թիմին",decline:"Հրաժարվել",
+ eName:"Գրեք Ձեր անունը։",ePw:"Գաղտնաբառը պետք է լինի առնվազն 8 նիշ։",ePw2:"Գաղտնաբառերը չեն համընկնում։",eAgree:"Հաստատեք համաձայնությունը։",eNet:"Կապի սխալ։ Փորձեք նորից։",
+ okH:"Բարի գալուստ թիմ, {n}",okP:"{s}-ի սեփականատերը կստանա ծանուցում։ Հենց նա հաստատի, կկարողանաք մտնել Ձեր email-ով և գաղտնաբառով։",login:"Մուտք գործել",
+ decH:"Հրավերը մերժված է",decP:"Եթե սխալմամբ եք սեղմել, խնդրեք սեփականատիրոջը ուղարկել նոր հրավեր։",
+ badH:"Հրավերի հղումը սխալ է",badP:"Խնդրեք խանութի սեփականատիրոջը ուղարկել նոր հրավեր։",
+ mSubj:"Թեմա",mFrom:"Ումից",mTo:"Ում",mHi:"Բարև {n},",mP1:"{o}-ը ({s}) Ձեզ ավելացրել է իր թիմում Nectar of Armenia-ի մեծածախ հաշվում։",mP2:"Ընդունեք հրավերը և ստեղծեք Ձեր գաղտնաբառը։",mCta:"Ընդունել հրավերը",mP3:"Եթե չեք սպասում այս նամակին, պարզապես անտեսեք այն։",mSubjT:"{s}-ը Ձեզ հրավիրում է Nectar of Armenia թիմ",mFoot:"Nectar of Armenia Inc · Glendale, CA · (515) 588-5555"},
+en:{kick:"Team invitation",h1:"{s} invites you to their team",p:"You'll be able to work in the store's Nectar of Armenia wholesale account on its behalf.",by:"Invited by {o}",role:"Your role",permH:"What you can do",permS:"The store owner sets these permissions and can change them at any time.",
+ P:["See orders and deliveries","Place new orders","Pay invoices","Receive deliveries","Manage the team"],
+ stepsH:"How it works",steps:["Create your password on this page.","Sign in at nectarofarmenia.com with your email.","You'll see the store account with your permissions."],
+ formH:"Join the team",formS:"Fill in your details and create a password.",name:"Full name",email:"Email",phone:"Phone",pw:"Password",pw2:"Repeat password",agree:"I agree to act on behalf of {s} under Nectar of Armenia's terms.",join:"Join the team",decline:"Decline",
+ eName:"Enter your name.",ePw:"Password must be at least 8 characters.",ePw2:"Passwords don't match.",eAgree:"Please confirm your agreement.",eNet:"Connection error. Please try again.",
+ okH:"Welcome to the team, {n}",okP:"The owner of {s} will be notified. Once they confirm, you can sign in with your email and password.",login:"Sign in",
+ decH:"Invitation declined",decP:"If this was a mistake, ask the owner to send a new invitation.",
+ badH:"This invitation link is not valid",badP:"Ask the store owner to send a new invitation.",
+ mSubj:"Subject",mFrom:"From",mTo:"To",mHi:"Hi {n},",mP1:"{o} ({s}) added you to their team in the Nectar of Armenia wholesale account.",mP2:"Accept the invitation and create your password.",mCta:"Accept invitation",mP3:"If you weren't expecting this e-mail, you can ignore it.",mSubjT:"{s} invites you to the Nectar of Armenia team",mFoot:"Nectar of Armenia Inc · Glendale, CA · (515) 588-5555"},
+ru:{kick:"Приглашение в команду",h1:"{s} приглашает вас в свою команду",p:"Вы сможете работать в оптовом аккаунте Nectar of Armenia от имени магазина.",by:"Пригласил(а): {o}",role:"Ваша роль",permH:"Что вы можете делать",permS:"Права задаёт владелец магазина и может изменить их в любой момент.",
+ P:["Видеть заказы и доставки","Оформлять заказы","Оплачивать счета","Принимать доставки","Управлять командой"],
+ stepsH:"Как это работает",steps:["Создайте пароль на этой странице.","Войдите на nectarofarmenia.com со своим email.","Вы увидите аккаунт магазина со своими правами."],
+ formH:"Присоединиться",formS:"Заполните данные и создайте пароль.",name:"Имя и фамилия",email:"Email",phone:"Телефон",pw:"Пароль",pw2:"Повторите пароль",agree:"Я согласен(на) действовать от имени {s} на условиях Nectar of Armenia.",join:"Присоединиться",decline:"Отказаться",
+ eName:"Введите имя.",ePw:"Пароль — не менее 8 символов.",ePw2:"Пароли не совпадают.",eAgree:"Подтвердите согласие.",eNet:"Ошибка связи. Попробуйте ещё раз.",
+ okH:"Добро пожаловать, {n}",okP:"Владелец {s} получит уведомление. После подтверждения вы сможете войти по email и паролю.",login:"Войти",
+ decH:"Приглашение отклонено",decP:"Если это ошибка, попросите владельца отправить новое приглашение.",
+ badH:"Ссылка приглашения недействительна",badP:"Попросите владельца магазина отправить новое приглашение.",
+ mSubj:"Тема",mFrom:"От",mTo:"Кому",mHi:"Здравствуйте, {n}!",mP1:"{o} ({s}) добавил(а) вас в команду оптового аккаунта Nectar of Armenia.",mP2:"Примите приглашение и создайте пароль.",mCta:"Принять приглашение",mP3:"Если вы не ждали этого письма, просто проигнорируйте его.",mSubjT:"{s} приглашает вас в команду Nectar of Armenia",mFoot:"Nectar of Armenia Inc · Glendale, CA · (515) 588-5555"},
+es:{kick:"Invitación al equipo",h1:"{s} le invita a su equipo",p:"Podrá trabajar en la cuenta mayorista de Nectar of Armenia en nombre de la tienda.",by:"Le invitó {o}",role:"Su rol",permH:"Lo que puede hacer",permS:"El dueño de la tienda define estos permisos y puede cambiarlos en cualquier momento.",
+ P:["Ver pedidos y entregas","Hacer pedidos","Pagar facturas","Recibir entregas","Administrar el equipo"],
+ stepsH:"Cómo funciona",steps:["Cree su contraseña en esta página.","Inicie sesión en nectarofarmenia.com con su email.","Verá la cuenta de la tienda con sus permisos."],
+ formH:"Unirse al equipo",formS:"Complete sus datos y cree una contraseña.",name:"Nombre y apellido",email:"Email",phone:"Teléfono",pw:"Contraseña",pw2:"Repita la contraseña",agree:"Acepto actuar en nombre de {s} bajo las condiciones de Nectar of Armenia.",join:"Unirse al equipo",decline:"Rechazar",
+ eName:"Escriba su nombre.",ePw:"La contraseña debe tener al menos 8 caracteres.",ePw2:"Las contraseñas no coinciden.",eAgree:"Confirme su aceptación.",eNet:"Error de conexión. Inténtelo de nuevo.",
+ okH:"Bienvenido al equipo, {n}",okP:"El dueño de {s} recibirá un aviso. Cuando lo confirme, podrá entrar con su email y contraseña.",login:"Iniciar sesión",
+ decH:"Invitación rechazada",decP:"Si fue un error, pida al dueño una nueva invitación.",
+ badH:"El enlace de invitación no es válido",badP:"Pida al dueño de la tienda una nueva invitación.",
+ mSubj:"Asunto",mFrom:"De",mTo:"Para",mHi:"Hola {n}:",mP1:"{o} ({s}) le añadió a su equipo en la cuenta mayorista de Nectar of Armenia.",mP2:"Acepte la invitación y cree su contraseña.",mCta:"Aceptar invitación",mP3:"Si no esperaba este correo, puede ignorarlo.",mSubjT:"{s} le invita al equipo de Nectar of Armenia",mFoot:"Nectar of Armenia Inc · Glendale, CA · (515) 588-5555"}};
+var ROLES={hy:["Սեփականատեր","Մենեջեր","Ընդունող","Պատվիրող"],en:["Owner","Manager","Receiving","Orderer"],ru:["Владелец","Менеджер","Приёмка","Заказчик"],es:["Dueño","Gerente","Recepción","Pedidos"]};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function f(s,o){return s.replace(/\{(\w)\}/g,function(_,k){return esc(o[k]||"");});}
+function dec(){try{var h=(location.hash.match(/i=([^&]+)/)||[])[1];if(!h){return null;}var s=decodeURIComponent(escape(atob(h.replace(/-/g,"+").replace(/_/g,"/"))));var d=JSON.parse(s);return d&&d.e&&d.s?d:null;}catch(e){return null;}}
+var D=dec();
+var lang=(function(){var q=(location.search.match(/[?&]lang=(hy|en|ru|es)/)||[])[1];if(q){return q;}if(D&&T[D.l]){return D.l;}try{var l=localStorage.getItem("noa-lang");if(T[l]){return l;}}catch(e){}return "hy";})();
+var mailView=/[?&]view=mail/.test(location.search);
+var state="form",errMsg="",show=false;
+function perms(){var r=+D.r||3;var p=D.p||{};var o=p.o!=null?!!p.o:r!==2;var pay=p.p!=null?!!p.p:r===1;return [true,o,pay,true,false];}
+function hdr(){return '<header class="hdr"><div class="in"><img src="'+LOGO+'" alt="Nectar of Armenia"><div class="lg" role="group" aria-label="Language">'+["hy","en","ru","es"].map(function(l){return '<button type="button" data-l="'+l+'" class="'+(l===lang?"on":"")+'">'+({hy:"ՀԱՅ",en:"EN",ru:"РУ",es:"ES"})[l]+'</button>';}).join("")+'</div></div></header><svg class="wave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0,0 L1440,0 L1440,22 C1200,52 960,58 720,34 C480,10 240,14 0,40 Z" fill="#1D5545"/></svg>';}
+function joinUrl(){return location.href.replace(/[?&]view=mail/,"").replace(/\?&/,"?").replace(/\?#/,"#");}
+function renderMail(t){var o={s:D.s,o:D.o||D.s,n:(D.n||"").split(" ")[0]||""};
+  return '<div class="mailbg"><div class="mmeta"><b>'+t.mSubj+':</b> '+f(t.mSubjT,o)+'<br><b>'+t.mFrom+':</b> Nectar of Armenia &lt;noreply@armenonline.com&gt;<br><b>'+t.mTo+':</b> '+esc(D.e)+'</div>'+
+  '<div class="mail"><div class="mhdr"><img src="'+LOGO+'" alt="Nectar of Armenia"><span>'+esc(t.kick.toUpperCase())+'</span></div><div class="mbar"></div><div class="mbody">'+
+  '<h1>'+f(t.mHi,o)+'</h1><p>'+f(t.mP1,o)+'</p>'+
+  '<div class="mbox"><span class="av">'+esc((D.s||"?").charAt(0))+'</span><div><b>'+esc(D.s)+'</b><br><span style="color:#6B756F;font-size:14px">'+t.role+': <b>'+esc(ROLES[lang][+D.r||3])+'</b></span></div></div>'+
+  '<p>'+t.mP2+'</p><div class="mcta"><a class="btn gold" href="'+esc(joinUrl())+'">'+t.mCta+' →</a></div><p style="font-size:13px;color:#6B756F">'+t.mP3+'</p></div>'+
+  '<div class="mfoot">'+t.mFoot+'<br>nectarofarmenia.com</div></div></div>';}
+function render(){var t=T[lang],app=document.getElementById("app");document.documentElement.lang=lang;
+  if(!D){app.innerHTML=hdr()+'<main><div class="card bad"><h2>'+t.badH+'</h2><p class="sub">'+t.badP+'</p></div></main>';return bind();}
+  if(mailView){app.innerHTML=renderMail(t);return bind();}
+  var o={s:D.s,o:D.o||D.s,n:D.n||""};
+  var left='<section><div class="hero"><div class="kick">'+t.kick+'</div><h1>'+f(t.h1,o)+'</h1><p>'+t.p+'</p>'+
+   '<div class="who"><span class="av">'+esc(D.s.charAt(0))+'</span><div><b>'+esc(D.s)+'</b><span>'+f(t.by,o)+'</span></div></div>'+
+   '<div class="role">'+t.role+': '+esc(ROLES[lang][+D.r||3])+'</div><img class="apri" src="'+APRI+'" alt=""></div>'+
+   '<div class="card" style="margin-top:18px"><h2>'+t.permH+'</h2><p class="sub">'+t.permS+'</p><ul class="perm">'+perms().map(function(y,i){return '<li class="'+(y?"y":"n")+'"><i>'+(y?"✓":"–")+'</i>'+t.P[i]+'</li>';}).join("")+'</ul>'+
+   '<div class="steps">'+t.steps.map(function(s,i){return '<div><b>'+(i+1)+'</b><span>'+s+'</span></div>';}).join("")+'</div></div></section>';
+  var right;
+  if(state==="ok"){right='<div class="card done"><div class="ok">✓</div><h2>'+f(t.okH,{n:(state.n||D.n||"").split(" ")[0]})+'</h2><p class="sub" style="max-width:380px">'+f(t.okP,o)+'</p><a class="btn green" href="Account.dc.html">'+t.login+'</a></div>';}
+  else if(state==="dec"){right='<div class="card done"><h2>'+t.decH+'</h2><p class="sub">'+t.decP+'</p></div>';}
+  else{right='<div class="card"><h2>'+t.formH+'</h2><p class="sub">'+t.formS+'</p><form id="jf" novalidate>'+
+   '<label>'+t.name+'<input id="jn" autocomplete="name" value="'+esc(D.n||"")+'"></label>'+
+   '<div class="row2"><label>'+t.email+'<input value="'+esc(D.e)+'" readonly autocomplete="username"></label><label>'+t.phone+'<input id="jp" type="tel" autocomplete="tel" inputmode="tel" placeholder="(818) 555-0101"></label></div>'+
+   '<label>'+t.pw+'<span class="pw"><input id="j1" type="'+(show?"text":"password")+'" autocomplete="new-password" minlength="8"><button type="button" id="eye" aria-label="show">'+(show?"🙈":"👁")+'</button></span></label>'+
+   '<label>'+t.pw2+'<input id="j2" type="'+(show?"text":"password")+'" autocomplete="new-password"></label>'+
+   '<label class="chk"><input id="ja" type="checkbox"><span>'+f(t.agree,o)+'</span></label>'+
+   '<div class="err" role="alert">'+esc(errMsg)+'</div>'+
+   '<button class="btn gold" type="submit">'+t.join+'</button><button class="btn ghost" type="button" id="jd">'+t.decline+'</button></form></div>';}
+  app.innerHTML=hdr()+'<main><div class="grid">'+left+'<section>'+right+'</section></div></main>';bind();}
+function sha(s){if(!(window.crypto&&crypto.subtle)){return Promise.resolve("");}return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return ("0"+x.toString(16)).slice(-2);}).join("");});}
+function send(kind,v){return fetch("api/api.php?a=submit",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({em:D.e,items:[{kind:kind,k:"noa-team-join|"+String(D.oe||"").toLowerCase(),v:v}]})}).then(function(r){return r.json();});}
+function bind(){
+  document.querySelectorAll("[data-l]").forEach(function(b){b.onclick=function(){lang=b.dataset.l;try{localStorage.setItem("noa-lang",lang);}catch(e){}render();};});
+  var e=document.getElementById("eye");if(e){e.onclick=function(){var keep=[jn.value,jp.value,j1.value,j2.value,ja.checked];show=!show;render();jn.value=keep[0];jp.value=keep[1];j1.value=keep[2];j2.value=keep[3];ja.checked=keep[4];};}
+  var d=document.getElementById("jd");if(d){d.onclick=function(){send("team",{st:"declined",e:D.e,at:new Date().toISOString()}).catch(function(){});state="dec";render();};}
+  var fm=document.getElementById("jf");if(!fm){return;}
+  fm.onsubmit=function(ev){ev.preventDefault();var t=T[lang];var n=jn.value.trim(),p=j1.value,p2=j2.value;
+    var keep=function(m){errMsg=m;var v=[jn.value,jp.value,j1.value,j2.value,ja.checked];render();jn.value=v[0];jp.value=v[1];j1.value=v[2];j2.value=v[3];ja.checked=v[4];};
+    if(!n){return keep(t.eName);}if(p.length<8){return keep(t.ePw);}if(p!==p2){return keep(t.ePw2);}if(!ja.checked){return keep(t.eAgree);}
+    var btn=fm.querySelector("[type=submit]");btn.disabled=true;
+    sha(String(D.e).toLowerCase()+"|"+p).then(function(h){return send("team",{st:"joined",e:D.e,n:n,ph:jp.value.trim(),pwh:h,r:+D.r||3,at:new Date().toISOString()});})
+      .then(function(j){if(j&&j.ok){errMsg="";D.n=n;state="ok";render();}else{btn.disabled=false;keep(t.eNet);}})
+      .catch(function(){btn.disabled=false;keep(t.eNet);});};
+}
+window.addEventListener("hashchange",function(){D=dec();render();});
+render();
+})();
+</script>
+</body></html>
