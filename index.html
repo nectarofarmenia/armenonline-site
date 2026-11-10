@@ -500,8 +500,8 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 22px">
 <sc-for list="{{products}}" as="p" hint-placeholder-count="8">
 <article class="card3d" style="background: #FFFFFF; border-radius: 22px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid #E4DCC8">
-<div class="photo3d" style="aspect-ratio: 4 / 5; background: #F6E9C8; display: flex; align-items: center; justify-content: center; color: #6B5A2E; font-size: 14px; text-align: center; padding: 16px; position: relative; overflow: hidden">
-<sc-if value="{{p.hasImg}}" hint-placeholder-val="{{false}}"><img class="nofa-zoom" src="{{p.img}}" alt="{{p.name}}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 65%"></sc-if>
+<div class="photo3d" style="aspect-ratio: 68 / 100; background: #F3EBD7; display: flex; align-items: center; justify-content: center; color: #6B5A2E; font-size: 14px; text-align: center; padding: 16px; position: relative; overflow: hidden">
+<sc-if value="{{p.hasImg}}" hint-placeholder-val="{{false}}"><img class="nofa-zoom" src="{{p.img}}" alt="{{p.name}}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain"></sc-if>
 <sc-if value="{{p.noImg}}" hint-placeholder-val="{{true}}">[{{t.photo}}: {{p.name}}]</sc-if>
 <sc-if value="{{p.hasTag}}" hint-placeholder-val="{{false}}">
 <span style="position: absolute; top: 14px; left: 14px; background: #1D5545; color: #F6E3B4; font-size: 12px; font-weight: 800; padding: 6px 12px; border-radius: 999px">{{p.tag}}</span>
