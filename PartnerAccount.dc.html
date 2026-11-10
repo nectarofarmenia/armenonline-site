@@ -807,7 +807,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 <div class="qo-grid">
 <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
 <div class="qo-t {{r.qcls}}">
-<div class="qo-top"><sc-if value="{{r.hasImg}}" hint-placeholder-val="{{true}}"><img class="qo-img" src="{{r.img}}" alt="{{r.name}}" loading="lazy"></sc-if><sc-if value="{{r.noImg}}" hint-placeholder-val="{{false}}"><span class="qo-ini">{{r.ini}}</span></sc-if><div class="qo-nm"><strong>{{r.name}}</strong><span>{{r.size}}</span></div><span class="qo-pr">{{r.price}}</span></div>
+<div class="qo-top"><sc-if value="{{r.hasImg}}" hint-placeholder-val="{{true}}"><img class="qo-img nofa-zoom" src="{{r.img}}" alt="{{r.name}}" loading="lazy"></sc-if><sc-if value="{{r.noImg}}" hint-placeholder-val="{{false}}"><span class="qo-ini">{{r.ini}}</span></sc-if><div class="qo-nm"><strong>{{r.name}}</strong><span>{{r.size}}</span></div><span class="qo-pr">{{r.price}}</span></div>
 <div class="qo-bot">
 <sc-if value="{{r.notSold}}" hint-placeholder-val="{{true}}"><div class="qty" role="group" aria-label="{{t.qty}}"><button type="button" onClick="{{r.dec}}">−</button><span>{{r.q}}</span><button type="button" onClick="{{r.inc}}">+</button></div></sc-if><sc-if value="{{r.sold}}" hint-placeholder-val="{{false}}"><span class="qo-sold">⛔ {{r.soldL}}</span></sc-if>
 <span class="qo-ln">{{r.line}}</span>
@@ -1841,6 +1841,27 @@ function mount(){draw();document.body.appendChild(tab);document.body.appendChild
   if(isP){var u=U();if(u&&u.type==="biz"&&!seen()){setTimeout(open,1800);}}}
 if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",mount);}else{mount();}
 setInterval(function(){var l=L();if(l!==cur&&!pn.classList.contains("on")){cur=l;draw();}},1500);
+})();
+</script>
+<script id="nofa-zoom">
+(function () {
+  if (window.nofaZoom) { return; }
+  var css = document.createElement("style");
+  css.textContent = ".nz-ov{position:fixed;inset:0;z-index:2147483000;background:rgba(10,30,24,.82);display:flex;align-items:center;justify-content:center;padding:24px;cursor:zoom-out;animation:nzIn .18s ease}.nz-ov img{max-width:min(92vw,720px);max-height:86vh;border-radius:22px;box-shadow:0 24px 60px rgba(0,0,0,.45);background:#F6F1E3;cursor:default}.nz-ov .nz-x{position:absolute;top:16px;right:16px;width:46px;height:46px;border-radius:50%;border:0;background:#F6F1E3;color:#133B30;font-size:26px;line-height:1;cursor:pointer}.nz-ov .nz-c{position:absolute;bottom:18px;left:0;right:0;text-align:center;color:#F6F1E3;font:600 16px system-ui,sans-serif}@keyframes nzIn{from{opacity:0}to{opacity:1}}img.nofa-zoom{cursor:zoom-in}";
+  document.head.appendChild(css);
+  window.nofaZoom = function (src, alt) {
+    if (!src) { return; }
+    var ov = document.createElement("div"); ov.className = "nz-ov"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", alt || "");
+    var im = document.createElement("img"); im.src = src; im.alt = alt || "";
+    var x = document.createElement("button"); x.type = "button"; x.className = "nz-x"; x.setAttribute("aria-label", "Close"); x.textContent = "×";
+    var c = document.createElement("div"); c.className = "nz-c"; c.textContent = alt || "";
+    var close = function () { ov.remove(); document.removeEventListener("keydown", key); };
+    var key = function (e) { if (e.key === "Escape") { close(); } };
+    ov.addEventListener("click", function (e) { if (e.target !== im) { close(); } });
+    x.addEventListener("click", close); document.addEventListener("keydown", key);
+    ov.appendChild(im); ov.appendChild(x); ov.appendChild(c); document.body.appendChild(ov); x.focus();
+  };
+  document.addEventListener("click", function (e) { var t = e.target; if (t && t.tagName === "IMG" && t.classList.contains("nofa-zoom")) { e.preventDefault(); e.stopPropagation(); window.nofaZoom(t.currentSrc || t.src, t.alt); } }, true);
 })();
 </script>
 </body>

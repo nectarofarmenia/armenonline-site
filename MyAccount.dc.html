@@ -448,7 +448,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px">
 <sc-for list="{{prods}}" as="pr" hint-placeholder-count="8">
 <div style="border: 1.5px solid #ECE3CF; border-radius: 18px; background: #FFFFFF; overflow: hidden; display: flex; flex-direction: column">
-<div style="aspect-ratio: 4 / 3; background: #F3EBD7; display: flex; align-items: center; justify-content: center; overflow: hidden"><sc-if value="{{pr.hasImg}}" hint-placeholder-val="{{false}}"><img src="{{pr.img}}" alt="{{pr.name}}" style="width: 100%; height: 100%; object-fit: cover; object-position: center 65%"></sc-if><sc-if value="{{pr.noImg}}" hint-placeholder-val="{{true}}"><span style="font-size: 40px">🥟</span></sc-if></div>
+<div style="aspect-ratio: 4 / 3; background: #F3EBD7; display: flex; align-items: center; justify-content: center; overflow: hidden"><sc-if value="{{pr.hasImg}}" hint-placeholder-val="{{false}}"><img class="nofa-zoom" src="{{pr.img}}" alt="{{pr.name}}" style="width: 100%; height: 100%; object-fit: cover; object-position: center 65%"></sc-if><sc-if value="{{pr.noImg}}" hint-placeholder-val="{{true}}"><span style="font-size: 40px">🥟</span></sc-if></div>
 <div style="padding: 12px; display: flex; flex-direction: column; gap: 6px; flex: 1"><strong style="color: #1D5545">{{pr.name}}</strong><span style="font-size: 12px; color: #6B756F; min-height: 16px">{{pr.size}}</span>
 <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto"><strong style="font-family: Fraunces, Lora, serif; font-size: 18px; color: #1D5545">{{pr.price}}</strong>
 <sc-if value="{{pr.canBuy}}" hint-placeholder-val="{{true}}"><sc-if value="{{pr.notIn}}" hint-placeholder-val="{{true}}"><button type="button" onClick="{{pr.inc}}" class="btn-green" style="min-height: 38px; padding: 0 14px; border-radius: 999px; border: none; color: #F6E3B4; font-family: inherit; font-weight: 800; cursor: pointer">+ {{t.add}}</button></sc-if><sc-if value="{{pr.isIn}}" hint-placeholder-val="{{false}}"><div class="qty"><button type="button" onClick="{{pr.dec}}">−</button><span>{{pr.q}}</span><button type="button" onClick="{{pr.inc}}">+</button></div></sc-if></sc-if>
@@ -1382,6 +1382,27 @@ return Object.assign(plVals, extVals, dzVals, lgVals, chVals, avVals, ivVals, rd
     var hz = parseFloat(getComputedStyle(document.documentElement).zoom) || 1; if (document.body) { hz *= parseFloat(getComputedStyle(document.body).zoom) || 1; } var dk = /card3d-dark/.test(el.className); var inset = dk ? 15 : 10; ind.dn.style.left = ind.up.style.left = (r.right / hz - inset - 8) + "px"; ind.dn.style.top = (r.bottom / hz - 30) + "px"; var tt = el.querySelector(".as-ttl"); ind.up.style.top = (sc !== el ? sc.getBoundingClientRect().top / hz + 2 : r.top / hz + (tt ? tt.offsetHeight + 4 : 16)) + "px"; }
   window.addEventListener("resize", upd); window.addEventListener("scroll", upd, { passive: true }); document.addEventListener("scroll", function (e) { if (e.target && (e.target.tagName === "ASIDE" || (e.target.classList && e.target.classList.contains("ma-scroll")))) { upd(); } }, true);
   setInterval(upd, 600); setTimeout(upd, 300);
+})();
+</script>
+<script id="nofa-zoom">
+(function () {
+  if (window.nofaZoom) { return; }
+  var css = document.createElement("style");
+  css.textContent = ".nz-ov{position:fixed;inset:0;z-index:2147483000;background:rgba(10,30,24,.82);display:flex;align-items:center;justify-content:center;padding:24px;cursor:zoom-out;animation:nzIn .18s ease}.nz-ov img{max-width:min(92vw,720px);max-height:86vh;border-radius:22px;box-shadow:0 24px 60px rgba(0,0,0,.45);background:#F6F1E3;cursor:default}.nz-ov .nz-x{position:absolute;top:16px;right:16px;width:46px;height:46px;border-radius:50%;border:0;background:#F6F1E3;color:#133B30;font-size:26px;line-height:1;cursor:pointer}.nz-ov .nz-c{position:absolute;bottom:18px;left:0;right:0;text-align:center;color:#F6F1E3;font:600 16px system-ui,sans-serif}@keyframes nzIn{from{opacity:0}to{opacity:1}}img.nofa-zoom{cursor:zoom-in}";
+  document.head.appendChild(css);
+  window.nofaZoom = function (src, alt) {
+    if (!src) { return; }
+    var ov = document.createElement("div"); ov.className = "nz-ov"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", alt || "");
+    var im = document.createElement("img"); im.src = src; im.alt = alt || "";
+    var x = document.createElement("button"); x.type = "button"; x.className = "nz-x"; x.setAttribute("aria-label", "Close"); x.textContent = "×";
+    var c = document.createElement("div"); c.className = "nz-c"; c.textContent = alt || "";
+    var close = function () { ov.remove(); document.removeEventListener("keydown", key); };
+    var key = function (e) { if (e.key === "Escape") { close(); } };
+    ov.addEventListener("click", function (e) { if (e.target !== im) { close(); } });
+    x.addEventListener("click", close); document.addEventListener("keydown", key);
+    ov.appendChild(im); ov.appendChild(x); ov.appendChild(c); document.body.appendChild(ov); x.focus();
+  };
+  document.addEventListener("click", function (e) { var t = e.target; if (t && t.tagName === "IMG" && t.classList.contains("nofa-zoom")) { e.preventDefault(); e.stopPropagation(); window.nofaZoom(t.currentSrc || t.src, t.alt); } }, true);
 })();
 </script>
 </body>
