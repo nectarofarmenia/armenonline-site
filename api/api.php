@@ -233,6 +233,30 @@ switch ($a) {
     $no = (string) ($j['client_reference_id'] ?? ''); $paid = ($j['payment_status'] ?? '') === 'paid';
     if ($paid && $no !== '') { $L = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: []; if (empty($L[$no])) { $L[$no] = ['amt' => ((int) ($j['amount_total'] ?? 0)) / 100, 'pi' => (string) ($j['payment_intent'] ?? ''), 't' => now_ms()]; kv_put($db, '__paidweb', json_encode($L)); } }
     out(['ok' => true, 'paid' => $paid, 'no' => $no, 'amt' => ((int) ($j['amount_total'] ?? 0)) / 100]);
+  case 'pay_inv': // wholesale customer: pay an invoice balance by card; amount computed here from the stored invoice
+    $sk = stripe_sk($db); if ($sk === '') { out(['ok' => false, 'err' => 'off']); }
+    $b = body(); $me = cust_rec($db, $b['em'] ?? '', 'biz', $b['tok'] ?? ''); if (!$me) { $me = cust_rec($db, $b['em'] ?? '', 'retail', $b['tok'] ?? ''); } if (!$me) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $em = strtolower(trim((string) $b['em'])); $id = (string) ($b['id'] ?? ''); $rec = $me[1]; $w = substr($me[0], -4) === '|biz';
+    $nm = $w ? ($rec['biz'] ?? '') : trim(($rec['first'] ?? '') . ' ' . ($rec['last'] ?? '')); $ck = preg_replace('/[^a-z0-9\x{0531}-\x{0587}]+/u', '', mb_strtolower($nm)) . '|' . ($w ? 'w' : 'r');
+    $inv = json_decode((kv_get($db, 'noa-inv2') ?: ['v' => '{}'])['v'], true) ?: []; $v = null;
+    foreach (($inv['list'] ?? []) as $x) { if (is_array($x) && (string) ($x['id'] ?? '') === $id && !in_array($x['st'] ?? '', ['draft', 'void', 'paid'], true) && (($x['ck'] ?? '') === $ck || strtolower($x['c']['e'] ?? '') === $em)) { $v = $x; } }
+    if (!$v) { out(['ok' => false, 'err' => 'noinv']); }
+    $sub = 0; foreach (($v['lines'] ?? []) as $l) { $sub += (float) ($l['q'] ?? 0) * (float) ($l['pr'] ?? 0); } $base = max(0, $sub - (float) ($v['disc'] ?? 0)); $tot = $base + $base * (float) ($v['tax'] ?? 0) / 100 + (float) ($v['ship'] ?? 0);
+    $bal = round(max(0, $tot - (float) (($v['paid'] ?? [])['amt'] ?? 0)), 2); if ($bal < 0.5) { out(['ok' => false, 'err' => 'zero']); }
+    $no = (string) ($v['no'] ?? $id);
+    $host = ($https ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'armenonline.com'); $base0 = $host . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '/api/api.php')), '/');
+    $form = ['mode' => 'payment', 'client_reference_id' => 'INV:' . $id, 'metadata[invoice]' => $no, 'payment_intent_data[metadata][invoice]' => $no, 'line_items[0][price_data][currency]' => 'usd', 'line_items[0][price_data][product_data][name]' => 'Invoice #' . $no . ' — Nectar of Armenia Inc', 'line_items[0][price_data][unit_amount]' => (int) round($bal * 100), 'line_items[0][quantity]' => 1, 'submit_type' => 'pay', 'success_url' => $base0 . '/PartnerAccount.dc.html?invpaid={CHECKOUT_SESSION_ID}#invoices', 'cancel_url' => $base0 . '/PartnerAccount.dc.html#invoices'];
+    if (filter_var($em, FILTER_VALIDATE_EMAIL)) { $form['customer_email'] = $em; }
+    $r = stripe_api($sk, 'POST', 'checkout/sessions', $form, $code); $j = json_decode((string) $r, true) ?: [];
+    if ($code !== 200 || empty($j['url'])) { out(['ok' => false, 'err' => 'stripe']); }
+    kv_put($db, '__pay|INV:' . $id, json_encode(['sid' => $j['id'], 'amt' => $bal, 't' => now_ms()]));
+    out(['ok' => true, 'url' => $j['url'], 'amt' => $bal]);
+  case 'pay_sync': // admin: confirm with Stripe any card payments whose customer never came back to the site
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $sk = stripe_sk($db); $L = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: []; $n = 0;
+    if ($sk !== '') { $s = $db->prepare("SELECT k, v FROM nofa_kv WHERE k LIKE '__pay|%'"); $s->execute(); foreach ($s->fetchAll(PDO::FETCH_ASSOC) as $row) { $ref = substr($row['k'], 6); if (!empty($L[$ref])) { continue; } $pv = json_decode($row['v'], true) ?: []; if (empty($pv['sid']) || now_ms() - (int) ($pv['t'] ?? 0) > 86400000 * 3) { continue; }
+      $r = stripe_api($sk, 'GET', 'checkout/sessions/' . $pv['sid'], [], $code); $j = json_decode((string) $r, true) ?: []; if ($code === 200 && ($j['payment_status'] ?? '') === 'paid') { $L[$ref] = ['amt' => ((int) ($j['amount_total'] ?? 0)) / 100, 'pi' => (string) ($j['payment_intent'] ?? ''), 't' => now_ms()]; $n++; } if ($n > 30) { break; } } }
+    if ($n) { kv_put($db, '__paidweb', json_encode($L)); } out(['ok' => true, 'n' => $n, 'paid' => $L ?: new stdClass()]);
   case 'pay_list': // admin: orders confirmed paid by card
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     out(['ok' => true, 'paid' => json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: new stdClass()]);

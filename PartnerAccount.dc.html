@@ -409,6 +409,13 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
 .hdr-stick > div[aria-hidden="true"] svg{height:16px !important}
 .pgx button{width:38px !important;height:38px !important;font-size:18px !important}.hdr-stick .nf-bell,header .nf-bell{width:38px !important;height:38px !important;min-width:38px !important;font-size:18px !important;flex:none !important}
 }</style>
+<script id="nofa-inv-return">(function () { var q = new URLSearchParams(location.search); var sid = q.get("invpaid"); if (!sid) { return; }
+  var L = "hy"; try { L = JSON.parse(localStorage.getItem("noa-lang") || '"hy"') || "hy"; } catch (e) {}
+  function bar(msg, ok) { var b = document.createElement("div"); b.setAttribute("role", "status"); b.style.cssText = "position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:2147483000;max-width:min(560px,92vw);padding:16px 20px;border-radius:18px;font:700 15px/1.45 Manrope,'Noto Sans Armenian',system-ui,sans-serif;box-shadow:0 14px 34px rgba(0,0,0,.25);background:" + (ok ? "#E2F0E7;color:#1F5E3E;border:1.5px solid #8CC5A2" : "#FFF4DA;color:#7A5A12;border:1.5px solid #EBA93A"); b.textContent = msg; document.body.appendChild(b); setTimeout(function () { b.style.transition = "opacity .6s"; b.style.opacity = "0"; setTimeout(function () { b.remove(); }, 700); }, 9000); }
+  function go() { fetch("api/api.php?a=pay_check", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sid: sid }) }).then(function (r) { return r.json(); }).then(function (j) { try { history.replaceState(null, "", location.pathname + location.hash); } catch (e) {}
+      if (j && j.ok && j.paid) { bar(L === "en" ? "✓ Payment received — $" + Number(j.amt).toFixed(2) + ". Thank you! The invoice will show as paid shortly." : "✓ Վճարումը ստացված է՝ $" + Number(j.amt).toFixed(2) + "։ Շնորհակալություն։ Հաշիվը շուտով կնշվի որպես վճարված։", true); }
+      else { bar(L === "en" ? "Payment is not confirmed yet. If you were charged, call +1 (515) 588-5555." : "Վճարումը դեռ չի հաստատվել։ Եթե գումարը գանձվել է, զանգահարեք +1 (515) 588-5555։", false); } }).catch(function () {}); }
+  if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", go); } else { go(); } })();</script>
 </head>
 <body>
 <x-dc>
