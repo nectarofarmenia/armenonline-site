@@ -278,7 +278,7 @@ function render(){var t=T[LG];var app=document.getElementById("app");
   if(W){h+=fld("biz",t.biz,"text",true)+'<label>'+t.btype+'<select id="f_bizType">'+t.btypes.map(function(x){return '<option'+(F.bizType===x?' selected':'')+'>'+esc(x)+'</option>';}).join("")+'</select></label>'+fld("branches",t.branches,"number");}
   h+=fld("first",t.first)+fld("last",t.last)+fld("phone",t.phone,"tel")+fld("email",t.email,"email")+fld("addr",t.addr,"text",true)+fld("city",t.city)+fld("zip",t.zip);
   if(W){h+=fld("permit",t.permit,"text",true);}else{h+=fld("dob",t.dob,"date",true);}
-  h+='</div><label class="agree"><input type="checkbox" id="agree"> <span>'+(W?t.agree:t.agreeR)+'</span></label>'+(ERR?'<div class="err">'+ERR+'</div>':'')+'<button type="button" class="btn" id="go">'+t.go+'</button></div><p class="ft">'+t.ft+'</p></div>';
+  h+='</div><label class="agree"><input type="checkbox" id="agree"> <span>'+(W?t.agree:t.agreeR)+' <a href="Legal.html#'+(W?'wholesale':'privacy')+'" target="_blank" rel="noopener" style="color:#1D5545;font-weight:700">'+(LG==="hy"?"Կարդալ":(LG==="ru"?"Читать":(LG==="es"?"Leer":"Read")))+' ↗</a></span></label>'+(ERR?'<div class="err">'+ERR+'</div>':'')+'<button type="button" class="btn" id="go">'+t.go+'</button></div><p class="ft">'+t.ft+'</p></div>';
   app.innerHTML=h;}
 function grab(){Object.keys(F).forEach(function(k){var el=document.getElementById("f_"+k);if(el){F[k]=el.value;}});}
 document.addEventListener("click",function(e){var b=e.target.closest("[data-lg]");if(b){grab();LG=b.getAttribute("data-lg");render();return;}
