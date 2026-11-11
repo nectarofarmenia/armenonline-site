@@ -214,7 +214,7 @@ input:focus,select:focus{outline:2px solid #8CC5A2;border-color:#8CC5A2}input.ba
     return req("submit", { em: em, tok: tok, items: send }).then(function (r) { if (r.ok) { send.forEach(function (it) { sent[it.k] = h(it.v); }); LS("noa-sync-sent", JSON.stringify(sent)); } });
   }
   function custPull() {
-    var u = me(); var p1 = req("pub").then(function (j) { if (!j.ok) { return false; } var ch = false; Object.keys(j.kv || {}).forEach(function (k) { if (LG(k) !== j.kv[k]) { LS(k, j.kv[k]); ch = true; } }); return ch; }).catch(function () { return false; });
+    var u = me(); var p1 = req("pub").then(function (j) { if (!j.ok) { return false; } var ch = false; Object.keys(j.kv || {}).forEach(function (k) { var v = j.kv[k]; if (k === "noa-paycfg") { try { var pv = J("noa-paycfg-priv", null); if (pv) { v = JSON.stringify(Object.assign(JSON.parse(v) || {}, pv)); } } catch (e) {} } if (LG(k) !== v) { LS(k, v); ch = true; } }); return ch; }).catch(function () { return false; });
     if (!u) { return p1; }
     var em = String(u.email).toLowerCase(), tok = ensureTok(u);
     var p2 = req("my", { em: em, tok: tok }).then(function (j) { if (!j.ok || j.pending) { return false; } var ch = false, sent = J("noa-sync-sent", {});
@@ -225,6 +225,7 @@ input:focus,select:focus{outline:2px solid #8CC5A2;border-color:#8CC5A2}input.ba
         else { nv = lv != null && sent[k] !== h(lv) ? lv : sv; }
         if (nv !== lv) { LS(k, nv); ch = true; } });
       var inv = JSON.stringify({ list: j.inv || [] }); if (LG("noa-inv2") !== inv) { LS("noa-inv2", inv); ch = true; }
+      if (j.pay && typeof j.pay === "object") { LS("noa-paycfg-priv", JSON.stringify(j.pay)); var PC = J("noa-paycfg", {}), PN = JSON.stringify(Object.assign({}, PC, j.pay)); if (LG("noa-paycfg") !== PN) { LS("noa-paycfg", PN); ch = true; } }
       if (j.cprof && Object.keys(j.cprof).length) { var C = J("noa-cost-v2", {}); C.cprof = Object.assign({}, C.cprof || {}, j.cprof); LS("noa-cost-v2", JSON.stringify(C)); }
       return ch; }).catch(function () { return false; });
     return Promise.all([p1, p2]).then(function (r) { return r[0] || r[1]; });
