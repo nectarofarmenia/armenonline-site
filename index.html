@@ -523,6 +523,14 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 </section>
 
 
+<section id="cook-tips" style="background: #F7F3EA; padding-top: 8px; position: relative">
+<div id="apri-tips" class="ak-box">
+<div class="ak-head"><div class="ak-chef"><img src="img/c1999a6e0a1f0a5218be4d17335ab22d.webp" alt="Chef Apri"><img class="ak-h" src="img/f9280bbbf31cb7aba245e670f4e5ae57.webp" alt=""><img class="ak-l" src="img/2fc668d693fee0e6607551e82b831db8.webp" alt=""></div><div class="ak-intro"><span class="ak-kick">{{apT.kick}}</span><h3>{{apT.H}}</h3><p>{{apT.P}}</p></div></div>
+<div class="ak-chips" role="tablist"><sc-for list="{{apChips}}" as="c" hint-placeholder-count="9"><button type="button" role="tab" onClick="{{c.pick}}" class="ak-chip {{c.cls}}"><img class="ak-ci" src="{{c.img}}" alt="">{{c.name}}</button></sc-for></div>
+<div class="ak-card" key="{{apKey}}"><div class="ak-title"><span class="ak-big ak-pic"><img class="nofa-zoom" src="{{apCur.img}}" alt="{{apCur.name}}"></span><div><h4>{{apCur.name}}</h4><div class="ak-meta"><span>⏱ {{apCur.time}}</span><span>📦 {{apCur.pack}}</span><span>❄️ {{apCur.thaw}}</span></div><sc-if value="{{apCur.hasAlg}}" hint-placeholder-val="{{true}}"><div class="ak-alg">⚠️ {{apT.contains}}: {{apCur.alg}}</div></sc-if></div></div><div class="ak-grid"><div class="ak-step"><b>🔥 {{apT.cook}}</b><sc-for list="{{apCur.how}}" as="h" hint-placeholder-count="3"><div class="ak-li"><i>{{h.n}}</i><span>{{h.x}}</span></div></sc-for></div><div class="ak-step"><b>🍽 {{apT.serve}}</b><div class="ak-tags"><sc-for list="{{apCur.serve}}" as="v" hint-placeholder-count="3"><em class="ak-tag">{{v.x}}</em></sc-for></div><div class="ak-tip"><img src="img/a478e8b679045ec0e4be7aae32b0e96d.webp" alt=""><div><b>{{apT.tip}}</b><span>{{apCur.tip}}</span></div></div></div></div><div class="ak-foot"><button type="button" onClick="{{apPrev}}" class="ak-nav" aria-label="Previous">‹</button><span>{{apT.note}}</span><button type="button" onClick="{{apNext}}" class="ak-nav" aria-label="Next">›</button></div></div>
+</div>
+</section>
+
 <section id="culture" style="background: #F7F3EA">
 <div style="max-width: 1240px; margin: 0 auto; padding: 72px 24px; display: flex; flex-direction: column; gap: 18px">
 <span style="font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #7A5A12; font-weight: 800">{{t.navCulture}}</span>
@@ -646,11 +654,7 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 </button>
 </div>
 </div>
-<div id="apri-tips" class="ak-box">
-<div class="ak-head"><div class="ak-chef"><img src="img/c1999a6e0a1f0a5218be4d17335ab22d.webp" alt="Chef Apri"><img class="ak-h" src="img/f9280bbbf31cb7aba245e670f4e5ae57.webp" alt=""><img class="ak-l" src="img/2fc668d693fee0e6607551e82b831db8.webp" alt=""></div><div class="ak-intro"><span class="ak-kick">{{apT.kick}}</span><h3>{{apT.H}}</h3><p>{{apT.P}}</p></div></div>
-<div class="ak-chips" role="tablist"><sc-for list="{{apChips}}" as="c" hint-placeholder-count="9"><button type="button" role="tab" onClick="{{c.pick}}" class="ak-chip {{c.cls}}"><img class="ak-ci" src="{{c.img}}" alt="">{{c.name}}</button></sc-for></div>
-<div class="ak-card" key="{{apKey}}"><div class="ak-title"><span class="ak-big ak-pic"><img class="nofa-zoom" src="{{apCur.img}}" alt="{{apCur.name}}"></span><div><h4>{{apCur.name}}</h4><div class="ak-meta"><span>⏱ {{apCur.time}}</span><span>📦 {{apCur.pack}}</span><span>❄️ {{apCur.thaw}}</span></div><sc-if value="{{apCur.hasAlg}}" hint-placeholder-val="{{true}}"><div class="ak-alg">⚠️ {{apT.contains}}: {{apCur.alg}}</div></sc-if></div></div><div class="ak-grid"><div class="ak-step"><b>🔥 {{apT.cook}}</b><sc-for list="{{apCur.how}}" as="h" hint-placeholder-count="3"><div class="ak-li"><i>{{h.n}}</i><span>{{h.x}}</span></div></sc-for></div><div class="ak-step"><b>🍽 {{apT.serve}}</b><div class="ak-tags"><sc-for list="{{apCur.serve}}" as="v" hint-placeholder-count="3"><em class="ak-tag">{{v.x}}</em></sc-for></div><div class="ak-tip"><img src="img/a478e8b679045ec0e4be7aae32b0e96d.webp" alt=""><div><b>{{apT.tip}}</b><span>{{apCur.tip}}</span></div></div></div></div><div class="ak-foot"><button type="button" onClick="{{apPrev}}" class="ak-nav" aria-label="Previous">‹</button><span>{{apT.note}}</span><button type="button" onClick="{{apNext}}" class="ak-nav" aria-label="Next">›</button></div></div>
-</div>
+
 </div>
 </section>
 <div aria-hidden="true" style="background: #F7F3EA; line-height: 0"><svg viewBox="0 0 1440 90" preserveAspectRatio="none" style="display: block; width: 100%; height: 60px"><path d="M0,50 C320,90 640,10 960,40 C1160,58 1320,58 1440,44 L1440,90 L0,90 Z" fill="#F9D06F"></path></svg></div>
