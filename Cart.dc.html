@@ -1,6 +1,27 @@
 <!doctype html>
 <html lang="hy">
-<head>
+<head><script id="nofa-webp-fb">(function () {
+  /* Older Safari (before macOS Big Sur) cannot show WebP images: swap them for JPG/PNG copies. */
+  var M = {"0f5ce6e80b23a0e775ad415e85b7ef0d":"j","135d0cd80fa69f4a118392eea9b8bcd6":"j","1c1170ea552448c772716318143a3c45":"p","2571b64d12e186d54c2591031e538957":"j","2e13e2a29372cd73025958546269e785":"j","2fc668d693fee0e6607551e82b831db8":"p","32c5e8684bfdef6cb6aa876203be146e":"j","4c3be5aa8f8c066b21e7db3bf8e1cbaf":"j","60cf8a3c2218a3e5d79caed873a2883d":"j","645bf576eb7a0134b08d93cb48d381e7":"j","65940d08dd8a527a15d113ecd1854f3a":"j","694aba8a1723dd6f05e5c9dc4a4b80fc":"j","6a86ac441cd9dd29b3e3ba1a16934988":"j","85bd1a1af6a266bd807c5b882cd849b4":"j","88e8751182c785d43c5bd18576ebe169":"j","8a47925b65b04cee7ac978e787689593":"j","94525798ce3df192c2fd40bf0abec73b":"j","9a580a459d40f07e1e5447273060935e":"j","9d91996f4ebb65c55fc461bb8efdcd00":"p","9eb33fd2c3ff435a1314ecd2f69f9245":"j","a478e8b679045ec0e4be7aae32b0e96d":"p","a6aaa8aa5db20ba68bc42c3406095e44":"j","c1999a6e0a1f0a5218be4d17335ab22d":"p","cf4f14e5b2e161eced326c4ebe8644fd":"p","d6103de8acf18a5ec32795735ec79205":"j","d78e37aae45585ef207c38b383cf4849":"j","f550783da0db12a4738aed9c8d1ecf2d":"j","f9280bbbf31cb7aba245e670f4e5ae57":"p","apri":"p","logo_w":"p"};
+  function fb(u) { return String(u).replace(/((?:img|vendor\/inv)\/([A-Za-z0-9_-]+))\.webp/g, function (m, b, k) { return b + "." + (M[k] === "p" ? "png" : "jpg"); }); }
+  function fixEl(el) {
+    if (!el || el.nodeType !== 1) { return; }
+    if (el.tagName === "IMG" || el.tagName === "SOURCE") { ["src", "srcset"].forEach(function (a) { var v = el.getAttribute(a); if (v && v.indexOf(".webp") >= 0) { el.setAttribute(a, fb(v)); } }); }
+    if (el.tagName === "STYLE" && el.textContent.indexOf(".webp") >= 0) { el.textContent = fb(el.textContent); }
+    var s = el.getAttribute("style"); if (s && s.indexOf(".webp") >= 0) { el.setAttribute("style", fb(s)); }
+  }
+  function sweep(root) { fixEl(root); if (root.querySelectorAll) { Array.prototype.forEach.call(root.querySelectorAll("img,source,style,[style*='.webp']"), fixEl); } }
+  function run() {
+    document.documentElement.className += " no-webp";
+    sweep(document.documentElement);
+    new MutationObserver(function (ms) { ms.forEach(function (m) { if (m.type === "attributes") { fixEl(m.target); } else { if (m.target && m.target.tagName === "STYLE") { fixEl(m.target); } Array.prototype.forEach.call(m.addedNodes, function (n) { if (n.nodeType === 1) { sweep(n); } }); } }); })
+      .observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ["src", "srcset", "style"] });
+    document.addEventListener("DOMContentLoaded", function () { sweep(document.documentElement); });
+  }
+  if (/[?&]nowebp=1/.test(location.search)) { run(); return; }
+  var t = new Image(); t.onload = function () { if (!(t.width > 0)) { run(); } }; t.onerror = run;
+  t.src = "data:image/webp;base64,UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA";
+})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
