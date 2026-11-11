@@ -367,7 +367,7 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 </a>
 <nav aria-label="Main" class="nav-desk" style="flex: 1 1 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 16px; font-size: 19px; font-weight: 700; white-space: nowrap">
 <a href="#shop" style="text-decoration: none; color: #F7F3EA">{{t.navShop}}</a>
-<a href="#made" style="text-decoration: none; color: #F7F3EA">{{t.navMade}}</a>
+
 <a href="#apri-tips" style="text-decoration: none; color: #F7F3EA">{{t.navCook}}</a>
 <a href="#story" style="text-decoration: none; color: #F7F3EA">{{t.navStory}}</a>
 <a href="#culture" style="text-decoration: none; color: #F7F3EA">{{t.navCulture}}</a>
@@ -420,7 +420,7 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 <sc-if value="{{menuOpen}}" hint-placeholder-val="{{false}}">
 <div class="mob-only mob-panel" style="flex-direction: column; padding: 4px 22px 22px; border-top: 1px solid rgba(255,255,255,.12)">
 <a href="#shop" class="mob-link" onClick="{{closeMenu}}">{{t.navShop}}</a>
-<a href="#made" class="mob-link" onClick="{{closeMenu}}">{{t.navMade}}</a>
+
 <a href="#apri-tips" class="mob-link" onClick="{{closeMenu}}">{{t.navCook}}</a>
 <a href="Wholesale.dc.html" class="mob-link" style="color: #F6C35A">{{t.navWholesale}}</a>
 <a href="#culture" class="mob-link" onClick="{{closeMenu}}">{{t.navCulture}}</a>
@@ -455,7 +455,7 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 <p style="margin: 0; font-size: 19px; line-height: 1.6; color: #D9E6DF; max-width: 540px">{{t.heroP}}</p>
 <div style="display: flex; flex-wrap: wrap; gap: 14px; margin-top: 4px">
 <a href="#shop" id="hero-buy" class="btn-gold" style="display: inline-flex; align-items: center; min-height: 54px; padding: 0 30px; border-radius: 999px; background: #EBA93A; color: #133B30; font-weight: 800; font-size: 16px; text-decoration: none">{{t.heroCta1}} ↓</a>
-<a href="#made" class="btn-ghost" style="display: inline-flex; align-items: center; min-height: 54px; padding: 0 30px; border-radius: 999px; border: 1.5px solid #EBA93A; color: #F6E3B4; font-weight: 700; font-size: 16px; text-decoration: none">{{t.heroCta2}}</a>
+
 </div>
 </div>
 <div style="flex: 1 1 320px; min-width: 0; display: flex; justify-content: center">
@@ -521,34 +521,7 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 </div>
 </div>
 </section>
-<div aria-hidden="true" style="background: #F7F3EA; line-height: 0"><svg viewBox="0 0 1440 90" preserveAspectRatio="none" style="display: block; width: 100%; height: 70px"><path d="M0,30 C300,74 600,74 900,42 C1140,16 1320,20 1440,36 L1440,90 L0,90 Z" fill="#EFE8D8"></path></svg></div>
 
-<section id="made" style="background: #EFE8D8">
-<div style="max-width: 1240px; margin: 0 auto; padding: 72px 24px; display: flex; flex-direction: column; gap: 32px">
-<div style="display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center">
-<span style="font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #7A5A12; font-weight: 800">{{t.madeKick}}</span>
-<h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 44px; color: #1D5545">{{t.madeH2}}</h2>
-<div role="tablist" aria-label="{{t.madeH2}}" class="st-names mk-names" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 4px; padding: 10px 0 4px; margin-top: 6px">
-<sc-for list="{{madeNames}}" as="mn" hint-placeholder-count="9">
-<button type="button" role="tab" aria-selected="{{mn.aria}}" onClick="{{mn.pick}}" class="st-name mk-name {{mn.cls}}">{{mn.name}}</button>
-</sc-for>
-</div>
-</div>
-<div class="mk-stage" style="display: flex; align-items: center; gap: 16px">
-<button type="button" onClick="{{madePrev}}" aria-label="Previous" class="mk-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
-<div class="mk-grid" style="flex: 1 1 auto; min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px">
-<sc-for list="{{steps}}" as="s" hint-placeholder-count="4">
-<div class="card3d" style="background: #FFFFFF; border: 1px solid #E4DCC8; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
-<div class="photo3d" style="aspect-ratio: 4 / 3; background: #F6E9C8; border-radius: 14px; display: flex; align-items: center; justify-content: center; text-align: center; color: #6B5A2E; font-size: 13px; padding: 12px">[{{t.photo}}: {{s.label}}]</div>
-<div style="display: flex; align-items: center; gap: 10px"><span class="btn-gold" style="width: 30px; height: 30px; border-radius: 50%; background: #EBA93A; color: #133B30; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex: 0 0 auto">{{s.n}}</span><span style="font-weight: 700; font-size: 16px">{{s.label}}</span></div>
-</div>
-</sc-for>
-</div>
-<button type="button" onClick="{{madeNext}}" aria-label="Next" class="mk-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
-</div>
-</div>
-</section>
-<div aria-hidden="true" style="background: #EFE8D8; line-height: 0"><svg viewBox="0 0 1440 90" preserveAspectRatio="none" style="display: block; width: 100%; height: 70px"><path d="M0,60 C360,8 720,8 1080,50 C1260,72 1380,64 1440,52 L1440,90 L0,90 Z" fill="#F7F3EA"></path></svg></div>
 
 <section id="culture" style="background: #F7F3EA">
 <div style="max-width: 1240px; margin: 0 auto; padding: 72px 24px; display: flex; flex-direction: column; gap: 18px">
