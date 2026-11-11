@@ -1305,5 +1305,8 @@ return Object.assign(poVals, apVals, { isBizSess: !!(accU && accU.type === "biz"
   new MutationObserver(scan).observe(document.documentElement, { childList: true, subtree: true }); scan();
 })();
 </script>
+<script id="nofa-mob-open">(function () { var st = document.createElement("style"); st.textContent = "html.mob-open #pgx,html.mob-open .nt-mu,html.mob-open .fab-buy,html.mob-open .ap-dock{display:none!important}"; document.head.appendChild(st);
+  function chk() { var on = !!document.querySelector(".mob-link"); document.documentElement.classList.toggle("mob-open", on); }
+  new MutationObserver(chk).observe(document.documentElement, { childList: true, subtree: true }); chk(); })();</script>
 </body>
 </html>

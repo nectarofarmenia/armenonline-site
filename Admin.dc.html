@@ -1164,7 +1164,7 @@ var brk = function (b) { var r = { mat: 0, lab: 0, pk: 0 }; var add = function (
 var orders = RAW.map(function (b, i) {
 var o = ov[b.no] || {}; var c = CUST[b.ci]; var isW = c[1] === "W"; var bd = new Date(b.d); bd.setHours(0, 0, 0, 0);
 var dl = DLV[b.no] || null; var dlOk = !!(dl && dl.s === "delivered");
-return { i: i, no: b.no, ci: b.ci, cust: c[0], city: c[2] || "—", isW: isW, items: b.items, total: b.total, pack: b.pack || "", dl: dl, pay: dlOk && b.total > 0 && (dl.cash + dl.zelle) >= b.total - 0.01 ? "paid" : (o.pay || b.pay), st: dlOk ? 4 : (typeof o.st === "number" ? o.st : b.st), drv: typeof o.drv === "number" ? o.drv : (typeof b.drv === "number" ? b.drv : -1), dayOff: Math.round((bd - day0) / 864e5), inv: !!o.inv, bk: brk(b), src: b.src || "site", cl: b.cl || null, rawItems: b.items, addr: b.addr || "", slot: b.slot || "" };
+return { i: i, no: b.no, ci: b.ci, cust: c[0], city: c[2] || (b.addr && String(b.addr).split(",").length > 1 ? String(b.addr).split(",")[1].trim() : "") || "—", isW: isW, items: b.items, total: b.total, pack: b.pack || "", dl: dl, pay: dlOk && b.total > 0 && (dl.cash + dl.zelle) >= b.total - 0.01 ? "paid" : (o.pay || b.pay), st: dlOk ? 4 : (typeof o.st === "number" ? o.st : b.st), drv: typeof o.drv === "number" ? o.drv : (typeof b.drv === "number" ? b.drv : -1), dayOff: Math.round((bd - day0) / 864e5), inv: !!o.inv, bk: brk(b), src: b.src || "site", cl: b.cl || null, rawItems: b.items, addr: b.addr || "", slot: b.slot || "" };
 });
 var setO = function (i, patch) { var key = (orders[i] || {}).no; var n = Object.assign({}, ov); n[key] = Object.assign({}, n[key] || {}, patch); try { window.localStorage.setItem("noa-admin-ov", JSON.stringify(n)); } catch (e) {} self.setState({ ov: n }); };
 var now = new Date();
