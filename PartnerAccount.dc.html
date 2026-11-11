@@ -807,6 +807,8 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </sc-if>
 <sc-if value="{{tabQO}}" hint-placeholder-val="{{false}}">
 <sc-if value="{{notDone}}" hint-placeholder-val="{{true}}">
+<div class="two-col" style="display: flex; gap: 22px; align-items: flex-start">
+<div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 22px">
 <div class="card3d" style="border-radius: 26px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px"><h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 30px; color: #1D5545">{{t.qoH}}</h1><span style="font-size: 12px; font-weight: 800; color: #7A5A12; background: #F3EBD7; padding: 4px 10px; border-radius: 999px">{{t.demo}}</span></div>
 <p style="margin: 0; color: #5E6A63">{{t.qoP}}</p>
@@ -823,7 +825,6 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </sc-for>
 </div>
 </div>
-<div class="two-col" style="display: flex; gap: 22px; align-items: flex-start">
 <div class="card3d" style="flex: 1 1 auto; min-width: 0; border-radius: 26px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
 <label class="lbl">{{t.qLocH}}<select class="fld" onChange="{{setQLoc}}"><sc-for list="{{qLocOpts}}" as="lo" hint-placeholder-count="3"><option value="{{lo.v}}" selected="{{lo.sel}}">{{lo.label}}</option></sc-for></select></label>
 <sc-if value="{{qLocHas}}" hint-placeholder-val="{{true}}"><span style="font-size: 13px; color: #5E6A63; margin-top: -4px">{{qLocAddr}}</span></sc-if>
@@ -836,7 +837,8 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </sc-for>
 </div>
 </div>
-<aside class="card3d" style="flex: 0 0 300px; max-width: 100%; box-sizing: border-box; border-radius: 26px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+</div>
+<aside class="card3d" style="flex: 0 0 300px; max-width: 100%; box-sizing: border-box; border-radius: 26px; padding: 24px; display: flex; flex-direction: column; position: sticky; top: 170px; align-self: flex-start; gap: 14px">
 <h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 22px; color: #1D5545">{{t.sum}}</h2>
 <div style="display: flex; justify-content: space-between"><span>{{t.items}}</span><strong>{{units}}</strong></div>
 <div style="display: flex; justify-content: space-between; gap: 10px"><span>📍</span><strong style="text-align: right">{{qLocName}}</strong></div>
