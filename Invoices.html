@@ -626,4 +626,45 @@ if(/emb/.test(document.documentElement.className)){document.documentElement.styl
   new MutationObserver(scan).observe(document.documentElement, { childList: true, subtree: true }); scan();
 })();
 </script>
+<script id="nofa-cust-dd">
+(function () { if (window.__nofaCDD) { return; } window.__nofaCDD = 1;
+  /* Arrow next to the invoice search fields: opens the customer list; picking a customer fills the search. */
+  var css = document.createElement("style");
+  css.textContent = ".cdd{position:relative;display:inline-flex;align-items:stretch;flex:1 1 380px;max-width:380px}.cdd input{max-width:none!important;width:100%;padding-right:48px!important}.cdd-b{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:10px;border:0;background:#F3EBD7;color:#1D5545;cursor:pointer;display:flex;align-items:center;justify-content:center}.cdd-b svg{transition:transform .2s}.cdd.open .cdd-b svg{transform:rotate(180deg)}.cdd-l{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:50;background:#fff;border:1px solid #E4DCC8;border-radius:14px;box-shadow:0 14px 34px rgba(19,59,48,.18);max-height:320px;overflow:auto;padding:6px;display:none}.cdd.open .cdd-l{display:block}.cdd-i{display:flex;gap:8px;align-items:center;width:100%;text-align:left;border:0;background:none;padding:10px 12px;border-radius:10px;font:inherit;font-size:14.5px;color:#133B30;cursor:pointer}.cdd-i:hover,.cdd-i.on{background:#FBF5E6}.cdd-i small{margin-left:auto;color:#8A8F86;font-size:12px}.cdd-e{padding:10px 12px;color:#8A8F86;font-size:14px}";
+  document.head.appendChild(css);
+  var openId = "";
+  function list(id) {
+    var C = []; try { C = customers(); } catch (e) { C = []; }
+    var cnt = {}; try { (DB.list || []).forEach(function (v) { if (v.st !== "void") { cnt[v.ck] = (cnt[v.ck] || 0) + 1; } }); } catch (e) {}
+    var cur = id === "q" ? V.q : V.cq;
+    return C.filter(function (c) { return c && c.n; }).sort(function (a, b) { return a.n.localeCompare(b.n); }).map(function (c) {
+      return { n: c.n, t: c.t, k: c.k, c: cnt[c.k] || 0, on: cur && String(cur).toLowerCase() === String(c.n).toLowerCase() };
+    });
+  }
+  function esc(x) { return String(x).replace(/[&<>"]/g, function (z) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[z]; }); }
+  function fill(w, id) {
+    var L = list(id), h = '<button type="button" class="cdd-i" data-cdd-pick=""><b>Բոլոր հաճախորդները</b></button>';
+    h += L.length ? L.map(function (c) { return '<button type="button" class="cdd-i' + (c.on ? " on" : "") + '" data-cdd-pick="' + esc(c.n) + '">' + (c.t === "w" ? "🏪" : "👤") + " " + esc(c.n) + (c.c ? "<small>" + c.c + " հաշիվ</small>" : "") + "</button>"; }).join("") : '<div class="cdd-e">Հաճախորդներ չկան</div>';
+    w.querySelector(".cdd-l").innerHTML = h;
+  }
+  function wrap() {
+    ["q", "cq"].forEach(function (id) {
+      var inp = document.getElementById(id); if (!inp || inp.parentElement.classList.contains("cdd")) { return; }
+      var w = document.createElement("div"); w.className = "cdd" + (openId === id ? " open" : ""); w.setAttribute("data-cdd", id);
+      inp.parentElement.insertBefore(w, inp); w.appendChild(inp);
+      var b = document.createElement("button"); b.type = "button"; b.className = "cdd-b"; b.setAttribute("aria-label", "Հաճախորդների ցանկ"); b.setAttribute("data-cdd-tog", id);
+      b.innerHTML = '<svg width="16" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1.5l8 7 8-7"/></svg>';
+      w.appendChild(b); var l = document.createElement("div"); l.className = "cdd-l"; w.appendChild(l); if (openId === id) { fill(w, id); }
+    });
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest && e.target.closest("[data-cdd-tog],[data-cdd-pick]");
+    if (t && t.hasAttribute("data-cdd-tog")) { var id = t.getAttribute("data-cdd-tog"), w = t.closest(".cdd"); if (w.classList.contains("open")) { w.classList.remove("open"); openId = ""; } else { fill(w, id); w.classList.add("open"); openId = id; } return; }
+    if (t) { var w2 = t.closest(".cdd"), id2 = w2.getAttribute("data-cdd"), v = t.getAttribute("data-cdd-pick"); openId = ""; if (id2 === "q") { V.q = v; } else { V.cq = v; } render(); return; }
+    if (!(e.target.closest && e.target.closest(".cdd"))) { document.querySelectorAll(".cdd.open").forEach(function (x) { x.classList.remove("open"); }); openId = ""; }
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && openId) { document.querySelectorAll(".cdd.open").forEach(function (x) { x.classList.remove("open"); }); openId = ""; } });
+  new MutationObserver(wrap).observe(document.body, { childList: true, subtree: true }); wrap();
+})();
+</script>
 </body></html>
