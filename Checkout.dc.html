@@ -339,7 +339,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 .paybtn{min-height:52px;border-radius:14px;border:none;font-family:inherit;font-weight:800;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
 .social{min-height:52px;border-radius:999px;border:1.5px solid #D8CDB4;background:#FFFFFF;font-family:inherit;font-weight:800;font-size:15px;color:#1E2A24;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;width:100%}
 .social:hover{border-color:#EBA93A}
-@media (max-width:760px){.two-col{flex-direction:column !important}.sum-card{position:static !important}.hdr-back{display:none !important}}
+@media (max-width:760px){.two-col{flex-direction:column !important;align-items:stretch !important}.two-col > form{width:100%}.sum-card{position:static !important}.hdr-back{display:none !important}}
 .ma-tl li{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;text-align:center}
 .ma-tl li + li::before{content:"";position:absolute;top:15px;right:50%;width:100%;height:3px;background:rgba(255,255,255,.18);z-index:0}
 .ma-tl li.done + li::before,.ma-tl li.now::before{background:#EBA93A}

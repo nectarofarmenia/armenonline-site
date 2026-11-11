@@ -42,6 +42,7 @@ header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,#22604
 nav.toc{max-width:1100px;margin:0 auto;padding:8px max(16px,env(safe-area-inset-left)) 12px;display:flex;gap:8px;overflow-x:auto}
 nav.toc a{flex:0 0 auto;color:#F7F3EA;text-decoration:none;font-weight:700;font-size:13.5px;padding:7px 12px;border:1px solid rgba(246,227,180,.35);border-radius:999px;white-space:nowrap}
 nav.toc a:hover,nav.toc a:focus-visible{background:rgba(246,227,180,.15)}
+@media (max-width:700px){header{position:static}nav.toc{flex-wrap:wrap;justify-content:flex-start}section,[id]{scroll-margin-top:12px}}
 main{max-width:860px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-left)) 60px}
 h1{font-family:Fraunces,'Noto Serif Armenian',serif;font-weight:600;color:var(--green);font-size:36px;line-height:1.15;margin:8px 0 6px}
 .upd{color:var(--mut);font-size:14px;margin:0 0 18px}
