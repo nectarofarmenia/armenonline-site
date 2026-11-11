@@ -232,7 +232,7 @@ switch ($a) {
     if ($code !== 200) { out(['ok' => false, 'err' => 'stripe']); }
     $no = (string) ($j['client_reference_id'] ?? ''); $paid = ($j['payment_status'] ?? '') === 'paid';
     if ($paid && $no !== '') { $L = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: []; if (empty($L[$no])) { $pr0 = json_decode((kv_get($db, '__pay|' . $no) ?: ['v' => '{}'])['v'], true) ?: []; $L[$no] = ['amt' => ((int) ($j['amount_total'] ?? 0)) / 100, 'base' => isset($pr0['amt']) ? (float) $pr0['amt'] : null, 'fee' => (float) ($pr0['fee'] ?? 0), 'pi' => (string) ($j['payment_intent'] ?? ''), 't' => now_ms()]; kv_put($db, '__paidweb', json_encode($L)); } }
-    out(['ok' => true, 'paid' => $paid, 'no' => $no, 'amt' => ((int) ($j['amount_total'] ?? 0)) / 100]);
+    out(['ok' => true, 'paid' => $paid, 'processing' => !$paid && ($j['status'] ?? '') === 'complete', 'no' => $no, 'amt' => ((int) ($j['amount_total'] ?? 0)) / 100]);
   case 'pay_inv': // wholesale customer: pay an invoice balance by card; amount computed here from the stored invoice
     $sk = stripe_sk($db); if ($sk === '') { out(['ok' => false, 'err' => 'off']); }
     $b = body(); $me = cust_rec($db, $b['em'] ?? '', 'biz', $b['tok'] ?? ''); if (!$me) { $me = cust_rec($db, $b['em'] ?? '', 'retail', $b['tok'] ?? ''); } if (!$me) { out(['ok' => false, 'err' => 'auth'], 401); }
@@ -243,18 +243,19 @@ switch ($a) {
     if (!$v) { out(['ok' => false, 'err' => 'noinv']); }
     $sub = 0; foreach (($v['lines'] ?? []) as $l) { $sub += (float) ($l['q'] ?? 0) * (float) ($l['pr'] ?? 0); } $base = max(0, $sub - (float) ($v['disc'] ?? 0)); $tot = $base + $base * (float) ($v['tax'] ?? 0) / 100 + (float) ($v['ship'] ?? 0);
     $bal = round(max(0, $tot - (float) (($v['paid'] ?? [])['amt'] ?? 0)), 2); if ($bal < 0.5) { out(['ok' => false, 'err' => 'zero']); }
-    $no = (string) ($v['no'] ?? $id); $fee = round($bal * 0.03, 2);
+    $no = (string) ($v['no'] ?? $id); $ach = ($b['m'] ?? '') === 'ach'; $fee = $ach ? 0 : round($bal * 0.03, 2);
     $host = ($https ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'armenonline.com'); $base0 = $host . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '/api/api.php')), '/');
-    $form = ['mode' => 'payment', 'client_reference_id' => 'INV:' . $id, 'metadata[invoice]' => $no, 'payment_intent_data[metadata][invoice]' => $no, 'line_items[0][price_data][currency]' => 'usd', 'line_items[0][price_data][product_data][name]' => 'Invoice #' . $no . ' — Nectar of Armenia Inc', 'line_items[0][price_data][unit_amount]' => (int) round($bal * 100), 'line_items[0][quantity]' => 1, 'line_items[1][price_data][currency]' => 'usd', 'line_items[1][price_data][product_data][name]' => 'Card processing fee (3%)', 'line_items[1][price_data][unit_amount]' => (int) round($fee * 100), 'line_items[1][quantity]' => 1, 'submit_type' => 'pay', 'success_url' => $base0 . '/PartnerAccount.dc.html?invpaid={CHECKOUT_SESSION_ID}#invoices', 'cancel_url' => $base0 . '/PartnerAccount.dc.html#invoices'];
+    $form = ['mode' => 'payment', 'client_reference_id' => 'INV:' . $id, 'metadata[invoice]' => $no, 'payment_intent_data[metadata][invoice]' => $no, 'line_items[0][price_data][currency]' => 'usd', 'line_items[0][price_data][product_data][name]' => 'Invoice #' . $no . ' — Nectar of Armenia Inc', 'line_items[0][price_data][unit_amount]' => (int) round($bal * 100), 'line_items[0][quantity]' => 1, 'payment_method_types[0]' => $ach ? 'us_bank_account' : 'card', 'submit_type' => 'pay', 'success_url' => $base0 . '/PartnerAccount.dc.html?invpaid={CHECKOUT_SESSION_ID}#invoices', 'cancel_url' => $base0 . '/PartnerAccount.dc.html#invoices'];
+    if ($fee > 0) { $form['line_items[1][price_data][currency]'] = 'usd'; $form['line_items[1][price_data][product_data][name]'] = 'Card processing fee (3%)'; $form['line_items[1][price_data][unit_amount]'] = (int) round($fee * 100); $form['line_items[1][quantity]'] = 1; }
     if (filter_var($em, FILTER_VALIDATE_EMAIL)) { $form['customer_email'] = $em; }
     $r = stripe_api($sk, 'POST', 'checkout/sessions', $form, $code); $j = json_decode((string) $r, true) ?: [];
-    if ($code !== 200 || empty($j['url'])) { out(['ok' => false, 'err' => 'stripe']); }
+    if ($code !== 200 || empty($j['url'])) { out(['ok' => false, 'err' => 'stripe', 'msg' => $j['error']['message'] ?? '']); }
     kv_put($db, '__pay|INV:' . $id, json_encode(['sid' => $j['id'], 'amt' => $bal, 'fee' => $fee, 't' => now_ms()]));
     out(['ok' => true, 'url' => $j['url'], 'amt' => $bal, 'fee' => $fee]);
   case 'pay_sync': // admin: confirm with Stripe any card payments whose customer never came back to the site
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $sk = stripe_sk($db); $L = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: []; $n = 0;
-    if ($sk !== '') { $s = $db->prepare("SELECT k, v FROM nofa_kv WHERE k LIKE '__pay|%'"); $s->execute(); foreach ($s->fetchAll(PDO::FETCH_ASSOC) as $row) { $ref = substr($row['k'], 6); if (!empty($L[$ref])) { continue; } $pv = json_decode($row['v'], true) ?: []; if (empty($pv['sid']) || now_ms() - (int) ($pv['t'] ?? 0) > 86400000 * 3) { continue; }
+    if ($sk !== '') { $s = $db->prepare("SELECT k, v FROM nofa_kv WHERE k LIKE '__pay|%'"); $s->execute(); foreach ($s->fetchAll(PDO::FETCH_ASSOC) as $row) { $ref = substr($row['k'], 6); if (!empty($L[$ref])) { continue; } $pv = json_decode($row['v'], true) ?: []; if (empty($pv['sid']) || now_ms() - (int) ($pv['t'] ?? 0) > 86400000 * 10) { continue; }
       $r = stripe_api($sk, 'GET', 'checkout/sessions/' . $pv['sid'], [], $code); $j = json_decode((string) $r, true) ?: []; if ($code === 200 && ($j['payment_status'] ?? '') === 'paid') { $L[$ref] = ['amt' => ((int) ($j['amount_total'] ?? 0)) / 100, 'base' => isset($pv['amt']) ? (float) $pv['amt'] : null, 'fee' => (float) ($pv['fee'] ?? 0), 'pi' => (string) ($j['payment_intent'] ?? ''), 't' => now_ms()]; $n++; } if ($n > 30) { break; } } }
     if ($n) { kv_put($db, '__paidweb', json_encode($L)); } out(['ok' => true, 'n' => $n, 'paid' => $L ?: new stdClass()]);
   case 'pay_list': // admin: orders confirmed paid by card
