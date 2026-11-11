@@ -1,6 +1,16 @@
 <!doctype html>
 <html lang="hy">
 <head>
+<script id="nofa-geo">window.nofaGeo = function (q, lim) {
+  var m = /^\s*(\d+[A-Za-z]?)\s+/.exec(q || ""), num = m ? m[1] : "";
+  var D = { n: "North", s: "South", e: "East", w: "West", ne: "Northeast", nw: "Northwest", se: "Southeast", sw: "Southwest" };
+  var A = { st: "Street", ave: "Avenue", av: "Avenue", blvd: "Boulevard", dr: "Drive", rd: "Road", ln: "Lane", ct: "Court", pl: "Place", hwy: "Highway", pkwy: "Parkway", cir: "Circle", ter: "Terrace", wy: "Way" };
+  var qq = String(q || "").trim().split(/\s+/).map(function (w, i) { var k = w.toLowerCase().replace(/[.,]$/, ""); if (D[k] && i <= 2) { return D[k]; } if (A[k] && i > 0) { return A[k]; } return w; }).join(" ");
+  function go(bb) { return fetch("https://photon.komoot.io/api/?limit=" + (lim || 7) + "&lang=en&lat=34.15&lon=-118.25&zoom=11&location_bias_scale=0.1&bbox=" + bb + "&q=" + encodeURIComponent(qq)).then(function (r) { return r.json(); }); }
+  return go("-120.7,32.5,-114.1,35.8").then(function (j) { return (j && j.features && j.features.length) ? j : go("-125,24,-66,50"); }).then(function (j) {
+    (j.features || []).forEach(function (f) { var p = f.properties || {}; if (num && !p.housenumber && (p.osm_key === "highway" || p.type === "street")) { p.street = p.street || p.name; p.housenumber = num; } }); return j; });
+};</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
@@ -1098,7 +1108,7 @@ render();
     else { setVal(el, it.full); }
     hide(); el.focus(); }
   function search(el, q) { var my = ++seq; render(true);
-    fetch("https://photon.komoot.io/api/?limit=7&lang=en&lat=34.15&lon=-118.25&bbox=-125,24,-66,50&q=" + encodeURIComponent(q)).then(function (r) { return r.json(); }).then(function (j) { if (my !== seq || cur !== el) { return; } var seen = {}; items = (j.features || []).map(function (f) { return f.properties || {}; }).filter(function (p) { return !p.countrycode || p.countrycode === "US"; }).map(fmt).filter(function (it) { if (!it.line1 || seen[it.full]) { return false; } seen[it.full] = 1; return true; }).slice(0, 6); sel = -1; render(false); }).catch(function () { if (my === seq) { hide(); } }); }
+    window.nofaGeo(q, 7).then(function (j) { if (my !== seq || cur !== el) { return; } var seen = {}; items = (j.features || []).map(function (f) { return f.properties || {}; }).filter(function (p) { return !p.countrycode || p.countrycode === "US"; }).map(fmt).filter(function (it) { if (!it.line1 || seen[it.full]) { return false; } seen[it.full] = 1; return true; }).slice(0, 6); sel = -1; render(false); }).catch(function () { if (my === seq) { hide(); } }); }
   document.addEventListener("input", function (e) { var el = e.target; if (!isAddr(el) || el.__nofaSet) { return; } cur = el; var q = (el.value || "").trim(); clearTimeout(timer); if (q.length < 3) { hide(); return; } timer = setTimeout(function () { search(el, q); }, 260); }, true);
   document.addEventListener("keydown", function (e) { if (!box || box.style.display !== "block" || e.target !== cur) { return; } if (e.key === "ArrowDown") { e.preventDefault(); sel = Math.min(items.length - 1, sel + 1); render(false); } else if (e.key === "ArrowUp") { e.preventDefault(); sel = Math.max(0, sel - 1); render(false); } else if (e.key === "Enter" && sel >= 0) { e.preventDefault(); pick(sel); } else if (e.key === "Escape") { hide(); } }, true);
   document.addEventListener("focusout", function (e) { if (e.target === cur) { setTimeout(hide, 180); } }, true);
