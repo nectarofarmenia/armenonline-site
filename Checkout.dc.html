@@ -304,7 +304,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
 </script>
 <style id="nofa-mob-hdr">@media (max-width:700px){
 .hdr-stick header > div{padding:8px 12px !important;flex-wrap:nowrap !important;gap:8px !important}
-.hdr-stick .logo3d{height:42px !important}.hdr-stick .nt-ltree{display:none !important}
+.hdr-stick .logo3d{height:42px !important}.hdr-stick .nt-ltree{display:none !important}.done-card{box-sizing:border-box;width:100%;max-width:100% !important;padding:28px 16px 80px !important}.done-card h1,.done-card > div{overflow-wrap:anywhere}.done-card ol li span[style*="font-size: 13px"]{text-align:center;font-size:11px !important;word-break:normal;overflow-wrap:normal;line-height:1.25}.done-card ol{flex-wrap:wrap;row-gap:14px}.done-card ol li{min-width:0;flex:0 0 50% !important}.done-card ol li span[style*="font-size: 13px"]{font-size:13px !important}.done-card h1{font-size:26px !important;line-height:1.2}.done-card > div{max-width:100% !important;box-sizing:border-box}
 .hdr-stick header > div > *{flex-shrink:0}.hdr-stick header > div > div{flex-shrink:1;flex-wrap:nowrap !important;gap:6px !important;min-width:0}
 .hdr-stick .pill-group{padding:2px !important}
 .hdr-stick .pill-group button{min-height:30px !important;min-width:30px !important;padding:0 6px !important;font-size:12.5px !important}
@@ -513,7 +513,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </div>
 </sc-if>
 <sc-if value="{{done}}" hint-placeholder-val="{{false}}">
-<div class="card3d" style="max-width: 760px; margin: 20px auto 0; border-radius: 28px; padding: 40px 28px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center">
+<div class="card3d done-card" style="max-width: 760px; margin: 20px auto 0; border-radius: 28px; padding: 40px 28px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center">
 <span class="btn-green" style="width: 72px; height: 72px; border-radius: 50%; color: #F6E3B4; display: flex; align-items: center; justify-content: center; font-size: 36px">✓</span>
 <h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 36px; color: #1D5545">{{t.okH}}</h1>
 <p style="margin: 0; font-size: 17px; color: #4A564F; max-width: 520px">{{t.okP}}</p>
