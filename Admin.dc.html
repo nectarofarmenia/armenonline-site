@@ -965,6 +965,13 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </div>
 <span id="cpw-msg" style="font-size: 14px; font-weight: 700"></span>
 </div>
+<div class="card3d" id="zn-card" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; color: #1D5545; font-size: 22px">🗺 Առաքման գոտիներ</h2>
+<p style="margin: 0; color: #5E6A63; font-size: 14px; line-height: 1.5">Գոտի 1-ի և Գոտի 2-ի գները դրվում են վերևի «Առաքման վճար» դաշտերում։ Սեղմեք քաղաքի կողքի 1 կամ 2 կոճակը՝ գոտին փոխելու համար։ Ցանկում չեղած քաղաքներին առաքում չի արվում։</p>
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><input id="zn-new" class="fld" placeholder="Նոր քաղաք (անգլերեն), օր.՝ Santa Clarita" style="flex: 1 1 220px; min-height: 44px"><button type="button" id="zn-add1" class="btn-green ad-btn">+ Գոտի 1</button><button type="button" id="zn-add2" class="btn-gold ad-btn" style="color: #133B30">+ Գոտի 2</button></div>
+<div id="zn-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px"></div>
+<span id="zn-msg" style="font-size: 13px; font-weight: 700; color: #2F7A55"></span>
+</div>
 </div>
 </sc-if>
 <sc-if value="{{tab10}}" hint-placeholder-val="{{false}}">
@@ -1414,10 +1421,10 @@ total: money(curInv.tot), note: curInv.note || "", hasNote: !!curInv.note, unpai
 payBtns: [["zelle", "Zelle"], ["ach", "ACH"], ["wire", "Wire"]].map(function (m) { return { label: m[1], pick: function () { setInv(curInv.no, { status: "paid", method: m[0], paidAt: invToday }); } }; }),
 undo: function () { setInv(curInv.no, { status: "unpaid", method: "", paidAt: "" }); },
 sendL: st.ivSent === curInv.no ? t.sent : t.sendInv, send: function () { self.setState({ ivSent: curInv.no }); setTimeout(function () { self.setState({ ivSent: "" }); }, 2000); } }; }
-var CFG0 = { zelle: "+1 (515) 588 5555", zphone: "+1 (515) 588 5555", bank: "Bank of America", acctName: "Nectar of Armenia Inc", routing: "121000358", acct: "", wireRouting: "026009593", bankAddr: "", freeFrom: "", delFee: "7" };
+var CFG0 = { zelle: "+1 (515) 588 5555", zphone: "+1 (515) 588 5555", bank: "Bank of America", acctName: "Nectar of Armenia Inc", routing: "121000358", acct: "", wireRouting: "026009593", bankAddr: "", freeFrom: "", delFee: "7", delFee2: "14" };
 var cfgLoad = function () { try { var s1 = window.localStorage.getItem("noa-paycfg"); if (s1) { var o1 = JSON.parse(s1) || {}, r1 = Object.assign({}, CFG0); Object.keys(o1).forEach(function (k1) { if (o1[k1] !== "" && o1[k1] != null) { r1[k1] = o1[k1]; } }); return r1; } } catch (e) {} return Object.assign({}, CFG0); };
 var cfgSaved0 = cfgLoad(); var cfg = st.cfgDraft || cfgSaved0;
-var cfgFields = [["zelle", t.fZphone, "+1 (555) 555 5555"], ["bank", t.fBank, "Chase, Bank of America…"], ["acctName", t.fAcctName, "Nectar of Armenia LLC"], ["routing", t.fRouting, "9 digits"], ["acct", t.fAcct, lang === "en" ? "Account number" : "Հաշվի համարը"], ["wireRouting", t.fWireRouting, t.sameAsAch], ["bankAddr", t.fBankAddr, "Street, City, State ZIP"], ["freeFrom", lang === "en" ? "Free delivery from ($), empty = never" : "Անվճար առաքում՝ սկսած ($), դատարկ = միշտ վճարովի", "—"], ["delFee", lang === "en" ? "Delivery fee ($)" : "Առաքման վճար ($)", "7"]].map(function (f) { return { label: f[1], v: cfg[f[0]] || "", ph: f[2], type: f[0] === "acct" ? "password" : "text", set: function (e) { var n = Object.assign({}, cfg); n[f[0]] = e.target.value; self.setState({ cfgDraft: n }); } }; });
+var cfgFields = [["zelle", t.fZphone, "+1 (555) 555 5555"], ["bank", t.fBank, "Chase, Bank of America…"], ["acctName", t.fAcctName, "Nectar of Armenia LLC"], ["routing", t.fRouting, "9 digits"], ["acct", t.fAcct, lang === "en" ? "Account number" : "Հաշվի համարը"], ["wireRouting", t.fWireRouting, t.sameAsAch], ["bankAddr", t.fBankAddr, "Street, City, State ZIP"], ["freeFrom", lang === "en" ? "Free delivery from ($), empty = never" : "Անվճար առաքում՝ սկսած ($), դատարկ = միշտ վճարովի", "—"], ["delFee", lang === "en" ? "Delivery fee, zone 1 ($)" : "Առաքման վճար՝ Գոտի 1 ($)", "7"], ["delFee2", lang === "en" ? "Delivery fee, zone 2 ($)" : "Առաքման վճար՝ Գոտի 2 ($)", "14"]].map(function (f) { return { label: f[1], v: cfg[f[0]] || "", ph: f[2], type: f[0] === "acct" ? "password" : "text", set: function (e) { var n = Object.assign({}, cfg); n[f[0]] = e.target.value; self.setState({ cfgDraft: n }); } }; });
 var dash = function (v) { return v ? v : "—"; };
 var pc = { zelle: dash(cfgSaved0.zelle), zphone: dash(cfgSaved0.zphone), bank: dash(cfgSaved0.bank), acctName: dash(cfgSaved0.acctName), routing: dash(cfgSaved0.routing), acct: dash(cfgSaved0.acct), wireRouting: dash(cfgSaved0.wireRouting || cfgSaved0.routing), bankAddr: dash(cfgSaved0.bankAddr) };
 var nfC0 = CUST.map(function (c, i) { return c[1] === "W" ? i : -1; }).filter(function (i) { return i >= 0; })[0]; var nf = st.nf || { ci: nfC0 == null ? -1 : nfC0, net: 0, lines: [[1, 10]], note: "" };
@@ -2014,6 +2021,20 @@ window.azSet=function(d){z=Math.round(Math.min(1.6,Math.max(0.9,z+d))*100)/100;a
   b.disabled = true; fetch("api/api.php?a=cpw_admin", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ em: em, pw: pw }) }).then(function (r) { return r.json(); }).then(function (j) {
     b.disabled = false; if (j && j.ok) { m.style.color = "#2F7A55"; m.textContent = "✓ Պահպանվեց։ Հայտնեք հաճախորդին նոր գաղտնաբառը։"; document.getElementById("cpw-pw").value = ""; } else { m.style.color = "#B03A2E"; m.textContent = j && j.err === "nouser" ? "Այս email-ով հաճախորդ չգտնվեց։" : (j && j.err === "auth" ? "Նախ մուտք գործեք ադմին գաղտնաբառով։" : "Չհաջողվեց, փորձեք նորից։"); } })
     .catch(function () { b.disabled = false; m.style.color = "#B03A2E"; m.textContent = "Կապ չկա սերվերի հետ։"; }); });
+})();
+</script>
+<script id="nofa-zones-admin">
+(function () { var DEF = {"Glendale": 1, "Burbank": 1, "Montrose": 1, "La Crescenta": 1, "La Cañada Flintridge": 1, "Eagle Rock": 1, "Atwater Village": 1, "Sun Valley": 1, "Toluca Lake": 1, "Universal City": 1, "Valley Village": 1, "North Hollywood": 1, "Studio City": 1, "Sunland": 1, "Tujunga": 1, "Hollywood": 1, "Pasadena": 1, "Altadena": 1, "South Pasadena": 1, "Los Angeles": 2, "West Hollywood": 1, "Pacoima": 1, "Arleta": 1, "Panorama City": 1, "Van Nuys": 2, "Sherman Oaks": 2, "Encino": 2, "Tarzana": 2, "Reseda": 2, "Northridge": 2, "Granada Hills": 2, "Porter Ranch": 2, "Chatsworth": 2, "Woodland Hills": 2, "Sylmar": 2, "Mission Hills": 2, "North Hills": 2, "Lake Balboa": 2, "Canoga Park": 2};
+  function get() { try { var c = JSON.parse(localStorage.getItem("noa-cities") || "null"); if (c && c.cities && Object.keys(c.cities).length) { return c.cities; } } catch (e) {} return Object.assign({}, DEF); }
+  function save(m, msg) { try { localStorage.setItem("noa-cities", JSON.stringify({ cities: m, t: Date.now() })); } catch (e) {} draw(); var el = document.getElementById("zn-msg"); if (el) { el.textContent = msg || "✓ Պահպանվեց"; setTimeout(function () { el.textContent = ""; }, 2500); } }
+  function esc(x) { return String(x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function draw() { var box = document.getElementById("zn-list"); if (!box) { return; } var m = get(); var ks = Object.keys(m).sort(function (a, b) { return (m[a] - m[b]) || a.localeCompare(b); });
+    box.innerHTML = ks.map(function (k) { var z = +m[k] === 2 ? 2 : 1; return '<div style="display:flex;align-items:center;gap:8px;padding:6px 8px 6px 12px;border-radius:12px;border:1px solid #E4DCC8;background:' + (z === 2 ? '#FFF8E8' : '#FFFFFF') + '"><span style="flex:1;font-weight:700;color:#1E2A24;font-size:14px">' + esc(k) + '</span>' + [1, 2].map(function (n) { return '<button type="button" data-zn="' + esc(k) + '" data-z="' + n + '" style="width:34px;height:30px;border-radius:999px;border:1.5px solid ' + (n === 2 ? '#EBA93A' : '#1D5545') + ';background:' + (z === n ? (n === 2 ? '#EBA93A' : '#1D5545') : 'transparent') + ';color:' + (z === n ? (n === 2 ? '#133B30' : '#F6E3B4') : '#5E6A63') + ';font-weight:800;cursor:pointer">' + n + '</button>'; }).join("") + '<button type="button" data-znrm="' + esc(k) + '" title="Հեռացնել" style="width:30px;height:30px;border:none;background:transparent;color:#B03A2E;font-size:18px;cursor:pointer">×</button></div>'; }).join(""); }
+  document.addEventListener("click", function (e) { var t = e.target; if (!t.closest) { return; } var b = t.closest("[data-zn]"); var m;
+    if (b) { m = get(); m[b.getAttribute("data-zn")] = +b.getAttribute("data-z"); save(m); return; }
+    b = t.closest("[data-znrm]"); if (b) { m = get(); delete m[b.getAttribute("data-znrm")]; save(m, "✓ Հեռացվեց"); return; }
+    b = t.closest("#zn-add1, #zn-add2"); if (b) { var inp = document.getElementById("zn-new"); var v = (inp.value || "").trim().replace(/\s+/g, " "); if (!v) { return; } v = v.replace(/\b\w/g, function (c) { return c.toUpperCase(); }); m = get(); m[v] = b.id === "zn-add2" ? 2 : 1; inp.value = ""; save(m, "✓ Ավելացվեց " + v); } });
+  setInterval(function () { var box = document.getElementById("zn-list"); if (box && !box.childElementCount) { draw(); } }, 600);
 })();
 </script>
 </body>
