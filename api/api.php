@@ -61,6 +61,40 @@ switch ($a) {
     $b = body(); $pw = (string) ($b['pw'] ?? '');
     if ($pw !== '' && password_verify($pw, $cfg['admin_hash'])) { session_regenerate_id(true); $_SESSION['nofa_admin'] = 1; out(['ok' => true]); }
     sleep(1); out(['ok' => false, 'err' => 'bad_password'], 401);
+  case 'cpw_set': // customer: set or change the account password (needs the account token)
+    $b = body(); $em = strtolower(trim((string) ($b['em'] ?? ''))); $tok = (string) ($b['tok'] ?? ''); $pw = (string) ($b['pw'] ?? '');
+    if (!preg_match('/^[^@\s]+@[^@\s]+\.[^@\s]+$/', $em) || strlen($tok) < 16 || strlen($pw) < 8 || strlen($pw) > 200) { out(['ok' => false, 'err' => 'bad'], 400); }
+    $k = '__cpw|' . $em; $old = kv_get($db, $k); $old = $old ? (json_decode($old['v'], true) ?: []) : [];
+    if ($old) { if (!hash_equals((string) ($old['tok'] ?? ''), $tok)) { out(['ok' => false, 'err' => 'exists'], 403); } }
+    else { $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; foreach ($A as $key => $rec) { if (is_array($rec) && strtolower((string) ($rec['email'] ?? '')) === $em && !empty($rec['tok']) && !hash_equals((string) $rec['tok'], $tok)) { out(['ok' => false, 'err' => 'exists'], 403); } } }
+    $acc = []; foreach ((array) ($b['acc'] ?? []) as $key => $rec) { $key = strtolower((string) $key); if (is_array($rec) && strpos($key, $em . '|') === 0 && count($acc) < 4) { unset($rec['pw'], $rec['pass']); $acc[$key] = $rec; } }
+    if (!$acc && !empty($old['acc'])) { $acc = $old['acc']; }
+    kv_put($db, $k, json_encode(['h' => password_hash($pw, PASSWORD_DEFAULT), 'tok' => $tok, 'acc' => $acc, 't' => now_ms()], JSON_UNESCAPED_UNICODE));
+    out(['ok' => true]);
+  case 'cpw_admin': // admin: give a customer a temporary password (forgot-password help)
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $b = body(); $em = strtolower(trim((string) ($b['em'] ?? ''))); $pw = (string) ($b['pw'] ?? '');
+    if ($em === '' || strlen($pw) < 8) { out(['ok' => false, 'err' => 'bad'], 400); }
+    $k = '__cpw|' . $em; $old = kv_get($db, $k); $old = $old ? (json_decode($old['v'], true) ?: []) : [];
+    $tok = (string) ($old['tok'] ?? ''); $acc = (array) ($old['acc'] ?? []);
+    $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: [];
+    foreach ($A as $key => $x) { if (is_array($x) && strtolower((string) ($x['email'] ?? '')) === $em) { $acc[strtolower((string) $key)] = $x; if ($tok === '' && !empty($x['tok'])) { $tok = (string) $x['tok']; } } }
+    if (!$acc) { out(['ok' => false, 'err' => 'nouser'], 404); }
+    if ($tok === '') { $tok = bin2hex(random_bytes(16)); }
+    kv_put($db, $k, json_encode(['h' => password_hash($pw, PASSWORD_DEFAULT), 'tok' => $tok, 'acc' => $acc, 't' => now_ms()], JSON_UNESCAPED_UNICODE));
+    out(['ok' => true]);
+  case 'clogin': // customer: sign in with email + password on any device
+    $b = body(); $em = strtolower(trim((string) ($b['em'] ?? ''))); $pw = (string) ($b['pw'] ?? '');
+    $ip = substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64); $fk = '__clfail|' . $ip; $fr = kv_get($db, $fk); $fv = $fr ? (json_decode($fr['v'], true) ?: []) : [];
+    $fv = array_values(array_filter((array) $fv, function ($t) { return $t > now_ms() - 3600000; }));
+    if (count($fv) >= 20) { out(['ok' => false, 'err' => 'rate'], 429); }
+    $r = kv_get($db, '__cpw|' . $em); $rec = $r ? (json_decode($r['v'], true) ?: []) : [];
+    if (!$rec) { $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $has = false; foreach ($A as $key => $x) { if (is_array($x) && strtolower((string) ($x['email'] ?? '')) === $em) { $has = true; } } if ($has) { out(['ok' => false, 'err' => 'nopw']); } }
+    if (!$rec || $pw === '' || !password_verify($pw, (string) ($rec['h'] ?? ''))) { $fv[] = now_ms(); kv_put($db, $fk, json_encode($fv)); sleep(1); out(['ok' => false, 'err' => 'bad'], 401); }
+    $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $mine = (array) ($rec['acc'] ?? []);
+    foreach ($A as $key => $x) { if (is_array($x) && strtolower((string) ($x['email'] ?? '')) === $em) { $mine[strtolower((string) $key)] = $x; } }
+    foreach ($mine as $key => $x) { $mine[$key]['tok'] = $rec['tok']; }
+    out(['ok' => true, 'tok' => $rec['tok'], 'accounts' => $mine]);
   case 'logout':
     $_SESSION = []; session_destroy(); out(['ok' => true]);
   case 'all': // admin: everything

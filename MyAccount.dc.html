@@ -21,7 +21,7 @@
   if (/[?&]nowebp=1/.test(location.search)) { run(); return; }
   var t = new Image(); t.onload = function () { if (!(t.width > 0)) { run(); } }; t.onerror = run;
   t.src = "data:image/webp;base64,UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA";
-})();</script><script id="nofa-auth-gate">(function () { if (/[?&](demo|embed)=1/.test(location.search)) { return; } var u = null; try { u = JSON.parse(localStorage.getItem("noa-user") || "null"); } catch (e) { u = null; } if (!u || !u.email) { location.replace("Account.dc.html"); } else if (u.type === "biz") { location.replace("PartnerAccount.dc.html"); } })();</script>
+})();</script><script id="nofa-auth-gate">(function () { if (/[?&](demo|embed)=1/.test(location.search)) { return; } var u = null; try { u = JSON.parse(localStorage.getItem("noa-user") || "null"); } catch (e) { u = null; } var se0 = null; try { se0 = localStorage.getItem("noa-session"); } catch (e) {} if (!u || !u.email || !se0) { location.replace("Account.dc.html"); } else if (u.type === "biz") { location.replace("PartnerAccount.dc.html"); } })();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
@@ -882,7 +882,7 @@ var lgSave = function () { if (!dzIsU) { self.setState({ lgMsg: dz.demo, lgErr: 
  var myKey = null; Object.keys(A).forEach(function (k) { if (isMine(k, A[k])) { myKey = k; } }); var me = Object.assign({}, (myKey && A[myKey]) || dzUser || {});
  var sfx = "retail" === "biz" ? "|biz" : "|retail";
  if (ne && ne !== dzEm) { var used = Object.keys(A).some(function (k) { var u = A[k]; return u && u.email && u.email.toLowerCase() === ne && ((u.type === "biz" || k.slice(-4) === "|biz") === ("retail" === "biz")); }); if (used) { self.setState({ lgMsg: lg.eUsed, lgErr: true }); return; } }
- if (np) { var h = 0; for (var i = 0; i < np.length; i++) { h = (h * 31 + np.charCodeAt(i)) | 0; } me.pwH = String(h); me.pwAt = new Date().toISOString(); }
+ if (np) { var h = 0; for (var i = 0; i < np.length; i++) { h = (h * 31 + np.charCodeAt(i)) | 0; } me.pwH = String(h); me.pwAt = new Date().toISOString(); var tkC = me.tok; try { tkC = tkC || window.localStorage.getItem("noa-sync-tok|" + dzEm); } catch (e) {} if (tkC) { var accC = {}; accC[(ne || dzEm) + sfx] = Object.assign({}, me, { email: ne || me.email }); fetch("api/api.php?a=cpw_set", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ em: ne || dzEm, tok: tkC, pw: np, acc: accC }) }).catch(function () {}); } }
  var sep = !!(ne && ne !== dzEm && dzOther);
  if (ne && ne !== dzEm) { if (myKey) { delete A[myKey]; } me.email = ne; if ("retail" === "biz") { ["noa-ws-orders|", "noa-deposit|", "noa-depsign|", "noa-members|", "noa-actas|"].forEach(function (p) { try { var v = window.localStorage.getItem(p + dzEm); if (v !== null) { window.localStorage.setItem(p + ne, v); window.localStorage.removeItem(p + dzEm); } } catch (e) {} }); } }
  A[(me.email || dzEm).toLowerCase() + sfx] = me;
