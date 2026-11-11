@@ -25,6 +25,16 @@ function apri_rpc($fn, $args, &$code) {
   if (isset($http_response_header[0]) && preg_match('/\s(\d{3})\s/', $http_response_header[0], $mm)) { $code = (int) $mm[1]; }
   return $r;
 }
+
+// Customer account verification (email + type + token), used by account linking.
+function cust_rec($db, $em, $type, $tok) {
+  $em = strtolower(trim((string) $em)); $type = $type === 'biz' ? 'biz' : 'retail'; $tok = (string) $tok;
+  if ($em === '' || strlen($tok) < 16) { return null; }
+  $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: [];
+  foreach ($A as $key => $rec) { if (is_array($rec) && strtolower($rec['email'] ?? '') === $em && (($rec['type'] ?? '') === 'biz' ? 'biz' : 'retail') === $type && isset($rec['tok']) && hash_equals((string) $rec['tok'], $tok)) { return [$em . '|' . $type, $rec]; } }
+  return null;
+}
+function links_get($db) { return json_decode((kv_get($db, '__links') ?: ['v' => '{}'])['v'], true) ?: []; }
 function kv_put($db, $k, $v) { $t = now_ms(); $s = $db->prepare('REPLACE INTO nofa_kv (k, v, t) VALUES (?, ?, ?)'); $s->execute([$k, $v, $t]); return $t; }
 
 // One-time price update (Nov 10): gata unpackaged $1.50/piece; pelmeni wholesale $22 / 900 g, packaged only.
@@ -129,6 +139,31 @@ switch ($a) {
       if ($wp) { $res['noa-wsprices'] = json_encode($wp); $res['noa-prices'] = json_encode($all); } }
     if (isset($res['noa-paycfg'])) { $p = json_decode($res['noa-paycfg'], true) ?: []; $res['noa-paycfg'] = json_encode(['zelle' => $p['zelle'] ?? '', 'zphone' => $p['zphone'] ?? '', 'acctName' => $p['acctName'] ?? ''], JSON_UNESCAPED_UNICODE); }
     out(['ok' => true, 'kv' => $res]);
+  case 'link_code': // customer: one-time code to link this account with another one (wholesale <-> personal)
+  case 'link_use':
+  case 'link_rm':
+    $b = body(); $me = cust_rec($db, $b['em'] ?? '', $b['type'] ?? '', $b['tok'] ?? ''); if (!$me) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $ip = substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64); $fk = '__lkfail|' . $ip; $fr = kv_get($db, $fk); $fails = $fr ? json_decode($fr['v'], true) : ['n' => 0, 't' => now_ms()];
+    if (now_ms() - ($fails['t'] ?? 0) > 3600000) { $fails = ['n' => 0, 't' => now_ms()]; }
+    if ($a === 'link_code') {
+      $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+      kv_put($db, '__lk|' . $code, json_encode(['key' => $me[0], 't' => now_ms()])); out(['ok' => true, 'code' => $code, 'ttl' => 15]);
+    }
+    $L = links_get($db);
+    if ($a === 'link_rm') {
+      $other = (string) ($b['other'] ?? ''); $L[$me[0]] = array_values(array_diff($L[$me[0]] ?? [], [$other])); $L[$other] = array_values(array_diff($L[$other] ?? [], [$me[0]]));
+      kv_put($db, '__links', json_encode($L)); out(['ok' => true]);
+    }
+    if (($fails['n'] ?? 0) >= 12) { out(['ok' => false, 'err' => 'rate'], 429); }
+    $code = preg_replace('/\D/', '', (string) ($b['code'] ?? '')); $cr = strlen($code) === 6 ? kv_get($db, '__lk|' . $code) : null; $c = $cr ? json_decode($cr['v'], true) : null;
+    if (!$c || now_ms() - ($c['t'] ?? 0) > 900000) { $fails['n'] = ($fails['n'] ?? 0) + 1; kv_put($db, $fk, json_encode($fails)); out(['ok' => false, 'err' => 'bad_code']); }
+    $db->prepare('DELETE FROM nofa_kv WHERE k = ?')->execute(['__lk|' . $code]);
+    if ($c['key'] === $me[0]) { out(['ok' => false, 'err' => 'same']); }
+    $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $orec = null;
+    foreach ($A as $k2 => $r2) { if (is_array($r2) && strtolower($r2['email'] ?? '') . '|' . ((($r2['type'] ?? '') === 'biz') ? 'biz' : 'retail') === $c['key']) { $orec = $r2; } }
+    if (!$orec) { out(['ok' => false, 'err' => 'bad_code']); }
+    $L[$me[0]] = array_values(array_unique(array_merge($L[$me[0]] ?? [], [$c['key']]))); $L[$c['key']] = array_values(array_unique(array_merge($L[$c['key']] ?? [], [$me[0]])));
+    kv_put($db, '__links', json_encode($L)); out(['ok' => true, 'other' => $c['key'], 'account' => $orec]);
   case 'my': // customer: own data, verified by email + token
     $b = body(); $em = strtolower((string) ($b['em'] ?? '')); $tok = (string) ($b['tok'] ?? '');
     if ($em === '' || strlen($tok) < 16) { out(['ok' => false, 'err' => 'auth'], 401); }
@@ -141,6 +176,7 @@ switch ($a) {
     foreach (($inv['list'] ?? []) as $v) { if (!is_array($v) || in_array($v['st'] ?? '', ['draft', 'void'], true)) { continue; } if (in_array($v['ck'] ?? '', $cks, true) || strtolower($v['c']['e'] ?? '') === $em) { $list[] = $v; } }
     $cost = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: []; $cp = [];
     foreach ($cks as $ck) { if (isset($cost['cprof'][$ck]['dep0'])) { $cp[$ck] = ['dep0' => $cost['cprof'][$ck]['dep0']]; } }
-    out(['ok' => true, 'accounts' => $mine, 'keys' => $keys, 'inv' => $list, 'cprof' => $cp]);
+    $LK = links_get($db); $lk = []; foreach (array_keys($mine) as $mk) { foreach (($LK[$mk] ?? []) as $ok2) { $lk[$mk][] = $ok2; foreach ($A as $k3 => $r3) { if (is_array($r3) && strtolower($r3['email'] ?? '') . '|' . ((($r3['type'] ?? '') === 'biz') ? 'biz' : 'retail') === $ok2) { $mine[$k3] = $r3; } } } }
+    out(['ok' => true, 'accounts' => $mine, 'links' => $lk, 'keys' => $keys, 'inv' => $list, 'cprof' => $cp]);
 }
 out(['ok' => false, 'err' => 'unknown'], 400);

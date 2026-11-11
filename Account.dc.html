@@ -883,5 +883,26 @@ goIn: function () { self.setState({ mode: "in", err: "", ver: null }); }, goUp: 
 })();
 </script>
 <style id="pg-arr-css">.pgx{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;gap:8px}.pgx button{width:46px;height:46px;border-radius:50%;border:1.5px solid #EBA93A;background:#1D5545;color:#F6E3B4;font:800 22px/1 Manrope,system-ui,sans-serif;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;padding:0}.pgx button:hover{background:#133B30}.pgx .up{background:linear-gradient(180deg,#FCDB82,#EDB040 50%,#D38A22);color:#133B30;border-color:#D38A22}.pgx.main{bottom:88px;flex-direction:column}.pg-arrows{display:none !important}@media print{.pgx{display:none}}</style><div class="pgx" id="pgx"><button type="button" aria-label="Back" onclick="history.back()">‹</button><button type="button" aria-label="Forward" onclick="history.forward()">›</button><button type="button" class="up" aria-label="Top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button></div>
+<script id="nofa-pw-eye">
+(function () {
+  /* Eye button next to every password field: tap to show / hide the password. */
+  var css = document.createElement("style");
+  css.textContent = ".nz-pw{position:relative;display:block}.nz-pw>input{padding-right:46px!important;width:100%;box-sizing:border-box}.nz-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:#5E6A63;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}.nz-eye:hover{background:rgba(29,85,69,.08)}.nz-eye svg{width:20px;height:20px}";
+  document.head.appendChild(css);
+  var OPEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var SHUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-7 0-11-7-11-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
+  function lbl(show) { var l = (document.documentElement.lang || "hy").slice(0, 2); var T = { hy: ["Ցույց տալ գաղտնաբառը", "Թաքցնել գաղտնաբառը"], ru: ["Показать пароль", "Скрыть пароль"], es: ["Mostrar contraseña", "Ocultar contraseña"], en: ["Show password", "Hide password"] }; return (T[l] || T.en)[show ? 1 : 0]; }
+  function add(inp) {
+    if (inp.__nzEye) { return; } inp.__nzEye = 1;
+    var p = inp.parentElement; if (!p || p.querySelector(".pw-eye, .nz-eye")) { return; }
+    var w = document.createElement("span"); w.className = "nz-pw"; p.insertBefore(w, inp); w.appendChild(inp);
+    var b = document.createElement("button"); b.type = "button"; b.className = "nz-eye"; b.innerHTML = OPEN; b.setAttribute("aria-label", lbl(false)); b.title = lbl(false);
+    b.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); var show = inp.type === "password"; inp.type = show ? "text" : "password"; b.innerHTML = show ? SHUT : OPEN; b.setAttribute("aria-label", lbl(show)); b.title = lbl(show); inp.focus(); });
+    w.appendChild(b);
+  }
+  function scan() { document.querySelectorAll('input[type="password"]').forEach(add); }
+  new MutationObserver(scan).observe(document.documentElement, { childList: true, subtree: true }); scan();
+})();
+</script>
 </body>
 </html>

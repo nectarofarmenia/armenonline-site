@@ -728,7 +728,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </sc-if>
 <sc-if value="{{tabSet}}" hint-placeholder-val="{{false}}">
 <div class="card3d" style="border-radius: 26px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
-<h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">{{t.setH}}</h1>
+<h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545" data-seth="1">{{t.setH}}</h1>
 <sc-if value="{{showPm}}" hint-placeholder-val="{{false}}"><h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 21px; color: #1D5545">💳 {{t.payH}}</h2><p style="margin: 0; color: #5E6A63; font-size: 14px">{{t.payP}}</p>
 <sc-if value="{{noCards}}" hint-placeholder-val="{{false}}"><p style="margin: 0; color: #6B756F">{{t.noCard}}</p></sc-if>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px">
@@ -1005,7 +1005,7 @@ return Object.assign({}, x, { selected: x.id === lang, unselected: x.id !== lang
 var st = this.state || {};
 var user = null; try { user = JSON.parse(window.localStorage.getItem("noa-user") || "null"); } catch (e) { user = null; }
 var isU = !!(user && user.type === "biz");
-var swOther = null; try { var cu1 = JSON.parse(window.localStorage.getItem("noa-user") || "null"); if (cu1 && cu1.email) { var AX = JSON.parse(window.localStorage.getItem("noa-accounts") || "{}") || {}; Object.keys(AX).forEach(function (k) { var u = AX[k]; if (u && u.email && u.email.toLowerCase() === cu1.email.toLowerCase() && (u.type === "biz") !== (cu1.type === "biz")) { swOther = u; } }); } } catch (e) { swOther = null; }
+var swOther = null; try { var cu1 = JSON.parse(window.localStorage.getItem("noa-user") || "null"); if (cu1 && cu1.email) { var AX = JSON.parse(window.localStorage.getItem("noa-accounts") || "{}") || {}; Object.keys(AX).forEach(function (k) { var u = AX[k]; if (u && u.email && u.email.toLowerCase() === cu1.email.toLowerCase() && (u.type === "biz") !== (cu1.type === "biz")) { swOther = u; } }); if (!swOther) { var lk1 = JSON.parse(window.localStorage.getItem("noa-links|" + cu1.email.toLowerCase() + "|" + (cu1.type === "biz" ? "biz" : "retail")) || "[]") || []; lk1.forEach(function (k) { if (!swOther && /\|retail$/.test(k) && AX[k]) { swOther = AX[k]; } }); } } } catch (e) { swOther = null; }
 var doSwitch = function () { if (!swOther) { return; } try { window.localStorage.setItem("noa-user", JSON.stringify(swOther)); window.localStorage.setItem("noa-session", swOther.email.toLowerCase() + "|" + (swOther.type === "biz" ? "biz" : "retail")); } catch (e) {} };
 
 var bizN = isU ? (user.biz || ((user.first || "") + " " + (user.last || "")).trim() || "—") : t.biz;
@@ -1917,6 +1917,72 @@ html:not(.ci-closed) .ci-tog{transform:rotate(180deg)}
     hd.appendChild(b);
   }
   new MutationObserver(put).observe(document.documentElement, { childList: true, subtree: true }); setInterval(put, 1000); put();
+})();
+</script>
+<script id="nofa-pw-eye">
+(function () {
+  /* Eye button next to every password field: tap to show / hide the password. */
+  var css = document.createElement("style");
+  css.textContent = ".nz-pw{position:relative;display:block}.nz-pw>input{padding-right:46px!important;width:100%;box-sizing:border-box}.nz-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:#5E6A63;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}.nz-eye:hover{background:rgba(29,85,69,.08)}.nz-eye svg{width:20px;height:20px}";
+  document.head.appendChild(css);
+  var OPEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var SHUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-7 0-11-7-11-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
+  function lbl(show) { var l = (document.documentElement.lang || "hy").slice(0, 2); var T = { hy: ["Ցույց տալ գաղտնաբառը", "Թաքցնել գաղտնաբառը"], ru: ["Показать пароль", "Скрыть пароль"], es: ["Mostrar contraseña", "Ocultar contraseña"], en: ["Show password", "Hide password"] }; return (T[l] || T.en)[show ? 1 : 0]; }
+  function add(inp) {
+    if (inp.__nzEye) { return; } inp.__nzEye = 1;
+    var p = inp.parentElement; if (!p || p.querySelector(".pw-eye, .nz-eye")) { return; }
+    var w = document.createElement("span"); w.className = "nz-pw"; p.insertBefore(w, inp); w.appendChild(inp);
+    var b = document.createElement("button"); b.type = "button"; b.className = "nz-eye"; b.innerHTML = OPEN; b.setAttribute("aria-label", lbl(false)); b.title = lbl(false);
+    b.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); var show = inp.type === "password"; inp.type = show ? "text" : "password"; b.innerHTML = show ? SHUT : OPEN; b.setAttribute("aria-label", lbl(show)); b.title = lbl(show); inp.focus(); });
+    w.appendChild(b);
+  }
+  function scan() { document.querySelectorAll('input[type="password"]').forEach(add); }
+  new MutationObserver(scan).observe(document.documentElement, { childList: true, subtree: true }); scan();
+})();
+</script>
+<script id="nofa-link-acc">
+(function () {
+  /* Settings → Linked accounts: link a wholesale and a personal account that use different emails (one-time 6-digit code). */
+  var L = (document.documentElement.lang || "hy").slice(0, 2);
+  var T = ({ hy: { h: "🔗 Կապված հաշիվներ", p: "Եթե ունեք և՛ մեծածախ, և՛ անձնական հաշիվ տարբեր email-ներով, կապեք դրանք, որ մեկ կոճակով անցնեք մեկից մյուսին։", none: "Կապված հաշիվ դեռ չկա։", go: "Անցնել", rm: "Անջատել", rmQ: "Անջատե՞լ այս հաշիվը։", s1: "1. Այս հաշվում ստացեք կոդը", get: "Ստանալ կապի կոդ", codeP: "Կոդը վավեր է 15 րոպե։ Մտեք մյուս հաշիվ → Կարգավորումներ → մուտքագրեք այս կոդը։", s2: "2. Կամ մուտքագրեք մյուս հաշվից ստացած կոդը", ph: "6 թվանշան", link: "Կապել", ok: "✓ Հաշիվները կապվեցին", bad: "Կոդը սխալ է կամ ժամկետն անցել է։", same: "Սա նույն հաշվի կոդն է։ Մուտքագրեք մյուս հաշվում։", rate: "Չափից շատ փորձեր։ Փորձեք 1 ժամից։", noTok: "Հաշիվը դեռ համաժամեցվում է։ Թարմացրեք էջը մի քանի վայրկյանից։", err: "Չհաջողվեց։ Փորձեք նորից։", biz: "Մեծածախ", ret: "Անձնական" },
+    en: { h: "🔗 Linked accounts", p: "If you have both a wholesale and a personal account with different emails, link them to switch between them with one tap.", none: "No linked accounts yet.", go: "Switch", rm: "Unlink", rmQ: "Unlink this account?", s1: "1. Get a code in this account", get: "Get link code", codeP: "The code is valid for 15 minutes. Sign in to the other account → Settings → enter this code.", s2: "2. Or enter the code from the other account", ph: "6 digits", link: "Link", ok: "✓ Accounts linked", bad: "Wrong or expired code.", same: "This code is from this same account. Enter it in the other one.", rate: "Too many attempts. Try again in an hour.", noTok: "The account is still syncing. Reload the page in a few seconds.", err: "Something went wrong. Try again.", biz: "Wholesale", ret: "Personal" } })[L] || null;
+  if (!T) { T = { h: "🔗 Linked accounts", p: "Link your wholesale and personal accounts (different emails) to switch with one tap.", none: "No linked accounts yet.", go: "Switch", rm: "Unlink", rmQ: "Unlink this account?", s1: "1. Get a code in this account", get: "Get link code", codeP: "Valid for 15 minutes. Sign in to the other account → Settings → enter this code.", s2: "2. Or enter the code from the other account", ph: "6 digits", link: "Link", ok: "✓ Accounts linked", bad: "Wrong or expired code.", same: "Enter this code in the other account.", rate: "Too many attempts. Try again in an hour.", noTok: "The account is still syncing. Reload in a few seconds.", err: "Something went wrong.", biz: "Wholesale", ret: "Personal" }; }
+  var st = { code: "", msg: "", ok: false, links: null, busy: false };
+  function J(k, d) { try { var v = JSON.parse(localStorage.getItem(k) || "null"); return v == null ? d : v; } catch (e) { return d; } }
+  function me() { var u = J("noa-user", null); if (!u || !u.email) { return null; } var em = String(u.email).toLowerCase(), ty = u.type === "biz" ? "biz" : "retail"; var A = J("noa-accounts", {}); var tok = (A[em + "|" + ty] && A[em + "|" + ty].tok) || u.tok || localStorage.getItem("noa-sync-tok|" + em) || ""; return { em: em, type: ty, tok: tok, key: em + "|" + ty }; }
+  function api(a, body) { return fetch("api/api.php?a=" + a, { method: "POST", credentials: "same-origin", cache: "no-store", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(function (r) { return r.json(); }); }
+  function esc(x) { return String(x == null ? "" : x).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function saveLinks(m, keys, accounts) { localStorage.setItem("noa-links|" + m.key, JSON.stringify(keys)); if (accounts) { var A = J("noa-accounts", {}); Object.keys(accounts).forEach(function (k) { A[k] = Object.assign({}, A[k] || {}, accounts[k]); }); localStorage.setItem("noa-accounts", JSON.stringify(A)); } }
+  function loadLinks() { var m = me(); if (!m || !m.tok || st.loading) { return; } st.loading = true; api("my", { em: m.em, tok: m.tok }).then(function (j) { st.loading = false; if (j && j.ok && !j.pending) { saveLinks(m, (j.links || {})[m.key] || [], j.accounts || null); st.links = (j.links || {})[m.key] || []; draw(); } }).catch(function () { st.loading = false; }); }
+  function acc(key) { var A = J("noa-accounts", {}); var r = A[key]; if (r) { return r; } var p = key.split("|"); return { email: p[0], type: p[1] }; }
+  function sw(key) { var r = acc(key); if (!r || !r.email) { return; } localStorage.setItem("noa-user", JSON.stringify(r)); localStorage.setItem("noa-session", String(r.email).toLowerCase() + "|" + (r.type === "biz" ? "biz" : "retail")); location.href = r.type === "biz" ? "PartnerAccount.dc.html" : "MyAccount.dc.html"; }
+  var box = null;
+  function draw() {
+    if (!box) { return; } var m = me(); var keys = st.links || (m ? J("noa-links|" + m.key, []) : []);
+    var rows = keys.map(function (k) { var r = acc(k); var nm = r.type === "biz" ? (r.biz || r.email) : (((r.first || "") + " " + (r.last || "")).trim() || r.email); return '<div class="lk-row"><span class="lk-ic">' + (r.type === "biz" ? "🏪" : "👤") + '</span><div class="lk-n"><b>' + esc(nm) + '</b><small>' + (r.type === "biz" ? T.biz : T.ret) + ' · ' + esc(r.email) + '</small></div><button type="button" class="lk-go" data-go="' + esc(k) + '">' + T.go + ' →</button><button type="button" class="lk-rm" data-rm="' + esc(k) + '">' + T.rm + '</button></div>'; }).join("");
+    box.innerHTML = '<h2 class="lk-h">' + T.h + '</h2><p class="lk-p">' + T.p + '</p>' + (rows || '<p class="lk-none">' + T.none + '</p>') +
+      '<div class="lk-steps"><div class="lk-step"><b>' + T.s1 + '</b>' + (st.code ? '<div class="lk-code">' + st.code.slice(0, 3) + ' ' + st.code.slice(3) + '</div><small>' + T.codeP + '</small>' : '<button type="button" class="lk-btn" data-get="1">' + T.get + '</button>') + '</div>' +
+      '<div class="lk-step"><b>' + T.s2 + '</b><div class="lk-in"><input inputmode="numeric" maxlength="7" placeholder="' + T.ph + '" aria-label="' + T.ph + '"><button type="button" class="lk-btn" data-use="1">' + T.link + '</button></div></div></div>' +
+      (st.msg ? '<p class="lk-msg ' + (st.ok ? "ok" : "") + '">' + esc(st.msg) + '</p>' : "");
+  }
+  function onClick(e) {
+    var t = e.target.closest("[data-get],[data-use],[data-go],[data-rm]"); if (!t || !box || !box.contains(t)) { return; } var m = me(); if (!m || !m.tok) { st.msg = T.noTok; st.ok = false; draw(); return; }
+    if (t.dataset.go) { sw(t.dataset.go); return; }
+    if (t.dataset.rm) { if (!confirm(T.rmQ)) { return; } api("link_rm", { em: m.em, type: m.type, tok: m.tok, other: t.dataset.rm }).then(function () { st.links = (st.links || J("noa-links|" + m.key, [])).filter(function (k) { return k !== t.dataset.rm; }); saveLinks(m, st.links); draw(); }); return; }
+    if (t.dataset.get) { api("link_code", { em: m.em, type: m.type, tok: m.tok }).then(function (j) { if (j.ok) { st.code = j.code; st.msg = ""; } else { st.msg = j.err === "auth" ? T.noTok : T.err; st.ok = false; } draw(); }).catch(function () { st.msg = T.err; draw(); }); return; }
+    if (t.dataset.use) { var inp = box.querySelector(".lk-in input"); var code = (inp && inp.value || "").replace(/\D/g, ""); if (code.length !== 6) { st.msg = T.bad; st.ok = false; draw(); return; }
+      api("link_use", { em: m.em, type: m.type, tok: m.tok, code: code }).then(function (j) { if (j.ok) { var keys = (st.links || J("noa-links|" + m.key, [])).concat([j.other]).filter(function (v, i, a) { return a.indexOf(v) === i; }); var acs = {}; acs[j.other] = j.account; saveLinks(m, keys, acs); st.links = keys; st.msg = T.ok; st.ok = true; } else { st.msg = j.err === "same" ? T.same : (j.err === "rate" ? T.rate : (j.err === "auth" ? T.noTok : T.bad)); st.ok = false; } draw(); }).catch(function () { st.msg = T.err; st.ok = false; draw(); }); }
+  }
+  document.addEventListener("click", onClick);
+  var css = document.createElement("style");
+  css.textContent = ".lk-card{border-radius:26px;padding:24px;display:flex;flex-direction:column;gap:12px}.lk-h{margin:0;font-family:Fraunces,'Noto Serif Armenian',Lora,serif;font-weight:600;font-size:22px;color:#1D5545}.lk-p,.lk-none{margin:0;color:#5E6A63;font-size:14px}.lk-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;border:1.5px solid #E4DCC8;background:#FBF9F4;flex-wrap:wrap}.lk-ic{font-size:24px}.lk-n{flex:1 1 180px;display:flex;flex-direction:column}.lk-n b{color:#1D5545}.lk-n small{color:#6B756F}.lk-go,.lk-btn{min-height:42px;padding:0 16px;border-radius:999px;border:0;background:linear-gradient(180deg,#2A6B57,#1D5545);color:#fff;font:700 14px inherit;font-family:inherit;cursor:pointer}.lk-rm{min-height:42px;padding:0 14px;border-radius:999px;border:1.5px solid #E4DCC8;background:#fff;color:#9B2C20;font:700 14px inherit;font-family:inherit;cursor:pointer}.lk-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.lk-step{display:flex;flex-direction:column;gap:8px;align-items:flex-start;padding:14px;border-radius:16px;background:#F7F1E3}.lk-step b{color:#1D5545;font-size:14px}.lk-step small{color:#6B756F;font-size:12.5px}.lk-code{font:800 30px/1.1 ui-monospace,Menlo,monospace;letter-spacing:4px;color:#1D5545;background:#fff;border-radius:12px;padding:8px 14px;border:1.5px dashed #EBA93A}.lk-in{display:flex;gap:8px;width:100%}.lk-in input{flex:1;min-width:0;min-height:42px;border-radius:12px;border:1.5px solid #E4DCC8;padding:0 12px;font:700 18px ui-monospace,Menlo,monospace;letter-spacing:3px}.lk-msg{margin:0;font-weight:700;color:#9B2C20}.lk-msg.ok{color:#2F7A55}";
+  document.head.appendChild(css);
+  function mount() {
+    var h = document.querySelector("[data-seth]"); if (!h) { box = null; return; } var card = h.closest(".card3d"); if (!card || !card.parentElement) { return; }
+    var ex = card.parentElement.querySelector(":scope > .lk-card"); if (ex) { box = ex; return; }
+    box = document.createElement("section"); box.className = "card3d lk-card"; card.parentElement.insertBefore(box, card.nextSibling); draw(); if (st.links === null) { loadLinks(); }
+  }
+  new MutationObserver(mount).observe(document.documentElement, { childList: true, subtree: true }); mount();
 })();
 </script>
 </body>
