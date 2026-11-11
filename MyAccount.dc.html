@@ -1384,7 +1384,7 @@ return Object.assign(plVals, extVals, dzVals, lgVals, chVals, avVals, ivVals, rd
     var fs = document.querySelectorAll("iframe.ext-frame"); for (var i = 0; i < fs.length; i++) { if (fs[i].contentWindow === e.source) { fs[i].style.height = Math.max(160, Math.min(20000, d.nofaH)) + "px"; } } });
 })();
 </script>
-<style id="pg-arr-css">@media (max-width:700px){footer{padding-bottom:84px !important}}.pgx{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;gap:8px}.pgx button{width:46px;height:46px;border-radius:50%;border:1.5px solid #EBA93A;background:#1D5545;color:#F6E3B4;font:800 22px/1 Manrope,system-ui,sans-serif;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;padding:0}.pgx button:hover{background:#133B30}.pgx .up{background:linear-gradient(180deg,#FCDB82,#EDB040 50%,#D38A22);color:#133B30;border-color:#D38A22}.pgx.main{bottom:88px;flex-direction:column}.pg-arrows{display:none !important}@media print{.pgx{display:none}}</style><div class="pgx" id="pgx"><button type="button" aria-label="Back" onclick="history.back()">‹</button><button type="button" aria-label="Forward" onclick="history.forward()">›</button><button type="button" class="up" aria-label="Top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button></div>
+<style id="pg-arr-css">@media (max-width:700px){footer{padding-bottom:140px !important}.pgx button[aria-label="Back"],.pgx button[aria-label="Forward"]{display:none !important}}.pgx{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;gap:8px}.pgx button{width:46px;height:46px;border-radius:50%;border:1.5px solid #EBA93A;background:#1D5545;color:#F6E3B4;font:800 22px/1 Manrope,system-ui,sans-serif;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;padding:0}.pgx button:hover{background:#133B30}.pgx .up{background:linear-gradient(180deg,#FCDB82,#EDB040 50%,#D38A22);color:#133B30;border-color:#D38A22}.pgx.main{bottom:88px;flex-direction:column}.pg-arrows{display:none !important}@media print{.pgx{display:none}}</style><div class="pgx" id="pgx"><button type="button" aria-label="Back" onclick="history.back()">‹</button><button type="button" aria-label="Forward" onclick="history.forward()">›</button><button type="button" class="up" aria-label="Top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button></div>
 <script id="nofa-menuscroll-js">
 (function () { if (window.__nofaMS) { return; } window.__nofaMS = 1;
   /* Menu scrolls freely on its own; arrows at the bottom/top show that there is more to scroll. */
@@ -1564,5 +1564,8 @@ html:not(.ci-closed) .ci-tog{transform:rotate(180deg)}
   new MutationObserver(function () { clearTimeout(tick.t); tick.t = setTimeout(tick, 60); }).observe(document.documentElement, { childList: true, subtree: true }); setTimeout(tick, 400);
 })();
 </script>
+<script id="nofa-foot-in">(function () { var st = document.createElement("style"); st.textContent = "@media (max-width:700px){html.foot-in .ap-dock{opacity:0!important;visibility:hidden!important;transition:opacity .3s,visibility 0s .3s}}"; document.head.appendChild(st);
+  var tk = 0; function chk() { tk = 0; var f = document.querySelector("footer"); if (!f) { return; } var r = f.getBoundingClientRect(); document.documentElement.classList.toggle("foot-in", r.top < window.innerHeight - 40); }
+  window.addEventListener("scroll", function () { if (!tk) { tk = requestAnimationFrame(chk); } }, { passive: true }); setTimeout(chk, 800); })();</script>
 </body>
 </html>

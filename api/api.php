@@ -83,6 +83,10 @@ switch ($a) {
     if ($tok === '') { $tok = bin2hex(random_bytes(16)); }
     kv_put($db, $k, json_encode(['h' => password_hash($pw, PASSWORD_DEFAULT), 'tok' => $tok, 'acc' => $acc, 't' => now_ms()], JSON_UNESCAPED_UNICODE));
     out(['ok' => true]);
+  case 'cexists': // checkout: is this email already a customer account? (so a guest order doesn't clash with it)
+    $b = body(); $em = strtolower(trim((string) ($b['em'] ?? ''))); usleep(300000); if ($em === '') { out(['ok' => true, 'exists' => false]); }
+    $has = (bool) kv_get($db, '__cpw|' . $em); if (!$has) { $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; foreach ($A as $key => $x) { if (is_array($x) && strtolower((string) ($x['email'] ?? '')) === $em) { $has = true; break; } } }
+    out(['ok' => true, 'exists' => $has]);
   case 'clogin': // customer: sign in with email + password on any device
     $b = body(); $em = strtolower(trim((string) ($b['em'] ?? ''))); $pw = (string) ($b['pw'] ?? '');
     $ip = substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64); $fk = '__clfail|' . $ip; $fr = kv_get($db, $fk); $fv = $fr ? (json_decode($fr['v'], true) ?: []) : [];
