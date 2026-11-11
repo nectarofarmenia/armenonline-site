@@ -42,6 +42,37 @@ function stripe_api($sk, $method, $path, $form, &$code) {
   $ctx = stream_context_create(['http' => ['method' => $method, 'timeout' => 25, 'ignore_errors' => true, 'header' => "Authorization: Bearer $sk\r\nStripe-Version: 2024-06-20\r\nContent-Type: application/x-www-form-urlencoded\r\n", 'content' => $method === 'POST' ? $q : '']]);
   $r = @file_get_contents($method === 'GET' && $q ? $url . '?' . $q : $url, false, $ctx); if (isset($http_response_header[0]) && preg_match('/\s(\d{3})\s/', $http_response_header[0], $mm)) { $code = (int) $mm[1]; } return $r;
 }
+function mail_cfg($db) { $r = kv_get($db, '__mail'); return $r ? (json_decode($r['v'], true) ?: []) : []; }
+function smtp_send($m, $to, $subject, $html, &$err = null) {
+  $host = (string) ($m['host'] ?? 'smtp.hostinger.com'); $port = (int) ($m['port'] ?? 465); $user = (string) ($m['user'] ?? ''); $pass = (string) ($m['pass'] ?? '');
+  if ($user === '' || $pass === '' || !filter_var($to, FILTER_VALIDATE_EMAIL)) { $err = 'cfg'; return false; }
+  $plain = getenv('NOFA_SMTP_PLAIN') ? true : false; $fp = @stream_socket_client(($plain ? 'tcp://' : 'ssl://') . $host . ':' . $port, $en, $es, 15); if (!$fp) { $err = 'connect ' . $es; return false; }
+  stream_set_timeout($fp, 15);
+  $rd = function () use ($fp) { $d = ''; while (($l = fgets($fp, 515)) !== false) { $d .= $l; if (strlen($l) < 4 || $l[3] === ' ') { break; } } return $d; };
+  $cmd = function ($c, $ok) use ($fp, $rd, &$err) { if ($c !== null) { fwrite($fp, $c . "\r\n"); } $r = $rd(); if (!in_array(substr($r, 0, 3), (array) $ok, true)) { $err = trim($r); return false; } return true; };
+  $dom = substr(strrchr($user, '@'), 1) ?: 'localhost';
+  if (!$cmd(null, '220') || !$cmd('EHLO ' . $dom, '250') || !$cmd('AUTH LOGIN', '334') || !$cmd(base64_encode($user), '334') || !$cmd(base64_encode($pass), '235') || !$cmd('MAIL FROM:<' . $user . '>', '250') || !$cmd('RCPT TO:<' . $to . '>', ['250', '251']) || !$cmd('DATA', '354')) { fclose($fp); return false; }
+  $enc = function ($s) { return '=?UTF-8?B?' . base64_encode($s) . '?='; };
+  $h = 'Date: ' . date('r') . "\r\nFrom: " . $enc('Nectar of Armenia') . ' <' . $user . ">\r\nTo: <" . $to . ">\r\nReply-To: <" . $user . ">\r\nSubject: " . $enc($subject) . "\r\nMessage-ID: <" . bin2hex(random_bytes(12)) . '@' . $dom . ">\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n";
+  $body = chunk_split(base64_encode($html));
+  fwrite($fp, $h . $body . "\r\n.\r\n"); $ok = $cmd(null, '250'); $cmd('QUIT', ['221', '250']); fclose($fp); return $ok;
+}
+function mail_tpl($title, $inner) {
+  return '<!doctype html><html><body style="margin:0;background:#F7F3EA;font-family:Arial,Helvetica,sans-serif;color:#23342C"><div style="max-width:560px;margin:0 auto;padding:24px 14px"><div style="background:#1D5545;border-radius:18px 18px 0 0;padding:18px 22px;color:#F6E3B4;font-size:20px;font-weight:bold">Nectar of Armenia</div><div style="background:#ffffff;border-radius:0 0 18px 18px;padding:22px;border:1px solid #E4DCC8;border-top:0"><h2 style="margin:0 0 12px;color:#1D5545;font-size:20px">' . $title . '</h2>' . $inner . '</div><p style="text-align:center;color:#6B756F;font-size:12px;margin:14px 0 0">Nectar of Armenia Inc · 6222 San Fernando Rd, Glendale, CA 91201 · +1 (515) 588-5555</p></div></body></html>';
+}
+function mail_esc($s) { return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8'); }
+function pay_mails($db, $ref, $amt) { // after a confirmed payment: receipt to the customer + notice to the owner (once)
+  $m = mail_cfg($db); if (empty($m['user'])) { return; } $pk = '__pay|' . $ref; $pr = kv_get($db, $pk); $pv = $pr ? (json_decode($pr['v'], true) ?: []) : []; if (!empty($pv['mailed'])) { return; }
+  $pv['mailed'] = now_ms(); kv_put($db, $pk, json_encode($pv, JSON_UNESCAPED_UNICODE));
+  $rows = ''; foreach ((array) ($pv['lines'] ?? []) as $l) { $rows .= '<tr><td style="padding:6px 0">' . mail_esc($l[0]) . ' × ' . (int) $l[1] . '</td><td style="padding:6px 0;text-align:right">$' . number_format((float) $l[2], 2) . '</td></tr>'; }
+  if (!empty($pv['fee']) && strpos($ref, 'INV:') !== 0) { $rows .= '<tr><td style="padding:6px 0">Delivery</td><td style="padding:6px 0;text-align:right">$' . number_format((float) $pv['fee'], 2) . '</td></tr>'; }
+  $tbl = '<table style="width:100%;border-collapse:collapse;font-size:15px">' . $rows . '<tr><td style="padding:10px 0;border-top:1px solid #E4DCC8;font-weight:bold">Total paid</td><td style="padding:10px 0;border-top:1px solid #E4DCC8;text-align:right;font-weight:bold;color:#1D5545">$' . number_format((float) $amt, 2) . '</td></tr></table>';
+  $isInv = strpos($ref, 'INV:') === 0; $label = $isInv ? ('Invoice #' . ($pv['no'] ?? substr($ref, 4))) : ('Order ' . $ref);
+  $extra = !$isInv ? ('<p style="margin:12px 0 0;font-size:15px">' . (($pv['fm'] ?? '') === 'pick' ? 'Pickup: 6222 San Fernando Rd, Glendale, CA 91201' : 'Delivery: ' . mail_esc($pv['addr'] ?? '')) . (!empty($pv['day']) ? '<br>Date: ' . mail_esc(substr((string) $pv['day'], 0, 10)) : '') . '</p>') : '';
+  $cust = (string) ($pv['email'] ?? ''); $site = (string) ($pv['site'] ?? '');
+  if (filter_var($cust, FILTER_VALIDATE_EMAIL)) { smtp_send($m, $cust, 'Payment received — ' . $label, mail_tpl('Thank you! Payment received ✓', '<p style="margin:0 0 14px;font-size:15px">' . mail_esc($label) . ' is confirmed. We are getting it ready.</p>' . $tbl . $extra . ($site ? '<p style="margin:18px 0 0"><a href="' . mail_esc($site) . '" style="display:inline-block;background:#EBA93A;color:#133B30;text-decoration:none;font-weight:bold;padding:12px 22px;border-radius:999px">View my order</a></p>' : '') . '<p style="margin:16px 0 0;color:#6B756F;font-size:13px">Questions? Reply to this email or call +1 (515) 588-5555.</p>')); }
+  $own = (string) ($m['notify'] ?? $m['user']); if (filter_var($own, FILTER_VALIDATE_EMAIL)) { smtp_send($m, $own, '💳 New payment $' . number_format((float) $amt, 2) . ' — ' . $label, mail_tpl('New payment received', '<p style="margin:0 0 14px;font-size:15px"><b>' . mail_esc($label) . '</b><br>' . mail_esc($pv['name'] ?? '') . ' · ' . mail_esc($cust) . ' · ' . mail_esc($pv['phone'] ?? '') . '</p>' . $tbl . $extra)); }
+}
 function links_get($db) { return json_decode((kv_get($db, '__links') ?: ['v' => '{}'])['v'], true) ?: []; }
 function kv_put($db, $k, $v) { $t = now_ms(); $s = $db->prepare('REPLACE INTO nofa_kv (k, v, t) VALUES (?, ?, ?)'); $s->execute([$k, $v, $t]); return $t; }
 
@@ -208,9 +239,9 @@ switch ($a) {
     $P = [22.00, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0]; $ids = ['gata', 'khash', '', '', 'khinkali', 'pelmeni', 'blinchik', 'kufta', 'kiev', 'chcut', 'beefcut'];
     $N = ['Gata', 'Khash', 'Khash Broth', 'Khash Set', 'Khinkali', 'Pelmeni', 'Blinchik', 'Mijukov Kufta', 'Chicken Kiev', 'Chicken Cutlets', 'Beef Cutlets'];
     $cr = kv_get($db, 'noa-cost-v2'); if ($cr) { $cv = json_decode($cr['v'], true) ?: []; foreach (($cv['prod'] ?? []) as $pd) { $k = array_search((string) ($pd['id'] ?? ''), $ids, true); $v = (float) (($pd['pr'] ?? [])[0] ?? 0); if ($k !== false && $v > 0) { $P[$k] = round($v, 2); } } }
-    $lines = []; $sub = 0; $form = ['mode' => 'payment', 'client_reference_id' => $no, 'metadata[order]' => $no, 'payment_intent_data[metadata][order]' => $no, 'payment_intent_data[statement_descriptor_suffix]' => substr($no, -10)];
+    $lines = []; $mlines = []; $sub = 0; $form = ['mode' => 'payment', 'client_reference_id' => $no, 'metadata[order]' => $no, 'payment_intent_data[metadata][order]' => $no, 'payment_intent_data[statement_descriptor_suffix]' => substr($no, -10)];
     $i = 0; foreach ((array) ($b['items'] ?? []) as $it) { $pi = (int) ($it[0] ?? -1); $q = (int) ($it[1] ?? 0); if ($pi < 0 || $pi > 10 || $q < 1 || $q > 200 || $P[$pi] <= 0) { continue; }
-      $form["line_items[$i][price_data][currency]"] = 'usd'; $form["line_items[$i][price_data][product_data][name]"] = $N[$pi]; $form["line_items[$i][price_data][unit_amount]"] = (int) round($P[$pi] * 100); $form["line_items[$i][quantity]"] = $q; $sub += $P[$pi] * $q; $i++; }
+      $form["line_items[$i][price_data][currency]"] = 'usd'; $form["line_items[$i][price_data][product_data][name]"] = $N[$pi]; $form["line_items[$i][price_data][unit_amount]"] = (int) round($P[$pi] * 100); $form["line_items[$i][quantity]"] = $q; $sub += $P[$pi] * $q; $mlines[] = [$N[$pi], $q, $P[$pi] * $q]; $i++; }
     if (!$i) { out(['ok' => false, 'err' => 'empty']); }
     $fee = 0; if (($b['fm'] ?? 'del') === 'del') {
       $pc = json_decode((kv_get($db, 'noa-paycfg') ?: ['v' => '{}'])['v'], true) ?: []; $f1 = isset($pc['delFee']) && $pc['delFee'] !== '' ? (float) $pc['delFee'] : 7; $f2 = isset($pc['delFee2']) && $pc['delFee2'] !== '' ? (float) $pc['delFee2'] : 14;
@@ -224,15 +255,43 @@ switch ($a) {
     if (!empty($b['embed'])) { $form['ui_mode'] = 'embedded'; $form['return_url'] = $base . '/Checkout.dc.html?paid={CHECKOUT_SESSION_ID}&no=' . $no; } else { $form['success_url'] = $base . '/Checkout.dc.html?paid={CHECKOUT_SESSION_ID}&no=' . $no; $form['cancel_url'] = $base . '/Checkout.dc.html?paycancel=' . $no; } $form['submit_type'] = 'pay'; $lc = (string) ($b['lang'] ?? ''); if (in_array($lc, ['en', 'ru', 'es'], true)) { $form['locale'] = $lc; }
     $r = stripe_api($sk, 'POST', 'checkout/sessions', $form, $code); $j = json_decode((string) $r, true) ?: [];
     if ($code !== 200 || (empty($j['url']) && empty($j['client_secret']))) { out(['ok' => false, 'err' => 'stripe', 'msg' => $j['error']['message'] ?? '']); }
-    kv_put($db, '__pay|' . $no, json_encode(['sid' => $j['id'], 'amt' => round($sub + $fee, 2), 'fee' => $fee, 't' => now_ms()]));
+    kv_put($db, '__pay|' . $no, json_encode(['sid' => $j['id'], 'amt' => round($sub + $fee, 2), 'fee' => $fee, 't' => now_ms(), 'lines' => $mlines, 'email' => $em, 'name' => (string) ($b['name'] ?? ''), 'phone' => (string) ($b['phone'] ?? ''), 'addr' => (string) ($b['addr'] ?? ''), 'day' => (string) ($b['day'] ?? ''), 'fm' => (string) ($b['fm'] ?? 'del'), 'site' => $base . '/MyAccount.dc.html'], JSON_UNESCAPED_UNICODE));
     out(['ok' => true, 'url' => $j['url'] ?? '', 'cs' => $j['client_secret'] ?? '', 'total' => round($sub + $fee, 2), 'fee' => $fee]);
   case 'pay_check': // anyone with the session id: confirm with Stripe and record the order as paid (server-side)
     $sk = stripe_sk($db); $b = body(); $sid = preg_replace('/[^A-Za-z0-9_]/', '', (string) ($b['sid'] ?? '')); if ($sk === '' || $sid === '') { out(['ok' => false]); }
     $r = stripe_api($sk, 'GET', 'checkout/sessions/' . $sid, [], $code); $j = json_decode((string) $r, true) ?: [];
     if ($code !== 200) { out(['ok' => false, 'err' => 'stripe']); }
     $no = (string) ($j['client_reference_id'] ?? ''); $paid = ($j['payment_status'] ?? '') === 'paid';
-    if ($paid && $no !== '') { $L = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: []; if (empty($L[$no])) { $pr0 = json_decode((kv_get($db, '__pay|' . $no) ?: ['v' => '{}'])['v'], true) ?: []; $L[$no] = ['amt' => ((int) ($j['amount_total'] ?? 0)) / 100, 'base' => isset($pr0['amt']) ? (float) $pr0['amt'] : null, 'fee' => (float) ($pr0['fee'] ?? 0), 'pi' => (string) ($j['payment_intent'] ?? ''), 't' => now_ms()]; kv_put($db, '__paidweb', json_encode($L)); } }
+    if ($paid && $no !== '') { $L = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: []; if (empty($L[$no])) { $pr0 = json_decode((kv_get($db, '__pay|' . $no) ?: ['v' => '{}'])['v'], true) ?: []; $L[$no] = ['amt' => ((int) ($j['amount_total'] ?? 0)) / 100, 'base' => isset($pr0['amt']) ? (float) $pr0['amt'] : null, 'fee' => (float) ($pr0['fee'] ?? 0), 'pi' => (string) ($j['payment_intent'] ?? ''), 't' => now_ms()]; kv_put($db, '__paidweb', json_encode($L)); pay_mails($db, $no, ((int) ($j['amount_total'] ?? 0)) / 100); } }
     out(['ok' => true, 'paid' => $paid, 'processing' => !$paid && ($j['status'] ?? '') === 'complete', 'no' => $no, 'amt' => ((int) ($j['amount_total'] ?? 0)) / 100]);
+  case 'mail_cfg': // admin: save the order mailbox (password stays on the server)
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $b = body(); $m = mail_cfg($db); foreach (['user', 'notify', 'host'] as $f) { if (isset($b[$f])) { $m[$f] = trim((string) $b[$f]); } } if (isset($b['port'])) { $m['port'] = (int) $b['port']; } if (!empty($b['pass'])) { $m['pass'] = (string) $b['pass']; }
+    kv_put($db, '__mail', json_encode($m)); out(['ok' => true]);
+  case 'mail_info':
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $m = mail_cfg($db); out(['ok' => true, 'user' => $m['user'] ?? '', 'notify' => $m['notify'] ?? '', 'host' => $m['host'] ?? 'smtp.hostinger.com', 'port' => $m['port'] ?? 465, 'pass' => !empty($m['pass'])]);
+  case 'mail_test':
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $m = mail_cfg($db); $to = (string) ($m['notify'] ?? '') ?: (string) ($m['user'] ?? ''); $e = null;
+    $ok = smtp_send($m, $to, 'Test — Nectar of Armenia website', mail_tpl('It works ✓', '<p style="font-size:15px;margin:0">The website can now send emails from ' . mail_esc($m['user'] ?? '') . '.</p>'), $e); out(['ok' => $ok, 'to' => $to, 'err' => $ok ? '' : $e]);
+  case 'pw_reset_req': // anyone: email a password-reset link (same answer whether or not the email exists)
+    $b = body(); $em = strtolower(trim((string) ($b['em'] ?? ''))); $ip = substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64); $fk = '__pwrr|' . $ip; $fr = kv_get($db, $fk); $fv = $fr ? (json_decode($fr['v'], true) ?: []) : [];
+    $fv = array_values(array_filter((array) $fv, function ($t) { return $t > now_ms() - 3600000; })); if (count($fv) >= 6) { out(['ok' => false, 'err' => 'rate'], 429); } $fv[] = now_ms(); kv_put($db, $fk, json_encode($fv));
+    $m = mail_cfg($db); if (empty($m['user'])) { out(['ok' => false, 'err' => 'nomail']); }
+    $has = (bool) kv_get($db, '__cpw|' . $em); $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; foreach ($A as $key => $x) { if (is_array($x) && strtolower((string) ($x['email'] ?? '')) === $em) { $has = true; } }
+    if ($has && filter_var($em, FILTER_VALIDATE_EMAIL)) { $t = bin2hex(random_bytes(20)); kv_put($db, '__pwr|' . $t, json_encode(['em' => $em, 't' => now_ms()]));
+      $host = ($https ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'armenonline.com'); $base = $host . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '/api/api.php')), '/'); $link = $base . '/Account.dc.html?reset=' . $t;
+      smtp_send($m, $em, 'Reset your password — Nectar of Armenia', mail_tpl('Reset your password', '<p style="font-size:15px;margin:0 0 16px">Press the button to choose a new password. The link works for 1 hour.<br><span style="color:#6B756F">Սեղմեք կոճակը՝ նոր գաղտնաբառ ընտրելու համար։ Հղումը գործում է 1 ժամ։</span></p><p style="margin:0"><a href="' . mail_esc($link) . '" style="display:inline-block;background:#EBA93A;color:#133B30;text-decoration:none;font-weight:bold;padding:12px 22px;border-radius:999px">Choose a new password</a></p><p style="margin:16px 0 0;color:#6B756F;font-size:13px">If you did not ask for this, you can ignore this email.</p>')); }
+    out(['ok' => true]);
+  case 'pw_reset_do':
+    $b = body(); $t = preg_replace('/[^a-f0-9]/', '', (string) ($b['t'] ?? '')); $pw = (string) ($b['pw'] ?? ''); if ($t === '' || strlen($pw) < 8 || strlen($pw) > 200) { out(['ok' => false, 'err' => 'bad']); }
+    $r = kv_get($db, '__pwr|' . $t); $v = $r ? (json_decode($r['v'], true) ?: []) : []; if (!$v || now_ms() - (int) ($v['t'] ?? 0) > 3600000) { out(['ok' => false, 'err' => 'expired']); }
+    $em = (string) $v['em']; $k = '__cpw|' . $em; $old = kv_get($db, $k); $old = $old ? (json_decode($old['v'], true) ?: []) : []; $tok = (string) ($old['tok'] ?? ''); $acc = (array) ($old['acc'] ?? []);
+    if ($tok === '') { $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; foreach ($A as $key => $x) { if (is_array($x) && strtolower((string) ($x['email'] ?? '')) === $em) { if (!empty($x['tok'])) { $tok = (string) $x['tok']; } $acc[strtolower((string) $key)] = $x; } } }
+    if ($tok === '') { $tok = bin2hex(random_bytes(16)); }
+    kv_put($db, $k, json_encode(['h' => password_hash($pw, PASSWORD_DEFAULT), 'tok' => $tok, 'acc' => $acc, 't' => now_ms()], JSON_UNESCAPED_UNICODE)); kv_put($db, '__pwr|' . $t, json_encode(['used' => now_ms()]));
+    out(['ok' => true, 'em' => $em]);
   case 'pay_inv': // wholesale customer: pay an invoice balance by card; amount computed here from the stored invoice
     $sk = stripe_sk($db); if ($sk === '') { out(['ok' => false, 'err' => 'off']); }
     $b = body(); $me = cust_rec($db, $b['em'] ?? '', 'biz', $b['tok'] ?? ''); if (!$me) { $me = cust_rec($db, $b['em'] ?? '', 'retail', $b['tok'] ?? ''); } if (!$me) { out(['ok' => false, 'err' => 'auth'], 401); }
@@ -250,13 +309,13 @@ switch ($a) {
     if (filter_var($em, FILTER_VALIDATE_EMAIL)) { $form['customer_email'] = $em; }
     $r = stripe_api($sk, 'POST', 'checkout/sessions', $form, $code); $j = json_decode((string) $r, true) ?: [];
     if ($code !== 200 || empty($j['url'])) { out(['ok' => false, 'err' => 'stripe', 'msg' => $j['error']['message'] ?? '']); }
-    kv_put($db, '__pay|INV:' . $id, json_encode(['sid' => $j['id'], 'amt' => $bal, 'fee' => $fee, 't' => now_ms()]));
+    kv_put($db, '__pay|INV:' . $id, json_encode(['sid' => $j['id'], 'amt' => $bal, 'fee' => $fee, 't' => now_ms(), 'no' => $no, 'email' => $em, 'name' => $nm, 'lines' => [['Invoice #' . $no, 1, $bal]] + ($fee > 0 ? [1 => ['Card processing fee (3%)', 1, $fee]] : []), 'site' => $base0 . '/PartnerAccount.dc.html#invoices'], JSON_UNESCAPED_UNICODE));
     out(['ok' => true, 'url' => $j['url'], 'amt' => $bal, 'fee' => $fee]);
   case 'pay_sync': // admin: confirm with Stripe any card payments whose customer never came back to the site
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $sk = stripe_sk($db); $L = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: []; $n = 0;
     if ($sk !== '') { $s = $db->prepare("SELECT k, v FROM nofa_kv WHERE k LIKE '__pay|%'"); $s->execute(); foreach ($s->fetchAll(PDO::FETCH_ASSOC) as $row) { $ref = substr($row['k'], 6); if (!empty($L[$ref])) { continue; } $pv = json_decode($row['v'], true) ?: []; if (empty($pv['sid']) || now_ms() - (int) ($pv['t'] ?? 0) > 86400000 * 10) { continue; }
-      $r = stripe_api($sk, 'GET', 'checkout/sessions/' . $pv['sid'], [], $code); $j = json_decode((string) $r, true) ?: []; if ($code === 200 && ($j['payment_status'] ?? '') === 'paid') { $L[$ref] = ['amt' => ((int) ($j['amount_total'] ?? 0)) / 100, 'base' => isset($pv['amt']) ? (float) $pv['amt'] : null, 'fee' => (float) ($pv['fee'] ?? 0), 'pi' => (string) ($j['payment_intent'] ?? ''), 't' => now_ms()]; $n++; } if ($n > 30) { break; } } }
+      $r = stripe_api($sk, 'GET', 'checkout/sessions/' . $pv['sid'], [], $code); $j = json_decode((string) $r, true) ?: []; if ($code === 200 && ($j['payment_status'] ?? '') === 'paid') { $L[$ref] = ['amt' => ((int) ($j['amount_total'] ?? 0)) / 100, 'base' => isset($pv['amt']) ? (float) $pv['amt'] : null, 'fee' => (float) ($pv['fee'] ?? 0), 'pi' => (string) ($j['payment_intent'] ?? ''), 't' => now_ms()]; $n++; pay_mails($db, $ref, ((int) ($j['amount_total'] ?? 0)) / 100); } if ($n > 30) { break; } } }
     if ($n) { kv_put($db, '__paidweb', json_encode($L)); } out(['ok' => true, 'n' => $n, 'paid' => $L ?: new stdClass()]);
   case 'pay_list': // admin: orders confirmed paid by card
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
