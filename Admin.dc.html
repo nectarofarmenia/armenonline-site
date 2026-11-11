@@ -1884,5 +1884,87 @@ window.azSet=function(d){z=Math.round(Math.min(1.6,Math.max(0.9,z+d))*100)/100;a
   new MutationObserver(function () { clearTimeout(tick.t); tick.t = setTimeout(tick, 60); }).observe(document.documentElement, { childList: true, subtree: true }); setTimeout(tick, 400);
 })();
 </script>
+<script id="nofa-city-mon">
+(function () { if (window.__nofaCity) { return; } window.__nofaCity = 1;
+  /* Statistics → monitoring by city: retail customers, wholesale partners and their stores, orders and sales per city. */
+  var EN = (document.documentElement.lang || "").slice(0, 2) === "en";
+  var T = EN ? { h: "🏙 Monitoring by city", p: "Where our customers and stores are. Click a city to see who is there.", city: "City", r: "Retail customers", w: "Wholesale partners", st: "Stores", o: "Orders", rev: "Sales", last: "Last order", cities: "Cities", unk: "No address", all: "All", ro: "Retail", wo: "Wholesale", none: "No customers yet.", store: "store", stores: "stores" }
+    : { h: "🏙 Մոնիթորինգ ըստ քաղաքների", p: "Որտեղ են մեր հաճախորդներն ու խանութները։ Սեղմեք քաղաքի վրա՝ տեսնելու, թե ովքեր են այնտեղ։", city: "Քաղաք", r: "Մանրածախ հաճախորդներ", w: "Մեծածախ գործընկերներ", st: "Խանութներ", o: "Պատվերներ", rev: "Վաճառք", last: "Վերջին պատվեր", cities: "Քաղաքներ", unk: "Առանց հասցեի", all: "Բոլորը", ro: "Մանրածախ", wo: "Մեծածախ", none: "Դեռ հաճախորդներ չկան։", store: "խանութ", stores: "խանութ" };
+  function J(k, d) { try { var v = JSON.parse(localStorage.getItem(k) || "null"); return v == null ? d : v; } catch (e) { return d; } }
+  function esc(x) { return String(x == null ? "" : x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function nrm(x) { return String(x || "").toLowerCase().replace(/[^a-z0-9Ա-և]+/g, ""); }
+  function money(v) { return "$" + Math.round(v).toLocaleString("en-US"); }
+  var ZR = [[91201, 91210, "Glendale"], [91214, 91214, "La Crescenta"], [91020, 91021, "Montrose"], [91011, 91012, "La Cañada Flintridge"], [91501, 91523, "Burbank"], [91101, 91199, "Pasadena"], [91001, 91001, "Altadena"], [91030, 91031, "South Pasadena"], [91601, 91606, "North Hollywood"], [91604, 91604, "Studio City"], [91401, 91411, "Van Nuys"], [91403, 91403, "Sherman Oaks"], [91423, 91423, "Sherman Oaks"], [91316, 91316, "Encino"], [91436, 91436, "Encino"], [91356, 91357, "Tarzana"], [91335, 91337, "Reseda"], [91324, 91330, "Northridge"], [91343, 91343, "North Hills"], [91344, 91344, "Granada Hills"], [91352, 91353, "Sun Valley"], [91040, 91041, "Sunland"], [91042, 91043, "Tujunga"], [91602, 91602, "Toluca Lake"], [91607, 91607, "Valley Village"], [91608, 91608, "Universal City"], [90041, 90041, "Eagle Rock"], [90039, 90039, "Atwater Village"], [90028, 90028, "Hollywood"], [90038, 90038, "Hollywood"], [90068, 90068, "Hollywood"], [90046, 90046, "West Hollywood"], [90069, 90069, "West Hollywood"], [91340, 91346, "San Fernando"], [91367, 91367, "Woodland Hills"], [91364, 91365, "Woodland Hills"], [91303, 91304, "Canoga Park"], [91306, 91306, "Winnetka"], [91311, 91311, "Chatsworth"], [91402, 91402, "Panorama City"], [91405, 91406, "Van Nuys"], [91605, 91605, "North Hollywood"], [90001, 90099, "Los Angeles"]];
+  function zipCity(z) { z = +String(z || "").replace(/\D/g, "").slice(0, 5); if (!z) { return ""; } for (var i = 0; i < ZR.length; i++) { if (z >= ZR[i][0] && z <= ZR[i][1]) { return ZR[i][2]; } } return ""; }
+  function tidy(c) { c = String(c || "").replace(/\b(CA|California)\b\.?/gi, "").replace(/\d{5}(-\d{4})?/g, "").replace(/[,.\s]+$/g, "").replace(/^[,.\s]+/g, "").trim(); if (!c || /\d/.test(c)) { return ""; } return c.toLowerCase().replace(/(^|[\s-])\S/g, function (x) { return x.toUpperCase(); }); }
+  function cityOf(addr, city, zip) {
+    var c = tidy(city); if (c) { return c; }
+    var a = String(addr || ""), p = a.split(",").map(function (x) { return x.trim(); }).filter(Boolean);
+    var zm = a.match(/\b(9\d{4})\b/); var zc = zipCity(zm ? zm[1] : zip);
+    if (p.length >= 3) { c = tidy(p[p.length - 2]); if (/^(CA|California)\b/i.test(p[p.length - 1]) || /^\d{5}/.test(p[p.length - 1])) { c = tidy(p[p.length - 2]); } if (c) { return c; } }
+    if (p.length === 2) { c = tidy(/^\d/.test(p[0]) ? p[1] : p[0]); if (c) { return c; } }
+    return zc || "";
+  }
+  function collect() {
+    var ACC = J("noa-accounts", {}), CS = J("noa-cost-v2", {}), prof = CS.cprof || {};
+    var C = {}, byEm = {};
+    function get(name, t) { var k = nrm(name) + "|" + t; return C[k] || (C[k] = { k: k, n: name || "—", t: t, city: "", stores: [], o: 0, rev: 0, last: "" }); }
+    Object.keys(ACC).forEach(function (k) { var a = ACC[k]; if (!a || typeof a !== "object") { return; } var w = a.type === "biz" || /\|biz$/.test(k); var nm = w ? (a.biz || ((a.first || "") + " " + (a.last || "")).trim()) : ((a.first || "") + " " + (a.last || "")).trim(); nm = nm || a.email; if (!nm) { return; }
+      var c = get(nm, w ? "w" : "r"); if (a.email) { byEm[String(a.email).toLowerCase() + "|" + c.t] = c; }
+      if (!c.city) { c.city = cityOf(a.addr || a.address || a.street, a.city, a.zip); }
+      if (w && Array.isArray(a.locs) && a.locs.length) { c.stores = a.locs.map(function (l) { return { n: l.name || nm, city: cityOf(l.addr, l.city, l.zip) || c.city }; }); } });
+    (CS.calls || []).forEach(function (x) { var t = x.type === "w" ? "w" : "r"; var c = get(x.name || x.phone, t); if (!c.city) { c.city = cityOf(x.addr); }
+      var tot = 0; (x.lines || []).forEach(function (l) { var p = (CS.prod || [])[+l[0]]; if (!p) { return; } var j = (t === "w" ? 2 : 0) + (+l[1] === 1 ? 1 : 0); tot += (+l[2] || 0) * (l[3] != null ? +l[3] : (+(p.pr || [])[j] || 0)); });
+      c.o++; c.rev += tot; var d = String(x.ddate || x.date || "").slice(0, 10); if (d > c.last) { c.last = d; } });
+    J("noa-orders", []).forEach(function (o) { if (!o) { return; } var c = byEm[String(o.email || "").toLowerCase() + "|r"] || get(o.name || o.email || "—", "r"); c.o++; c.rev += parseFloat(String(o.total || "0").replace(/[^0-9.]/g, "")) || 0; var d = String(o.day || "").slice(0, 10); if (d > c.last) { c.last = d; } });
+    for (var i = 0; i < localStorage.length; i++) { var key = localStorage.key(i); if (!key || key.indexOf("noa-ws-orders|") !== 0 || key === "noa-ws-orders|demo") { continue; } var em = key.slice(14); var c0 = byEm[em + "|w"]; J(key, []).forEach(function (o) { if (!o || o.ap !== "approved") { return; } var c = c0 || get(em, "w"); c.o++; c.rev += +o.amt || +o.total || 0; var d = String(o.date || "").slice(0, 10); if (d > c.last) { c.last = d; } if (!c.city && o.locAddr) { c.city = cityOf(o.locAddr); } }); }
+    Object.keys(prof).forEach(function (k) { var p = prof[k]; if (p && p.addr && C[k] && !C[k].city) { C[k].city = cityOf(p.addr); } });
+    var L = Object.keys(C).map(function (k) { return C[k]; }).filter(function (c) { return c.n && c.n !== "—"; });
+    L.forEach(function (c) { if (c.t === "w" && !c.stores.length) { c.stores = [{ n: c.n, city: c.city }]; } });
+    return L;
+  }
+  var sortK = "tot", sortD = -1, open = {}, flt = "all";
+  function build() {
+    var L = collect(), G = {}; var unk = T.unk;
+    function g(city) { var k = city || unk; return G[k] || (G[k] = { city: k, r: [], w: [], st: [], o: 0, rev: 0, last: "" }); }
+    L.forEach(function (c) {
+      if (c.t === "r") { if (flt === "wo") { return; } var x = g(c.city); x.r.push(c.n); x.o += c.o; x.rev += c.rev; if (c.last > x.last) { x.last = c.last; } return; }
+      if (flt === "ro") { return; }
+      var cs = {}; c.stores.forEach(function (s) { var x = g(s.city); x.st.push(s.n + (String(s.n).indexOf(c.n) < 0 ? " (" + c.n + ")" : "")); cs[s.city || unk] = 1; });
+      Object.keys(cs).forEach(function (k) { if (G[k].w.indexOf(c.n) < 0) { G[k].w.push(c.n); } });
+      var home = G[(c.city && cs[c.city]) ? c.city : Object.keys(cs)[0]]; home.o += c.o; home.rev += c.rev; if (c.last > home.last) { home.last = c.last; }
+    });
+    var rows = Object.keys(G).map(function (k) { var x = G[k]; x.tot = x.r.length + x.w.length; return x; });
+    rows.sort(function (a, b) { if (a.city === unk) { return 1; } if (b.city === unk) { return -1; } var va = sortK === "city" ? a.city : (sortK === "r" ? a.r.length : sortK === "w" ? a.w.length : sortK === "st" ? a.st.length : a[sortK]), vb = sortK === "city" ? b.city : (sortK === "r" ? b.r.length : sortK === "w" ? b.w.length : sortK === "st" ? b.st.length : b[sortK]); if (va < vb) { return -sortD; } if (va > vb) { return sortD; } return b.tot - a.tot || a.city.localeCompare(b.city); });
+    var nR = 0, nW = 0, nS = 0, nC = 0; rows.forEach(function (x) { nR += x.r.length; nS += x.st.length; if (x.city !== unk) { nC++; } }); var ws = {}; rows.forEach(function (x) { x.w.forEach(function (n) { ws[n] = 1; }); }); nW = Object.keys(ws).length;
+    var mx = 1; rows.forEach(function (x) { if (x.tot > mx) { mx = x.tot; } });
+    var th = function (k, l, n) { return '<th data-cs="' + k + '" class="' + (n ? "n " : "") + (sortK === k ? "on" : "") + '">' + l + (sortK === k ? (sortD < 0 ? " ↓" : " ↑") : "") + "</th>"; };
+    var h = '<div class="cm-top"><div><h2>' + T.h + '</h2><p>' + T.p + '</p></div><div class="cm-f">' + [["all", T.all], ["ro", "👤 " + T.ro], ["wo", "🏪 " + T.wo]].map(function (x) { return '<button type="button" data-cf="' + x[0] + '" class="ad-chip' + (flt === x[0] ? " on" : "") + '">' + x[1] + "</button>"; }).join("") + "</div></div>";
+    h += '<div class="cm-k">' + [["🏙", T.cities, nC], ["👤", T.r, nR], ["🏪", T.w, nW], ["🏬", T.st, nS]].map(function (k) { return '<div><span>' + k[0] + " " + k[1] + "</span><b>" + k[2] + "</b></div>"; }).join("") + "</div>";
+    if (!rows.length) { return h + '<p class="cm-none">' + T.none + "</p>"; }
+    h += '<div class="cm-t"><table><thead><tr>' + th("city", T.city) + th("r", "👤 " + T.ro, 1) + th("w", "🏪 " + T.wo, 1) + th("st", "🏬 " + T.st, 1) + th("o", T.o, 1) + th("rev", T.rev, 1) + th("last", T.last, 1) + "</tr></thead><tbody>";
+    rows.forEach(function (x) { var op = !!open[x.city];
+      h += '<tr class="cm-r' + (op ? " op" : "") + '" data-cc="' + esc(x.city) + '"><td><b>' + (op ? "▾ " : "▸ ") + esc(x.city) + '</b><div class="cm-bar"><i style="width:' + Math.round(x.tot / mx * 100) + '%"></i></div></td><td class="n">' + (x.r.length || "—") + '</td><td class="n">' + (x.w.length || "—") + '</td><td class="n">' + (x.st.length || "—") + '</td><td class="n">' + (x.o || "—") + '</td><td class="n"><b>' + (x.rev ? money(x.rev) : "—") + '</b></td><td class="n">' + esc(x.last || "—") + "</td></tr>";
+      if (op) { h += '<tr class="cm-d"><td colspan="7">' + (x.st.length ? '<div><b>🏬 ' + T.st + ":</b> " + x.st.map(esc).join(" · ") + "</div>" : "") + (x.r.length ? '<div><b>👤 ' + T.r + ":</b> " + x.r.slice().sort().map(esc).join(" · ") + "</div>" : "") + "</td></tr>"; } });
+    return h + "</tbody></table></div>";
+  }
+  var css = document.createElement("style");
+  css.textContent = "#city-mon{border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:14px;background:#fff;margin-top:20px}#city-mon .cm-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:flex-end}#city-mon h2{margin:0;font-family:Fraunces,'Noto Serif Armenian',Lora,serif;font-weight:600;font-size:21px;color:#1D5545}#city-mon p{margin:4px 0 0;color:#5E6A63;font-size:13.5px}#city-mon .cm-f{display:flex;gap:8px;flex-wrap:wrap}#city-mon .cm-k{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}#city-mon .cm-k div{padding:10px 12px;border-radius:12px;background:#FBF9F4;border:1px solid #ECE3CF;display:flex;flex-direction:column;gap:2px}#city-mon .cm-k span{font-size:12.5px;color:#6B756F;font-weight:700}#city-mon .cm-k b{font-size:22px;color:#1D5545}#city-mon .cm-t{overflow-x:auto;border:1px solid #ECE3CF;border-radius:14px}#city-mon table{width:100%;border-collapse:collapse;min-width:720px;font-size:14px}#city-mon th{background:#1D5545;color:#F6E3B4;text-align:left;padding:10px 12px;font-size:12.5px;cursor:pointer;white-space:nowrap;user-select:none}#city-mon th.on{color:#fff}#city-mon th.n,#city-mon td.n{text-align:right}#city-mon td:first-child{white-space:nowrap}#city-mon td{padding:9px 12px;border-top:1px solid #F0E8D6;color:#33403A;vertical-align:top}#city-mon tr.cm-r{cursor:pointer}#city-mon tr.cm-r:hover td,#city-mon tr.op td{background:#FBF5E6}#city-mon .cm-bar{height:5px;border-radius:9px;background:#F0E8D6;margin-top:5px;max-width:180px;overflow:hidden}#city-mon .cm-bar i{display:block;height:100%;background:#EBA93A;border-radius:9px}#city-mon tr.cm-d td{background:#FFFCF5;font-size:13px;line-height:1.6}#city-mon .cm-none{color:#6B756F}";
+  document.head.appendChild(css);
+  function onStats() { var n = document.querySelector("aside .wa-nav.on"); return !!(n && /Ստատիստիկա|Statistics/.test(n.textContent)); }
+  function draw() { var b = document.getElementById("city-mon"); if (b) { b.innerHTML = build(); } }
+  function mount() {
+    var b = document.getElementById("city-mon");
+    if (!onStats()) { if (b) { b.remove(); } return; }
+    var h = Array.prototype.find.call(document.querySelectorAll("h2"), function (x) { return /💰/.test(x.textContent); }); var card = h && h.closest(".card3d"); if (!card) { return; }
+    if (b && b.previousElementSibling === card) { return; } if (b) { b.remove(); }
+    b = document.createElement("section"); b.id = "city-mon"; b.className = "card3d"; card.parentElement.insertBefore(b, card.nextSibling); draw();
+  }
+  document.addEventListener("click", function (e) { var t = e.target.closest && e.target.closest("#city-mon [data-cs],#city-mon [data-cc],#city-mon [data-cf]"); if (!t) { return; }
+    if (t.dataset.cs) { if (sortK === t.dataset.cs) { sortD = -sortD; } else { sortK = t.dataset.cs; sortD = t.dataset.cs === "city" ? 1 : -1; } }
+    else if (t.dataset.cf) { flt = t.dataset.cf; } else { var c = t.dataset.cc; open[c] = !open[c]; } draw(); });
+  new MutationObserver(function () { mount(); }).observe(document.body, { childList: true, subtree: true }); setInterval(mount, 1500); setInterval(function () { if (document.getElementById("city-mon") && !document.querySelector("#city-mon tr.op")) { draw(); } }, 30000);
+})();
+</script>
 </body>
 </html>
