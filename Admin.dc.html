@@ -1079,7 +1079,7 @@ var lang = st.lang || "hy"; var t = L[lang] || L.hy;
 var langs = [{ id: "hy", label: "ՀԱՅ" }, { id: "en", label: "EN" }].map(function (x) { return { label: x.label, cls: x.id === lang ? "on" : "", pick: function () { self.setState({ lang: x.id }); } }; });
 var money = function (v) { return "$" + v.toFixed(2); };
 var RP = (function (d, c) { var ids = ["gata", "khash", "", "", "khinkali", "pelmeni", "blinchik", "kufta", "kiev", "chcut", "beefcut"]; var m = null; try { var cv = JSON.parse(window.localStorage.getItem("noa-cost-v2") || "null"); if (cv && Array.isArray(cv.prod) && cv.prod.length) { m = {}; cv.prod.forEach(function (p) { m[p.id] = p.pr || []; }); } if (!m) { m = JSON.parse(window.localStorage.getItem("noa-prices") || "null"); } } catch (e) { m = null; } if (!m) { return d; } return d.map(function (v, i) { var r = ids[i] && m[ids[i]]; var x = r ? +r[c] : 0; return x > 0 ? Math.round(x * 100) / 100 : v; }); })([22.00, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0], 0);
-var WP = (function (d, c) { var ids = ["gata", "khash", "", "", "khinkali", "pelmeni", "blinchik", "kufta", "kiev", "chcut", "beefcut"]; var m = null; try { var cv = JSON.parse(window.localStorage.getItem("noa-cost-v2") || "null"); if (cv && Array.isArray(cv.prod) && cv.prod.length) { m = {}; cv.prod.forEach(function (p) { m[p.id] = p.pr || []; }); } if (!m) { m = JSON.parse(window.localStorage.getItem("noa-prices") || "null"); } } catch (e) { m = null; } if (!m) { return d; } return d.map(function (v, i) { var r = ids[i] && m[ids[i]]; var x = r ? +r[c] : 0; return x > 0 ? Math.round(x * 100) / 100 : v; }); })([18.00, 15.00, 12.00, 45.00, 22.00, 11.00, 32.00, 33.00, 18.00, 13.20, 15.00], 2);
+var WP = (function (d, c) { var ids = ["gata", "khash", "", "", "khinkali", "pelmeni", "blinchik", "kufta", "kiev", "chcut", "beefcut"]; var m = null; try { var cv = JSON.parse(window.localStorage.getItem("noa-cost-v2") || "null"); if (cv && Array.isArray(cv.prod) && cv.prod.length) { m = {}; cv.prod.forEach(function (p) { m[p.id] = p.pr || []; }); } if (!m) { m = JSON.parse(window.localStorage.getItem("noa-prices") || "null"); } } catch (e) { m = null; } if (!m) { return d; } return d.map(function (v, i) { var r = ids[i] && m[ids[i]]; var x = r ? +r[c] : 0; return x > 0 ? Math.round(x * 100) / 100 : v; }); })([18.00, 15.00, 12.00, 45.00, 22.00, 22.00, 32.00, 33.00, 18.00, 13.20, 15.00], 2);
 var stockQ = st.stock || (function () { try { var a = JSON.parse(window.localStorage.getItem("noa-stock") || "null"); if (Array.isArray(a) && a.length === 11) { return a; } } catch (e) {} return [40, 62, 33, 18, 55, 48, 31, 22, 12, 50, 9]; })();
 var FULL = typeof st.full === "number" ? st.full : (function () { try { var v = parseInt(window.localStorage.getItem("noa-stock-full") || "", 10); if (v > 0) { return v; } } catch (e) {} return 50; })();
 var LV_OK = Math.round(FULL * 0.6), LV_LOW = Math.round(FULL * 0.3);
@@ -1782,6 +1782,17 @@ window.azSet=function(d){z=Math.round(Math.min(1.6,Math.max(0.9,z+d))*100)/100;a
   var t = null; function sched() { clearTimeout(t); t = setTimeout(function () { mark(); apply(); }, 120); }
   function start() { mark(); apply(); try { new MutationObserver(sched).observe(document.body, { childList: true, subtree: true, characterData: true }); } catch (e) {} setInterval(function () { mark(); }, 1500); }
   if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", start); } else { start(); }
+})();
+</script>
+<script id="nofa-price-nov10">
+(function () {
+  /* One-time price update (Nov 10): gata unpackaged $1.50/piece; pelmeni wholesale $22 per 900 g, packaged only. */
+  function run() {
+    try { var raw = localStorage.getItem("noa-cost-v2"); if (!raw) { return; } var S = JSON.parse(raw); if (!S || !Array.isArray(S.prod) || S.prNov10) { return; }
+      S.prod.forEach(function (p) { if (!p || !Array.isArray(p.pr)) { return; } if (p.id === "gata") { p.pr[3] = 1.5; } if (p.id === "pelmeni") { p.pr[2] = 22; p.pr[3] = 0; p.noBulk = true; } });
+      S.prNov10 = 1; localStorage.setItem("noa-cost-v2", JSON.stringify(S)); } catch (e) {}
+  }
+  setTimeout(run, 9000); setInterval(run, 15000);
 })();
 </script>
 </body>
