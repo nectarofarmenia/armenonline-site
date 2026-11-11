@@ -44,6 +44,17 @@ if ($__c) { $__v = json_decode($__c['v'], true); if (is_array($__v) && empty($__
     if ($__p['id'] === 'gata') { $__p['pr'][3] = 1.5; }
     if ($__p['id'] === 'pelmeni') { $__p['pr'][2] = 22; $__p['pr'][3] = 0; $__p['noBulk'] = true; } }
   unset($__p); $__v['prNov10'] = 1; kv_put($db, 'noa-cost-v2', json_encode($__v, JSON_UNESCAPED_UNICODE)); } }
+// One-time payment details update (Nov 10): Zelle by phone only; Bank of America routing numbers (public bank numbers). The account number is entered by the owner in Admin → Settings.
+$__c = kv_get($db, 'noa-paycfg'); $__v = $__c ? (json_decode($__c['v'], true) ?: []) : [];
+if (empty($__v['payNov10'])) {
+  if (empty($__v['zelle']) || strpos((string) $__v['zelle'], '@') !== false) { $__v['zelle'] = !empty($__v['zphone']) ? $__v['zphone'] : '+1 (515) 588 5555'; }
+  if (empty($__v['zphone'])) { $__v['zphone'] = $__v['zelle']; }
+  if (empty($__v['bank'])) { $__v['bank'] = 'Bank of America'; }
+  if (empty($__v['acctName'])) { $__v['acctName'] = 'Nectar of Armenia Inc'; }
+  if (empty($__v['routing'])) { $__v['routing'] = '121000358'; }
+  if (empty($__v['wireRouting'])) { $__v['wireRouting'] = '026009593'; }
+  $__v['payNov10'] = 1; kv_put($db, 'noa-paycfg', json_encode($__v, JSON_UNESCAPED_UNICODE));
+}
 
 switch ($a) {
   case 'login':
