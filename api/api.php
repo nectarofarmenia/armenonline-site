@@ -217,7 +217,7 @@ switch ($a) {
     if ($fee > 0) { $form["line_items[$i][price_data][currency]"] = 'usd'; $form["line_items[$i][price_data][product_data][name]"] = 'Delivery'; $form["line_items[$i][price_data][unit_amount]"] = (int) round($fee * 100); $form["line_items[$i][quantity]"] = 1; }
     $em = trim((string) ($b['email'] ?? '')); if (filter_var($em, FILTER_VALIDATE_EMAIL)) { $form['customer_email'] = $em; }
     $host = ($https ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'armenonline.com'); $base = $host . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '/api/api.php')), '/');
-    $form['success_url'] = $base . '/MyAccount.dc.html?paid={CHECKOUT_SESSION_ID}&no=' . $no; $form['cancel_url'] = $base . '/MyAccount.dc.html?paycancel=' . $no;
+    $form['success_url'] = $base . '/Checkout.dc.html?paid={CHECKOUT_SESSION_ID}&no=' . $no; $form['cancel_url'] = $base . '/Checkout.dc.html?paycancel=' . $no; $form['submit_type'] = 'pay'; $lc = (string) ($b['lang'] ?? ''); if (in_array($lc, ['en', 'ru', 'es'], true)) { $form['locale'] = $lc; }
     $r = stripe_api($sk, 'POST', 'checkout/sessions', $form, $code); $j = json_decode((string) $r, true) ?: [];
     if ($code !== 200 || empty($j['url'])) { out(['ok' => false, 'err' => 'stripe', 'msg' => $j['error']['message'] ?? '']); }
     kv_put($db, '__pay|' . $no, json_encode(['sid' => $j['id'], 'amt' => round($sub + $fee, 2), 'fee' => $fee, 't' => now_ms()]));
