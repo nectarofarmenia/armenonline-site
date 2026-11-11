@@ -965,6 +965,13 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </div>
 <span id="cpw-msg" style="font-size: 14px; font-weight: 700"></span>
 </div>
+<div class="card3d" id="stripe-card" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; color: #1D5545; font-size: 22px">💳 Քարտով վճարում (Stripe)</h2>
+<p style="margin: 0; color: #5E6A63; font-size: 14px; line-height: 1.55">Stripe → Developers → API keys → <b>Secret key</b> (<code>sk_test_…</code> թեստի համար, <code>sk_live_…</code> իրականի)։ Բանալին պահվում է միայն սերվերում և այլևս ոչ մի տեղ չի ցուցադրվում։ Դատարկ պահպանելը անջատում է քարտով վճարումը։</p>
+<div id="stripe-st" style="font-size: 14px; font-weight: 800; color: #5E6A63">…</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><input id="stripe-sk" class="fld" type="password" autocomplete="off" placeholder="sk_test_… / sk_live_…" style="flex: 1 1 260px; min-height: 44px"><button type="button" id="stripe-go" class="btn-green ad-btn">Պահպանել</button></div>
+<span id="stripe-msg" style="font-size: 14px; font-weight: 700"></span>
+</div>
 <div class="card3d" id="zn-card" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 12px">
 <h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; color: #1D5545; font-size: 22px">🗺 Առաքման գոտիներ</h2>
 <p style="margin: 0; color: #5E6A63; font-size: 14px; line-height: 1.5">Գոտի 1-ի և Գոտի 2-ի գները դրվում են վերևի «Առաքման վճար» դաշտերում։ Սեղմեք քաղաքի կողքի 1 կամ 2 կոճակը՝ գոտին փոխելու համար։ Ցանկում չեղած քաղաքներին առաքում չի արվում։</p>
@@ -1156,8 +1163,9 @@ var CUST = []; var cIdx = {};
 var custOf = function (email, ty) { var em = (email || "").toLowerCase(); var key = (em || "guest") + "|" + ty; if (cIdx[key] == null) { var a = RACC[em + "|" + ty] || null; var nm = a ? (ty === "W" ? (a.biz || ((a.first || "") + " " + (a.last || "")).trim()) : ((a.first || "") + " " + (a.last || "")).trim()) : ""; CUST.push([nm || em || (lang === "en" ? "Guest" : "Հյուր"), ty, (a && (a.city || a.zip)) || "", em, (a && a.phone) || ""]); cIdx[key] = CUST.length - 1; } return cIdx[key]; };
 Object.keys(RACC).sort(function (a, b) { return String(RACC[a].createdAt || "") < String(RACC[b].createdAt || "") ? -1 : 1; }).forEach(function (k) { custOf(RACC[k].email, k.slice(-1)); });
 var day0 = new Date(); day0.setHours(0, 0, 0, 0);
+var CARDPAID = (function () { try { return JSON.parse(window.localStorage.getItem("noa-cardpaid") || "{}") || {}; } catch (e) { return {}; } })();
 var RAW = [];
-try { (JSON.parse(window.localStorage.getItem("noa-orders") || "[]") || []).forEach(function (o) { if (!o || !o.items) { return; } RAW.push({ no: String(o.no || "").replace(/^NOA-/, "NofA-"), ci: custOf(o.email, "R"), items: o.items, total: parseFloat(String(o.total || "0").replace(/[^0-9.]/g, "")) || 0, pay: o.paid || !o.pay ? "paid" : "unpaid", addr: o.addr || "", fee: +o.fee || 0, st: 0, d: new Date(o.day || Date.now()) }); }); } catch (e) {}
+try { (JSON.parse(window.localStorage.getItem("noa-orders") || "[]") || []).forEach(function (o) { if (!o || !o.items) { return; } RAW.push({ no: String(o.no || "").replace(/^NOA-/, "NofA-"), ci: custOf(o.email, "R"), items: o.items, total: parseFloat(String(o.total || "0").replace(/[^0-9.]/g, "")) || 0, pay: o.pay === "card" ? (CARDPAID[String(o.no || "")] ? "paid" : "unpaid") : (o.paid || !o.pay ? "paid" : "unpaid"), pm: o.pay || "", addr: o.addr || "", fee: +o.fee || 0, st: 0, d: new Date(o.day || Date.now()) }); }); } catch (e) {}
 try { for (var ki = 0; ki < window.localStorage.length; ki++) { var kk0 = window.localStorage.key(ki); if (!kk0 || kk0.indexOf("noa-ws-orders|") !== 0 || kk0 === "noa-ws-orders|demo") { continue; } var em0 = kk0.slice(14); (JSON.parse(window.localStorage.getItem(kk0) || "[]") || []).forEach(function (o) { if (!o || !(o.ap === "approved" || o.ap === "pending")) { return; } var tw = 0; (o.items || []).forEach(function (x) { tw += x[1] * (WP[x[0]] || 0); }); if (+o.amt > 0) { tw = +o.amt; } RAW.push({ no: String(o.no || "").replace(/^NOA-/, "NofA-"), ci: custOf(em0, "W"), items: o.items || [], total: tw, pack: o.pack || "", pay: o.chargedAt ? "paid" : "unpaid", st: o.ap === "pending" ? 0 : (o.st === 2 ? 4 : (o.st === 1 ? 3 : 1)), d: new Date(o.date || Date.now()) }); }); } } catch (e) {}
 try { var CST = JSON.parse(window.localStorage.getItem("noa-cost-v2") || "null"); var SI = { gata: 0, khash: 1, khinkali: 4, pelmeni: 5, blinchik: 6, kufta: 7, kiev: 8, chcut: 9, beefcut: 10 };
   if (CST && Array.isArray(CST.calls)) { CST.calls.forEach(function (c) { var ty = c.type === "w" ? "W" : "R"; var pdg = String(c.phone || "").replace(/\D/g, ""); var key = pdg ? "tel:" + pdg : "name:" + String(c.name || "").trim().toLowerCase(); var ix = cIdx[key + "|" + ty]; if (ix == null) { CUST.push([c.name || c.phone || "—", ty, (c.addr || "").split(",").slice(-2, -1)[0] ? String((c.addr || "").split(",").slice(-2, -1)[0]).trim() : (c.addr || ""), "", c.phone || ""]); ix = CUST.length - 1; cIdx[key + "|" + ty] = ix; }
@@ -2037,5 +2045,15 @@ window.azSet=function(d){z=Math.round(Math.min(1.6,Math.max(0.9,z+d))*100)/100;a
   setInterval(function () { var box = document.getElementById("zn-list"); if (box && !box.childElementCount) { draw(); } }, 600);
 })();
 </script>
+<script id="nofa-stripe-admin">(function () {
+  function api(x, b) { return fetch("api/api.php?a=" + x, { method: b ? "POST" : "GET", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: b ? JSON.stringify(b) : undefined }).then(function (r) { return r.json(); }); }
+  api("pay_list").then(function (j) { if (j && j.ok) { var s = JSON.stringify(j.paid || {}); if (localStorage.getItem("noa-cardpaid") !== s) { localStorage.setItem("noa-cardpaid", s); } } }).catch(function () {});
+  function info() { var st = document.getElementById("stripe-st"); if (!st) { return; } api("stripe_info").then(function (j) { if (!j || !j.ok) { st.textContent = "Սերվերի հետ կապ չկա"; return; } st.style.color = j.on ? "#2F7A55" : "#B03A2E"; st.textContent = j.on ? ("✓ Միացված է · " + (j.mode === "live" ? "ԻՐԱԿԱՆ (live)" : "ԹԵՍՏ (test)") + " · …" + j.tail) : "✕ Միացված չէ"; }).catch(function () { st.textContent = "Սերվերի հետ կապ չկա"; }); }
+  var iv = setInterval(function () { if (document.getElementById("stripe-st")) { clearInterval(iv); info(); } }, 500);
+  document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest("#stripe-go"); if (!b) { return; } var inp = document.getElementById("stripe-sk"), m = document.getElementById("stripe-msg"); var sk = (inp.value || "").trim();
+    if (sk && /^pk_/.test(sk)) { m.style.color = "#B03A2E"; m.textContent = "Սա Publishable key է (pk_)։ Պետք է Secret key-ը (sk_)։"; return; }
+    b.disabled = true; m.style.color = "#5E6A63"; m.textContent = "Ստուգում ենք Stripe-ի հետ…";
+    api("stripe_cfg", { sk: sk }).then(function (j) { b.disabled = false; inp.value = ""; if (j && j.ok) { m.style.color = "#2F7A55"; m.textContent = sk ? "✓ Պահպանվեց և ստուգվեց Stripe-ի հետ։" : "Քարտով վճարումը անջատված է։"; info(); } else { m.style.color = "#B03A2E"; m.textContent = j && j.err === "format" ? "Բանալին պետք է սկսվի sk_test_ կամ sk_live_-ով։" : (j && j.err === "stripe" ? "Stripe-ը չընդունեց այս բանալին։ Ստուգեք, որ ամբողջությամբ եք պատճենել։" : "Չհաջողվեց պահպանել։"); } }).catch(function () { b.disabled = false; m.style.color = "#B03A2E"; m.textContent = "Սերվերի հետ կապ չկա։"; }); });
+})();</script>
 </body>
 </html>

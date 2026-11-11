@@ -34,6 +34,14 @@ function cust_rec($db, $em, $type, $tok) {
   foreach ($A as $key => $rec) { $kt = substr((string) $key, -4) === '|biz' ? 'biz' : ((isset($rec['type']) && $rec['type'] === 'biz') ? 'biz' : 'retail'); if (is_array($rec) && strtolower($rec['email'] ?? '') === $em && $kt === $type && isset($rec['tok']) && hash_equals((string) $rec['tok'], $tok)) { return [$em . '|' . $type, $rec]; } }
   return null;
 }
+function stripe_sk($db) { $r = kv_get($db, '__stripe'); $j = $r ? (json_decode($r['v'], true) ?: []) : []; return (string) ($j['sk'] ?? ''); }
+function stripe_api($sk, $method, $path, $form, &$code) {
+  $url = (getenv('NOFA_STRIPE_URL') ?: 'https://api.stripe.com/v1/') . $path; $q = http_build_query($form); $code = 0;
+  if (function_exists('curl_init')) { $ch = curl_init($method === 'GET' && $q ? $url . '?' . $q : $url); curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 25, CURLOPT_USERPWD => $sk . ':', CURLOPT_HTTPHEADER => ['Stripe-Version: 2024-06-20']]);
+    if ($method === 'POST') { curl_setopt($ch, CURLOPT_POST, true); curl_setopt($ch, CURLOPT_POSTFIELDS, $q); } $r = curl_exec($ch); $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch); return $r; }
+  $ctx = stream_context_create(['http' => ['method' => $method, 'timeout' => 25, 'ignore_errors' => true, 'header' => "Authorization: Bearer $sk\r\nStripe-Version: 2024-06-20\r\nContent-Type: application/x-www-form-urlencoded\r\n", 'content' => $method === 'POST' ? $q : '']]);
+  $r = @file_get_contents($method === 'GET' && $q ? $url . '?' . $q : $url, false, $ctx); if (isset($http_response_header[0]) && preg_match('/\s(\d{3})\s/', $http_response_header[0], $mm)) { $code = (int) $mm[1]; } return $r;
+}
 function links_get($db) { return json_decode((kv_get($db, '__links') ?: ['v' => '{}'])['v'], true) ?: []; }
 function kv_put($db, $k, $v) { $t = now_ms(); $s = $db->prepare('REPLACE INTO nofa_kv (k, v, t) VALUES (?, ?, ?)'); $s->execute([$k, $v, $t]); return $t; }
 
@@ -180,6 +188,50 @@ switch ($a) {
       exit;
     }
     out(['ok' => true, 'data' => $j]);
+  case 'stripe_cfg': // admin: save Stripe secret key (server-only, never returned)
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $b = body(); $sk = trim((string) ($b['sk'] ?? ''));
+    if ($sk === '') { kv_put($db, '__stripe', json_encode([])); out(['ok' => true, 'mode' => '']); }
+    if (!preg_match('/^(sk|rk)_(test|live)_[A-Za-z0-9]{10,}$/', $sk)) { out(['ok' => false, 'err' => 'format']); }
+    $r = stripe_api($sk, 'GET', 'balance', [], $code); if ($code !== 200) { out(['ok' => false, 'err' => 'stripe', 'code' => $code]); }
+    kv_put($db, '__stripe', json_encode(['sk' => $sk, 't' => now_ms()])); out(['ok' => true, 'mode' => strpos($sk, '_live_') !== false ? 'live' : 'test']);
+  case 'stripe_info': // admin: is a key set, which mode (never the key)
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $sk = stripe_sk($db); out(['ok' => true, 'on' => $sk !== '', 'mode' => $sk === '' ? '' : (strpos($sk, '_live_') !== false ? 'live' : 'test'), 'tail' => $sk === '' ? '' : substr($sk, -4)]);
+  case 'pay_create': // customer: Stripe Checkout for a retail web order; amounts computed here, not trusted from the browser
+    $sk = stripe_sk($db); if ($sk === '') { out(['ok' => false, 'err' => 'off']); }
+    $b = body(); $no = preg_replace('/[^A-Za-z0-9-]/', '', (string) ($b['no'] ?? '')); if ($no === '') { out(['ok' => false, 'err' => 'no']); }
+    $P = [22.00, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0]; $ids = ['gata', 'khash', '', '', 'khinkali', 'pelmeni', 'blinchik', 'kufta', 'kiev', 'chcut', 'beefcut'];
+    $N = ['Gata', 'Khash', 'Khash Broth', 'Khash Set', 'Khinkali', 'Pelmeni', 'Blinchik', 'Mijukov Kufta', 'Chicken Kiev', 'Chicken Cutlets', 'Beef Cutlets'];
+    $cr = kv_get($db, 'noa-cost-v2'); if ($cr) { $cv = json_decode($cr['v'], true) ?: []; foreach (($cv['prod'] ?? []) as $pd) { $k = array_search((string) ($pd['id'] ?? ''), $ids, true); $v = (float) (($pd['pr'] ?? [])[0] ?? 0); if ($k !== false && $v > 0) { $P[$k] = round($v, 2); } } }
+    $lines = []; $sub = 0; $form = ['mode' => 'payment', 'client_reference_id' => $no, 'metadata[order]' => $no, 'payment_intent_data[metadata][order]' => $no, 'payment_intent_data[statement_descriptor_suffix]' => substr($no, -10)];
+    $i = 0; foreach ((array) ($b['items'] ?? []) as $it) { $pi = (int) ($it[0] ?? -1); $q = (int) ($it[1] ?? 0); if ($pi < 0 || $pi > 10 || $q < 1 || $q > 200 || $P[$pi] <= 0) { continue; }
+      $form["line_items[$i][price_data][currency]"] = 'usd'; $form["line_items[$i][price_data][product_data][name]"] = $N[$pi]; $form["line_items[$i][price_data][unit_amount]"] = (int) round($P[$pi] * 100); $form["line_items[$i][quantity]"] = $q; $sub += $P[$pi] * $q; $i++; }
+    if (!$i) { out(['ok' => false, 'err' => 'empty']); }
+    $fee = 0; if (($b['fm'] ?? 'del') === 'del') {
+      $pc = json_decode((kv_get($db, 'noa-paycfg') ?: ['v' => '{}'])['v'], true) ?: []; $f1 = isset($pc['delFee']) && $pc['delFee'] !== '' ? (float) $pc['delFee'] : 7; $f2 = isset($pc['delFee2']) && $pc['delFee2'] !== '' ? (float) $pc['delFee2'] : 14;
+      $Z = ['Glendale' => 1, 'Burbank' => 1, 'Montrose' => 1, 'La Crescenta' => 1, 'La Cañada Flintridge' => 1, 'Eagle Rock' => 1, 'Atwater Village' => 1, 'Sun Valley' => 1, 'Toluca Lake' => 1, 'Universal City' => 1, 'Valley Village' => 1, 'North Hollywood' => 1, 'Studio City' => 1, 'Sunland' => 1, 'Tujunga' => 1, 'Hollywood' => 1, 'Pasadena' => 1, 'Altadena' => 1, 'South Pasadena' => 1, 'Los Angeles' => 2, 'West Hollywood' => 1, 'Pacoima' => 1, 'Arleta' => 1, 'Panorama City' => 1, 'Van Nuys' => 2, 'Sherman Oaks' => 2, 'Encino' => 2, 'Tarzana' => 2, 'Reseda' => 2, 'Northridge' => 2, 'Granada Hills' => 2, 'Porter Ranch' => 2, 'Chatsworth' => 2, 'Woodland Hills' => 2, 'Sylmar' => 2, 'Mission Hills' => 2, 'North Hills' => 2, 'Lake Balboa' => 2, 'Canoga Park' => 2]; $zr = kv_get($db, 'noa-cities'); if ($zr) { $zc = json_decode($zr['v'], true) ?: []; if (!empty($zc['cities']) && is_array($zc['cities'])) { $Z = $zc['cities']; } }
+      $city = strtolower(trim(explode(',', (string) ($b['city'] ?? ''))[0])); $zone = 0; foreach ($Z as $zk => $zv) { if (strtolower($zk) === $city) { $zone = (int) $zv; } }
+      if (!$zone) { out(['ok' => false, 'err' => 'zone']); } $fee = $zone === 2 ? $f2 : $f1;
+      $ff = isset($pc['freeFrom']) ? (float) $pc['freeFrom'] : 0; if ($ff > 0 && $sub >= $ff) { $fee = 0; } }
+    if ($fee > 0) { $form["line_items[$i][price_data][currency]"] = 'usd'; $form["line_items[$i][price_data][product_data][name]"] = 'Delivery'; $form["line_items[$i][price_data][unit_amount]"] = (int) round($fee * 100); $form["line_items[$i][quantity]"] = 1; }
+    $em = trim((string) ($b['email'] ?? '')); if (filter_var($em, FILTER_VALIDATE_EMAIL)) { $form['customer_email'] = $em; }
+    $host = ($https ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'armenonline.com'); $base = $host . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '/api/api.php')), '/');
+    $form['success_url'] = $base . '/MyAccount.dc.html?paid={CHECKOUT_SESSION_ID}&no=' . $no; $form['cancel_url'] = $base . '/MyAccount.dc.html?paycancel=' . $no;
+    $r = stripe_api($sk, 'POST', 'checkout/sessions', $form, $code); $j = json_decode((string) $r, true) ?: [];
+    if ($code !== 200 || empty($j['url'])) { out(['ok' => false, 'err' => 'stripe', 'msg' => $j['error']['message'] ?? '']); }
+    kv_put($db, '__pay|' . $no, json_encode(['sid' => $j['id'], 'amt' => round($sub + $fee, 2), 'fee' => $fee, 't' => now_ms()]));
+    out(['ok' => true, 'url' => $j['url'], 'total' => round($sub + $fee, 2), 'fee' => $fee]);
+  case 'pay_check': // anyone with the session id: confirm with Stripe and record the order as paid (server-side)
+    $sk = stripe_sk($db); $b = body(); $sid = preg_replace('/[^A-Za-z0-9_]/', '', (string) ($b['sid'] ?? '')); if ($sk === '' || $sid === '') { out(['ok' => false]); }
+    $r = stripe_api($sk, 'GET', 'checkout/sessions/' . $sid, [], $code); $j = json_decode((string) $r, true) ?: [];
+    if ($code !== 200) { out(['ok' => false, 'err' => 'stripe']); }
+    $no = (string) ($j['client_reference_id'] ?? ''); $paid = ($j['payment_status'] ?? '') === 'paid';
+    if ($paid && $no !== '') { $L = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: []; if (empty($L[$no])) { $L[$no] = ['amt' => ((int) ($j['amount_total'] ?? 0)) / 100, 'pi' => (string) ($j['payment_intent'] ?? ''), 't' => now_ms()]; kv_put($db, '__paidweb', json_encode($L)); } }
+    out(['ok' => true, 'paid' => $paid, 'no' => $no, 'amt' => ((int) ($j['amount_total'] ?? 0)) / 100]);
+  case 'pay_list': // admin: orders confirmed paid by card
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    out(['ok' => true, 'paid' => json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: new stdClass()]);
   case 'pub': // anyone: public site settings (theme, stock, cities)
     $res = []; foreach ($PUBLIC as $k) { $r = kv_get($db, $k); if ($r) { $res[$k] = $r['v']; } }
     // wholesale prices from the admin cost/price page (prices only, never costs or recipes)
@@ -187,6 +239,7 @@ switch ($a) {
       foreach (($cv['prod'] ?? []) as $pd) { if (!is_array($pd) || !isset($pd['id'])) { continue; } $pr = $pd['pr'] ?? []; $wp[(string) $pd['id']] = [round((float) ($pr[2] ?? 0), 2), round((float) ($pr[3] ?? 0), 2), !empty($pd['noBulk'])]; $all[(string) $pd['id']] = [round((float) ($pr[0] ?? 0), 2), round((float) ($pr[1] ?? 0), 2), round((float) ($pr[2] ?? 0), 2), round((float) ($pr[3] ?? 0), 2)]; }
       if ($wp) { $res['noa-wsprices'] = json_encode($wp); $res['noa-prices'] = json_encode($all); } }
     if (isset($res['noa-paycfg'])) { $p = json_decode($res['noa-paycfg'], true) ?: []; $res['noa-paycfg'] = json_encode(['zelle' => $p['zelle'] ?? '', 'zphone' => $p['zphone'] ?? '', 'acctName' => $p['acctName'] ?? '', 'freeFrom' => $p['freeFrom'] ?? '', 'delFee' => $p['delFee'] ?? '', 'delFee2' => $p['delFee2'] ?? ''], JSON_UNESCAPED_UNICODE); }
+    $res['noa-stripe-on'] = stripe_sk($db) !== '' ? '1' : '0';
     out(['ok' => true, 'kv' => $res]);
   case 'link_code': // customer: one-time code to link this account with another one (wholesale <-> personal)
   case 'link_use':
