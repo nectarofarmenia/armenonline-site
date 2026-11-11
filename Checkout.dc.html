@@ -314,6 +314,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
 .pgx button{width:38px !important;height:38px !important;font-size:18px !important}.hdr-stick .nf-bell,header .nf-bell{width:38px !important;height:38px !important;min-width:38px !important;font-size:18px !important;flex:none !important}
 }</style>
 <style id="nofa-no-wait">.po-wait,#po-wait-co{display:none !important}</style>
+<script id="nofa-stripe-flag">(function () { try { fetch("api/api.php?a=pub", { credentials: "same-origin" }).then(function (r) { return r.json(); }).then(function (j) { var v = j && j.kv ? j.kv["noa-stripe-on"] : null; if (v == null) { return; } var old = null; try { old = localStorage.getItem("noa-stripe-on"); } catch (e) {} if (old !== v) { try { localStorage.setItem("noa-stripe-on", v); } catch (e) {} if (!sessionStorage.getItem("noa-stripe-rl")) { sessionStorage.setItem("noa-stripe-rl", "1"); location.reload(); } } }).catch(function () {}); } catch (e) {} })();</script>
 </head>
 <body>
 <x-dc>
