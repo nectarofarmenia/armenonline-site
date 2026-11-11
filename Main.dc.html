@@ -983,7 +983,8 @@ t.setSize,
 "6 " + t.pcs + " · 25 oz / 720 g",
 "6 " + t.pcs + " · 25 oz / 720 g"
 ];
-var prices = ["", "$19.95", "$15.95", "$60.00", "$24.95", "$24.95", "$34.95", "$34.95", "$20.95", "", ""];
+var PRN = (function (d, c) { var ids = ["gata", "khash", "", "", "khinkali", "pelmeni", "blinchik", "kufta", "kiev", "chcut", "beefcut"]; var m = null; try { var cv = JSON.parse(window.localStorage.getItem("noa-cost-v2") || "null"); if (cv && Array.isArray(cv.prod) && cv.prod.length) { m = {}; cv.prod.forEach(function (p) { m[p.id] = p.pr || []; }); } if (!m) { m = JSON.parse(window.localStorage.getItem("noa-prices") || "null"); } } catch (e) { m = null; } if (!m) { return d; } return d.map(function (v, i) { var r = ids[i] && m[ids[i]]; var x = r ? +r[c] : 0; return x > 0 ? Math.round(x * 100) / 100 : v; }); })([22.00, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0], 0);
+var prices = PRN.map(function (v) { return v > 0 ? "$" + v.toFixed(2) : ""; });
 var PIMG = ["img/6830d83c7ec9c8d627f12f1f2a8c5eeb.jpg", "img/c8b0737505aa785eed93371b09c8e049.jpg", "img/c8b0737505aa785eed93371b09c8e049.jpg", "img/d3fbe1930c2f9c5d58eab675b2128cfd.png", "img/65940d08dd8a527a15d113ecd1854f3a.webp", "img/9eb33fd2c3ff435a1314ecd2f69f9245.webp", "img/645bf576eb7a0134b08d93cb48d381e7.webp", "img/a6aaa8aa5db20ba68bc42c3406095e44.webp", "img/6a86ac441cd9dd29b3e3ba1a16934988.webp", "img/0f5ce6e80b23a0e775ad415e85b7ef0d.webp", "img/135d0cd80fa69f4a118392eea9b8bcd6.webp"];
 var tagIdx = [-1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1];
 var cart = (this.state && this.state.cart) || null;
