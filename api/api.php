@@ -31,7 +31,7 @@ function cust_rec($db, $em, $type, $tok) {
   $em = strtolower(trim((string) $em)); $type = $type === 'biz' ? 'biz' : 'retail'; $tok = (string) $tok;
   if ($em === '' || strlen($tok) < 16) { return null; }
   $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: [];
-  foreach ($A as $key => $rec) { if (is_array($rec) && strtolower($rec['email'] ?? '') === $em && (($rec['type'] ?? '') === 'biz' ? 'biz' : 'retail') === $type && isset($rec['tok']) && hash_equals((string) $rec['tok'], $tok)) { return [$em . '|' . $type, $rec]; } }
+  foreach ($A as $key => $rec) { $kt = substr((string) $key, -4) === '|biz' ? 'biz' : ((isset($rec['type']) && $rec['type'] === 'biz') ? 'biz' : 'retail'); if (is_array($rec) && strtolower($rec['email'] ?? '') === $em && $kt === $type && isset($rec['tok']) && hash_equals((string) $rec['tok'], $tok)) { return [$em . '|' . $type, $rec]; } }
   return null;
 }
 function links_get($db) { return json_decode((kv_get($db, '__links') ?: ['v' => '{}'])['v'], true) ?: []; }
@@ -160,7 +160,7 @@ switch ($a) {
     $db->prepare('DELETE FROM nofa_kv WHERE k = ?')->execute(['__lk|' . $code]);
     if ($c['key'] === $me[0]) { out(['ok' => false, 'err' => 'same']); }
     $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $orec = null;
-    foreach ($A as $k2 => $r2) { if (is_array($r2) && strtolower($r2['email'] ?? '') . '|' . ((($r2['type'] ?? '') === 'biz') ? 'biz' : 'retail') === $c['key']) { $orec = $r2; } }
+    foreach ($A as $k2 => $r2) { if (is_array($r2) && strtolower((string) $k2) === $c['key']) { $orec = $r2; } }
     if (!$orec) { out(['ok' => false, 'err' => 'bad_code']); }
     $L[$me[0]] = array_values(array_unique(array_merge($L[$me[0]] ?? [], [$c['key']]))); $L[$c['key']] = array_values(array_unique(array_merge($L[$c['key']] ?? [], [$me[0]])));
     kv_put($db, '__links', json_encode($L)); out(['ok' => true, 'other' => $c['key'], 'account' => $orec]);
@@ -176,7 +176,7 @@ switch ($a) {
     foreach (($inv['list'] ?? []) as $v) { if (!is_array($v) || in_array($v['st'] ?? '', ['draft', 'void'], true)) { continue; } if (in_array($v['ck'] ?? '', $cks, true) || strtolower($v['c']['e'] ?? '') === $em) { $list[] = $v; } }
     $cost = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: []; $cp = [];
     foreach ($cks as $ck) { if (isset($cost['cprof'][$ck]['dep0'])) { $cp[$ck] = ['dep0' => $cost['cprof'][$ck]['dep0']]; } }
-    $LK = links_get($db); $lk = []; foreach (array_keys($mine) as $mk) { foreach (($LK[$mk] ?? []) as $ok2) { $lk[$mk][] = $ok2; foreach ($A as $k3 => $r3) { if (is_array($r3) && strtolower($r3['email'] ?? '') . '|' . ((($r3['type'] ?? '') === 'biz') ? 'biz' : 'retail') === $ok2) { $mine[$k3] = $r3; } } } }
+    $LK = links_get($db); $lk = []; foreach (array_keys($mine) as $mk) { foreach (($LK[$mk] ?? []) as $ok2) { $lk[$mk][] = $ok2; foreach ($A as $k3 => $r3) { if (is_array($r3) && strtolower((string) $k3) === $ok2) { $mine[$k3] = $r3; } } } }
     out(['ok' => true, 'accounts' => $mine, 'links' => $lk, 'keys' => $keys, 'inv' => $list, 'cprof' => $cp]);
 }
 out(['ok' => false, 'err' => 'unknown'], 400);
