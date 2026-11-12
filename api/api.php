@@ -42,6 +42,17 @@ function stripe_api($sk, $method, $path, $form, &$code) {
   $ctx = stream_context_create(['http' => ['method' => $method, 'timeout' => 25, 'ignore_errors' => true, 'header' => "Authorization: Bearer $sk\r\nStripe-Version: 2024-06-20\r\nContent-Type: application/x-www-form-urlencoded\r\n", 'content' => $method === 'POST' ? $q : '']]);
   $r = @file_get_contents($method === 'GET' && $q ? $url . '?' . $q : $url, false, $ctx); if (isset($http_response_header[0]) && preg_match('/\s(\d{3})\s/', $http_response_header[0], $mm)) { $code = (int) $mm[1]; } return $r;
 }
+function sms_conf($db) { $r = kv_get($db, '__sms'); return $r ? (json_decode($r['v'], true) ?: []) : []; }
+function sms_e164($p) { $d = preg_replace('/\D/', '', (string) $p); if (strlen($d) === 10) { return '+1' . $d; } if (strlen($d) === 11 && $d[0] === '1') { return '+' . $d; } return ''; }
+function sms_one($c, $to, $text, &$err) {
+  if (($c['provider'] ?? '') === 'twilio') { $url = (getenv('NOFA_SMS_URL') ?: 'https://api.twilio.com/2010-04-01/Accounts/') . rawurlencode($c['sid']) . '/Messages.json'; $hdr = ['Authorization: Basic ' . base64_encode($c['sid'] . ':' . $c['key']), 'Content-Type: application/x-www-form-urlencoded']; $payload = http_build_query(['To' => $to, 'From' => $c['from'], 'Body' => $text]); }
+  else { $url = getenv('NOFA_SMS_URL') ?: 'https://api.telnyx.com/v2/messages'; $hdr = ['Authorization: Bearer ' . $c['key'], 'Content-Type: application/json']; $payload = json_encode(['from' => $c['from'], 'to' => $to, 'text' => $text], JSON_UNESCAPED_UNICODE); }
+  $code = 0; $r = false;
+  if (function_exists('curl_init')) { $ch = curl_init($url); curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 20, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload, CURLOPT_HTTPHEADER => $hdr]); $r = curl_exec($ch); $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch); }
+  else { $ctx = stream_context_create(['http' => ['method' => 'POST', 'timeout' => 20, 'ignore_errors' => true, 'header' => implode("\r\n", $hdr) . "\r\n", 'content' => $payload]]); $r = @file_get_contents($url, false, $ctx); if (isset($http_response_header[0]) && preg_match('/\s(\d{3})\s/', $http_response_header[0], $mm)) { $code = (int) $mm[1]; } }
+  if ($code >= 200 && $code < 300) { return true; }
+  $j = json_decode((string) $r, true); $err = (string) ($j['errors'][0]['detail'] ?? $j['message'] ?? ('http ' . $code)); $err = substr($err, 0, 160); return false;
+}
 function mail_cfg($db) { $r = kv_get($db, '__mail'); return $r ? (json_decode($r['v'], true) ?: []) : []; }
 function smtp_send($m, $to, $subject, $html, &$err = null) {
   $host = (string) ($m['host'] ?? 'smtp.hostinger.com'); $port = (int) ($m['port'] ?? 465); $user = (string) ($m['user'] ?? ''); $pass = (string) ($m['pass'] ?? '');
@@ -227,6 +238,40 @@ switch ($a) {
       exit;
     }
     out(['ok' => true, 'data' => $j]);
+  case 'track': // public: one delivery's status for the customer tracking page (Track.html?t=...)
+    $tk = (string) ($_GET['t'] ?? ''); if (!preg_match('/^[a-f0-9]{20}$/', $tk)) { out(['ok' => false, 'err' => 'bad'], 400); }
+    $t = kv_get($db, '__apri_token'); if (!$t) { out(['ok' => false, 'err' => 'off'], 503); }
+    $r = apri_rpc('nofa_track', ['p_token' => $t['v'], 'p_tok' => $tk], $code);
+    if ($r === false || $code >= 400) { out(['ok' => false, 'err' => 'apri_http'], 502); }
+    $j = json_decode($r, true); if (!is_array($j)) { out(['ok' => false, 'err' => 'none'], 404); }
+    out(['ok' => true, 'd' => $j]);
+  case 'apri_track': // admin: tracking codes + times for stops (to copy the link or text the customer)
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $t = kv_get($db, '__apri_token'); if (!$t) { out(['ok' => false, 'err' => 'no_token']); }
+    $b = body(); $ids = array_values(array_filter(array_map(function ($x) { return substr((string) $x, 0, 60); }, array_slice(is_array($b['ids'] ?? null) ? $b['ids'] : [], 0, 500)), 'strlen'));
+    $r = apri_rpc('nofa_track_tokens', ['p_token' => $t['v'], 'p_ids' => $ids], $code);
+    if ($r === false || $code >= 400) { out(['ok' => false, 'err' => 'apri_http', 'code' => $code, 'body' => substr((string) $r, 0, 300)]); }
+    out(['ok' => true, 'data' => json_decode($r, true) ?: []]);
+  case 'sms_cfg': // admin: SMS provider (Telnyx or Twilio); the key stays on the server and is never returned
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $b = body(); $pv = in_array($b['provider'] ?? '', ['telnyx', 'twilio'], true) ? $b['provider'] : '';
+    if ($pv === '') { kv_put($db, '__sms', json_encode([])); out(['ok' => true, 'on' => false]); }
+    $key = trim((string) ($b['key'] ?? '')); $sid = trim((string) ($b['sid'] ?? '')); $from = sms_e164($b['from'] ?? '');
+    if ($key === '' || !$from || ($pv === 'twilio' && !preg_match('/^AC[a-f0-9]{32}$/', $sid))) { out(['ok' => false, 'err' => 'format']); }
+    kv_put($db, '__sms', json_encode(['provider' => $pv, 'key' => $key, 'sid' => $sid, 'from' => $from, 't' => now_ms()])); out(['ok' => true, 'on' => true]);
+  case 'sms_info':
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $c = sms_conf($db); out(['ok' => true, 'on' => !empty($c['key']), 'provider' => $c['provider'] ?? '', 'from' => isset($c['from']) ? substr($c['from'], 0, -4) . '••••' : '']);
+  case 'sms_send': // admin: [{to, text}] up to 100 per call
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $c = sms_conf($db); if (empty($c['key'])) { out(['ok' => false, 'err' => 'no_sms']); }
+    $b = body(); $res = [];
+    foreach (array_slice(is_array($b['msgs'] ?? null) ? $b['msgs'] : [], 0, 100) as $m) {
+      $to = sms_e164($m['to'] ?? ''); $tx = mb_substr(trim((string) ($m['text'] ?? '')), 0, 480); $id = substr((string) ($m['id'] ?? ''), 0, 60);
+      if (!$to || $tx === '') { $res[] = ['id' => $id, 'ok' => false, 'err' => 'bad']; continue; }
+      $e = null; $ok = sms_one($c, $to, $tx, $e); $res[] = ['id' => $id, 'ok' => $ok, 'err' => $ok ? '' : $e];
+    }
+    out(['ok' => true, 'res' => $res]);
   case 'stripe_cfg': // admin: save Stripe secret key (server-only, never returned)
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $b = body(); $sk = trim((string) ($b['sk'] ?? ''));

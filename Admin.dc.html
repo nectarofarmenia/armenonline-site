@@ -2171,6 +2171,90 @@ window.azSet=function(d){z=Math.round(Math.min(1.6,Math.max(0.9,z+d))*100)/100;a
   setInterval(function () { var box = document.getElementById("zn-list"); if (box && !box.childElementCount) { draw(); } }, 600);
 })();
 </script>
+<script id="nofa-track-admin">
+/* Customer tracking links + SMS (Drivers tab): a private link per stop, text it to the customer with the estimated time. */
+(function () { if (window.__nofaTrk) { return; } window.__nofaTrk = 1;
+  var LS = function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, LG = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  var J = function (k, d) { try { var v = JSON.parse(LG(k) || "null"); return v == null ? d : v; } catch (e) { return d; } };
+  var DEF = "Nectar of Armenia: Hi {name}! Your order {no} arrives {when}. Track it live: {link}";
+  var info = null, toks = {}, tokKey = "", busy = false, msg = "", day = "today", cfgOpen = false, tplOpen = false;
+  var css = document.createElement("style");
+  css.textContent = "#trk-adm{border-radius:26px;padding:24px;display:flex;flex-direction:column;gap:12px}#trk-adm h2{margin:0;font-family:Fraunces,'Noto Serif Armenian',Lora,serif;font-weight:600;font-size:22px;color:#1D5545}#trk-adm .p{margin:0;color:#5E6A63;font-size:14px}" +
+    "#trk-adm .st{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-radius:14px;background:#FBF9F4;border:1px solid #EFE6D0;font-size:13.5px}#trk-adm .st b{color:#1D5545}#trk-adm .st .off{color:#9A6A00}" +
+    "#trk-adm .lnk{border:0;background:none;color:#1D5545;font:inherit;font-weight:800;text-decoration:underline;cursor:pointer;padding:0}" +
+    "#trk-adm .cfg{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;padding:14px;border-radius:16px;background:#FBF9F4;border:1px dashed #E2D3AE}#trk-adm label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:700;color:#5E6A63}" +
+    "#trk-adm input,#trk-adm select,#trk-adm textarea{font:15px Manrope,'Noto Sans Armenian',sans-serif;padding:9px 11px;border-radius:11px;border:1.5px solid #E4DCC8;background:#fff;color:#1E2A24}#trk-adm textarea{width:100%;min-height:70px;resize:vertical}" +
+    "#trk-adm .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}#trk-adm .seg{display:inline-flex;background:#F1EBDC;border-radius:999px;padding:3px}#trk-adm .seg button{border:0;background:none;padding:7px 14px;border-radius:999px;font:700 13.5px Manrope,'Noto Sans Armenian',sans-serif;color:#5E6A63;cursor:pointer}#trk-adm .seg button[aria-pressed=true]{background:#1D5545;color:#F6E3B4}" +
+    "#trk-adm .btn{border:0;border-radius:12px;padding:9px 14px;font:800 13.5px Manrope,'Noto Sans Armenian',sans-serif;cursor:pointer;background:#1D5545;color:#F6E3B4;text-decoration:none;display:inline-flex;align-items:center;gap:6px}#trk-adm .btn.l{background:#F1EBDC;color:#1D5545}#trk-adm .btn:disabled{opacity:.5;cursor:default}" +
+    "#trk-adm ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}#trk-adm li{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:14px;background:#fff;border:1px solid #EFE6D0;flex-wrap:wrap}" +
+    "#trk-adm li .w{flex:1;min-width:160px;display:flex;flex-direction:column}#trk-adm li .w b{font-size:14px}#trk-adm li small{color:#6B756F;font-size:12.5px}#trk-adm li .ty{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:11px;font-weight:900;background:#FFF1D6;color:#8A5A0B;flex:none}#trk-adm li .ty.w2{background:#E8EEFB;color:#2E4E9A}" +
+    "#trk-adm li .ok{color:#2F7A55;font-weight:800;font-size:12.5px}#trk-adm li.dim{opacity:.55}#trk-adm .m{font-size:13.5px;font-weight:700}#trk-adm .m.e{color:#B03A2E}#trk-adm .m.g{color:#2F7A55}";
+  document.head.appendChild(css);
+  function esc(x) { return String(x == null ? "" : x).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function api(a, b) { return fetch("api/api.php?a=" + a, { method: b ? "POST" : "GET", credentials: "same-origin", cache: "no-store", headers: b ? { "Content-Type": "application/json" } : {}, body: b ? JSON.stringify(b) : undefined }).then(function (r) { return r.json(); }); }
+  function ymd(off) { var d = new Date(); d.setDate(d.getDate() + off); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  function hm(iso) { var d = new Date(iso); return isNaN(d) ? "" : d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }); }
+  function dg(p) { var d = String(p || "").replace(/\D/g, ""); return d.length === 11 && d[0] === "1" ? d.slice(1) : d; }
+  function ws() { return LG("noa-trk-ws") === "1"; }
+  function rows() { var S = window.__nofaStops; var dt = ymd(day === "tom" ? 1 : 0); return ((S && S.rows) || []).filter(function (r) { return r.date === dt; }); }
+  function link(id) { var t = toks[id]; return t ? location.origin + location.pathname.replace(/[^\/]*$/, "") + "Track.html?t=" + t.tok : ""; }
+  function when(r) { var t = toks[r.id], d = day === "tom" ? "tomorrow" : "today"; if (t && t.eta) { return d + " around " + hm(t.eta); } return d + (r.data && r.data.slot ? " between " + String(r.data.slot).replace(/\s*[–-]\s*/, "–") : ""); }
+  function text(r) { var nm = String((r.data && r.data.cust) || "").trim().split(/\s+/)[0] || ""; return (LG("noa-trk-tpl") || DEF).replace(/\{name\}/g, nm).replace(/\{no\}/g, (r.data && r.data.no) || r.id).replace(/\{when\}/g, when(r)).replace(/\{link\}/g, link(r.id)).replace(/Hi !/, "Hi!"); }
+  function sent() { return J("noa-trk-sent", {}); }
+  function loadToks() { var L = rows(), ids = L.map(function (r) { return r.id; }), key = ids.join(","); if (!ids.length || key === tokKey) { return; } tokKey = key;
+    api("apri_track", { ids: ids }).then(function (j) { if (j && j.ok) { (j.data || []).forEach(function (x) { toks[x.id] = x; }); } else { msg = j && j.err === "no_token" ? "e:Նախ միացրեք My Apri-ն։" : "e:Չհաջողվեց բեռնել հղումները (track.sql-ը աշխատեցվա՞ծ է Supabase-ում)։"; } draw(); }).catch(function () { draw(); }); }
+  function build() {
+    var L = rows(), S = sent(), on = info && info.on;
+    var inc = L.filter(function (r) { return !(r.data && r.data.isW) || ws(); });
+    var can = inc.filter(function (r) { return toks[r.id] && dg(r.data && r.data.tel).length === 10 && !S[r.id] && toks[r.id].status === "assigned"; });
+    var h = "<h2>📲 Հաճախորդին՝ հետևելու հղում և SMS</h2><p class='p'>Ամեն պատվեր ունի իր գաղտնի հղումը։ Հաճախորդը տեսնում է մոտավոր ժամը, քանի կանգառ է մնացել և, երբ մոտ է, մեքենան քարտեզի վրա։</p>";
+    h += "<div class='st'>" + (info == null ? "…" : on ? "<span>✓ SMS-ը միացված է՝ <b>" + esc(info.provider === "twilio" ? "Twilio" : "Telnyx") + "</b> · " + esc(info.from) + "</span>" : "<span class='off'>SMS ծառայությունը դեռ միացված չէ — հղումը կարող եք պատճենել կամ ուղարկել ձեր հեռախոսից։</span>") + " <button type='button' class='lnk' data-t='cfg'>" + (cfgOpen ? "Փակել" : on ? "Փոխել" : "Միացնել SMS") + "</button></div>";
+    if (cfgOpen) { h += "<div class='cfg'><label>Ծառայություն<select id='trk-pv'><option value='telnyx'>Telnyx (առաջարկվում է)</option><option value='twilio'>Twilio</option></select></label><label>Ուղարկող համար<input id='trk-from' inputmode='tel' placeholder='+1 818 555 0100'></label><label>API key / Auth token<input id='trk-key' type='password' autocomplete='off' placeholder='KEY…'></label><label id='trk-sidl' style='display:none'>Twilio Account SID<input id='trk-sid' autocomplete='off' placeholder='AC…'></label>" +
+      "<div class='row' style='grid-column:1/-1'><button type='button' class='btn' data-t='save'>Պահպանել</button>" + (on ? "<button type='button' class='btn l' data-t='off'>Անջատել</button>" : "") + "<span class='p' style='font-size:12.5px'>Բանալին պահվում է միայն սերվերում և չի ցուցադրվում։</span></div></div>"; }
+    h += "<div class='row'><div class='seg'><button type='button' data-day='today' aria-pressed='" + (day === "today") + "'>Այսօր</button><button type='button' data-day='tom' aria-pressed='" + (day === "tom") + "'>Վաղը</button></div>" +
+      "<label style='flex-direction:row;align-items:center;gap:6px;font-size:13.5px'><input type='checkbox' id='trk-ws'" + (ws() ? " checked" : "") + "> Մեծածախ հաճախորդներին նույնպես</label>" +
+      "<button type='button' class='lnk' data-t='tpl'>✏️ Տեքստը</button></div>";
+    if (tplOpen) { h += "<div><textarea id='trk-tpl'>" + esc(LG("noa-trk-tpl") || DEF) + "</textarea><p class='p' style='font-size:12.5px'>{name} — անուն, {no} — պատվերի համար, {when} — «today around 11:30 AM», {link} — հետևելու հղում։ Անգլերեն տեքստը ավելի էժան է (1 SMS = 160 նիշ, հայերենը՝ 70)։</p><div class='row'><button type='button' class='btn l' data-t='tplsave'>Պահպանել տեքստը</button><button type='button' class='lnk' data-t='tpldef'>Վերադարձնել սկզբնականը</button></div></div>"; }
+    if (!inc.length) { h += "<p class='p'>" + (L.length ? "Այս օրը մանրածախ առաքում չկա։" : "Այս օրը My Apri վարորդներին նշանակված առաքում չկա։") + "</p>"; }
+    else { h += "<ul>" + inc.map(function (r) { var d = r.data || {}, t = toks[r.id], ph = dg(d.tel), s = S[r.id], dn = t && t.status !== "assigned";
+      var sms = !t || dn || ph.length !== 10 ? "" : on ? "<button type='button' class='btn' data-send='" + esc(r.id) + "'" + (dn ? " disabled" : "") + ">📲 " + (s ? "Կրկին" : "SMS") + "</button>" : "<a class='btn' href='sms:+1" + ph + (/iPhone|iPad|Mac/.test(navigator.userAgent) ? "&" : "?") + "body=" + encodeURIComponent(text(r)) + "' data-mark='" + esc(r.id) + "'>📲 SMS</a>";
+      return "<li class='" + (dn ? "dim" : "") + "'><span class='ty" + (d.isW ? " w2" : "") + "'>" + (d.isW ? "W" : "R") + "</span><span class='w'><b>" + esc(d.cust) + " · " + esc(d.no || r.id) + "</b><small>" + (ph.length === 10 ? "(" + ph.slice(0, 3) + ") ···-" + ph.slice(6) : "հեռախոս չկա") + " · " + esc(t && t.eta ? "≈ " + hm(t.eta) : d.slot || "") + (t && t.driver ? " · " + esc(t.driver) : "") + (dn ? " · " + (t.status === "delivered" ? "✓ հանձնված" : "✕") : "") + "</small></span>" +
+        (s ? "<span class='ok'>✓ " + hm(s) + "</span>" : "") + (t ? "<button type='button' class='btn l' data-copy='" + esc(r.id) + "'>🔗 Հղում</button>" : "<small>Նախ ուղարկեք My Apri</small>") + sms + "</li>"; }).join("") + "</ul>"; }
+    if (on && can.length) { h += "<div class='row'><button type='button' class='btn' data-t='all'" + (busy ? " disabled" : "") + ">📲 Ուղարկել բոլորին (" + can.length + ")</button><span class='p' style='font-size:12.5px'>Միայն նրանց, ում դեռ չենք ուղարկել այսօր։</span></div>"; }
+    if (msg) { h += "<p class='m " + (msg.slice(0, 2) === "e:" ? "e" : "g") + "'>" + esc(msg.slice(2)) + "</p>"; }
+    return h;
+  }
+  function draw() { var b = document.getElementById("trk-adm"); if (!b) { return; } var f = document.activeElement && b.contains(document.activeElement) && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName); if (f) { return; } b.innerHTML = build(); var pv = document.getElementById("trk-pv"); if (pv) { pv.onchange = function () { document.getElementById("trk-sidl").style.display = pv.value === "twilio" ? "" : "none"; }; } }
+  function send(list) { if (!list.length) { return; } busy = true; msg = ""; draw();
+    api("sms_send", { msgs: list.map(function (r) { return { id: r.id, to: dg(r.data && r.data.tel), text: text(r) }; }) }).then(function (j) { busy = false;
+      if (!j || !j.ok) { msg = "e:" + (j && j.err === "no_sms" ? "SMS ծառայությունը միացված չէ։" : "Չհաջողվեց ուղարկել։"); draw(); return; }
+      var S = sent(), ok = 0, bad = []; (j.res || []).forEach(function (x) { if (x.ok) { S[x.id] = new Date().toISOString(); ok++; } else { bad.push(x.id + (x.err ? " (" + x.err + ")" : "")); } }); LS("noa-trk-sent", JSON.stringify(S));
+      msg = bad.length ? "e:Ուղարկվեց՝ " + ok + "։ Չստացվեց՝ " + bad.join(", ") : "g:✓ Ուղարկվեց՝ " + ok; draw(); }).catch(function () { busy = false; msg = "e:Կապի սխալ։"; draw(); }); }
+  document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest("#trk-adm [data-t],#trk-adm [data-day],#trk-adm [data-copy],#trk-adm [data-send],#trk-adm [data-mark]"); if (!b) { return; }
+    var byId = function (id) { return rows().filter(function (r) { return r.id === id; })[0]; };
+    if (b.dataset.day) { day = b.dataset.day; msg = ""; draw(); loadToks(); return; }
+    if (b.dataset.copy) { var u = link(b.dataset.copy); try { navigator.clipboard.writeText(u); } catch (x) {} msg = "g:✓ Պատճենվեց՝ " + u; draw(); return; }
+    if (b.dataset.mark) { var S0 = sent(); S0[b.dataset.mark] = new Date().toISOString(); LS("noa-trk-sent", JSON.stringify(S0)); setTimeout(draw, 300); return; }
+    if (b.dataset.send) { var r0 = byId(b.dataset.send); if (r0) { send([r0]); } return; }
+    var t = b.dataset.t;
+    if (t === "cfg") { cfgOpen = !cfgOpen; draw(); }
+    else if (t === "tpl") { tplOpen = !tplOpen; draw(); }
+    else if (t === "tplsave") { var v = (document.getElementById("trk-tpl").value || "").trim(); if (v.indexOf("{link}") < 0) { msg = "e:Տեքստում պետք է լինի {link}։"; } else { LS("noa-trk-tpl", v); msg = "g:✓ Տեքստը պահպանվեց"; tplOpen = false; } document.activeElement.blur(); draw(); }
+    else if (t === "tpldef") { try { localStorage.removeItem("noa-trk-tpl"); } catch (x) {} tplOpen = false; draw(); }
+    else if (t === "save" || t === "off") { var body = t === "off" ? { provider: "" } : { provider: document.getElementById("trk-pv").value, from: document.getElementById("trk-from").value, key: document.getElementById("trk-key").value, sid: (document.getElementById("trk-sid") || {}).value || "" };
+      document.activeElement.blur(); api("sms_cfg", body).then(function (j) { if (j && j.ok) { cfgOpen = false; msg = j.on ? "g:✓ SMS-ը միացվեց" : "g:SMS-ը անջատվեց"; loadInfo(); } else { msg = "e:Ստուգեք համարը և բանալին" + (body.provider === "twilio" ? " (Account SID-ը սկսվում է AC-ով)" : "") + "։"; draw(); } }); }
+    else if (t === "all") { var S1 = sent(); send(rows().filter(function (r) { return (!(r.data && r.data.isW) || ws()) && toks[r.id] && toks[r.id].status === "assigned" && dg(r.data && r.data.tel).length === 10 && !S1[r.id]; })); }
+  });
+  document.addEventListener("change", function (e) { if (e.target && e.target.id === "trk-ws") { LS("noa-trk-ws", e.target.checked ? "1" : "0"); e.target.blur(); draw(); } });
+  function loadInfo() { api("sms_info").then(function (j) { info = j && j.ok ? j : { on: false }; draw(); }).catch(function () { info = { on: false }; draw(); }); }
+  function mount() { var b = document.getElementById("trk-adm"); var h = Array.prototype.find.call(document.querySelectorAll("h2"), function (x) { return /^\s*👷\s*(Վարորդներ|Drivers)\s*$/.test(x.textContent); });
+    var card = h && (h.closest(".card3d") || h.closest("section") || h.parentElement); if (!card) { if (b) { b.remove(); } return; }
+    if (b && b.previousElementSibling === card) { loadToks(); return; } if (b) { b.remove(); }
+    b = document.createElement("section"); b.id = "trk-adm"; b.className = card.className || "card3d"; card.parentElement.insertBefore(b, card.nextSibling); draw(); if (info == null) { loadInfo(); } tokKey = ""; loadToks(); }
+  new MutationObserver(function () { mount(); }).observe(document.body, { childList: true, subtree: true }); setInterval(mount, 2000);
+  setInterval(function () { if (document.getElementById("trk-adm")) { tokKey = ""; loadToks(); } }, 120000);
+})();
+</script>
 <script id="nofa-stripe-admin">(function () {
   function api(x, b) { return fetch("api/api.php?a=" + x, { method: b ? "POST" : "GET", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: b ? JSON.stringify(b) : undefined }).then(function (r) { return r.json(); }); }
   function applyPaid(P) { var s = JSON.stringify(P || {}); var ch = false; if (localStorage.getItem("noa-cardpaid") !== s) { localStorage.setItem("noa-cardpaid", s); ch = true; }

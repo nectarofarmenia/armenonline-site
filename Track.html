@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Nectar of Armenia — Track your order</title>
+<link rel="icon" href="img/cf4f14e5b2e161eced326c4ebe8644fd.webp">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Noto+Serif+Armenian:wght@600;700&family=Noto+Sans+Armenian:wght@400;500;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<style>
+:root{--g:#1D5545;--g2:#2F7A55;--gold:#EBA93A;--cream:#F6F1E3;--card:#FFFDF8;--ink:#1E2A24;--mut:#5E6A63;--line:#EFE6D0;--red:#B03A2E}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--cream);color:var(--ink);font:15px/1.5 Manrope,"Noto Sans Armenian",system-ui,sans-serif;-webkit-text-size-adjust:100%}
+.top{background:linear-gradient(160deg,#1D5545,#164437);color:#F6E3B4;padding:18px 16px 46px;position:relative;overflow:hidden}
+.top::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-38px;height:70px;background:var(--cream);border-radius:50% 50% 0 0}
+.bar{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.brand{font-family:Fraunces,"Noto Serif Armenian",serif;font-weight:700;font-size:20px;color:#fff;text-decoration:none;flex:1}
+.brand span{color:var(--gold)}
+.lang{border:1px solid rgba(246,227,180,.45);background:transparent;color:#F6E3B4;border-radius:999px;padding:6px 12px;font:700 12.5px Manrope,"Noto Sans Armenian",sans-serif;cursor:pointer}
+main{max-width:560px;margin:-26px auto 0;padding:0 16px 40px;position:relative;z-index:1;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:0 10px 30px rgba(19,59,48,.08)}
+.hero{display:flex;gap:14px;align-items:center}
+.hero img{width:74px;height:74px;object-fit:contain;flex:none}
+.k{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--g2)}
+h1{margin:2px 0 0;font-family:Fraunces,"Noto Serif Armenian",serif;font-weight:600;font-size:26px;line-height:1.15;color:var(--g)}
+.eta{margin-top:16px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.eta b{font-family:Fraunces,"Noto Serif Armenian",serif;font-size:44px;line-height:1;color:var(--g);font-variant-numeric:tabular-nums}
+.eta span{color:var(--mut);font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:7px 12px;border-radius:999px;background:#FFF1D6;color:#7A5410;font-weight:800;font-size:13.5px}
+.pill.g{background:#E3F2E8;color:#2F7A55}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.steps li{display:flex;gap:12px;align-items:flex-start;position:relative;padding-bottom:16px}
+.steps li:last-child{padding-bottom:0}
+.steps li::before{content:"";position:absolute;left:13px;top:28px;bottom:0;width:2px;background:var(--line)}
+.steps li:last-child::before{display:none}
+.dot{width:28px;height:28px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:13px;font-weight:800;background:#F1EBDC;color:#A79F8A;border:2px solid var(--line);position:relative;z-index:1}
+.steps li.done .dot{background:var(--g2);border-color:var(--g2);color:#fff}
+.steps li.done::before{background:var(--g2)}
+.steps li.now .dot{background:var(--gold);border-color:var(--gold);color:#2A1E05;box-shadow:0 0 0 6px rgba(235,169,58,.25)}
+.steps b{display:block;font-size:15px}
+.steps small{color:var(--mut);font-size:13px}
+.steps li:not(.done):not(.now) b{color:#9A9F98}
+#map{height:260px;border-radius:18px;overflow:hidden;background:#E6EDE6}
+.van{width:34px;height:34px;border-radius:50%;background:#fff;border:3px solid var(--g);display:grid;place-items:center;font-size:17px;box-shadow:0 0 0 7px rgba(29,85,69,.2)}
+.home{width:30px;height:30px;border-radius:50%;background:var(--gold);border:3px solid #fff;display:grid;place-items:center;font-size:15px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.muted{color:var(--mut);font-size:13.5px;margin:0}
+.foot{text-align:center;color:var(--mut);font-size:13px}
+.foot a{color:var(--g);font-weight:700;text-decoration:none}
+.err{text-align:center}
+.err h1{font-size:22px}
+@media (max-width:380px){.eta b{font-size:38px}h1{font-size:23px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="bar"><a class="brand" href="./">Nectar <span>of Armenia</span></a><button class="lang" id="lang" type="button">Հայերեն</button></div></header>
+<main id="app" aria-live="polite"><div class="card"><p class="muted">…</p></div></main>
+<script src="vendor/leaflet/leaflet.js"></script>
+<script>
+(function () {
+  var T = {
+    en: { sw: "Հայերեն", k: "Your order", h0: "We have your order", h1: "Your order is on the way", h2: "The driver is almost there", h3: "Delivered", h4: "We could not deliver", eta: "estimated arrival", today: "today", tom: "tomorrow", slot: "Delivery window", ahead: "{n} stops before you", ahead1: "1 stop before you", next: "You are the next stop", drv: "Driver: {n}", s1: "Order confirmed", s1d: "We are preparing it in our kitchen", s2: "Route planned", s2d: "Your stop is on the driver's route", s3: "On the way to you", s3d: "Only a few stops left before you", s4: "Delivered", s4d: "Enjoy your meal!", at: "at {t}", fail: "The driver could not reach you. We will call you to arrange a new time.", nf: "We could not find this order", nfd: "The link may be old or incomplete. Please check the text message or call us.", off: "Tracking is not available right now", upd: "Updated {t} · refreshes on its own", call: "Questions? Call", map: "The van's location appears when you are close." },
+    hy: { sw: "English", k: "Ձեր պատվերը", h0: "Պատվերը ստացել ենք", h1: "Պատվերը ճանապարհին է", h2: "Վարորդը համարյա հասել է", h3: "Հանձնված է", h4: "Չհաջողվեց առաքել", eta: "մոտավոր ժամանում", today: "այսօր", tom: "վաղը", slot: "Առաքման ժամեր", ahead: "Ձեզնից առաջ՝ {n} կանգառ", ahead1: "Ձեզնից առաջ՝ 1 կանգառ", next: "Հաջորդ կանգառը դուք եք", drv: "Վարորդ՝ {n}", s1: "Պատվերը հաստատված է", s1d: "Պատրաստում ենք մեր խոհանոցում", s2: "Երթուղին կազմված է", s2d: "Ձեր կանգառը վարորդի երթուղում է", s3: "Ճանապարհին է դեպի ձեզ", s3d: "Ձեզնից առաջ մի քանի կանգառ է մնացել", s4: "Հանձնված է", s4d: "Բարի ախորժակ։", at: "ժ. {t}", fail: "Վարորդը չկարողացավ կապվել ձեզ հետ։ Կզանգենք՝ նոր ժամ պայմանավորվելու։", nf: "Պատվերը չգտնվեց", nfd: "Հղումը կարող է հին կամ թերի լինել։ Ստուգեք հաղորդագրությունը կամ զանգահարեք մեզ։", off: "Հետևելը այս պահին հասանելի չէ", upd: "Թարմացվել է {t} · թարմանում է ինքնաբերաբար", call: "Հարցե՞ր։ Զանգահարեք", map: "Մեքենայի տեղը կերևա, երբ մոտ լինի։" }
+  };
+  var lang = "en"; try { lang = localStorage.getItem("noa-trk-lang") || ((navigator.language || "").indexOf("hy") === 0 ? "hy" : "en"); } catch (e) {}
+  var tok = (location.search.match(/[?&]t=([a-f0-9]{20})/) || [])[1] || "";
+  var D = null, state = "load", at = null, map = null, layer = null;
+  function tr(k, v) { var s = T[lang][k] || T.en[k] || k; Object.keys(v || {}).forEach(function (x) { s = s.replace("{" + x + "}", v[x]); }); return s; }
+  function esc(x) { return String(x == null ? "" : x).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function hm(iso) { var d = new Date(iso); if (isNaN(d)) { return ""; } return lang === "en" ? d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) : ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); }
+  function ymd(d) { return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  function dayL(s) { var n = new Date(); if (s === ymd(n)) { return tr("today"); } n.setDate(n.getDate() + 1); if (s === ymd(n)) { return tr("tom"); } var x = new Date(s + "T12:00:00"); return isNaN(x) ? s : x.toLocaleDateString(lang === "en" ? "en-US" : "hy-AM", { weekday: "long", month: "short", day: "numeric" }); }
+  function stage() { if (!D) { return 0; } if (D.status === "delivered") { return 3; } if (D.status === "failed") { return -1; } if (!D.planned) { return 0; } return D.ahead != null && D.ahead <= 2 ? 2 : 1; }
+  function render() {
+    var app = document.getElementById("app"); document.getElementById("lang").textContent = tr("sw"); document.documentElement.lang = lang;
+    if (state === "load") { return; }
+    if (state !== "ok") { app.innerHTML = '<div class="card err"><h1>' + tr(state === "off" ? "off" : "nf") + '</h1><p class="muted">' + tr("nfd") + '</p></div>' + foot(); return; }
+    var s = stage(), h = [tr("h0"), tr("h1"), tr("h2"), tr("h3")][Math.max(0, s)]; if (s < 0) { h = tr("h4"); }
+    var big = "", sub = "";
+    if (s === 3) { big = hm(D.done_at); sub = dayL(String(D.done_at || "").slice(0, 10)); }
+    else if (s >= 1 && D.eta) { big = "≈ " + hm(D.eta); sub = tr("eta") + " · " + dayL(D.date); }
+    else if (D.slot) { big = esc(D.slot); sub = tr("slot") + " · " + dayL(D.date); }
+    else { sub = dayL(D.date); }
+    var pill = "";
+    if (s === 1 || s === 2) { pill = D.ahead === 0 ? tr("next") : D.ahead === 1 ? tr("ahead1") : tr("ahead", { n: D.ahead }); }
+    var html = '<section class="card"><div class="hero"><img src="img/c1999a6e0a1f0a5218be4d17335ab22d.webp" alt=""><div><div class="k">' + tr("k") + '</div><h1>' + h + '</h1></div></div>' +
+      '<div class="eta">' + (big ? "<b>" + big + "</b>" : "") + '<span>' + esc(sub) + '</span></div>' +
+      (pill ? '<div class="pill' + (s === 2 ? '' : ' g') + '">🚚 ' + esc(pill) + '</div>' : '') +
+      (D.driver && s >= 1 && s < 3 ? '<p class="muted" style="margin-top:10px">' + esc(tr("drv", { n: D.driver })) + '</p>' : '') +
+      (s < 0 ? '<p class="muted" style="margin-top:12px;color:#B03A2E">' + tr("fail") + '</p>' : '') + '</section>';
+    var hasMap = !!(D.pos && D.dest && s >= 1 && s < 3 && window.L);
+    if (s >= 1 && s < 3) { html += '<section class="card" style="padding:10px">' + (hasMap ? '<div id="map"></div>' : '<p class="muted" style="padding:10px">📍 ' + tr("map") + '</p>') + '</section>'; }
+    if (s >= 0) { var st = [["s1", "s1d"], ["s2", "s2d"], ["s3", "s3d"], ["s4", "s4d"]];
+      html += '<section class="card"><ol class="steps">' + st.map(function (x, i) { var cls = i < s || (s === 3 && i === 3) ? "done" : i === s ? "now" : ""; if (s === 3) { cls = "done"; } var tm = i === 3 && s === 3 ? " · " + tr("at", { t: hm(D.done_at) }) : "";
+        return '<li class="' + cls + '"><span class="dot">' + (cls === "done" ? "✓" : i + 1) + '</span><span><b>' + tr(x[0]) + tm + '</b><small>' + tr(x[1]) + '</small></span></li>'; }).join("") + '</ol></section>'; }
+    html += foot();
+    if (map) { map.remove(); map = null; }
+    app.innerHTML = html;
+    if (hasMap) { map = L.map("map", { zoomControl: false, attributionControl: true, dragging: true, scrollWheelZoom: false });
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "&copy; OpenStreetMap" }).addTo(map);
+      var a = [D.pos.lat, D.pos.lon], b = [D.dest.lat, D.dest.lon];
+      L.marker(a, { icon: L.divIcon({ className: "", html: '<div class="van">🚚</div>', iconSize: [34, 34], iconAnchor: [17, 17] }) }).addTo(map);
+      L.marker(b, { icon: L.divIcon({ className: "", html: '<div class="home">🏠</div>', iconSize: [30, 30], iconAnchor: [15, 15] }) }).addTo(map);
+      L.polyline([a, b], { color: "#1D5545", weight: 3, dashArray: "6 8", opacity: .7 }).addTo(map);
+      map.fitBounds([a, b], { padding: [40, 40], maxZoom: 15 }); }
+  }
+  function foot() { return '<p class="foot">' + (at ? tr("upd", { t: hm(at.toISOString()) }) + "<br>" : "") + tr("call") + ' <a href="tel:+15155885555">(515) 588-5555</a></p>'; }
+  function load() {
+    if (!tok) { state = "nf"; render(); return; }
+    fetch("api/api.php?a=track&t=" + tok, { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (j) {
+      if (j && j.ok && j.d) { D = j.d; state = "ok"; at = new Date(); } else if (state !== "ok") { state = j && j.err === "off" ? "off" : "nf"; } render();
+    }).catch(function () { if (state !== "ok") { state = "off"; } render(); });
+  }
+  document.getElementById("lang").onclick = function () { lang = lang === "en" ? "hy" : "en"; try { localStorage.setItem("noa-trk-lang", lang); } catch (e) {} render(); };
+  render(); load();
+  setInterval(function () { if (!document.hidden && !(D && (D.status === "delivered" || D.status === "failed"))) { load(); } }, 30000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) { load(); } });
+})();
+</script>
+</body>
+</html>
