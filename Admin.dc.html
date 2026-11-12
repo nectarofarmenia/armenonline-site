@@ -1975,7 +1975,20 @@ window.azSet=function(d){z=Math.round(Math.min(1.6,Math.max(0.9,z+d))*100)/100;a
   function ppk() { var P = [12, 1, 1, 1, 10, 35, 10, 10, 6, 6, 6]; try { var C = J("noa-cost-v2", {}); var idm = { gata: 0, khinkali: 4, pelmeni: 5, blinchik: 6, kufta: 7, kiev: 8, chcut: 9, beefcut: 10 }; (C.prod || []).forEach(function (p) { if (idm[p.id] != null && +p.packPcs > 0) { P[idm[p.id]] = +p.packPcs; } }); } catch (e) {} return P; }
   function site() { var S = J("noa-stock", null), Lo = J("noa-stock-pcs", null), P = ppk(); if (!Array.isArray(S) || S.length !== 11) { return null; } if (!Array.isArray(Lo) || Lo.length !== 11) { Lo = [0,0,0,0,0,0,0,0,0,0,0]; }
     return { at: new Date().toISOString(), items: NAMES.map(function (n, i) { return { i: i, name: n, packs: +S[i] || 0, loose: +Lo[i] || 0, perPack: P[i] }; }) }; }
-  function push() { var s = site(); if (!s) { return; } var key = JSON.stringify(s.items); if (key === lastPush) { return; } lastPush = key;
+  /* Cost sheet (Cost.html, noa-cost-v2) summarised the same way Cost.html calc() does, for My Apri Work → Warehouse (admin only there). */
+  var lastCost = "";
+  function costs() { var C = J("noa-cost-v2", null); if (!C || !C.prod || !C.ing) { return null; }
+    var num = function (v) { var n = parseFloat(String(v).replace(",", ".")); return isFinite(n) ? n : 0; };
+    var M = {}; C.ing.forEach(function (g) { M[g[0]] = g; }); var perG = function (g) { return g && g[3] > 0 ? g[2] / g[3] : 0; };
+    var b = C.bag || {}, bq = num(b.qty), bagU = bq > 0 ? (num(b.paid) + num(b.extra)) / bq : 0;
+    var idm = { gata: 0, khash: 1, khinkali: 4, pelmeni: 5, blinchik: 6, kufta: 7, kiev: 8, chcut: 9, beefcut: 10 };
+    var r4 = function (v) { return Math.round(v * 10000) / 10000; };
+    return { items: C.prod.map(function (p) { var tot = 0, rec = []; (p.rec || []).forEach(function (r) { var g = M[r[0]], c = r[1] * perG(g); tot += c; rec.push([g ? g[1] : r[0], +r[1] || 0, r4(c)]); });
+      var bt = p.batch > 0 ? p.batch : 1, mat = tot / bt, lab = num(p.labor), base = mat + lab, pc = p.useBag ? bagU + num(p.label) : num(p.packCost), pp = +p.packPcs || 1;
+      return { i: idm[p.id] != null ? idm[p.id] : -1, id: p.id, name: p.name, unit: p.unit, packPcs: pp, batch: p.batch, mat: r4(mat), labor: lab, piece: r4(base), pack: r4(pp * base + pc), pr: (p.pr || []).map(num), rec: rec }; }) }; }
+  function pushCost() { var c = costs(); if (!c) { return; } var key = JSON.stringify(c.items); if (key === lastCost) { return; } lastCost = key;
+    fetch("api/api.php?a=apri_cost_push", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data: c }) }).catch(function () { lastCost = ""; }); }
+  function push() { try { pushCost(); } catch (e) {} var s = site(); if (!s) { return; } var key = JSON.stringify(s.items); if (key === lastPush) { return; } lastPush = key;
     fetch("api/api.php?a=apri_stock_push", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data: s }) }).catch(function () { lastPush = ""; }); }
   function build() {
     var h = "<h2>" + T.h + "</h2><p class='sm-p'>" + T.p + "</p>";

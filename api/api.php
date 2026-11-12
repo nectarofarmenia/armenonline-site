@@ -203,12 +203,14 @@ switch ($a) {
   case 'apri_routes':  // admin: drivers' planned routes (order, miles, times, earnings)
   case 'apri_stock':   // admin: warehouse from My Apri Work (made, packed, lots with expiry)
   case 'apri_stock_push': // admin: this site's warehouse (packs + loose pieces) to My Apri Work
+  case 'apri_cost_push':  // admin: cost sheet summary (cost per piece/pack, price list, recipe cost) to My Apri Work (admin-only there)
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $t = kv_get($db, '__apri_token'); if (!$t) { out(['ok' => false, 'err' => 'no_token']); }
     if ($a === 'apri_drivers') { $fn = 'nofa_drivers'; $args = []; }
     elseif ($a === 'apri_push') { $b = body(); $rows = array_slice(is_array($b['rows'] ?? null) ? $b['rows'] : [], 0, 500); foreach ($rows as &$rw) { if (isset($rw['data']['phone'])) { unset($rw['data']['phone']); } } unset($rw); $fn = 'nofa_push_deliveries'; $args = ['p_rows' => $rows]; }
     elseif ($a === 'apri_routes') { $fn = 'nofa_routes'; $args = []; }
     elseif ($a === 'apri_stock') { $fn = 'nofa_stock'; $args = []; }
+    elseif ($a === 'apri_cost_push') { $b = body(); $d = is_array($b['data'] ?? null) ? $b['data'] : []; $fn = 'nofa_push_cost'; $args = ['p_data' => $d]; }
     elseif ($a === 'apri_stock_push') { $b = body(); $d = is_array($b['data'] ?? null) ? $b['data'] : []; $fn = 'nofa_push_stock'; $args = ['p_data' => $d]; }
     elseif ($a === 'apri_dstatus') { $since = (string) ($_GET['since'] ?? ''); $fn = 'nofa_delivery_status'; $args = ['p_since' => preg_match('/^[0-9T:\.\-\+ Z]{10,40}$/', $since) ? $since : null]; }
     else { $fn = 'nofa_delivery_proof'; $args = ['p_id' => substr((string) ($_GET['id'] ?? ''), 0, 60)]; }
