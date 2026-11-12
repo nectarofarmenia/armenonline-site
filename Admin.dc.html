@@ -1957,7 +1957,7 @@ window.azSet=function(d){z=Math.round(Math.min(1.6,Math.max(0.9,z+d))*100)/100;a
 </script>
 <script id="nofa-stock-mon">
 /* Statistics: warehouse from My Apri Work — per product made, unpacked, packed in stock, and lots with best-before dates.
-   Also kept in localStorage "noa-stock" so other pages of the site can show stock and product facts. */
+   Also kept in localStorage "noa-apri-stock" (never "noa-stock", the site warehouse) so other pages of the site can show stock and product facts. */
 (function () { if (window.__nofaStock) { return; } window.__nofaStock = 1;
   var EN = (document.documentElement.lang || "").indexOf("en") === 0;
   var T = EN ? { h: "📦 Warehouse (My Apri Work)", p: "Made by the kitchen, packed by the manager, in stock with best-before dates.", pr: "Product", made: "Made", un: "Unpacked", pk: "In stock", lots: "Lots", exp: "Best before", left: "packs left", per: "pcs/pack", pcs: "pcs", none: "No stock data yet. Run stock.sql in Supabase and pack goods in My Apri Work.", err: "Could not load the warehouse.", soon: "expires within 30 days", w: "weight" }
@@ -1984,7 +1984,7 @@ window.azSet=function(d){z=Math.round(Math.min(1.6,Math.max(0.9,z+d))*100)/100;a
     return h + "</table></div>";
   }
   function draw() { var b = document.getElementById("stock-mon"); if (b) { b.innerHTML = build(); } }
-  function load() { fetch("api/api.php?a=apri_stock", { credentials: "same-origin", cache: "no-store" }).then(function (r) { return r.json(); }).then(function (j) { if (j && j.ok && j.data && typeof j.data === "object") { data = j.data; err = false; try { localStorage.setItem("noa-stock", JSON.stringify(data)); } catch (e) {} } else if (!data) { err = true; } draw(); }).catch(function () { if (!data) { err = true; } draw(); }); }
+  function load() { fetch("api/api.php?a=apri_stock", { credentials: "same-origin", cache: "no-store" }).then(function (r) { return r.json(); }).then(function (j) { if (j && j.ok && j.data && typeof j.data === "object") { data = j.data; err = false; try { localStorage.setItem("noa-apri-stock", JSON.stringify(data)); } catch (e) {} } else if (!data) { err = true; } draw(); }).catch(function () { if (!data) { err = true; } draw(); }); }
   function onStats() { var n = document.querySelector("aside .wa-nav.on"); return !!(n && /Ստատիստիկա|Statistics/.test(n.textContent)); }
   function mount() { var b = document.getElementById("stock-mon"); if (!onStats()) { if (b) { b.remove(); } return; }
     var h = Array.prototype.find.call(document.querySelectorAll("h2"), function (x) { return /💰/.test(x.textContent); }); var card = h && h.closest(".card3d"); if (!card) { return; }
