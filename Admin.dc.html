@@ -1631,7 +1631,13 @@ var chA = { site: { n: 0, v: 0 }, phone: { n: 0, v: 0 }, book: { n: 0, v: 0 } };
 var money0 = function (v) { return "$" + Math.round(v).toLocaleString("en-US"); };
 var HOME = "Glendale, CA";
 var pend = orders.filter(function (o) { return o.st < 4 && o.dayOff >= -1; });
-var stopAddr = function (o) { var c = CUST[o.ci] || []; return o.addr || [c[2]].filter(Boolean).join(", ") || ""; };
+/* Wholesale stops go to the store's registered address (customer profile, then the wholesale account), not whatever was typed on the order */
+var wsAcc = function (o) { var em = String((CUST[o.ci] || [])[3] || "").toLowerCase(); return em ? (RACC[em + "|W"] || null) : null; };
+var wsAddrOf = function (o) { var p = CS && CS.cprof ? CS.cprof[nrmA(o.cust) + "|w"] : null; if (p && p.addr) { return String(p.addr).trim(); }
+  var a = wsAcc(o); if (a) { var st0 = a.addr || a.address || a.street; if (st0) { return [String(st0).trim() + (a.apt ? " " + a.apt : ""), a.city, [a.state || "CA", a.zip].filter(Boolean).join(" ")].filter(Boolean).join(", "); } } return ""; };
+var stopAddr = function (o) { var c = CUST[o.ci] || []; if (o.isW) { var w = wsAddrOf(o); if (w) { return w; } } return o.addr || [c[2]].filter(Boolean).join(", ") || ""; };
+/* the assigned driver may call or text the customer at the door */
+var stopTel = function (o) { var p = CS && CS.cprof ? CS.cprof[nrmA(o.cust) + "|" + (o.isW ? "w" : "r")] : null; var a = o.isW ? wsAcc(o) : null; return String((p && p.phone) || (a && a.phone) || (CUST[o.ci] || [])[4] || "").trim(); };
 var WDA = ["Կիր", "Երկ", "Երք", "Չրք", "Հնգ", "Ուրբ", "Շբթ"];
 function stopHrs(o) { var p = CS && CS.cprof ? CS.cprof[nrmA(o.cust) + "|" + (o.isW ? "w" : "r")] : null; if (p && !o.isW) { var wdr = new Date(day0.getTime() + o.dayOff * 864e5).getDay(); var pd = p.pd || []; var ps = p.pslot || ""; var tx = (pd.length ? pd.map(function (d) { return WDA[d]; }).join(", ") : "") + (ps ? (pd.length ? " · " : "") + ps : ""); var sl0 = String(o.slot || SLOTS[o.i % SLOTS.length]); var bad = (pd.length && pd.indexOf(wdr) < 0) || (ps && sl0 !== ps); return { t: tx ? "🚚 Նախընտրում է՝ " + tx + (p.dnote ? " · " + p.dnote : "") + (p.door ? " · 🚪 " + p.door : "") : (p.door ? "🚪 " + p.door : ""), warn: bad ? "⚠️ Չի համընկնում նախընտրած օրվա/ժամի հետ" : "" }; }
   if (!p || !p.hrs || p.hrs.length !== 7) { return { t: "", warn: "" }; } var wd = new Date(day0.getTime() + o.dayOff * 864e5).getDay(); var r = p.hrs[wd]; if (!r || !r[0] || !r[1]) { return { t: "🕘 " + WDA[wd] + " փակ է", warn: "⚠️ Այդ օրը փակ է" }; } var sl = String(o.slot || SLOTS[o.i % SLOTS.length]).split(/[–-]/); var pad = function (x) { x = String(x || "").trim(); return x.length === 4 ? "0" + x : x; }; var a = pad(sl[0]), b = pad(sl[1] || sl[0]); var w = (a && a < r[0]) || (b && b > r[1]) ? "⚠️ Ժամը դուրս է աշխատանքային ժամերից" : ""; return { t: "🕘 " + r[0] + "–" + r[1], warn: w }; }
@@ -1647,7 +1653,7 @@ try { var stRows = []; var ymdOf = function (off) { var d = new Date(day0.getTim
   DRVL.forEach(function (dv, k) { if (!dv || !dv.apri || dv.st === "off") { return; }
     orders.filter(function (o) { return o.drv === k && o.st < 4 && o.dayOff >= -7; }).sort(function (a, b) { return a.dayOff - b.dayOff || String(stopAddr(a).split(",").slice(-2).join(",")).localeCompare(String(stopAddr(b).split(",").slice(-2).join(","))) || String(a.slot || SLOTS[a.i % SLOTS.length]).localeCompare(String(b.slot || SLOTS[b.i % SLOTS.length])); })
       .forEach(function (o, n) { var hz = stopHrs(o); var its = o.cl && CS && CS.prod ? o.cl.map(function (l) { return { n: (CS.prod[l[0]] || {}).name || "—", q: l[2], u: l[1] === 1 ? "հատ" : "տուփ" }; }) : (o.items || []).map(function (x) { return { n: t.pn[x[0]], q: x[1], u: "տուփ" }; });
-        stRows.push({ id: o.no, driver: dv.apri, date: ymdOf(o.dayOff), seq: n + 1, data: { no: o.no, cust: o.cust, isW: o.isW, addr: stopAddr(o), slot: o.slot || SLOTS[o.i % SLOTS.length], hrs: hz.t, warn: hz.warn, items: its, due: o.pay === "paid" ? 0 : Math.round(o.total * 100) / 100, pay: o.pay === "paid" ? "paid" : "unpaid", earn: Math.round((+o.fee || 0) * 100) / 100 } }); }); });
+        stRows.push({ id: o.no, driver: dv.apri, date: ymdOf(o.dayOff), seq: n + 1, data: { no: o.no, cust: o.cust, isW: o.isW, addr: stopAddr(o), tel: stopTel(o) || undefined, slot: o.slot || SLOTS[o.i % SLOTS.length], hrs: hz.t, warn: hz.warn, items: its, due: o.pay === "paid" ? 0 : Math.round(o.total * 100) / 100, pay: o.pay === "paid" ? "paid" : "unpaid", earn: Math.round((+o.fee || 0) * 100) / 100 } }); }); });
   window.__nofaStops = { ready: true, rows: stRows }; } catch (e) {}
 var dnf = st.dnf || { name: "", phone: "", email: "" };
 var invUrl = function (d) { return "https://myapriwork.com"; };
