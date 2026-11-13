@@ -1364,7 +1364,7 @@ var iv = IVT[lang] || IVT.en; var ivU = isU ? user : null;
 var ivFrom = (ivU && (((ivU.first || "") + " " + (ivU.last || "")).trim() || ivU.email)) || "Armen Sargsyan";
 var ivBiz = bizN;
 var ivCode = (function () { var e = (ivU && ivU.email) || "demo"; var h = 0; for (var i = 0; i < e.length; i++) { h = (h * 33 + e.charCodeAt(i)) >>> 0; } return h.toString(36).toUpperCase().slice(0, 6); })();
-var ivLink = "https://armenonline.com/Account.dc.html?ref=" + ivCode + "#biz";
+var ivLink = location.origin + "/Account.dc.html?ref=" + ivCode + "#biz";
 var ivMode = st.ivMode || "email"; var ivName = st.ivName || "";
 var ivDefMsg = (lang === "hy" ? "Բարև" + (ivName ? " " + ivName : "") + ",\n\nԵս " + ivBiz + "-ից եմ։ Մենք աշխատում ենք Nectar of Armenia-ի հետ՝ նրանց հայկական սառեցված ուտեստները (խինկալի, պելմենի, բլինչիկ, քուֆթա) շատ լավ են վաճառվում։ Գրանցվեք որպես մեծածախ գործընկեր, առաքումը սառնարանային մեքենայով է, իսկ ապրանքը կարելի է վերցնել նաև դեպոզիտով։\n\n" + ivFrom : "Hi" + (ivName ? " " + ivName : "") + ",\n\nI’m with " + ivBiz + ". We work with Nectar of Armenia — their Armenian frozen foods (khinkali, pelmeni, blinchik, kufta) sell really well. Sign up as a wholesale partner: delivery is by refrigerated van and goods are also available on deposit.\n\n" + ivFrom);
 var ivMsg = typeof st.ivMsg === "string" ? st.ivMsg : ivDefMsg;

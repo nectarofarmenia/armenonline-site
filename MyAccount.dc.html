@@ -955,7 +955,7 @@ var iv = IVT[lang] || IVT.en; var ivU = user;
 var ivFrom = (ivU && (((ivU.first || "") + " " + (ivU.last || "")).trim() || ivU.email)) || (lang === "hy" ? "Ձեր ընկերը" : "Your friend");
 var ivBiz = "";
 var ivCode = (function () { var e = (ivU && ivU.email) || "demo"; var h = 0; for (var i = 0; i < e.length; i++) { h = (h * 33 + e.charCodeAt(i)) >>> 0; } return h.toString(36).toUpperCase().slice(0, 6); })();
-var ivLink = "https://armenonline.com/" + "Main.dc.html" + "?ref=" + ivCode;
+var ivLink = location.origin + "/Main.dc.html" + "?ref=" + ivCode;
 var ivMode = st.ivMode || "email"; var ivName = st.ivName || "";
 var ivDefMsg = (lang === "hy" ? "Բարև" + (ivName ? " " + ivName : "") + ",\n\nՓորձիր Nectar of Armenia-ի իսկական հայկական ուտեստները՝ խինկալի, պելմենի, գաթա, խաշ։ Պատվիրում ես կայքից, և բերում են սառեցված, մինչև տուն։ Ինձ շատ դուր եկավ, կարծում եմ քեզ էլ դուր կգա։\n\n" + ivFrom : "Hi" + (ivName ? " " + ivName : "") + ",\n\nTry Nectar of Armenia’s Armenian dishes — khinkali, pelmeni, gata, khash. You order online and they deliver frozen to your door. I loved it, I think you will too.\n\n" + ivFrom);
 var ivMsg = typeof st.ivMsg === "string" ? st.ivMsg : ivDefMsg;
