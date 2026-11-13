@@ -83,7 +83,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
     var add = function () { document.body.appendChild(ov); var i = document.getElementById("nofa-pw"); if (i) { i.focus(); } };
     if (document.body) { add(); } else { document.addEventListener("DOMContentLoaded", add); }
     ov.querySelector("form").addEventListener("submit", function (e) { e.preventDefault(); var pe = document.getElementById("nofa-pe"); pe.textContent = "Ստուգվում է…";
-      req("login", { pw: document.getElementById("nofa-pw").value }).then(function (j) { if (j.ok) { ov.remove(); document.documentElement.style.overflow = ""; cb(); } else { pe.textContent = "Սխալ գաղտնաբառ"; } }).catch(function () { pe.textContent = "Կապի սխալ, փորձեք նորից"; }); });
+      req("login", { pw: document.getElementById("nofa-pw").value }).then(function (j) { if (j.ok) { ov.remove(); document.documentElement.style.overflow = ""; cb(); } else { pe.textContent = j.err === "rate" ? "Չափազանց շատ փորձեր։ Սպասեք 15 րոպե և նորից փորձեք։" : "Սխալ գաղտնաբառ"; } }).catch(function () { pe.textContent = "Կապի սխալ, փորձեք նորից"; }); });
   }
   function logoutBtn() { var tt = document.querySelector(".as-ttl"); if (!tt || tt.querySelector("[data-nofa-out]")) { return; } var b = document.createElement("button"); b.type = "button"; b.setAttribute("data-nofa-out", "1"); b.textContent = "🔒 Ելք"; b.title = "Ելք ադմինից"; b.style.cssText = "border:0;background:none;color:#9FC2B2;font:800 11px Manrope,sans-serif;cursor:pointer;padding:0;margin-left:6px"; b.onclick = function () { req("logout", {}).then(function () { location.reload(); }); }; var sm = tt.querySelector("small"); if (sm) { sm.appendChild(b); } else { tt.appendChild(b); } }
 
@@ -290,7 +290,7 @@ body{margin:0}
 <h1 style="margin: 0; font-family: Fraunces, serif; font-weight: 600; font-size: 52px; line-height: 1.05">Scan to open your<br>wholesale account</h1>
 <span style="font-family: 'Noto Sans Armenian', Manrope, sans-serif; font-size: 19px; font-weight: 600; color: #CFE2D9">Սկանավորեք · Сканируйте · Escanea</span>
 </div>
-<div style="font-size: 22px; font-weight: 700; color: #D9E3DC">+1 (515) 588 5555 · nectarofarmenia.com/wholesale</div>
+<div style="font-size: 22px; font-weight: 700; color: #D9E3DC">+1 (515) 588-5555 · nectarofarmenia.com/wholesale</div>
 </div>
 <div style="flex: 0 0 380px; display: flex; align-items: center; justify-content: center; position: relative">
 <div style="width: 300px; height: 300px; background: #FFFFFF; border-radius: 28px; display: flex; align-items: center; justify-content: center; text-align: center; color: #6B5A2E; font-size: 18px; padding: 28px; box-sizing: border-box; border: 6px solid #EBA93A">[QR code → nectarofarmenia.com/wholesale/join]</div>

@@ -112,7 +112,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
     var add = function () { document.body.appendChild(ov); var i = document.getElementById("nofa-pw"); if (i) { i.focus(); } };
     if (document.body) { add(); } else { document.addEventListener("DOMContentLoaded", add); }
     ov.querySelector("form").addEventListener("submit", function (e) { e.preventDefault(); var pe = document.getElementById("nofa-pe"); pe.textContent = "Ստուգվում է…";
-      req("login", { pw: document.getElementById("nofa-pw").value }).then(function (j) { if (j.ok) { ov.remove(); document.documentElement.style.overflow = ""; cb(); } else { pe.textContent = "Սխալ գաղտնաբառ"; } }).catch(function () { pe.textContent = "Կապի սխալ, փորձեք նորից"; }); });
+      req("login", { pw: document.getElementById("nofa-pw").value }).then(function (j) { if (j.ok) { ov.remove(); document.documentElement.style.overflow = ""; cb(); } else { pe.textContent = j.err === "rate" ? "Չափազանց շատ փորձեր։ Սպասեք 15 րոպե և նորից փորձեք։" : "Սխալ գաղտնաբառ"; } }).catch(function () { pe.textContent = "Կապի սխալ, փորձեք նորից"; }); });
   }
   function logoutBtn() { var tt = document.querySelector(".as-ttl"); if (!tt || tt.querySelector("[data-nofa-out]")) { return; } var b = document.createElement("button"); b.type = "button"; b.setAttribute("data-nofa-out", "1"); b.textContent = "🔒 Ելք"; b.title = "Ելք ադմինից"; b.style.cssText = "border:0;background:none;color:#9FC2B2;font:800 11px Manrope,sans-serif;cursor:pointer;padding:0;margin-left:6px"; b.onclick = function () { req("logout", {}).then(function () { location.reload(); }); }; var sm = tt.querySelector("small"); if (sm) { sm.appendChild(b); } else { tt.appendChild(b); } }
 
@@ -431,7 +431,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </sc-if>
 </div>
 </section>
-<footer style="background: #133B30; color: #CFE2D9; padding: 28px 24px; text-align: center; font-size: 14px; line-height: 1.8">© 2026 Nectar of Armenia Inc · 6222 San Fernando Rd, Glendale, CA 91201 · +1 (515) 588 5555 · nectarofarmenia@gmail.com<br><a href="Legal.html#terms" style="color: #F6E3B4">Terms</a> · <a href="Legal.html#privacy" style="color: #F6E3B4">Privacy</a> · <a href="Legal.html#returns" style="color: #F6E3B4">Returns</a> · <a href="Legal.html#wholesale" style="color: #F6E3B4">Wholesale terms</a></footer>
+<footer style="background: #133B30; color: #CFE2D9; padding: 28px 24px; text-align: center; font-size: 14px; line-height: 1.8">© 2026 Nectar of Armenia Inc · 6222 San Fernando Rd, Glendale, CA 91201 · +1 (515) 588-5555 · nectarofarmenia@gmail.com<br><a href="Legal.html#terms" style="color: #F6E3B4">Terms</a> · <a href="Legal.html#privacy" style="color: #F6E3B4">Privacy</a> · <a href="Legal.html#returns" style="color: #F6E3B4">Returns</a> · <a href="Legal.html#wholesale" style="color: #F6E3B4">Wholesale terms</a></footer>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>

@@ -147,7 +147,7 @@ function perms(){var r=+D.r||3;var p=D.p||{};var o=p.o!=null?!!p.o:r!==2;var pay
 function hdr(){return '<header class="hdr"><div class="in"><img src="'+LOGO+'" alt="Nectar of Armenia"><div class="lg" role="group" aria-label="Language">'+["hy","en","ru","es"].map(function(l){return '<button type="button" data-l="'+l+'" class="'+(l===lang?"on":"")+'">'+({hy:"ՀԱՅ",en:"EN",ru:"РУ",es:"ES"})[l]+'</button>';}).join("")+'</div></div></header><svg class="wave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0,0 L1440,0 L1440,22 C1200,52 960,58 720,34 C480,10 240,14 0,40 Z" fill="#1D5545"/></svg>';}
 function joinUrl(){return location.href.replace(/[?&]view=mail/,"").replace(/\?&/,"?").replace(/\?#/,"#");}
 function renderMail(t){var o={s:D.s,o:D.o||D.s,n:(D.n||"").split(" ")[0]||""};
-  return '<div class="mailbg"><div class="mmeta"><b>'+t.mSubj+':</b> '+f(t.mSubjT,o)+'<br><b>'+t.mFrom+':</b> Nectar of Armenia &lt;noreply@armenonline.com&gt;<br><b>'+t.mTo+':</b> '+esc(D.e)+'</div>'+
+  return '<div class="mailbg"><div class="mmeta"><b>'+t.mSubj+':</b> '+f(t.mSubjT,o)+'<br><b>'+t.mFrom+':</b> Nectar of Armenia &lt;orders@nectarofarmenia.com&gt;<br><b>'+t.mTo+':</b> '+esc(D.e)+'</div>'+
   '<div class="mail"><div class="mhdr"><img src="'+LOGO+'" alt="Nectar of Armenia"><span>'+esc(t.kick.toUpperCase())+'</span></div><div class="mbar"></div><div class="mbody">'+
   '<h1>'+f(t.mHi,o)+'</h1><p>'+f(t.mP1,o)+'</p>'+
   '<div class="mbox"><span class="av">'+esc((D.s||"?").charAt(0))+'</span><div><b>'+esc(D.s)+'</b><br><span style="color:#6B756F;font-size:14px">'+t.role+': <b>'+esc(ROLES[lang][+D.r||3])+'</b></span></div></div>'+

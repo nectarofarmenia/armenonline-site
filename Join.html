@@ -82,7 +82,7 @@ input:focus,select:focus{outline:2px solid #8CC5A2;border-color:#8CC5A2}input.ba
     var add = function () { document.body.appendChild(ov); var i = document.getElementById("nofa-pw"); if (i) { i.focus(); } };
     if (document.body) { add(); } else { document.addEventListener("DOMContentLoaded", add); }
     ov.querySelector("form").addEventListener("submit", function (e) { e.preventDefault(); var pe = document.getElementById("nofa-pe"); pe.textContent = "Ստուգվում է…";
-      req("login", { pw: document.getElementById("nofa-pw").value }).then(function (j) { if (j.ok) { ov.remove(); document.documentElement.style.overflow = ""; cb(); } else { pe.textContent = "Սխալ գաղտնաբառ"; } }).catch(function () { pe.textContent = "Կապի սխալ, փորձեք նորից"; }); });
+      req("login", { pw: document.getElementById("nofa-pw").value }).then(function (j) { if (j.ok) { ov.remove(); document.documentElement.style.overflow = ""; cb(); } else { pe.textContent = j.err === "rate" ? "Չափազանց շատ փորձեր։ Սպասեք 15 րոպե և նորից փորձեք։" : "Սխալ գաղտնաբառ"; } }).catch(function () { pe.textContent = "Կապի սխալ, փորձեք նորից"; }); });
   }
   function logoutBtn() { var tt = document.querySelector(".as-ttl"); if (!tt || tt.querySelector("[data-nofa-out]")) { return; } var b = document.createElement("button"); b.type = "button"; b.setAttribute("data-nofa-out", "1"); b.textContent = "🔒 Ելք"; b.title = "Ելք ադմինից"; b.style.cssText = "border:0;background:none;color:#9FC2B2;font:800 11px Manrope,sans-serif;cursor:pointer;padding:0;margin-left:6px"; b.onclick = function () { req("logout", {}).then(function () { location.reload(); }); }; var sm = tt.querySelector("small"); if (sm) { sm.appendChild(b); } else { tt.appendChild(b); } }
 
