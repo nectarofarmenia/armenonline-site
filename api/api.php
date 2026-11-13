@@ -68,8 +68,38 @@ function smtp_send($m, $to, $subject, $html, &$err = null) {
   $body = chunk_split(base64_encode($html));
   fwrite($fp, $h . $body . "\r\n.\r\n"); $ok = $cmd(null, '250'); $cmd('QUIT', ['221', '250']); fclose($fp); return $ok;
 }
-function mail_tpl($title, $inner) {
-  return '<!doctype html><html><body style="margin:0;background:#F7F3EA;font-family:Arial,Helvetica,sans-serif;color:#23342C"><div style="max-width:560px;margin:0 auto;padding:24px 14px"><div style="background:#1D5545;border-radius:18px 18px 0 0;padding:18px 22px;color:#F6E3B4;font-size:20px;font-weight:bold">Nectar of Armenia</div><div style="background:#ffffff;border-radius:0 0 18px 18px;padding:22px;border:1px solid #E4DCC8;border-top:0"><h2 style="margin:0 0 12px;color:#1D5545;font-size:20px">' . $title . '</h2>' . $inner . '</div><p style="text-align:center;color:#6B756F;font-size:12px;margin:14px 0 0">Nectar of Armenia Inc · 6222 San Fernando Rd, Glendale, CA 91201 · +1 (515) 588-5555</p></div></body></html>';
+function mail_tpl($title, $inner, $lang = '') {
+  $host = $_SERVER['HTTP_HOST'] ?? ''; if ($host === '' || preg_match('/^(127\.|localhost)/', $host)) { $host = 'armenonline.com'; } $u = 'https://' . $host;
+  $hy = $lang === 'hy' || ($lang === '' && preg_match('/[\x{0531}-\x{0587}]/u', $title . $inner));
+  $say = $hy ? 'Շնորհակալություն, որ ընտրում եք մեզ։ Ամեն ինչ պատրաստում ենք սիրով՝ հայկական ավանդական բաղադրատոմսերով։' : 'Thank you for choosing us. Everything is made with love, from traditional Armenian recipes.';
+  $sig = $hy ? '— Շեֆ Ապրի' : '— Chef Apri';
+  $f = 'font-family:Georgia,\'Times New Roman\',serif'; $g = 'font-family:Arial,Helvetica,sans-serif';
+  return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>' . $title . '</title></head>'
+  . '<body style="margin:0;padding:0;background:#F3EEE2;' . $g . ';color:#23342C;-webkit-text-size-adjust:100%">'
+  . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F3EEE2"><tr><td align="center" style="padding:24px 10px">'
+  . '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#FFFDF7;border-radius:22px;overflow:hidden;border:1px solid #E6DCC4">'
+  // header banner: logo, areva, khinkali
+  . '<tr><td style="padding:0;line-height:0;background:#1D5545"><a href="' . $u . '" style="text-decoration:none"><img src="' . $u . '/img/email/header.jpg" width="600" alt="Nectar of Armenia" style="display:block;width:100%;max-width:600px;height:auto;border:0"></a></td></tr>'
+  // body
+  . '<tr><td style="padding:30px 32px 8px">'
+  . '<h1 style="margin:0 0 6px;' . $f . ';font-size:26px;line-height:1.25;font-weight:600;color:#1D5545">' . $title . '</h1>'
+  . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:10px 0 18px"><tr><td style="width:56px;height:3px;background:#EBA93A;border-radius:3px;font-size:0;line-height:0">&nbsp;</td></tr></table>'
+  . '<div style="font-size:15.5px;line-height:1.6;color:#33403A">' . $inner . '</div></td></tr>'
+  // Chef Apri speaks
+  . '<tr><td style="padding:18px 24px 26px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FBF3E1;border:1px solid #F0DDB0;border-radius:18px"><tr>'
+  . '<td width="96" valign="bottom" style="padding:12px 0 0 14px;line-height:0"><img src="' . $u . '/img/email/apri.png" width="86" alt="Chef Apri" style="display:block;width:86px;height:auto;border:0"></td>'
+  . '<td valign="middle" style="padding:16px 18px 16px 12px;font-size:14.5px;line-height:1.55;color:#4A3B17"><span style="' . $f . ';font-style:italic">“' . $say . '”</span><br><b style="display:inline-block;margin-top:6px;color:#B07A1A;font-size:13.5px">' . $sig . '</b></td>'
+  . '</tr></table></td></tr>'
+  // footer
+  . '<tr><td align="center" style="background:#1D5545;padding:24px 22px 26px;color:#CFE0D8;font-size:13px;line-height:1.7">'
+  . '<img src="' . $u . '/img/email/arev.png" width="34" height="34" alt="" style="display:block;margin:0 auto 8px;border:0;opacity:.9">'
+  . '<div style="' . $f . ';font-size:17px;color:#F6E3B4;font-weight:600">Nectar of Armenia Inc</div>'
+  . '<div>6222 San Fernando Rd, Glendale, CA 91201</div>'
+  . '<div><a href="tel:+15155885555" style="color:#F6C35A;text-decoration:none;font-weight:bold">+1 (515) 588-5555</a> · <a href="mailto:orders@nectarofarmenia.com" style="color:#F6C35A;text-decoration:none">orders@nectarofarmenia.com</a></div>'
+  . '<div style="margin-top:12px"><a href="' . $u . '" style="color:#FFFFFF;text-decoration:none;font-weight:bold">' . ($hy ? 'Կայք' : 'Website') . '</a> &nbsp;·&nbsp; <a href="https://www.instagram.com/nectar_of_armenia/" style="color:#FFFFFF;text-decoration:none">Instagram</a> &nbsp;·&nbsp; <a href="https://www.facebook.com/profile.php?id=61574622277482" style="color:#FFFFFF;text-decoration:none">Facebook</a> &nbsp;·&nbsp; <a href="https://www.youtube.com/channel/UCgOrvhFCGnhkaffhzbVLzkg" style="color:#FFFFFF;text-decoration:none">YouTube</a></div>'
+  . '</td></tr></table>'
+  . '<div style="max-width:600px;padding:14px 10px 0;color:#8A8F86;font-size:11.5px;line-height:1.5">' . ($hy ? 'Այս նամակն ուղարկվել է Nectar of Armenia-ի կայքից։' : 'This email was sent by the Nectar of Armenia website.') . '</div>'
+  . '</td></tr></table></body></html>';
 }
 function mail_esc($s) { return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8'); }
 function pay_mails($db, $ref, $amt) { // after a confirmed payment: receipt to the customer + notice to the owner (once)
@@ -123,10 +153,10 @@ switch ($a) {
     if (!$old) { $m = mail_cfg($db); if (!empty($m['user']) && !empty($m['pass'])) { // welcome email for a brand-new account (once per email)
       $first = ''; foreach ($acc as $rec) { if (!empty($rec['first'])) { $first = (string) $rec['first']; break; } }
       $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https'); $host = ($https ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'armenonline.com'); $base = $host . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '/api/api.php')), '/');
-      $hy = (($b['lang'] ?? 'hy') === 'hy'); $btn = '<p style="margin:18px 0 0"><a href="' . mail_esc($base . '/Account.dc.html') . '" style="display:inline-block;background:#1D5545;color:#F6E3B4;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:700">' . ($hy ? 'Մուտք գործել' : 'Sign in') . '</a></p>';
-      $inner = $hy ? '<p style="font-size:15px;margin:0 0 10px">Բարև' . ($first !== '' ? ' ' . mail_esc($first) : '') . ',</p><p style="font-size:15px;margin:0">Ձեր հաշիվը Nectar of Armenia-ում ստեղծված է։ Այստեղից կարող եք պատվիրել, հետևել առաքմանը և տեսնել ձեր պատվերները։</p><p style="font-size:13px;color:#6B756F;margin:12px 0 0">Եթե դուք չեք գրանցվել, պարզապես անտեսեք այս նամակը կամ զանգահարեք +1 (515) 588-5555։</p>' . $btn
-        : '<p style="font-size:15px;margin:0 0 10px">Hello' . ($first !== '' ? ' ' . mail_esc($first) : '') . ',</p><p style="font-size:15px;margin:0">Your Nectar of Armenia account is ready. You can order, track deliveries and see your orders there.</p><p style="font-size:13px;color:#6B756F;margin:12px 0 0">If you did not sign up, just ignore this email or call +1 (515) 588-5555.</p>' . $btn;
-      $e = null; @smtp_send($m, $em, $hy ? 'Բարի գալուստ Nectar of Armenia' : 'Welcome to Nectar of Armenia', mail_tpl($hy ? 'Բարի գալուստ' : 'Welcome', $inner), $e); } }
+      $hy = (($b['lang'] ?? 'hy') === 'hy'); $btn = '<p style="margin:22px 0 0"><a href="' . mail_esc($base . '/Account.dc.html') . '" style="display:inline-block;background:#EBA93A;color:#133B30;padding:14px 30px;border-radius:999px;text-decoration:none;font-weight:700;font-size:16px;border-bottom:3px solid #C98A1E">' . ($hy ? 'Մուտք գործել իմ էջ →' : 'Go to my account →') . '</a></p>';
+      $inner = $hy ? '<p style="margin:0 0 12px;font-size:16px">Բարև' . ($first !== '' ? ' ' . mail_esc($first) : '') . ',</p><p style="margin:0 0 14px">Ուրախ ենք ձեզ տեսնել մեր ընտանիքում։ Ձեր հաշիվը <b>Nectar of Armenia</b>-ում պատրաստ է։</p><table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 6px"><tr><td width="34" valign="top" style="font-size:20px;padding:6px 0">🛒</td><td style="padding:6px 0;font-size:15px;color:#33403A">Պատվիրեք մի քանի կտտոցով՝ հասցեն ու տվյալները պահված են։</td></tr><tr><td width="34" valign="top" style="font-size:20px;padding:6px 0">🚚</td><td style="padding:6px 0;font-size:15px;color:#33403A">Առաքում մինչև 48 ժամում կամ անվճար վերցնել Գլենդելից։</td></tr><tr><td width="34" valign="top" style="font-size:20px;padding:6px 0">📦</td><td style="padding:6px 0;font-size:15px;color:#33403A">Հետևեք պատվերին և տեսեք ձեր բոլոր պատվերները մեկ տեղում։</td></tr></table>' . $btn . '<p style="font-size:12.5px;color:#7A817C;margin:18px 0 0">Եթե դուք չեք գրանցվել, պարզապես անտեսեք այս նամակը կամ զանգահարեք +1 (515) 588-5555։</p>'
+        : '<p style="margin:0 0 12px;font-size:16px">Hello' . ($first !== '' ? ' ' . mail_esc($first) : '') . ',</p><p style="margin:0 0 14px">We are glad to welcome you to our family. Your <b>Nectar of Armenia</b> account is ready.</p><table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 6px"><tr><td width="34" valign="top" style="font-size:20px;padding:6px 0">🛒</td><td style="padding:6px 0;font-size:15px;color:#33403A">Order in a few taps — your address and details are saved.</td></tr><tr><td width="34" valign="top" style="font-size:20px;padding:6px 0">🚚</td><td style="padding:6px 0;font-size:15px;color:#33403A">Delivery within 48 hours, or free pickup in Glendale.</td></tr><tr><td width="34" valign="top" style="font-size:20px;padding:6px 0">📦</td><td style="padding:6px 0;font-size:15px;color:#33403A">Track your order and see all your orders in one place.</td></tr></table>' . $btn . '<p style="font-size:12.5px;color:#7A817C;margin:18px 0 0">If you did not sign up, just ignore this email or call +1 (515) 588-5555.</p>';
+      $e = null; @smtp_send($m, $em, $hy ? 'Բարի գալուստ Nectar of Armenia' : 'Welcome to Nectar of Armenia', mail_tpl($hy ? 'Բարի գալուստ 🌿' : 'Welcome 🌿', $inner, $hy ? 'hy' : 'en'), $e); } }
     out(['ok' => true]);
   case 'cpw_admin': // admin: give a customer a temporary password (forgot-password help)
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
