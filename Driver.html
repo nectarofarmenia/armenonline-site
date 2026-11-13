@@ -41,7 +41,7 @@ button{width:100%;min-height:50px;border:0;border-radius:999px;background:linear
   var TOP = window.top === window;
   var API = "api/api.php";
   var ADMIN_PAGE = /(Admin\.dc|Cost|Invoices|Map|Invite)\.html$/i.test(location.pathname);
-  var SHARED = /^noa-(accounts|orders|ws-orders(\|.*)?|chat(\|.*)?|cost-v2|inv2|invites(\|.*)?|drivers|paycfg|admin-ov|stock|stock-full|stock-pcs|soldout|prod|theme-sel|theme-dates|notify|cities|city-req|members\|.*|deposit\|.*|depsign\|.*|rewards\|.*|refs|geo|invoices|dlv)$/;
+  var SHARED = /^noa-(accounts|orders|ws-orders(\|.*)?|chat(\|.*)?|cost-v2|inv2|invites(\|.*)?|drivers|paycfg|admin-ov|stock|stock-full|stock-pcs|soldout|apri-lots|prod|theme-sel|theme-dates|notify|cities|city-req|members\|.*|deposit\|.*|depsign\|.*|rewards\|.*|refs|geo|invoices|dlv)$/;
   var META = "noa-sync-meta";
   function LG(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function LS(k, v) { try { if (v === null) { localStorage.removeItem(k); } else { localStorage.setItem(k, v); } } catch (e) {} }
