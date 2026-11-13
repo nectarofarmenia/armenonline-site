@@ -139,12 +139,15 @@ if (empty($__v['payNov10'])) {
 switch ($a) {
   case 'login':
     $b = body(); $pw = (string) ($b['pw'] ?? '');
-    if ($pw !== '' && password_verify($pw, $cfg['admin_hash'])) { session_regenerate_id(true); $_SESSION['nofa_admin'] = 1; out(['ok' => true]); }
-    sleep(1); out(['ok' => false, 'err' => 'bad_password'], 401);
+    $ip = substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64); $fk = '__alfail|' . $ip; $fr = kv_get($db, $fk); $fv = $fr ? (json_decode($fr['v'], true) ?: []) : [];
+    $fv = array_values(array_filter((array) $fv, function ($t) { return $t > now_ms() - 900000; })); if (count($fv) >= 8) { out(['ok' => false, 'err' => 'rate'], 429); }
+    if ($pw !== '' && password_verify($pw, $cfg['admin_hash'])) { session_regenerate_id(true); $_SESSION['nofa_admin'] = 1; if ($fv) { kv_put($db, $fk, '[]'); } out(['ok' => true]); }
+    $fv[] = now_ms(); kv_put($db, $fk, json_encode($fv)); sleep(1); out(['ok' => false, 'err' => 'bad_password'], 401);
   case 'cpw_set': // customer: set or change the account password (needs the account token)
     $b = body(); $em = strtolower(trim((string) ($b['em'] ?? ''))); $tok = (string) ($b['tok'] ?? ''); $pw = (string) ($b['pw'] ?? '');
     if (!preg_match('/^[^@\s]+@[^@\s]+\.[^@\s]+$/', $em) || strlen($tok) < 16 || strlen($pw) < 8 || strlen($pw) > 200) { out(['ok' => false, 'err' => 'bad'], 400); }
     $k = '__cpw|' . $em; $old = kv_get($db, $k); $old = $old ? (json_decode($old['v'], true) ?: []) : [];
+    if (!$old) { $ip = substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64); $rk = '__cpwr|' . $ip; $rr = kv_get($db, $rk); $rv = $rr ? (json_decode($rr['v'], true) ?: []) : []; $rv = array_values(array_filter((array) $rv, function ($t) { return $t > now_ms() - 3600000; })); if (count($rv) >= 10) { out(['ok' => false, 'err' => 'rate'], 429); } $rv[] = now_ms(); kv_put($db, $rk, json_encode($rv)); }
     if ($old) { if (!hash_equals((string) ($old['tok'] ?? ''), $tok)) { out(['ok' => false, 'err' => 'exists'], 403); } }
     else { $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; foreach ($A as $key => $rec) { if (is_array($rec) && strtolower((string) ($rec['email'] ?? '')) === $em && !empty($rec['tok']) && !hash_equals((string) $rec['tok'], $tok)) { out(['ok' => false, 'err' => 'exists'], 403); } } }
     $acc = []; foreach ((array) ($b['acc'] ?? []) as $key => $rec) { $key = strtolower((string) $key); if (is_array($rec) && strpos($key, $em . '|') === 0 && count($acc) < 4) { unset($rec['pw'], $rec['pass']); $acc[$key] = $rec; } }
@@ -172,6 +175,7 @@ switch ($a) {
     out(['ok' => true]);
   case 'cexists': // checkout: is this email already a customer account? (so a guest order doesn't clash with it)
     $b = body(); $em = strtolower(trim((string) ($b['em'] ?? ''))); usleep(300000); if ($em === '') { out(['ok' => true, 'exists' => false]); }
+    $ip = substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64); $xk = '__cexr|' . $ip; $xr = kv_get($db, $xk); $xv = $xr ? (json_decode($xr['v'], true) ?: []) : []; $xv = array_values(array_filter((array) $xv, function ($t) { return $t > now_ms() - 3600000; })); if (count($xv) >= 60) { out(['ok' => true, 'exists' => false]); } $xv[] = now_ms(); kv_put($db, $xk, json_encode($xv));
     $has = (bool) kv_get($db, '__cpw|' . $em); if (!$has) { $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; foreach ($A as $key => $x) { if (is_array($x) && strtolower((string) ($x['email'] ?? '')) === $em) { $has = true; break; } } }
     out(['ok' => true, 'exists' => $has]);
   case 'clogin': // customer: sign in with email + password on any device
@@ -459,7 +463,7 @@ switch ($a) {
     $cost = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: []; $cp = [];
     foreach ($cks as $ck) { if (isset($cost['cprof'][$ck]['dep0'])) { $cp[$ck] = ['dep0' => $cost['cprof'][$ck]['dep0']]; } }
     $LK = links_get($db); $lk = []; foreach (array_keys($mine) as $mk) { foreach (($LK[$mk] ?? []) as $ok2) { $lk[$mk][] = $ok2; foreach ($A as $k3 => $r3) { if (is_array($r3) && strtolower((string) $k3) === $ok2) { $mine[$k3] = $r3; } } } }
-    $pay = null; foreach ($mine as $key => $rec) { $isBiz = substr((string) $key, -4) === '|biz'; if (!$isBiz || in_array($rec['status'] ?? '', ['approved', 'active'], true)) { $pay = true; break; } }
+    $pay = null; foreach ($mine as $key => $rec) { $isBiz = substr((string) $key, -4) === '|biz' || ($rec['type'] ?? '') === 'biz'; if ($isBiz && in_array($rec['status'] ?? '', ['approved', 'active'], true)) { $pay = true; break; } } // bank details: approved wholesale partners only
     if ($pay) { $pc = json_decode((kv_get($db, 'noa-paycfg') ?: ['v' => '{}'])['v'], true) ?: []; $pay = []; foreach (['bank', 'acctName', 'routing', 'acct', 'wireRouting', 'bankAddr'] as $f) { if (trim((string) ($pc[$f] ?? '')) !== '') { $pay[$f] = (string) $pc[$f]; } } }
     out(['ok' => true, 'accounts' => $mine, 'links' => $lk, 'keys' => $keys, 'inv' => $list, 'cprof' => $cp, 'pay' => $pay]);
 }
