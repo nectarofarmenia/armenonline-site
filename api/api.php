@@ -115,6 +115,8 @@ function pay_mails($db, $ref, $amt) { // after a confirmed payment: receipt to t
   $own = (string) ($m['notify'] ?? $m['user']); if (filter_var($own, FILTER_VALIDATE_EMAIL)) { smtp_send($m, $own, '💳 New payment $' . number_format((float) $amt, 2) . ' — ' . $label, mail_tpl('New payment received', '<p style="margin:0 0 14px;font-size:15px"><b>' . mail_esc($label) . '</b><br>' . mail_esc($pv['name'] ?? '') . ' · ' . mail_esc($cust) . ' · ' . mail_esc($pv['phone'] ?? '') . '</p>' . $tbl . $extra)); }
 }
 function links_get($db) { return json_decode((kv_get($db, '__links') ?: ['v' => '{}'])['v'], true) ?: []; }
+function nofa_docs() { return ['1' => ['f' => __DIR__ . '/private/glendale-business-registration.pdf', 'no' => 'BRC-003767-2025', 'exp' => '2027-05-14']]; }
+function doc_secret($db) { $r = kv_get($db, '__docsec'); if ($r && strlen($r['v']) >= 32) { return $r['v']; } $k = bin2hex(random_bytes(32)); kv_put($db, '__docsec', $k); return $k; }
 function kv_put($db, $k, $v) { $t = now_ms(); $s = $db->prepare('REPLACE INTO nofa_kv (k, v, t) VALUES (?, ?, ?)'); $s->execute([$k, $v, $t]); return $t; }
 
 // One-time price update (Nov 10): gata unpackaged $1.50/piece; pelmeni wholesale $22 / 900 g, packaged only.
@@ -450,6 +452,20 @@ switch ($a) {
     if (!$orec) { out(['ok' => false, 'err' => 'bad_code']); }
     $L[$me[0]] = array_values(array_unique(array_merge($L[$me[0]] ?? [], [$c['key']]))); $L[$c['key']] = array_values(array_unique(array_merge($L[$c['key']] ?? [], [$me[0]])));
     kv_put($db, '__links', json_encode($L)); out(['ok' => true, 'other' => $c['key'], 'account' => $orec]);
+  case 'doc_link': // approved wholesale customer: short-lived links to business documents (files are not public)
+    $b = body(); $em = strtolower((string) ($b['em'] ?? '')); $tok = (string) ($b['tok'] ?? '');
+    if ($em === '' || strlen($tok) < 16) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $okB = false;
+    foreach ($A as $key => $rec) { if (!is_array($rec) || strtolower($rec['email'] ?? '') !== $em || !isset($rec['tok']) || !hash_equals((string) $rec['tok'], $tok)) { continue; } $isBiz = substr((string) $key, -4) === '|biz' || ($rec['type'] ?? '') === 'biz'; if ($isBiz && in_array($rec['status'] ?? '', ['approved', 'active'], true)) { $okB = true; } }
+    if (!$okB) { out(['ok' => true, 'docs' => []]); }
+    $x = time() + 1800; $docs = [];
+    foreach (nofa_docs() as $id => $d) { if (is_file($d['f'])) { $docs[$id] = ['url' => 'api/api.php?a=doc&id=' . $id . '&x=' . $x . '&s=' . hash_hmac('sha256', $id . '|' . $x, doc_secret($db)), 'no' => $d['no'], 'exp' => $d['exp']]; } }
+    out(['ok' => true, 'docs' => $docs]);
+  case 'doc': // signed link from doc_link (expires in 30 minutes)
+    $id = (string) ($_GET['id'] ?? ''); $x = (int) ($_GET['x'] ?? 0); $sg = (string) ($_GET['s'] ?? ''); $D = nofa_docs();
+    if (!isset($D[$id]) || $x < time() || !hash_equals(hash_hmac('sha256', $id . '|' . $x, doc_secret($db)), $sg) || !is_file($D[$id]['f'])) { out(['ok' => false, 'err' => 'expired'], 403); }
+    header('Content-Type: application/pdf'); header('Content-Disposition: inline; filename="' . basename($D[$id]['f']) . '"'); header('Cache-Control: private, no-store'); header('X-Robots-Tag: noindex');
+    readfile($D[$id]['f']); exit;
   case 'my': // customer: own data, verified by email + token
     $b = body(); $em = strtolower((string) ($b['em'] ?? '')); $tok = (string) ($b['tok'] ?? '');
     if ($em === '' || strlen($tok) < 16) { out(['ok' => false, 'err' => 'auth'], 401); }
