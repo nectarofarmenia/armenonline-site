@@ -285,7 +285,7 @@ switch ($a) {
     kv_put($db, '__stripe_pk', json_encode(['pk' => $pk])); out(['ok' => true]);
   case 'stripe_info': // admin: is a key set, which mode (never the key)
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
-    $sk = stripe_sk($db); $pkr = kv_get($db, '__stripe_pk'); $pkv = $pkr ? ((json_decode($pkr['v'], true) ?: [])['pk'] ?? '') : ''; out(['ok' => true, 'pk' => $pkv !== '', 'on' => $sk !== '', 'mode' => $sk === '' ? '' : (strpos($sk, '_live_') !== false ? 'live' : 'test'), 'tail' => $sk === '' ? '' : substr($sk, -4)]);
+    $sk = stripe_sk($db); $pkr = kv_get($db, '__stripe_pk'); $pkv = $pkr ? ((json_decode($pkr['v'], true) ?: [])['pk'] ?? '') : ''; out(['ok' => true, 'pk' => $pkv !== '', 'pkmode' => $pkv === '' ? '' : (strpos($pkv, '_live_') !== false ? 'live' : 'test'), 'on' => $sk !== '', 'mode' => $sk === '' ? '' : (strpos($sk, '_live_') !== false ? 'live' : 'test'), 'tail' => $sk === '' ? '' : substr($sk, -4)]);
   case 'pay_create': // customer: Stripe Checkout for a retail web order; amounts computed here, not trusted from the browser
     $sk = stripe_sk($db); if ($sk === '') { out(['ok' => false, 'err' => 'off']); }
     $b = body(); $no = preg_replace('/[^A-Za-z0-9-]/', '', (string) ($b['no'] ?? '')); if ($no === '') { out(['ok' => false, 'err' => 'no']); }
