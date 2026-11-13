@@ -120,6 +120,13 @@ switch ($a) {
     $acc = []; foreach ((array) ($b['acc'] ?? []) as $key => $rec) { $key = strtolower((string) $key); if (is_array($rec) && strpos($key, $em . '|') === 0 && count($acc) < 4) { unset($rec['pw'], $rec['pass']); $acc[$key] = $rec; } }
     if (!$acc && !empty($old['acc'])) { $acc = $old['acc']; }
     kv_put($db, $k, json_encode(['h' => password_hash($pw, PASSWORD_DEFAULT), 'tok' => $tok, 'acc' => $acc, 't' => now_ms()], JSON_UNESCAPED_UNICODE));
+    if (!$old) { $m = mail_cfg($db); if (!empty($m['user']) && !empty($m['pass'])) { // welcome email for a brand-new account (once per email)
+      $first = ''; foreach ($acc as $rec) { if (!empty($rec['first'])) { $first = (string) $rec['first']; break; } }
+      $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https'); $host = ($https ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'armenonline.com'); $base = $host . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '/api/api.php')), '/');
+      $hy = (($b['lang'] ?? 'hy') === 'hy'); $btn = '<p style="margin:18px 0 0"><a href="' . mail_esc($base . '/Account.dc.html') . '" style="display:inline-block;background:#1D5545;color:#F6E3B4;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:700">' . ($hy ? 'Մուտք գործել' : 'Sign in') . '</a></p>';
+      $inner = $hy ? '<p style="font-size:15px;margin:0 0 10px">Բարև' . ($first !== '' ? ' ' . mail_esc($first) : '') . ',</p><p style="font-size:15px;margin:0">Ձեր հաշիվը Nectar of Armenia-ում ստեղծված է։ Այստեղից կարող եք պատվիրել, հետևել առաքմանը և տեսնել ձեր պատվերները։</p><p style="font-size:13px;color:#6B756F;margin:12px 0 0">Եթե դուք չեք գրանցվել, պարզապես անտեսեք այս նամակը կամ զանգահարեք +1 (515) 588-5555։</p>' . $btn
+        : '<p style="font-size:15px;margin:0 0 10px">Hello' . ($first !== '' ? ' ' . mail_esc($first) : '') . ',</p><p style="font-size:15px;margin:0">Your Nectar of Armenia account is ready. You can order, track deliveries and see your orders there.</p><p style="font-size:13px;color:#6B756F;margin:12px 0 0">If you did not sign up, just ignore this email or call +1 (515) 588-5555.</p>' . $btn;
+      $e = null; @smtp_send($m, $em, $hy ? 'Բարի գալուստ Nectar of Armenia' : 'Welcome to Nectar of Armenia', mail_tpl($hy ? 'Բարի գալուստ' : 'Welcome', $inner), $e); } }
     out(['ok' => true]);
   case 'cpw_admin': // admin: give a customer a temporary password (forgot-password help)
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }

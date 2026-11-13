@@ -596,7 +596,8 @@ var startVerify = function (via) { var f = self._f || {}; var em = (f.email || "
 var e = !(f.first || "").trim() ? "first" : (!/^[^@ ]+@[^@ ]+[.][^@ ]+$/.test(em) ? "email" : (ph.length < 10 ? "phone" : ((acct === "biz" && !(f.biz || "").trim()) ? "biz" : (via === "email" && (f.pass || "").length < 8 ? "pass" : (via === "email" && f.pass !== f.pass2 ? "pass2" : "")))));
 if (!e && loadAccts()[em.toLowerCase() + "|" + (acct === "biz" ? "biz" : "retail")]) { e = "exists"; }
 if (e) { self.setState({ err: "r" + e }); return; }
-self._f.eCode = ""; self._f.pCode = ""; self.setState({ eV: "", pV: "", ver: { via: via, e: code6(), p: code6(), eOk: false, pOk: false }, err: "" }); };
+var u = saveUser(via); putAcct(u); var tk0 = u.tok || newTok(); u.tok = tk0; putAcct(u); var emL = String(u.email || "").toLowerCase(); try { window.localStorage.setItem("noa-sync-tok|" + emL, tk0); window.localStorage.setItem("noa-session", KEY(u)); } catch (x) {} if (syncOn() && (f.pass || "").length >= 8) { var acc0 = {}; acc0[KEY(u)] = u; nofaApi("cpw_set", { em: emL, tok: tk0, pw: f.pass, acc: acc0, lang: lang }).catch(function () {}); }
+self.setState({ signed: via, uType: u.type, fresh: true, ver: null, err: "" }); };
 var ver = st.ver || null;
 var remOn = st.rem !== false; var remEm = null; try { remEm = window.localStorage.getItem("noa-remember"); } catch (e) { remEm = null; }
 var remAcct = null; if (remEm) { var LA = loadAccts(); remAcct = LA[remEm] || (mode === "ws" ? LA[remEm + "|biz"] : (LA[remEm + "|retail"] || LA[remEm + "|biz"])) || null; if (remAcct && mode === "ws" && remAcct.type !== "biz") { remAcct = LA[(remAcct.email || "").toLowerCase() + "|biz"] || null; } } var faceOk = !!remAcct; if (remAcct) { user = remAcct; }
