@@ -88,7 +88,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
   var TOP = window.top === window;
   var API = "api/api.php";
   var ADMIN_PAGE = /(Admin\.dc|Cost|Invoices|Map|Invite)\.html$/i.test(location.pathname);
-  var SHARED = /^noa-(accounts|orders|ws-orders(\|.*)?|chat(\|.*)?|cost-v2|inv2|invites(\|.*)?|drivers|paycfg|admin-ov|stock|stock-full|stock-pcs|prod|theme-sel|theme-dates|notify|cities|city-req|members\|.*|deposit\|.*|depsign\|.*|rewards\|.*|refs|geo|invoices|dlv)$/;
+  var SHARED = /^noa-(accounts|orders|ws-orders(\|.*)?|chat(\|.*)?|cost-v2|inv2|invites(\|.*)?|drivers|paycfg|admin-ov|stock|stock-full|stock-pcs|soldout|prod|theme-sel|theme-dates|notify|cities|city-req|members\|.*|deposit\|.*|depsign\|.*|rewards\|.*|refs|geo|invoices|dlv)$/;
   var META = "noa-sync-meta";
   function LG(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function LS(k, v) { try { if (v === null) { localStorage.removeItem(k); } else { localStorage.setItem(k, v); } } catch (e) {} }
@@ -875,7 +875,7 @@ var notifs = t.notifs.map(function (lb, i) { return { label: lb, e: nt[i][0], s:
 var cnt2 = (st.q || stored).reduce(function (a, b) { return a + (b || 0); }, 0);
 var PIMG2 = ["img/6830d83c7ec9c8d627f12f1f2a8c5eeb.jpg", "img/c8b0737505aa785eed93371b09c8e049.jpg", "img/c8b0737505aa785eed93371b09c8e049.jpg", "img/d3fbe1930c2f9c5d58eab675b2128cfd.png", "img/65940d08dd8a527a15d113ecd1854f3a.webp", "img/9eb33fd2c3ff435a1314ecd2f69f9245.webp", "img/645bf576eb7a0134b08d93cb48d381e7.webp", "img/a6aaa8aa5db20ba68bc42c3406095e44.webp", "img/6a86ac441cd9dd29b3e3ba1a16934988.webp", "img/0f5ce6e80b23a0e775ad415e85b7ef0d.webp", "img/135d0cd80fa69f4a118392eea9b8bcd6.webp"];
 var cq = (st.q || stored).slice(); var setQ2 = function (i, v) { var c = cq.slice(); c[i] = Math.max(0, Math.min(99, v)); saveCart(c); self.setState({ q: c }); };
-var SOLD = (function () { try { var a = JSON.parse(window.localStorage.getItem("noa-stock") || "null"); return Array.isArray(a) ? a.map(function (x) { return +x <= 0; }) : []; } catch (e) { return []; } })(); var SOLDL = ({ hy: "Սպառված է", en: "Sold out", ru: "Нет в наличии", es: "Agotado" })[lang] || "Sold out";
+var SOLD = (function () { try { var a = JSON.parse(window.localStorage.getItem("noa-stock") || "null"); var so = []; try { so = JSON.parse(window.localStorage.getItem("noa-soldout") || "[]") || []; } catch (e2) { so = []; } var aa = Array.isArray(a) ? a : []; var nn = Math.max(aa.length, so.length); var r = []; for (var ii = 0; ii < nn; ii++) { r.push((ii < aa.length && +aa[ii] <= 0) || !!so[ii]); } return r; } catch (e) { return []; } })(); var SOLDL = ({ hy: "Սպառված է", en: "Sold out", ru: "Нет в наличии", es: "Agotado" })[lang] || "Sold out";
 var prods = t.pn.map(function (nm2, i) { var so = !!SOLD[i]; var has = PRICES[i] > 0 && !so; return { sold: so, soldL: SOLDL, name: nm2, size: t.ps[i] || "", img: PIMG2[i], hasImg: !!PIMG2[i], noImg: !PIMG2[i], price: has ? money(PRICES[i]) : "", canBuy: has, soon: !has && !so, q: cq[i] || 0, isIn: (cq[i] || 0) > 0, notIn: !((cq[i] || 0) > 0), inc: function () { setQ2(i, (cq[i] || 0) + 1); }, dec: function () { setQ2(i, (cq[i] || 0) - 1); } }; });
 prods = [0, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3].map(function (k) { return prods[k]; }).filter(Boolean);
 var cartLines = []; var cSub = 0; cq.forEach(function (n2, i) { if (n2 > 0) { cSub += n2 * PRICES[i]; cartLines.push({ name: t.pn[i], q: n2, line: money(n2 * PRICES[i]) }); } });

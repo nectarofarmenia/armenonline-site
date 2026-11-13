@@ -15,8 +15,8 @@ if ($a === 'ping') { out(['ok' => true, 'configured' => (bool) $cfg, 'admin' => 
 if (!$cfg) { out(['ok' => false, 'err' => 'not_configured'], 503); }
 try { $db = nofa_db(); } catch (Exception $e) { out(['ok' => false, 'err' => 'db'], 503); }
 $isAdmin = !empty($_SESSION['nofa_admin']);
-$SHARED = '/^noa-(accounts|orders|ws-orders(\|.*)?|chat(\|.*)?|cost-v2|inv2|invites(\|.*)?|drivers|paycfg|admin-ov|stock|stock-full|stock-pcs|prod|theme-sel|theme-dates|notify|cities|city-req|members\|.*|deposit\|.*|depsign\|.*|rewards\|.*|refs|geo|invoices|dlv)$/';
-$PUBLIC = ['noa-theme-sel', 'noa-theme-dates', 'noa-stock', 'noa-stock-full', 'noa-cities', 'noa-paycfg'];
+$SHARED = '/^noa-(accounts|orders|ws-orders(\|.*)?|chat(\|.*)?|cost-v2|inv2|invites(\|.*)?|drivers|paycfg|admin-ov|stock|stock-full|stock-pcs|soldout|prod|theme-sel|theme-dates|notify|cities|city-req|members\|.*|deposit\|.*|depsign\|.*|rewards\|.*|refs|geo|invoices|dlv)$/';
+$PUBLIC = ['noa-theme-sel', 'noa-theme-dates', 'noa-stock', 'noa-stock-full', 'noa-soldout', 'noa-cities', 'noa-paycfg'];
 function kv_get($db, $k) { $s = $db->prepare('SELECT v, t FROM nofa_kv WHERE k = ?'); $s->execute([$k]); $r = $s->fetch(PDO::FETCH_ASSOC); return $r ?: null; }
 function apri_rpc($fn, $args, &$code) {
   $url = 'https://oddqwjvqqvoeqdrnasqc.supabase.co/rest/v1/rpc/' . $fn; $key = 'sb_publishable_ZVvJKCJXM5ylUlICX-57vw__ZZqQul0';
@@ -300,6 +300,7 @@ switch ($a) {
     $N = ['Gata', 'Khash', 'Khash Broth', 'Khash Set', 'Khinkali', 'Pelmeni', 'Blinchik', 'Mijukov Kufta', 'Chicken Kiev', 'Chicken Cutlets', 'Beef Cutlets'];
     $cr = kv_get($db, 'noa-cost-v2'); if ($cr) { $cv = json_decode($cr['v'], true) ?: []; foreach (($cv['prod'] ?? []) as $pd) { $k = array_search((string) ($pd['id'] ?? ''), $ids, true); $v = (float) (($pd['pr'] ?? [])[0] ?? 0); if ($k !== false && $v > 0) { $P[$k] = round($v, 2); } } }
     $lines = []; $mlines = []; $sub = 0; $form = ['mode' => 'payment', 'client_reference_id' => $no, 'metadata[order]' => $no, 'payment_intent_data[metadata][order]' => $no, 'payment_intent_data[statement_descriptor_suffix]' => substr($no, -10)];
+    $SO = json_decode((kv_get($db, 'noa-soldout') ?: ['v' => '[]'])['v'], true) ?: []; foreach ((array) ($b['items'] ?? []) as $it) { $pi0 = (int) ($it[0] ?? -1); if ($pi0 >= 0 && !empty($SO[$pi0]) && (int) ($it[1] ?? 0) > 0) { out(['ok' => false, 'err' => 'soldout', 'i' => $pi0]); } }
     $i = 0; foreach ((array) ($b['items'] ?? []) as $it) { $pi = (int) ($it[0] ?? -1); $q = (int) ($it[1] ?? 0); if ($pi < 0 || $pi > 10 || $q < 1 || $q > 200 || $P[$pi] <= 0) { continue; }
       $form["line_items[$i][price_data][currency]"] = 'usd'; $form["line_items[$i][price_data][product_data][name]"] = $N[$pi]; $form["line_items[$i][price_data][unit_amount]"] = (int) round($P[$pi] * 100); $form["line_items[$i][quantity]"] = $q; $sub += $P[$pi] * $q; $mlines[] = [$N[$pi], $q, $P[$pi] * $q]; $i++; }
     if (!$i) { out(['ok' => false, 'err' => 'empty']); }

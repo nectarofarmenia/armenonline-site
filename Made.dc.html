@@ -61,7 +61,7 @@ setInterval(post,500);window.addEventListener("load",post);}catch(e){}})();</scr
   var TOP = window.top === window;
   var API = "api/api.php";
   var ADMIN_PAGE = /(Admin\.dc|Cost|Invoices|Map|Invite)\.html$/i.test(location.pathname);
-  var SHARED = /^noa-(accounts|orders|ws-orders(\|.*)?|chat(\|.*)?|cost-v2|inv2|invites(\|.*)?|drivers|paycfg|admin-ov|stock|stock-full|stock-pcs|prod|theme-sel|theme-dates|notify|cities|city-req|members\|.*|deposit\|.*|depsign\|.*|rewards\|.*|refs|geo|invoices|dlv)$/;
+  var SHARED = /^noa-(accounts|orders|ws-orders(\|.*)?|chat(\|.*)?|cost-v2|inv2|invites(\|.*)?|drivers|paycfg|admin-ov|stock|stock-full|stock-pcs|soldout|prod|theme-sel|theme-dates|notify|cities|city-req|members\|.*|deposit\|.*|depsign\|.*|rewards\|.*|refs|geo|invoices|dlv)$/;
   var META = "noa-sync-meta";
   function LG(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function LS(k, v) { try { if (v === null) { localStorage.removeItem(k); } else { localStorage.setItem(k, v); } } catch (e) {} }
@@ -787,7 +787,7 @@ if (!cart) { try { cart = JSON.parse(window.localStorage.getItem("noa-cart-v2") 
 if (!Array.isArray(cart) || cart.length !== 11) { cart = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; }
 var cartCount = cart.reduce(function (a, b) { return a + (b || 0); }, 0);
 var addedIdx = (this.state && typeof this.state.added === "number") ? this.state.added : -1;
-var SOLD = (function () { try { var a = JSON.parse(window.localStorage.getItem("noa-stock") || "null"); return Array.isArray(a) ? a.map(function (x) { return +x <= 0; }) : []; } catch (e) { return []; } })(); var SOLDL = ({ hy: "Սպառված է", en: "Sold out", ru: "Нет в наличии", es: "Agotado" })[lang] || "Sold out";
+var SOLD = (function () { try { var a = JSON.parse(window.localStorage.getItem("noa-stock") || "null"); var so = []; try { so = JSON.parse(window.localStorage.getItem("noa-soldout") || "[]") || []; } catch (e2) { so = []; } var aa = Array.isArray(a) ? a : []; var nn = Math.max(aa.length, so.length); var r = []; for (var ii = 0; ii < nn; ii++) { r.push((ii < aa.length && +aa[ii] <= 0) || !!so[ii]); } return r; } catch (e) { return []; } })(); var SOLDL = ({ hy: "Սպառված է", en: "Sold out", ru: "Нет в наличии", es: "Agotado" })[lang] || "Sold out";
 var products = t.p.map(function (name, i) {
 var so = !!SOLD[i];
 var tag = so ? "⛔ " + SOLDL : (tagIdx[i] >= 0 ? t.tags[tagIdx[i]] : "");

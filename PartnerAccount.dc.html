@@ -88,7 +88,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
   var TOP = window.top === window;
   var API = "api/api.php";
   var ADMIN_PAGE = /(Admin\.dc|Cost|Invoices|Map|Invite)\.html$/i.test(location.pathname);
-  var SHARED = /^noa-(accounts|orders|ws-orders(\|.*)?|chat(\|.*)?|cost-v2|inv2|invites(\|.*)?|drivers|paycfg|admin-ov|stock|stock-full|stock-pcs|prod|theme-sel|theme-dates|notify|cities|city-req|members\|.*|deposit\|.*|depsign\|.*|rewards\|.*|refs|geo|invoices|dlv)$/;
+  var SHARED = /^noa-(accounts|orders|ws-orders(\|.*)?|chat(\|.*)?|cost-v2|inv2|invites(\|.*)?|drivers|paycfg|admin-ov|stock|stock-full|stock-pcs|soldout|prod|theme-sel|theme-dates|notify|cities|city-req|members\|.*|deposit\|.*|depsign\|.*|rewards\|.*|refs|geo|invoices|dlv)$/;
   var META = "noa-sync-meta";
   function LG(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function LS(k, v) { try { if (v === null) { localStorage.removeItem(k); } else { localStorage.setItem(k, v); } } catch (e) {} }
@@ -1071,7 +1071,7 @@ var plVals = { plOn: tab === 30, plT: plT, plRows: plSrc.map(function (r, i) { r
 var q = (st.wq && st.wq.length === IDX.length) ? st.wq : IDX.map(function () { return 1; });
 var money = function (v) { return "$" + v.toFixed(2); };
 var sum = 0, units = 0;
-var SOLD = (function () { try { var a = JSON.parse(window.localStorage.getItem("noa-stock") || "null"); return Array.isArray(a) ? a.map(function (x) { return +x <= 0; }) : []; } catch (e) { return []; } })(); var SOLDL = ({ hy: "Սպառված է", en: "Sold out", ru: "Нет в наличии", es: "Agotado" })[lang] || "Sold out";
+var SOLD = (function () { try { var a = JSON.parse(window.localStorage.getItem("noa-stock") || "null"); var so = []; try { so = JSON.parse(window.localStorage.getItem("noa-soldout") || "[]") || []; } catch (e2) { so = []; } var aa = Array.isArray(a) ? a : []; var nn = Math.max(aa.length, so.length); var r = []; for (var ii = 0; ii < nn; ii++) { r.push((ii < aa.length && +aa[ii] <= 0) || !!so[ii]); } return r; } catch (e) { return []; } })(); var SOLDL = ({ hy: "Սպառված է", en: "Sold out", ru: "Нет в наличии", es: "Agotado" })[lang] || "Sold out";
 q = q.map(function (v, k) { return SOLD[IDX[k]] ? 0 : v; });
 var PIMGW = ["img/6830d83c7ec9c8d627f12f1f2a8c5eeb.jpg", "img/c8b0737505aa785eed93371b09c8e049.jpg", "img/c8b0737505aa785eed93371b09c8e049.jpg", "img/d3fbe1930c2f9c5d58eab675b2128cfd.png", "img/65940d08dd8a527a15d113ecd1854f3a.webp", "img/9eb33fd2c3ff435a1314ecd2f69f9245.webp", "img/645bf576eb7a0134b08d93cb48d381e7.webp", "img/a6aaa8aa5db20ba68bc42c3406095e44.webp", "img/6a86ac441cd9dd29b3e3ba1a16934988.webp", "img/0f5ce6e80b23a0e775ad415e85b7ef0d.webp", "img/135d0cd80fa69f4a118392eea9b8bcd6.webp"];
 var PPK0 = [12, 1, 1, 1, 10, 35, 10, 10, 6, 6, 6];
