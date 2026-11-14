@@ -6,3 +6,31 @@ Header always set X-Frame-Options "SAMEORIGIN"
 Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(self)"
 </IfModule>
 Options -Indexes
+
+# HTML always revalidated, so visitors get site updates right away
+<IfModule mod_headers.c>
+<FilesMatch "\.html$">
+Header set Cache-Control "no-cache"
+</FilesMatch>
+</IfModule>
+
+# One-time per browser: drop any old cached pages left from the previous nectarofarmenia.com site
+<IfModule mod_setenvif.c>
+SetEnvIf Cookie "nofa_cc=1" NOFA_CC
+</IfModule>
+<IfModule mod_headers.c>
+<FilesMatch "\.html$">
+Header always set Clear-Site-Data "\"cache\"" env=!NOFA_CC
+Header always add Set-Cookie "nofa_cc=1; Max-Age=31536000; Path=/; Secure; SameSite=Lax" env=!NOFA_CC
+</FilesMatch>
+</IfModule>
+
+# Old-site links (from Google etc.) that no longer exist go to the home page
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteCond %{REQUEST_URI} !\.(png|jpe?g|webp|gif|svg|ico|css|js|json|pdf|woff2?|txt|xml|map)$ [NC]
+RewriteRule ^ / [R=302,L]
+</IfModule>
