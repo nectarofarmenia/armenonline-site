@@ -312,7 +312,7 @@ setInterval(upd,400);setTimeout(upd,300);})();</script>
   window.nofaApriSync = apriSync;
   function startAdmin() {
     logoutBtn(); setInterval(logoutBtn, 1500);
-    adminPull(true).then(function (changed) { return adminInbox().then(function (n) { return adminPush().then(function () { if (changed || n) { location.reload(); } else { toast("✓ Տվյալները համաժամեցված են սերվերի հետ"); } }); }); }).catch(function () { toast("⚠️ Սերվերի հետ կապ չկա"); });
+    adminPull(true).then(function (changed) { return adminInbox().then(function (n) { return adminPush().then(function () { if (changed || n) { location.reload(); } else { toast("✓ Տվյալները համաժամեցված են սերվերի հետ"); } }); }); }).catch(function (e) { if (e && e.err === "auth") { toast("🔒 Մուտքի ժամկետը լրացել է — մուտք գործեք նորից"); setTimeout(function () { location.reload(); }, 1800); } else { toast("⚠️ Սերվերի հետ կապ չկա — ստուգեք ինտերնետը և թարմացրեք էջը"); } });
     setInterval(function () { adminPush().catch(function () {}); }, 4000);
     setInterval(function () { adminInbox().then(function (n) { if (n) { toast("📥 Նոր տվյալներ հաճախորդներից"); return adminPush().then(function () { if (idle()) { location.reload(); } }); } }).catch(function () {}); }, 30000);
     setTimeout(function () { apriSync().then(function (c) { if (c) { return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 2500);
