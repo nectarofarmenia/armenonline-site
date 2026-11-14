@@ -1,6 +1,6 @@
 <?php
 // Nectar of Armenia — shared DB helpers
-function nofa_cfg_paths() { $out = []; $root = dirname(__DIR__); $out[] = dirname($root) . '/nofa_config.php'; $out[] = __DIR__ . '/config.php'; return $out; }
+function nofa_cfg_paths() { $out = []; $root = dirname(__DIR__); $out[] = dirname($root) . '/nofa_config.php'; $dr = rtrim((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''), '/'); if ($dr !== '') { $out[] = dirname($dr) . '/nofa_config.php'; } $h = strtolower(preg_replace('/^www\./', '', (string) ($_SERVER['HTTP_HOST'] ?? ''))); $home = getenv('HOME') ?: ''; if ($home === '' && preg_match('#^(/home/[^/]+)/#', __DIR__, $m)) { $home = $m[1]; } if ($home !== '' && preg_match('/^[a-z0-9.-]+$/', $h)) { $out[] = $home . '/domains/' . $h . '/nofa_config.php'; } $out[] = __DIR__ . '/config.php'; return array_values(array_unique($out)); }
 function nofa_cfg() { static $c = false; if ($c !== false) { return $c; } $c = null; foreach (nofa_cfg_paths() as $f) { if (@file_exists($f)) { $c = include $f; break; } } return $c; }
 function nofa_db() {
   static $pdo = null; if ($pdo) { return $pdo; }
