@@ -230,6 +230,11 @@ switch ($a) {
     $q = $db->query("SELECT k, v FROM nofa_kv WHERE k LIKE '\\_\\_stats|%' ESCAPE '\\'"); $res = [];
     foreach ($q->fetchAll(PDO::FETCH_ASSOC) as $r) { $res[substr($r['k'], 8)] = json_decode($r['v'], true); }
     ksort($res); out(['ok' => true, 'months' => $res]);
+  case 'pay_rec': // admin: the server copy of a card order (to restore an order removed from the admin list by mistake)
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $no = preg_replace('/[^A-Za-z0-9-]/', '', (string) ($_GET['no'] ?? '')); $r = kv_get($db, '__pay|' . $no); if (!$r) { out(['ok' => false, 'err' => 'none']); }
+    $v = json_decode($r['v'], true) ?: []; $pw = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: [];
+    unset($v['sid'], $v['site']); out(['ok' => true, 'rec' => $v, 'paid' => isset($pw[$no]) || !empty($v['paid'])]);
   case 'all': // admin: everything
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $since = (int) ($_GET['since'] ?? 0);

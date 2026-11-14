@@ -2349,6 +2349,18 @@ window.azSet=function(d){z=Math.round(Math.min(1.6,Math.max(0.9,z+d))*100)/100;a
 .nv-empty{font-size:13px;color:#6B756F}
 @media (max-width:760px){.nv-k{grid-template-columns:1fr 1fr}}
 </style>
+<script id="nofa-restore-092618">(function () {
+  /* One-time: bring back the real $18 card order NofA-092618, removed together with the test orders on Nov 13. Rebuilt from the server's payment record. */
+  var NO = "NofA-092618", FLAG = "noa-restored|" + NO;
+  var NM = ["gata", "khash", "khash broth", "khash set", "khinkali", "pelmeni", "blinchik", "mijukov kufta", "chicken kiev", "chicken cutlets", "beef cutlets"];
+  function run() { try { if (localStorage.getItem(FLAG)) { return; } var O = JSON.parse(localStorage.getItem("noa-orders") || "[]") || []; if (O.some(function (o) { return o && String(o.no).replace(/^NOA-/i, "NofA-") === NO; })) { localStorage.setItem(FLAG, "1"); return; }
+    fetch("api/api.php?a=pay_rec&no=" + NO, { credentials: "same-origin" }).then(function (r) { return r.json(); }).then(function (j) { if (!j || !j.ok || !j.rec) { return; } var v = j.rec, it = [], sum = 0;
+      (v.lines || []).forEach(function (l) { var ix = NM.indexOf(String(l[0] || "").toLowerCase()); if (ix >= 0) { it.push([ix, +l[1] || 1]); sum += +l[2] || 0; } }); if (!it.length) { return; }
+      var O2 = JSON.parse(localStorage.getItem("noa-orders") || "[]") || []; if (O2.some(function (o) { return o && String(o.no).replace(/^NOA-/i, "NofA-") === NO; })) { localStorage.setItem(FLAG, "1"); return; }
+      O2.push({ no: NO, items: it, total: "$" + (sum + (+v.fee || 0)).toFixed(2), day: v.day || "", email: v.email || "", name: v.name || "", phone: v.phone || "", pay: "card", paid: !!j.paid, fm: v.fm || "del", fee: +v.fee || 0, addr: v.addr || "", at: new Date(+v.t || Date.now()).toISOString() });
+      localStorage.setItem("noa-orders", JSON.stringify(O2)); localStorage.setItem(FLAG, "1"); setTimeout(function () { location.reload(); }, 300); }).catch(function () {}); } catch (e) {} }
+  var n = 0, iv = setInterval(function () { if (document.getElementById("nofa-pw") && document.getElementById("nofa-pw").offsetParent) { return; } if (++n > 1) { clearInterval(iv); run(); } }, 1500);
+})();</script>
 <style id="nofa-light">
 /* Flat green admin: keeps the brand green and gold, drops the 3D gradients, heavy shadows and wave, tighter spacing */
 .card3d,.card3d-dark,.hero3d{box-shadow:none !important}
