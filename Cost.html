@@ -812,7 +812,7 @@ function perInit(){var n=new Date();if(S.per!=="m"&&S.per!=="y"&&S.per!=="all"){
 function inPeriod(d){perInit();if(S.per==="all"){return true;}var dt=new Date(String(d||"").slice(0,10)+"T12:00:00");if(isNaN(dt)){return false;}
   if(dt.getFullYear()!==+S.py){return false;}return S.per==="y"||dt.getMonth()===+S.pm;}
 function perLabel(){perInit();return S.per==="all"?"Բոլոր ժամանակները":S.per==="y"?S.py+" թ.":MOS[+S.pm]+" "+S.py;}
-var PIMG={gata:"img/social/th_01_gata.jpg",khinkali:"img/social/th_02_khinkali.jpg",blinchik:"img/social/th_03_blinchik.jpg",pelmeni:"img/social/th_04_pelmeni.jpg",kiev:"img/social/th_05_kievski.jpg",chcut:"img/social/th_06_chicken_cutlets.jpg",beefcut:"img/social/th_07_beef_cutlets.jpg",kufta:"img/social/th_08_mijukov_kufta.jpg"};
+var PIMG={gata:"img/social/th_01_gata.jpg",khinkali:"img/social/th_02_khinkali.jpg",blinchik:"img/social/th_03_blinchik.jpg",pelmeni:"img/social/th_04_pelmeni.jpg",kiev:"img/social/th_05_kievski.jpg",chcut:"img/social/th_06_chicken_cutlets.jpg",beefcut:"img/social/th_07_beef_cutlets.jpg",kufta:"img/social/th_08_mijukov_kufta.jpg",khash:"img/social/th_09_khash.jpg"};
 function dqOf(pi,u){var q=0;S.draft.lines.forEach(function(l){if(+l[0]===pi&&+l[1]===u){q+=num(l[2]);}});return q;}
 function dqSet(pi,u,q){var L=S.draft.lines.filter(function(l){return !(+l[0]===pi&&+l[1]===u)&&num(l[2])>0;});q=Math.max(0,Math.round(num(q)));if(q>0){L.push([pi,u,q]);}S.draft.lines=L;}
 function draftSum(){var n=0,k=0;S.draft.lines.forEach(function(l){if(num(l[2])>0){k++;n+=num(l[2]);}});return k?("Ընտրված է "+k+" ապրանք · "+n+" միավոր"):"Սեղմեք + ապրանքի վրա՝ քանակ ավելացնելու համար";}
