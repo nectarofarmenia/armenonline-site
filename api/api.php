@@ -368,7 +368,7 @@ switch ($a) {
   case 'pay_create': // customer: Stripe Checkout for a retail web order; amounts computed here, not trusted from the browser
     $sk = stripe_sk($db); if ($sk === '') { out(['ok' => false, 'err' => 'off']); }
     $b = body(); $no = preg_replace('/[^A-Za-z0-9-]/', '', (string) ($b['no'] ?? '')); if ($no === '') { out(['ok' => false, 'err' => 'no']); }
-    $P = [22.00, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0]; $ids = ['gata', 'khash', '', '', 'khinkali', 'pelmeni', 'blinchik', 'kufta', 'kiev', 'chcut', 'beefcut'];
+    $P = [22.00, 19.95, 15.95, 60.00, 24.95, 24.95, 34.95, 34.95, 20.95, 0, 0]; $ids = ['gata', 'khash', 'khbroth', 'khset', 'khinkali', 'pelmeni', 'blinchik', 'kufta', 'kiev', 'chcut', 'beefcut'];
     $N = ['Gata', 'Khash', 'Khash Broth', 'Khash Set', 'Khinkali', 'Pelmeni', 'Blinchik', 'Mijukov Kufta', 'Chicken Kiev', 'Chicken Cutlets', 'Beef Cutlets'];
     $cr = kv_get($db, 'noa-cost-v2'); if ($cr) { $cv = json_decode($cr['v'], true) ?: []; foreach (($cv['prod'] ?? []) as $pd) { $k = array_search((string) ($pd['id'] ?? ''), $ids, true); $v = (float) (($pd['pr'] ?? [])[0] ?? 0); if ($k !== false && $v > 0) { $P[$k] = round($v, 2); } } }
     $lines = []; $mlines = []; $sub = 0; $form = ['mode' => 'payment', 'client_reference_id' => $no, 'metadata[order]' => $no, 'payment_intent_data[metadata][order]' => $no, 'payment_intent_data[statement_descriptor_suffix]' => substr($no, -10)];

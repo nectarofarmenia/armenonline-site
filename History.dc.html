@@ -1268,7 +1268,7 @@ return Object.assign(poVals, apVals, { isBizSess: !!(accU && accU.type === "biz"
     var sk = "noa-apri-seen|" + KIND, first = true; try { first = !sessionStorage.getItem(sk); sessionStorage.setItem(sk, "1"); } catch (e) {}
     d.querySelector(".ap-act").addEventListener("click", function () { peek(); });
     if (ISMAIN) { d.classList.add("ap-main"); }
-    var start = function () { if (first) { setTimeout(open, 1200); } else { i = Math.floor(Math.random() * 5) + 1; setTimeout(peek, 600); } };
+    var start = function () { var mob = window.innerWidth <= 640; if (first) { if (!(mob && !ISMAIN)) { setTimeout(open, mob ? 6000 : 1200); } } else { i = Math.floor(Math.random() * 5) + 1; if (!mob) { setTimeout(peek, 600); } } };
     if (ISMAIN && (window.scrollY || 0) < 380) { var onS = function () { if ((window.scrollY || 0) >= 380) { window.removeEventListener("scroll", onS); start(); } }; window.addEventListener("scroll", onS, { passive: true }); } else { start(); }
   }
   if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", init); } else { init(); }

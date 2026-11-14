@@ -467,5 +467,10 @@ return {};
     var b = JSON.stringify({ p: location.pathname.split("/").pop() || "index.html", r: r, n: n, m: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 1 : 0, l: String(ls.getItem("noa-lang") || document.documentElement.lang || "").replace(/"/g, "") });
     if (navigator.sendBeacon) { navigator.sendBeacon("api/api.php?a=hit", new Blob([b], { type: "application/json" })); } else { fetch("api/api.php?a=hit", { method: "POST", body: b, keepalive: true }); }
   } catch (e) {} })();</script>
+<script id="qr-fit">(function () { /* the printed card is 1050×600; shrink it to fit narrow screens (print stays full size) */
+  function fit() { var el = document.querySelector('div[style*="width: 1050px"]'); if (!el) { return; } var k = Math.min(1, (document.documentElement.clientWidth - 16) / 1050); el.style.zoom = k < 1 ? String(k) : ""; }
+  window.addEventListener("resize", fit); var n = 0, iv = setInterval(function () { fit(); if (++n > 20) { clearInterval(iv); } }, 250);
+  var mq = window.matchMedia && window.matchMedia("print"); if (mq && mq.addListener) { mq.addListener(function (m) { var el = document.querySelector('div[style*="width: 1050px"]'); if (el && m.matches) { el.style.zoom = ""; } else { fit(); } }); }
+})();</script>
 </body>
 </html>
