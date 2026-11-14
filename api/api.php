@@ -11,7 +11,7 @@ function body() { $r = file_get_contents('php://input'); if (strlen($r) > 6 * 10
 function now_ms() { return (int) round(microtime(true) * 1000); }
 $a = $_GET['a'] ?? '';
 $cfg = nofa_cfg();
-if ($a === 'ping') { out(['ok' => true, 'configured' => (bool) $cfg, 'admin' => !empty($_SESSION['nofa_admin'])]); }
+if ($a === 'ping') { $d = []; if (!empty($_GET['diag']) && $cfg) { $P = nofa_cfg_paths(); $d = ['cfg_idx' => $GLOBALS['NOFA_CFG_IDX'] ?? null, 'cfg_n' => count($P), 'cfg_kinds' => array_map(function ($f) { return basename(dirname($f)) . '/' . basename($f) . (@file_exists($f) ? ':y' : ':n'); }, $P), 'hfp' => substr(hash('sha256', (string) ($cfg['admin_hash'] ?? '')), 0, 8)]; try { $dbx = nofa_db(); $d['apw'] = (bool) kv_get($dbx, '__adminpw'); } catch (Exception $e) { $d['apw'] = 'dberr'; } } out(['ok' => true, 'configured' => (bool) $cfg, 'admin' => !empty($_SESSION['nofa_admin'])] + $d); }
 if (!$cfg) { out(['ok' => false, 'err' => 'not_configured'], 503); }
 try { $db = nofa_db(); } catch (Exception $e) { out(['ok' => false, 'err' => 'db'], 503); }
 $isAdmin = !empty($_SESSION['nofa_admin']);
