@@ -154,7 +154,8 @@ switch ($a) {
     $b = body(); $pw = (string) ($b['pw'] ?? '');
     $ip = substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64); $fk = '__alfail|' . $ip; $fr = kv_get($db, $fk); $fv = $fr ? (json_decode($fr['v'], true) ?: []) : [];
     $fv = array_values(array_filter((array) $fv, function ($t) { return $t > now_ms() - 900000; })); if (count($fv) >= 8) { out(['ok' => false, 'err' => 'rate'], 429); }
-    if ($pw !== '' && password_verify($pw, $cfg['admin_hash'])) { session_regenerate_id(true); $_SESSION['nofa_admin'] = 1; if ($fv) { kv_put($db, $fk, '[]'); } out(['ok' => true]); }
+    $apw = kv_get($db, '__adminpw'); $okpw = $pw !== '' && (password_verify($pw, (string) ($cfg['admin_hash'] ?? '')) || ($apw && password_verify($pw, (string) $apw['v'])));
+    if ($okpw) { session_regenerate_id(true); $_SESSION['nofa_admin'] = 1; if ($fv) { kv_put($db, $fk, '[]'); } out(['ok' => true]); }
     $fv[] = now_ms(); kv_put($db, $fk, json_encode($fv)); sleep(1); out(['ok' => false, 'err' => 'bad_password'], 401);
   case 'cpw_set': // customer: set or change the account password (needs the account token)
     $b = body(); $em = strtolower(trim((string) ($b['em'] ?? ''))); $tok = (string) ($b['tok'] ?? ''); $pw = (string) ($b['pw'] ?? '');
@@ -203,6 +204,11 @@ switch ($a) {
     foreach ($A as $key => $x) { if (is_array($x) && strtolower((string) ($x['email'] ?? '')) === $em) { $mine[strtolower((string) $key)] = $x; } }
     foreach ($mine as $key => $x) { $mine[$key]['tok'] = $rec['tok']; }
     out(['ok' => true, 'tok' => $rec['tok'], 'accounts' => $mine]);
+  case 'admin_pw': // admin: set a new admin password (stored as a hash, server-only key)
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 403); }
+    $b = body(); $pw = (string) ($b['pw'] ?? '');
+    if (strlen($pw) < 8) { out(['ok' => false, 'err' => 'short'], 400); }
+    kv_put($db, '__adminpw', password_hash($pw, PASSWORD_DEFAULT)); out(['ok' => true]);
   case 'logout':
     $_SESSION = []; session_destroy(); out(['ok' => true]);
   case 'hit': // public: one page view for visitor statistics (aggregated by month; no IPs or personal data kept)
