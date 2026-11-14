@@ -28,6 +28,9 @@ Header always add Set-Cookie "nofa_cc=1; Max-Age=31536000; Path=/; Secure; SameS
 # Old-site links (from Google etc.) that no longer exist go to the home page
 <IfModule mod_rewrite.c>
 RewriteEngine On
+# Short links printed on cards: /wholesale and /wholesale/join
+RewriteRule ^wholesale/?$ /Wholesale.dc.html [R=302,L]
+RewriteRule ^wholesale/join/?$ /Wholesale.dc.html#apply [R=302,NE,L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/api/
