@@ -974,5 +974,12 @@ goIn: function () { self.setState({ mode: "in", err: "", ver: null }); }, goUp: 
       api("pw_reset_do", { t: tok, pw: pw }).then(function (j) { b.disabled = false; if (j && j.ok) { m.style.color = "#2F7A55"; m.textContent = t.ok; b.style.display = "none"; try { history.replaceState(null, "", location.pathname); } catch (e) {} var inp = document.querySelector('input[type="email"]'); if (inp && j.em) { var set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set; set.call(inp, j.em); inp.dispatchEvent(new Event("input", { bubbles: true })); } } else { m.style.color = "#B03A2E"; m.textContent = j && j.err === "expired" ? t.exp : t.net; } }).catch(function () { b.disabled = false; m.style.color = "#B03A2E"; m.textContent = t.net; }); }); }
   var tok = new URLSearchParams(location.search).get("reset"); if (tok) { var go = function () { setTimeout(function () { resetForm(tok); }, 600); }; if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", go); } else { go(); } }
 })();</script>
+<script id="nofa-hit">(function () { /* anonymous visit counter for the admin's Statistics page: page name, referring site, device type and language only */
+  try { if (window.self !== window.top) { return; } var ls = window.localStorage; if (ls.getItem("noa-dash-known|admin")) { return; }
+    var d = new Date().toISOString().slice(0, 10), n = 0; try { if (ls.getItem("noa-vday") !== d) { n = 1; ls.setItem("noa-vday", d); } } catch (e) {}
+    var r = ""; try { r = document.referrer ? new URL(document.referrer).hostname : ""; } catch (e) {}
+    var b = JSON.stringify({ p: location.pathname.split("/").pop() || "index.html", r: r, n: n, m: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 1 : 0, l: String(ls.getItem("noa-lang") || document.documentElement.lang || "").replace(/"/g, "") });
+    if (navigator.sendBeacon) { navigator.sendBeacon("api/api.php?a=hit", new Blob([b], { type: "application/json" })); } else { fetch("api/api.php?a=hit", { method: "POST", body: b, keepalive: true }); }
+  } catch (e) {} })();</script>
 </body>
 </html>

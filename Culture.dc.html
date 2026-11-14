@@ -1338,5 +1338,12 @@ return Object.assign(poVals, apVals, { isBizSess: !!(accU && accU.type === "biz"
 <script id="nofa-foot-in">(function () { var st = document.createElement("style"); st.textContent = "@media (max-width:700px){html.foot-in .ap-dock{opacity:0!important;visibility:hidden!important;transition:opacity .3s,visibility 0s .3s}}"; document.head.appendChild(st);
   var tk = 0; function chk() { tk = 0; var f = document.querySelector("footer"); if (!f) { return; } var r = f.getBoundingClientRect(); document.documentElement.classList.toggle("foot-in", r.top < window.innerHeight - 40); }
   window.addEventListener("scroll", function () { if (!tk) { tk = requestAnimationFrame(chk); } }, { passive: true }); setTimeout(chk, 800); })();</script>
+<script id="nofa-hit">(function () { /* anonymous visit counter for the admin's Statistics page: page name, referring site, device type and language only */
+  try { if (window.self !== window.top) { return; } var ls = window.localStorage; if (ls.getItem("noa-dash-known|admin")) { return; }
+    var d = new Date().toISOString().slice(0, 10), n = 0; try { if (ls.getItem("noa-vday") !== d) { n = 1; ls.setItem("noa-vday", d); } } catch (e) {}
+    var r = ""; try { r = document.referrer ? new URL(document.referrer).hostname : ""; } catch (e) {}
+    var b = JSON.stringify({ p: location.pathname.split("/").pop() || "index.html", r: r, n: n, m: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 1 : 0, l: String(ls.getItem("noa-lang") || document.documentElement.lang || "").replace(/"/g, "") });
+    if (navigator.sendBeacon) { navigator.sendBeacon("api/api.php?a=hit", new Blob([b], { type: "application/json" })); } else { fetch("api/api.php?a=hit", { method: "POST", body: b, keepalive: true }); }
+  } catch (e) {} })();</script>
 </body>
 </html>

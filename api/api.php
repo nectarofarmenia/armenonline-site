@@ -117,6 +117,17 @@ function pay_mails($db, $ref, $amt) { // after a confirmed payment: receipt to t
 function links_get($db) { return json_decode((kv_get($db, '__links') ?: ['v' => '{}'])['v'], true) ?: []; }
 function nofa_docs() { return ['1' => ['f' => __DIR__ . '/private/glendale-business-registration.pdf', 'no' => 'BRC-003767-2025', 'exp' => '2027-05-14']]; }
 function doc_secret($db) { $r = kv_get($db, '__docsec'); if ($r && strlen($r['v']) >= 32) { return $r['v']; } $k = bin2hex(random_bytes(32)); kv_put($db, '__docsec', $k); return $k; }
+function geo_ip($db, $ip) { // country/city of a visitor's IP, cached 14 days by a hash (the IP itself is never stored)
+  if ($ip === '' || preg_match('/^(127\.|10\.|192\.168\.|::1$)/', $ip)) { return ['cc' => '', 'c' => '', 'ci' => '', 'rg' => '']; }
+  $hk = '__geo|' . substr(hash('sha256', 'nofa-geo|' . $ip), 0, 24); $r = kv_get($db, $hk);
+  if ($r) { $g = json_decode($r['v'], true); if (is_array($g) && ($g['t'] ?? 0) > time() - 14 * 86400) { return $g; } }
+  $g = ['cc' => '', 'c' => '', 'ci' => '', 'rg' => '', 't' => time()];
+  $get = function ($url) { if (!function_exists('curl_init')) { $c = @file_get_contents($url, false, stream_context_create(['http' => ['timeout' => 3]])); return $c ?: ''; } $ch = curl_init($url); curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 3, CURLOPT_CONNECTTIMEOUT => 2, CURLOPT_USERAGENT => 'NofA-site']); $c = curl_exec($ch); curl_close($ch); return is_string($c) ? $c : ''; };
+  $j = json_decode($get('https://ipwho.is/' . rawurlencode($ip) . '?fields=success,country,country_code,region,city'), true);
+  if (is_array($j) && !empty($j['success'])) { $g = ['cc' => (string) ($j['country_code'] ?? ''), 'c' => (string) ($j['country'] ?? ''), 'ci' => (string) ($j['city'] ?? ''), 'rg' => (string) ($j['region'] ?? ''), 't' => time()]; }
+  else { $j = json_decode($get('https://ipapi.co/' . rawurlencode($ip) . '/json/'), true); if (is_array($j) && empty($j['error'])) { $g = ['cc' => (string) ($j['country_code'] ?? ''), 'c' => (string) ($j['country_name'] ?? ''), 'ci' => (string) ($j['city'] ?? ''), 'rg' => (string) ($j['region'] ?? ''), 't' => time()]; } }
+  kv_put($db, $hk, json_encode($g, JSON_UNESCAPED_UNICODE)); return $g;
+}
 function kv_put($db, $k, $v) { $t = now_ms(); $s = $db->prepare('REPLACE INTO nofa_kv (k, v, t) VALUES (?, ?, ?)'); $s->execute([$k, $v, $t]); return $t; }
 
 // One-time price update (Nov 10): gata unpackaged $1.50/piece; pelmeni wholesale $22 / 900 g, packaged only.
@@ -194,6 +205,31 @@ switch ($a) {
     out(['ok' => true, 'tok' => $rec['tok'], 'accounts' => $mine]);
   case 'logout':
     $_SESSION = []; session_destroy(); out(['ok' => true]);
+  case 'hit': // public: one page view for visitor statistics (aggregated by month; no IPs or personal data kept)
+    $ua = (string) ($_SERVER['HTTP_USER_AGENT'] ?? ''); if ($ua === '' || preg_match('/bot|crawl|spider|slurp|preview|facebookexternalhit|headless|lighthouse|python|curl|wget/i', $ua)) { out(['ok' => true]); }
+    $b = body(); $ip = substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64); $hk = '__hitr|' . substr(hash('sha256', $ip), 0, 16); $hr = kv_get($db, $hk); $hv = $hr ? (json_decode($hr['v'], true) ?: []) : [];
+    $hv = array_values(array_filter((array) $hv, function ($t) { return $t > time() - 3600; })); if (count($hv) >= 300) { out(['ok' => true]); } $hv[] = time(); kv_put($db, $hk, json_encode($hv));
+    $pg = preg_replace('/[^A-Za-z0-9._-]/', '', (string) ($b['p'] ?? '')); $pg = substr($pg, 0, 40) ?: 'index.html'; if ($pg === 'Main.dc.html' || $pg === '') { $pg = 'index.html'; }
+    $ref = strtolower(preg_replace('/[^A-Za-z0-9.-]/', '', (string) ($b['r'] ?? ''))); $ref = substr(preg_replace('/^www\./', '', $ref), 0, 60);
+    $g = geo_ip($db, $ip); $tz = new DateTimeZone('America/Los_Angeles'); $now = new DateTime('now', $tz); $mk = '__stats|' . $now->format('Y-m'); $day = $now->format('j');
+    $sr = kv_get($db, $mk); $st = $sr ? (json_decode($sr['v'], true) ?: []) : [];
+    $inc = function (&$arr, $k, $n = 1) { if ($k === '' ) { $k = '?'; } $arr[$k] = ($arr[$k] ?? 0) + $n; };
+    foreach (['d', 'cc', 'cn', 'ci', 'p', 'r', 'dv', 'lg', 'pu'] as $f) { if (!isset($st[$f]) || !is_array($st[$f])) { $st[$f] = []; } }
+    $new = !empty($b['n']);
+    if (!isset($st['d'][$day])) { $st['d'][$day] = ['v' => 0, 'u' => 0]; } $st['d'][$day]['v']++; if ($new) { $st['d'][$day]['u']++; }
+    $st['v'] = ($st['v'] ?? 0) + 1; if ($new) { $st['u'] = ($st['u'] ?? 0) + 1; }
+    $cc = $g['cc'] ?: '?'; $inc($st['cc'], $cc); if ($g['c']) { $st['cn'][$cc] = $g['c']; }
+    if ($g['ci']) { $inc($st['ci'], $g['ci'] . ($g['rg'] ? ', ' . $g['rg'] : '') . ' · ' . $cc); }
+    $inc($st['p'], $pg); if ($new) { $inc($st['pu'], $pg); }
+    if ($ref !== '' && $ref !== strtolower(preg_replace('/^www\./', '', (string) ($_SERVER['HTTP_HOST'] ?? '')))) { $inc($st['r'], $ref); } elseif ($new) { $inc($st['r'], '(direct)'); }
+    $inc($st['dv'], !empty($b['m']) ? 'm' : 'd'); $lg = preg_replace('/[^a-z]/', '', strtolower(substr((string) ($b['l'] ?? ''), 0, 2))); $inc($st['lg'], $lg ?: '?');
+    foreach (['ci', 'r'] as $f) { if (count($st[$f]) > 400) { arsort($st[$f]); $st[$f] = array_slice($st[$f], 0, 300, true); } }
+    kv_put($db, $mk, json_encode($st, JSON_UNESCAPED_UNICODE)); out(['ok' => true]);
+  case 'stats': // admin: visitor statistics by month
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $q = $db->query("SELECT k, v FROM nofa_kv WHERE k LIKE '\\_\\_stats|%' ESCAPE '\\'"); $res = [];
+    foreach ($q->fetchAll(PDO::FETCH_ASSOC) as $r) { $res[substr($r['k'], 8)] = json_decode($r['v'], true); }
+    ksort($res); out(['ok' => true, 'months' => $res]);
   case 'all': // admin: everything
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $since = (int) ($_GET['since'] ?? 0);

@@ -766,6 +766,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 </div>
 </sc-if>
 <sc-if value="{{tab13}}" hint-placeholder-val="{{false}}">
+<div id="nofa-visits"></div>
 <div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 16px; background: #FFFFFF">
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; "><h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 21px; color: #1D5545">💰 Ֆինանսական պատկեր</h2><div style="display: flex; flex-wrap: wrap; gap: 8px"><sc-for list="{{sgPers}}" as="m" hint-placeholder-count="5"><button type="button" onClick="{{m.pick}}" class="ad-chip {{m.cls}}">{{m.label}}</button></sc-for></div></div>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px"><sc-for list="{{sgPk}}" as="k" hint-placeholder-count="8"><div style="padding: 10px 12px; border-radius: 12px; background: #FBF9F4; border: 1px solid #ECE3CF"><span style="display: block; font-size: 12px; font-weight: 700; color: #6B756F">{{k.i}} {{k.l}}</span><strong style="font-size: 18px; color: {{k.c}}">{{k.v}}</strong></div></sc-for></div>
@@ -2290,6 +2291,55 @@ window.azSet=function(d){z=Math.round(Math.min(1.6,Math.max(0.9,z+d))*100)/100;a
     if (b.id === "mail-go") { var u = $("mail-user").value.trim(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(u)) { b.disabled = false; m.style.color = "#B03A2E"; m.textContent = "Գրեք փոստարկղի հասցեն (orders@nectarofarmenia.com)։"; $("mail-user").focus(); return; } m.textContent = "Պահպանում ենք…"; api("mail_cfg", { user: $("mail-user").value.trim(), pass: $("mail-pass").value, notify: $("mail-notify").value.trim(), host: "smtp.hostinger.com", port: 465 }).then(function (j) { b.disabled = false; $("mail-pass").value = ""; m.style.color = j && j.ok ? "#2F7A55" : "#B03A2E"; m.textContent = j && j.ok ? "✓ Պահպանվեց։ Սեղմեք «Ուղարկել փորձնական նամակ»։" : "Չհաջողվեց պահպանել։"; info(); }).catch(function () { b.disabled = false; m.textContent = "Սերվերի հետ կապ չկա։"; }); }
     else { m.textContent = "Ուղարկում ենք…"; api("mail_test", {}).then(function (j) { b.disabled = false; m.style.color = j && j.ok ? "#2F7A55" : "#B03A2E"; m.textContent = j && j.ok ? "✓ Նամակն ուղարկվեց " + j.to + " հասցեին։ Ստուգեք փոստը (նաև Spam-ը)։" : "Չհաջողվեց ուղարկել. " + ((j && j.err) || "") + " — ստուգեք փոստարկղն ու գաղտնաբառը։"; }).catch(function () { b.disabled = false; m.textContent = "Սերվերի հետ կապ չկա։"; }); } });
 })();</script>
+<script id="nofa-visits-js">(function () {
+  /* Statistics → site visitors: countries, cities, pages, sources (aggregated monthly on the server) */
+  var PG = { "index.html": "🏠 Գլխավոր", "Made.dc.html": "🏭 Արտադրություն", "History.dc.html": "📜 Պատմություն", "Culture.dc.html": "🎭 Մշակույթ", "Cook.dc.html": "🍳 Պատրաստման ձև", "Wholesale.dc.html": "🏪 Մեծածախ", "Cart.dc.html": "🛒 Զամբյուղ", "Checkout.dc.html": "💳 Պատվերի ձևակերպում", "Account.dc.html": "🔑 Մուտք / գրանցում", "MyAccount.dc.html": "👤 Իմ հաշիվը", "PartnerAccount.dc.html": "🤝 Գործընկերոջ էջ", "QR-Card.dc.html": "▦ QR քարտ", "Legal.html": "📄 Պայմաններ", "Track.html": "🚚 Պատվերի հետևում", "Join.html": "✍️ Միանալ", "Invite.html": "✉️ Հրավեր", "MyInvoices.html": "🧾 Իմ հաշիվները" };
+  var LG = { hy: "Հայերեն", en: "English", ru: "Русский", es: "Español" };
+  var MO = ["Հունվար", "Փետրվար", "Մարտ", "Ապրիլ", "Մայիս", "Հունիս", "Հուլիս", "Օգոստոս", "Սեպտեմբեր", "Հոկտեմբեր", "Նոյեմբեր", "Դեկտեմբեր"];
+  var DATA = null, SEL = null, busy = false;
+  function esc(x) { return String(x == null ? "" : x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function flag(cc) { if (!/^[A-Z]{2}$/.test(cc || "")) { return "🌐"; } return String.fromCodePoint(127397 + cc.charCodeAt(0), 127397 + cc.charCodeAt(1)); }
+  function fmt(n) { return Number(n || 0).toLocaleString("en-US"); }
+  function top(o, n) { return Object.keys(o || {}).map(function (k) { return [k, o[k]]; }).sort(function (a, b) { return b[1] - a[1]; }).slice(0, n || 10); }
+  function list(title, rows, lab, empty) { var mx = rows.length ? rows[0][1] : 1; var h = '<div class="nv-box"><b class="nv-bt">' + title + '</b>';
+    if (!rows.length) { return h + '<span class="nv-empty">' + empty + '</span></div>'; }
+    rows.forEach(function (r) { h += '<div class="nv-row"><span class="nv-l">' + lab(r[0]) + '</span><span class="nv-bar"><i style="width:' + Math.max(3, Math.round(r[1] / mx * 100)) + '%"></i></span><b class="nv-n">' + fmt(r[1]) + '</b></div>'; });
+    return h + '</div>'; }
+  function render(el) {
+    if (!DATA) { el.innerHTML = '<div class="nv card3d"><h2 class="nv-h">🌍 Կայքի այցելուներ</h2><span class="nv-empty">Բեռնում ենք…</span></div>'; return; }
+    var ks = Object.keys(DATA).sort(); if (!ks.length) { el.innerHTML = '<div class="nv card3d"><h2 class="nv-h">🌍 Կայքի այցելուներ</h2><p class="nv-sub">Այցելությունների հաշվարկը միացված է։ Առաջին տվյալները կերևան այստեղ, երբ մարդիկ բացեն կայքը։</p></div>'; return; }
+    if (!SEL || !DATA[SEL]) { SEL = ks[ks.length - 1]; } var st = DATA[SEL] || {}; var y = +SEL.slice(0, 4), mo = +SEL.slice(5, 7);
+    var dv = st.dv || {}; var mob = (dv.m || 0) + (dv.d || 0) ? Math.round((dv.m || 0) / ((dv.m || 0) + (dv.d || 0)) * 100) : 0;
+    var nC = Object.keys(st.cc || {}).filter(function (k) { return k !== "?"; }).length;
+    var days = new Date(y, mo, 0).getDate(), mxd = 1, D = st.d || {}; for (var i = 1; i <= days; i++) { if (D[i] && D[i].v > mxd) { mxd = D[i].v; } }
+    var h = '<div class="nv card3d"><div class="nv-top"><div><h2 class="nv-h">🌍 Կայքի այցելուներ</h2><p class="nv-sub">Ովքեր են այցելում կայքը, որտեղից և որ էջերն են դիտում։ Ձեր ադմինի բրաուզերից արված այցելությունները չեն հաշվվում։</p></div><div class="nv-mo">' +
+      ks.slice(-6).map(function (k) { return '<button type="button" data-nvm="' + k + '" class="' + (k === SEL ? "on" : "") + '">' + MO[+k.slice(5, 7) - 1] + " " + k.slice(0, 4) + '</button>'; }).join("") + '</div></div>';
+    h += '<div class="nv-k"><div><span>👁 Դիտումներ</span><b>' + fmt(st.v) + '</b></div><div><span>👥 Այցելուներ</span><b>' + fmt(st.u) + '</b><small>օրական եզակի</small></div><div><span>📱 Հեռախոսից</span><b>' + mob + '%</b></div><div><span>🌍 Երկրներ</span><b>' + nC + '</b></div></div>';
+    h += '<div class="nv-chart" aria-label="Դիտումներ ըստ օրերի">'; for (var j = 1; j <= days; j++) { var v = D[j] ? D[j].v : 0, u = D[j] ? D[j].u : 0; h += '<div class="nv-c" title="' + j + ' ' + MO[mo - 1] + ' · ' + v + ' դիտում · ' + u + ' այցելու"><i style="height:' + (v ? Math.max(4, Math.round(v / mxd * 100)) : 0) + '%"></i><small>' + (j === 1 || j % 5 === 0 ? j : "") + '</small></div>'; } h += '</div>';
+    h += '<div class="nv-g">' + list("🌍 Երկրներ", top(st.cc, 10), function (k) { return flag(k) + " " + esc((st.cn || {})[k] || (k === "?" ? "Անհայտ" : k)); }, "Տվյալներ չկան") +
+      list("🏙 Քաղաքներ", top(st.ci, 12), function (k) { var p = String(k).split(" · "); return flag(p[1]) + " " + esc(p[0]); }, "Տվյալներ չկան") +
+      list("📄 Էջեր", top(st.p, 12), function (k) { return esc(PG[k] || k); }, "Տվյալներ չկան") +
+      list("🔗 Որտեղից են եկել", top(st.r, 10), function (k) { return k === "(direct)" ? "Ուղիղ / հղումով" : esc(k); }, "Տվյալներ չկան") +
+      list("🗣 Լեզու", top(st.lg, 5), function (k) { return esc(LG[k] || k); }, "Տվյալներ չկան") + '</div></div>';
+    el.innerHTML = h; }
+  function load(el) { if (busy) { return; } busy = true; fetch("api/api.php?a=stats", { credentials: "same-origin" }).then(function (r) { return r.json(); }).then(function (j) { busy = false; if (j && j.ok) { DATA = j.months || {}; render(el); } }).catch(function () { busy = false; }); }
+  document.addEventListener("click", function (e) { var b = e.target.closest("[data-nvm]"); if (!b) { return; } SEL = b.getAttribute("data-nvm"); var el = document.getElementById("nofa-visits"); if (el) { render(el); } });
+  setInterval(function () { var el = document.getElementById("nofa-visits"); if (!el) { return; } if (!el.firstChild) { render(el); load(el); } }, 600);
+})();</script>
+<style id="nofa-visits-css">
+.nv{border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;margin-bottom:18px}
+.nv-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:12px}
+.nv-h{margin:0;font-family:Fraunces,'Noto Serif Armenian',Lora,serif;font-weight:600;font-size:21px;color:#1D5545}
+.nv-sub{margin:4px 0 0;font-size:13px;color:#6B756F;max-width:560px}
+.nv-mo{display:flex;flex-wrap:wrap;gap:6px}.nv-mo button{border:1.5px solid #E4DCC8;background:#fff;border-radius:999px;padding:7px 14px;font:700 13px Manrope,'Noto Sans Armenian',sans-serif;color:#33403A;cursor:pointer}.nv-mo button.on{background:#1D5545;border-color:#1D5545;color:#F6E3B4}
+.nv-k{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.nv-k>div{padding:12px 14px;border-radius:14px;background:#FBF9F4;border:1px solid #ECE3CF;display:flex;flex-direction:column;gap:2px}.nv-k span{font-size:12px;font-weight:700;color:#6B756F}.nv-k b{font-size:24px;color:#133B30}.nv-k small{font-size:11px;color:#8A8F86}
+.nv-chart{display:flex;align-items:flex-end;gap:3px;height:140px;padding:6px 2px 0;border-bottom:2px solid #E4DCC8}.nv-c{flex:1 1 0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;position:relative}.nv-c i{display:block;width:100%;max-width:22px;background:#2F7A55;border-radius:5px 5px 0 0}.nv-c:hover i{background:#EBA93A}.nv-c small{position:absolute;bottom:-18px;font-size:10px;color:#8A8F86}
+.nv-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:14px}
+.nv-box{border:1px solid #ECE3CF;border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:7px}.nv-bt{color:#1D5545;font-size:15px}
+.nv-row{display:grid;grid-template-columns:minmax(0,2fr) minmax(50px,1fr) auto;gap:8px;align-items:center;font-size:13px}.nv-l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nv-bar{height:6px;border-radius:9px;background:#F0E8D6;overflow:hidden}.nv-bar i{display:block;height:100%;background:#EBA93A;border-radius:9px}.nv-n{font-variant-numeric:tabular-nums;color:#133B30}
+.nv-empty{font-size:13px;color:#6B756F}
+@media (max-width:760px){.nv-k{grid-template-columns:1fr 1fr}}
+</style>
 <style id="nofa-light">
 /* Flat green admin: keeps the brand green and gold, drops the 3D gradients, heavy shadows and wave, tighter spacing */
 .card3d,.card3d-dark,.hero3d{box-shadow:none !important}
