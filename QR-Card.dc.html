@@ -472,5 +472,6 @@ return {};
   window.addEventListener("resize", fit); var n = 0, iv = setInterval(function () { fit(); if (++n > 20) { clearInterval(iv); } }, 250);
   var mq = window.matchMedia && window.matchMedia("print"); if (mq && mq.addListener) { mq.addListener(function (m) { var el = document.querySelector('div[style*="width: 1050px"]'); if (el && m.matches) { el.style.zoom = ""; } else { fit(); } }); }
 })();</script>
+<style id="hdr-wave-same">.hdr-stick > header + div[aria-hidden="true"]{display:block !important;background:#133B30 !important;line-height:0 !important}.hdr-stick > header + div[aria-hidden="true"] svg{display:block !important;width:100% !important;height:46px !important}</style>
 </body>
 </html>
