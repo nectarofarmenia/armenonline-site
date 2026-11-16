@@ -609,10 +609,10 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 <sc-if value="{{plOn}}" hint-placeholder-val="{{false}}">
 <div class="card3d" style="border-radius: 26px; padding: 24px; display: flex; flex-direction: column; gap: 16px; background: #FFFFFF">
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: flex-end"><div><h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 28px; color: #1D5545">🏷 {{plT.H}}</h1><p style="margin: 6px 0 0; color: #5E6A63; font-size: 14px; line-height: 1.5">{{plT.P}}</p></div><span style="padding: 6px 12px; border-radius: 999px; background: #F3EBD7; color: #7A5A12; font-size: 12.5px; font-weight: 800">{{plT.upd}}</span></div>
-<div style="overflow-x: auto; border-radius: 18px; border: 1px solid #ECE3CF">
-<table style="width: 100%; border-collapse: collapse; min-width: 420px; font-size: 14.5px">
-<thead><tr style="background: #1D5545; color: #F6E3B4; text-align: left"><th style="padding: 12px 14px">{{plT.c1}}</th><th style="padding: 12px 14px">{{plT.c2}}</th><th style="padding: 12px 14px; text-align: right">📦 {{plT.c3}}</th></tr></thead>
-<tbody><sc-for list="{{plRows}}" as="r" hint-placeholder-count="8"><tr style="border-top: 1px solid #F0E8D6; background: {{r.bg}}"><td style="padding: 11px 14px; font-weight: 700; color: #133B30">{{r.name}}</td><td style="padding: 11px 14px; color: #6B756F; font-size: 13px">{{r.size}}</td><td style="padding: 11px 14px; text-align: right; font-weight: 800; color: {{r.c1}}">{{r.pk}}</td></tr></sc-for></tbody>
+<div style="overflow: hidden; border-radius: 18px; border: 1px solid #ECE3CF">
+<table style="width: 100%; border-collapse: collapse; font-size: 14.5px">
+<thead><tr style="background: #1D5545; color: #F6E3B4; text-align: left"><th style="padding: 12px 14px">{{plT.c1}}</th><th style="padding: 12px 14px; text-align: right">{{plT.c3}}</th></tr></thead>
+<tbody><sc-for list="{{plRows}}" as="r" hint-placeholder-count="8"><tr style="border-top: 1px solid #F0E8D6; background: {{r.bg}}"><td style="padding: 12px 14px; font-weight: 700; color: #133B30; line-height: 1.3">{{r.name}}</td><td style="padding: 12px 14px; text-align: right; white-space: nowrap; vertical-align: middle"><div style="font-weight: 800; font-size: 16px; color: {{r.c1}}">{{r.pk}}</div><div style="color: #6B756F; font-size: 12.5px; font-weight: 500; margin-top: 2px; white-space: normal">{{r.size}}</div></td></tr></sc-for></tbody>
 </table></div>
 <div style="padding: 12px 14px; border-radius: 14px; background: #FBF8F1; color: #5E6A63; font-size: 13px; line-height: 1.55">ℹ️ {{plT.note}}</div>
 </div>
