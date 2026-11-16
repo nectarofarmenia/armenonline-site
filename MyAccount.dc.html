@@ -1585,7 +1585,7 @@ html:not(.ci-closed) .ci-tog{transform:rotate(180deg)}
     var b = JSON.stringify({ p: location.pathname.split("/").pop() || "index.html", r: r, n: n, m: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 1 : 0, l: String(ls.getItem("noa-lang") || document.documentElement.lang || "").replace(/"/g, "") });
     if (navigator.sendBeacon) { navigator.sendBeacon("api/api.php?a=hit", new Blob([b], { type: "application/json" })); } else { fetch("api/api.php?a=hit", { method: "POST", body: b, keepalive: true }); }
   } catch (e) {} })();</script>
-<style id="nofa-burger-css">
+<style id="nofa-burger-css">/*nb-mob-drop*/@media (max-width:900px){body.nb-full aside.sum-card{display:none !important}body.nb-full .two-col > :not(aside){flex:1 1 auto !important;min-width:0;max-width:100%}.nb-pan{left:0 !important;right:0 !important;width:auto !important;border-radius:0 0 22px 22px !important;border-top:0 !important;display:block !important;max-height:0;overflow:hidden !important;padding:0 14px !important;opacity:0;transition:max-height .35s ease,opacity .25s ease,padding .35s ease;pointer-events:none}.nb-pan.open{max-height:calc(100vh - 120px);overflow-y:auto !important;padding:12px 14px 16px !important;opacity:1;pointer-events:auto}.nb-nav .nb-i{min-height:46px;font-size:16px}}
 body.nb-on header .pill-group,body.nb-on header .hdr-back{display:none !important}
 body.nb-on a[href="Account.dc.html#logout"]:not(.nb-i),body.nb-on a[href="PartnerAccount.dc.html"].btn-ghost:not(.nb-i),body.nb-on a[href="MyAccount.dc.html"].btn-gold:not(.nb-i){display:none !important}
 .nb-btn{width:48px;height:48px;flex:none;border-radius:999px;border:1.5px solid #EBA93A;background:#1D5545;color:#F6E3B4;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
@@ -1622,7 +1622,7 @@ body.nb-on a[href="Account.dc.html#logout"]:not(.nb-i),body.nb-on a[href="Partne
   function render() {
     var t = T[L()] || T.hy, h = "";
     var asd = document.querySelector("aside.sum-card");
-    if (asd && false) { var nm = asd.querySelector("strong"), mb = nm && nm.parentNode.querySelector("span"); if (nm) { h += '<div class="nb-who"><div><b>' + nm.textContent.trim().replace(/</g, "&lt;") + "</b>" + (mb && mb.textContent.trim() !== nm.textContent.trim() ? "<small>" + mb.textContent.trim().replace(/</g, "&lt;") + "</small>" : "") + "</div></div>"; }
+    if (asd && window.innerWidth <= 900) { var nm = asd.querySelector("strong"), mb = nm && nm.parentNode.querySelector("span"); if (nm) { h += '<div class="nb-who"><div><b>' + nm.textContent.trim().replace(/</g, "&lt;") + "</b>" + (mb && mb.textContent.trim() !== nm.textContent.trim() ? "<small>" + mb.textContent.trim().replace(/</g, "&lt;") + "</small>" : "") + "</div></div>"; }
       h += '<div class="nb-nav">'; asd.querySelectorAll(".ma-scroll nav .wa-nav").forEach(function (b, i) { h += '<button type="button" class="nb-i' + (b.classList.contains("on") ? " on" : "") + '" data-nv="' + i + '">' + b.innerHTML + "</button>"; }); h += "</div>";
       var ng = asd.querySelector(".ma-scroll > .btn-gold"); if (ng) { h += '<button type="button" class="nb-new" data-new="1">' + ng.textContent.trim().replace(/</g, "&lt;") + "</button>"; } }
     var lb = document.querySelectorAll("header .pill-group button");
