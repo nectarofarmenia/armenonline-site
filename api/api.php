@@ -548,6 +548,9 @@ switch ($a) {
     $LK = links_get($db); $lk = []; foreach (array_keys($mine) as $mk) { foreach (($LK[$mk] ?? []) as $ok2) { $lk[$mk][] = $ok2; foreach ($A as $k3 => $r3) { if (is_array($r3) && strtolower((string) $k3) === $ok2) { $mine[$k3] = $r3; } } } }
     $pay = null; foreach ($mine as $key => $rec) { $isBiz = substr((string) $key, -4) === '|biz' || ($rec['type'] ?? '') === 'biz'; if ($isBiz && in_array($rec['status'] ?? '', ['approved', 'active'], true)) { $pay = true; break; } } // bank details: approved wholesale partners only
     if ($pay) { $pc = json_decode((kv_get($db, 'noa-paycfg') ?: ['v' => '{}'])['v'], true) ?: []; $pay = []; foreach (['bank', 'acctName', 'routing', 'acct', 'wireRouting', 'bankAddr'] as $f) { if (trim((string) ($pc[$f] ?? '')) !== '') { $pay[$f] = (string) $pc[$f]; } } }
-    out(['ok' => true, 'accounts' => $mine, 'links' => $lk, 'keys' => $keys, 'inv' => $list, 'cprof' => $cp, 'pay' => $pay]);
+    $RF = json_decode((kv_get($db, 'noa-refs') ?: ['v' => '[]'])['v'], true) ?: []; $want = []; foreach ($RF as $rr) { if (is_array($rr) && strtolower((string) ($rr['ref'] ?? '')) === $em && !empty($rr['email'])) { $want[strtolower($rr['email'])] = 1; } }
+    $refPaid = []; if ($want) { $PW = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: []; foreach (array_keys($PW) as $pno) { $pr2 = json_decode((kv_get($db, '__pay|' . $pno) ?: ['v' => '{}'])['v'], true) ?: []; $pe = strtolower((string) ($pr2['email'] ?? '')); if ($pe !== '' && isset($want[$pe])) { $refPaid[$pe] = 1; } }
+      $OR = json_decode((kv_get($db, 'noa-orders') ?: ['v' => '[]'])['v'], true) ?: []; foreach ($OR as $oo) { if (!is_array($oo)) { continue; } $oe = strtolower((string) ($oo['email'] ?? '')); $stt = (string) ($oo['status'] ?? ''); if ($oe !== '' && isset($want[$oe]) && (!empty($oo['paid']) || in_array($stt, ['paid', 'delivered', 'done', 'completed'], true))) { $refPaid[$oe] = 1; } } }
+    out(['ok' => true, 'refPaid' => array_keys($refPaid), 'accounts' => $mine, 'links' => $lk, 'keys' => $keys, 'inv' => $list, 'cprof' => $cp, 'pay' => $pay]);
 }
 out(['ok' => false, 'err' => 'unknown'], 400);
