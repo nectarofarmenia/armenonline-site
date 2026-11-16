@@ -357,7 +357,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
     loadJs(function (err) { if (err || !window.Stripe) { close(true); return; } try { var stripe = window.Stripe(window.nofaEmbedPk()); stripe.initEmbeddedCheckout({ fetchClientSecret: function () { return Promise.resolve(cs); } }).then(function (c) { ck = c; document.getElementById("ep-mount").innerHTML = ""; c.mount("#ep-mount"); }).catch(function () { close(true); }); } catch (e) { close(true); } });
   };
 })();</script>
-</head>
+<style id="no-x-drift">html,body{max-width:100%;overflow-x:hidden}@supports (overflow:clip){html,body{overflow-x:clip}}</style></head>
 <body>
 <x-dc>
 <helmet>

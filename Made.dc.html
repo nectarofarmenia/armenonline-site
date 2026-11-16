@@ -280,7 +280,7 @@ setInterval(post,500);window.addEventListener("load",post);}catch(e){}})();</scr
 
 </script>
 <style id="nofa-no-wait">.po-wait,#po-wait-co{display:none !important}</style>
-<style id="mob-panel-right">.mob-panel .phone-only{flex-direction:column !important;align-items:center !important;justify-content:center !important}</style></head>
+<style id="mob-panel-right">.mob-panel .phone-only{flex-direction:column !important;align-items:center !important;justify-content:center !important}</style><style id="no-x-drift">html,body{max-width:100%;overflow-x:hidden}@supports (overflow:clip){html,body{overflow-x:clip}}</style></head>
 <body>
 <x-dc>
 <helmet>
@@ -1313,5 +1313,27 @@ return Object.assign(poVals, apVals, { isBizSess: !!(accU && accU.type === "biz"
     var b = JSON.stringify({ p: location.pathname.split("/").pop() || "index.html", r: r, n: n, m: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 1 : 0, l: String(ls.getItem("noa-lang") || document.documentElement.lang || "").replace(/"/g, "") });
     if (navigator.sendBeacon) { navigator.sendBeacon("api/api.php?a=hit", new Blob([b], { type: "application/json" })); } else { fetch("api/api.php?a=hit", { method: "POST", body: b, keepalive: true }); }
   } catch (e) {} })();</script>
-<script id="nofa-fab-fix">(function(){if(window.__fabFix){return;}window.__fabFix=1;function fix(){var up=document.querySelector(".pgx .up");if(!up){return;}var u=up.getBoundingClientRect();if(!u.width){return;}if(window.innerWidth<=700){var bo=Math.round(window.innerHeight-u.bottom);document.querySelectorAll('.pgx button[aria-label="Back"],.pgx button[aria-label="Forward"]').forEach(function(a){a.style.setProperty("bottom",bo+"px","important");});}document.querySelectorAll("body *").forEach(function(e){if(e===up||e.closest(".pgx")||e.closest(".of-pn")||e.closest(".nb-pan")){return;}var cs=getComputedStyle(e);if(cs.position!=="fixed"||cs.display==="none"){return;}var r=e.getBoundingClientRect();if(r.width<20||r.width>120||r.height>120){return;}if(r.right<u.left+4||r.left>u.right-4||r.bottom<u.top+2||r.top>u.bottom){return;}e.style.setProperty("bottom",Math.round(window.innerHeight-u.top+10)+"px","important");});}window.addEventListener("load",function(){fix();setTimeout(fix,1500);setTimeout(fix,4000);});window.addEventListener("resize",fix);var n=0,iv=setInterval(function(){fix();if(++n>10){clearInterval(iv);}},1000);})();</script><style id="nt-mob-notree">@media (max-width:700px){#culture::before,#history::before,#shop::before{display:none !important;content:none !important}}</style></body>
+<script id="nofa-fab-fix">(function(){if(window.__fabFix){return;}window.__fabFix=1;function fix(){var up=document.querySelector(".pgx .up");if(!up){return;}var u=up.getBoundingClientRect();if(!u.width){return;}if(window.innerWidth<=700){var bo=Math.round(window.innerHeight-u.bottom);document.querySelectorAll('.pgx button[aria-label="Back"],.pgx button[aria-label="Forward"]').forEach(function(a){a.style.setProperty("bottom",bo+"px","important");});}document.querySelectorAll("body *").forEach(function(e){if(e===up||e.closest(".pgx")||e.closest(".of-pn")||e.closest(".nb-pan")){return;}var cs=getComputedStyle(e);if(cs.position!=="fixed"||cs.display==="none"){return;}var r=e.getBoundingClientRect();if(r.width<20||r.width>120||r.height>120){return;}if(r.right<u.left+4||r.left>u.right-4||r.bottom<u.top+2||r.top>u.bottom){return;}e.style.setProperty("bottom",Math.round(window.innerHeight-u.top+10)+"px","important");});}window.addEventListener("load",function(){fix();setTimeout(fix,1500);setTimeout(fix,4000);});window.addEventListener("resize",fix);var n=0,iv=setInterval(function(){fix();if(++n>10){clearInterval(iv);}},1000);})();</script><style id="nt-mob-notree">@media (max-width:700px){#culture::before,#history::before,#shop::before{display:none !important;content:none !important}}</style><script id="nofa-emo-img">
+(function () {
+  if (window.__nofaEmo) { return; } window.__nofaEmo = 1;
+  var SRC = "img/social/th_00_all.jpg", FULL = "img/social/09_all_products.jpg", CH = "🥟";
+  var css = document.createElement("style");
+  css.textContent = "img.emo-all{width:1.35em;height:1.35em;border-radius:.3em;object-fit:cover;vertical-align:-.3em;margin:0 .12em;cursor:zoom-in;box-shadow:0 1px 3px rgba(0,0,0,.18);display:inline-block}";
+  document.head.appendChild(css);
+  function zoom() { if (window.nofaZoom) { window.nofaZoom(FULL, "Nectar of Armenia"); return; }
+    var ov = document.createElement("div"); ov.style.cssText = "position:fixed;inset:0;z-index:2147483000;background:rgba(10,30,24,.82);display:flex;align-items:center;justify-content:center;padding:24px;cursor:zoom-out";
+    ov.innerHTML = '<img src="' + FULL + '" alt="" style="max-width:min(92vw,720px);max-height:86vh;border-radius:22px;box-shadow:0 24px 60px rgba(0,0,0,.45)">'; ov.onclick = function () { ov.remove(); }; document.body.appendChild(ov); }
+  function sweep(root) {
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: function (n) { if (n.nodeValue.indexOf(CH) < 0) { return 2; } var p = n.parentNode; if (!p || /^(SCRIPT|STYLE|TEXTAREA|INPUT|OPTION|TITLE)$/.test(p.nodeName) || p.isContentEditable) { return 2; } return 1; } });
+    var list = []; while (w.nextNode()) { list.push(w.currentNode); }
+    list.forEach(function (n) { var parts = n.nodeValue.split(CH), f = document.createDocumentFragment();
+      parts.forEach(function (t, i) { if (t) { f.appendChild(document.createTextNode(t)); } if (i < parts.length - 1) { var im = document.createElement("img"); im.src = SRC; im.alt = ""; im.className = "emo-all"; im.setAttribute("role", "button"); im.title = "Nectar of Armenia"; f.appendChild(im); } });
+      n.parentNode.replaceChild(f, n); });
+  }
+  document.addEventListener("click", function (e) { var im = e.target.closest && e.target.closest("img.emo-all, img[src$='th_00_all.jpg']"); if (im) { e.preventDefault(); e.stopPropagation(); zoom(); } }, true);
+  function go() { sweep(document.body); new MutationObserver(function (ms) { ms.forEach(function (m) { m.addedNodes.forEach(function (n) { if (n.nodeType === 1) { sweep(n); } else if (n.nodeType === 3 && n.parentNode) { sweep(n.parentNode); } }); if (m.type === "characterData" && m.target.parentNode) { sweep(m.target.parentNode); } }); }).observe(document.body, { childList: true, subtree: true, characterData: true }); }
+  if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", go); } else { go(); }
+})();
+</script>
+</body>
 </html>

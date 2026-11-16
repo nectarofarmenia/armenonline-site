@@ -272,7 +272,7 @@ input:focus,select:focus{outline:2px solid #8CC5A2;border-color:#8CC5A2}input.ba
 })();
 
 </script>
-</head><body><div id="app"></div>
+<style id="no-x-drift">html,body{max-width:100%;overflow-x:hidden}@supports (overflow:clip){html,body{overflow-x:clip}}</style></head><body><div id="app"></div>
 <script>
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function b64d(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4){s+="=";}return JSON.parse(decodeURIComponent(escape(atob(s))));}
