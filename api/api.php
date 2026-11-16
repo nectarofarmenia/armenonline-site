@@ -3,6 +3,7 @@
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 require __DIR__ . '/db.php';
+require __DIR__ . '/push.php';
 $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
 session_set_cookie_params(['lifetime' => 60 * 60 * 24 * 30, 'path' => '/', 'secure' => $https, 'httponly' => true, 'samesite' => 'Lax']);
 session_name('NOFASESS'); session_start();
@@ -107,6 +108,7 @@ function mail_tpl($title, $inner, $lang = '') {
 }
 function mail_esc($s) { return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8'); }
 function pay_mails($db, $ref, $amt) { // after a confirmed payment: receipt to the customer + notice to the owner (once)
+  $pk0 = '__pushpaid|' . $ref; if (!kv_get($db, $pk0)) { kv_put($db, $pk0, '1'); push_admin($db, '💳 Վճարված պատվեր · $' . number_format((float) $amt, 2), (strpos($ref, 'INV:') === 0 ? 'Հաշիվ #' . substr($ref, 4) : $ref) . ' · վճարումը ստացված է'); }
   $m = mail_cfg($db); if (empty($m['user'])) { return; } $pk = '__pay|' . $ref; $pr = kv_get($db, $pk); $pv = $pr ? (json_decode($pr['v'], true) ?: []) : []; if (!empty($pv['mailed'])) { return; }
   $pv['mailed'] = now_ms(); kv_put($db, $pk, json_encode($pv, JSON_UNESCAPED_UNICODE));
   $rows = ''; foreach ((array) ($pv['lines'] ?? []) as $l) { $rows .= '<tr><td style="padding:6px 0">' . mail_esc($l[0]) . ' × ' . (int) $l[1] . '</td><td style="padding:6px 0;text-align:right">$' . number_format((float) $l[2], 2) . '</td></tr>'; }
@@ -224,6 +226,16 @@ switch ($a) {
     if (strlen($pw) < 8) { out(['ok' => false, 'err' => 'short'], 400); }
     kv_put($db, '__adminpw', password_hash($pw, PASSWORD_DEFAULT)); kv_put($db, '__adminrst', '{}');
     session_regenerate_id(true); $_SESSION['nofa_admin'] = 1; out(['ok' => true]);
+  case 'push_key': // admin: VAPID public key for subscribing this device
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); } $v = vapid_keys($db); out(['ok' => (bool) $v, 'key' => $v ? $v['pub'] : '']);
+  case 'push_sub': // admin: save this device's push subscription
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); } $b = body(); $ep = (string) ($b['endpoint'] ?? ''); if (!preg_match('#^https://[a-z0-9.-]+/#i', $ep)) { out(['ok' => false, 'err' => 'bad'], 400); }
+    $S = json_decode((kv_get($db, '__pushsubs') ?: ['v' => '[]'])['v'], true) ?: []; $S = array_values(array_filter($S, function ($x) use ($ep) { return ($x['endpoint'] ?? '') !== $ep; })); $S[] = ['endpoint' => $ep, 'at' => now_ms(), 'ua' => substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 120)]; kv_put($db, '__pushsubs', json_encode(array_slice($S, -10)));
+    out(['ok' => true, 'n' => count($S)]);
+  case 'push_test': // admin: send a test notification to all admin devices
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); } push_admin($db, '🔔 Ծանուցումները աշխատում են', 'Nectar of Armenia · ադմին'); out(['ok' => true]);
+  case 'push_latest': // admin: text for the newest notification (used by the service worker)
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); } $Q = json_decode((kv_get($db, '__pushq') ?: ['v' => '[]'])['v'], true) ?: []; out(['ok' => true, 'n' => $Q[0] ?? null]);
   case 'admin_pw': // admin: set a new admin password (stored as a hash, server-only key)
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 403); }
     $b = body(); $pw = (string) ($b['pw'] ?? '');
@@ -294,12 +306,14 @@ switch ($a) {
     $s = $db->prepare('SELECT COUNT(*) FROM nofa_inbox WHERE ip = ? AND t > ?'); $s->execute([$ip, now_ms() - 86400000]);
     if ((int) $s->fetchColumn() > 800) { out(['ok' => false, 'err' => 'rate'], 429); }
     $ins = $db->prepare((nofa_is_sqlite() ? 'INSERT OR IGNORE' : 'INSERT IGNORE') . ' INTO nofa_inbox (kind, em, h, data, ip, t) VALUES (?, ?, ?, ?, ?, ?)');
-    $n = 0;
+    $n = 0; $ev = [];
     foreach (array_slice($items, 0, 40) as $it) {
       $kind = substr((string) ($it['kind'] ?? 'key'), 0, 20); $data = json_encode(['k' => $it['k'] ?? '', 'v' => $it['v'] ?? null, 'tok' => $tok], JSON_UNESCAPED_UNICODE);
       if (strlen($data) > 400000) { continue; }
-      $ins->execute([$kind, $em, hash('sha256', $em . '|' . $data), $data, $ip, now_ms()]); $n++;
+      $ins->execute([$kind, $em, hash('sha256', $em . '|' . $data), $data, $ip, now_ms()]); if ($ins->rowCount() > 0) { $n++; $kk = (string) ($it['k'] ?? ''); if (preg_match('/^noa-(ws-orders|chat|accounts|orders|city-req|deposit|depsign|rewards)/', $kk, $mm)) { $ev[$mm[1]] = 1; } }
     }
+    if (!empty($ev)) { $TT = ['ws-orders' => ['🏪 Մեծածախ պատվեր', 'Նոր կամ թարմացված մեծածախ պատվեր'], 'orders' => ['🛒 Նոր պատվեր', 'Նոր մանրածախ պատվեր'], 'chat' => ['💬 Նոր նամակ', 'Հաճախորդը գրել է ձեզ'], 'accounts' => ['👤 Նոր գրանցում', 'Նոր կամ թարմացված հաճախորդի հաշիվ'], 'city-req' => ['📍 Նոր քաղաքի հայտ', 'Հաճախորդը առաջարկել է քաղաք'], 'deposit' => ['🤝 Դեպոզիտ', 'Դեպոզիտի թարմացում'], 'depsign' => ['✍️ Ստորագրություն', 'Խանութը ստորագրել է'], 'rewards' => ['🎁 Անվճար տուփի հայտ', 'Հաճախորդը ընտրել է անվճար տուփ']];
+      $lk = json_decode((kv_get($db, '__pushlast') ?: ['v' => '{}'])['v'], true) ?: []; foreach (array_keys($ev) as $e1) { if (now_ms() - (int) ($lk[$e1 . '|' . $em] ?? 0) < 60000) { continue; } $lk[$e1 . '|' . $em] = now_ms(); push_admin($db, $TT[$e1][0], $TT[$e1][1] . ($em !== '' ? ' · ' . $em : '')); } kv_put($db, '__pushlast', json_encode($lk)); }
     out(['ok' => true, 'n' => $n]);
   case 'apri_cfg': // admin: save My Apri link token (stored server-side only)
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
