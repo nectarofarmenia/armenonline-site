@@ -15,6 +15,10 @@ if ($a === 'ping') { $d = []; if (!empty($_GET['diag']) && $cfg) { $P = nofa_cfg
 if (!$cfg) { out(['ok' => false, 'err' => 'not_configured'], 503); }
 try { $db = nofa_db(); } catch (Exception $e) { out(['ok' => false, 'err' => 'db'], 503); }
 $isAdmin = !empty($_SESSION['nofa_admin']);
+if (!kv_get($db, '__mig_pel3')) { $cr = kv_get($db, 'noa-cost-v2'); $cv = $cr ? (json_decode($cr['v'], true) ?: null) : null;
+  if (is_array($cv) && isset($cv['prod']) && is_array($cv['prod'])) { foreach ($cv['prod'] as &$pp) { if (($pp['id'] ?? '') === 'pelmeni') { if (!isset($pp['pr']) || !is_array($pp['pr'])) { $pp['pr'] = [0, 0, 0, 0]; } $pp['pr'][0] = 32; $pp['pr'][2] = 24; } } unset($pp); $cv['prPel2'] = 1; $cv['prPel3'] = 1; kv_put($db, 'noa-cost-v2', json_encode($cv, JSON_UNESCAPED_UNICODE)); }
+  kv_put($db, '__mig_pel3', '1'); }
+
 $SHARED = '/^noa-(accounts|orders|ws-orders(\|.*)?|chat(\|.*)?|cost-v2|inv2|invites(\|.*)?|drivers|paycfg|admin-ov|stock|stock-full|stock-pcs|soldout|apri-lots|prod|theme-sel|theme-dates|notify|cities|city-req|members\|.*|deposit\|.*|depsign\|.*|rewards\|.*|refs|geo|invoices|dlv)$/';
 $PUBLIC = ['noa-theme-sel', 'noa-theme-dates', 'noa-stock', 'noa-stock-full', 'noa-soldout', 'noa-cities', 'noa-paycfg'];
 function kv_get($db, $k) { $s = $db->prepare('SELECT v, t FROM nofa_kv WHERE k = ?'); $s->execute([$k]); $r = $s->fetch(PDO::FETCH_ASSOC); return $r ?: null; }
