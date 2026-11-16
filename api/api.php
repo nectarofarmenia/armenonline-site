@@ -569,7 +569,7 @@ switch ($a) {
     $inv = json_decode((kv_get($db, 'noa-inv2') ?: ['v' => '{}'])['v'], true) ?: []; $list = [];
     foreach (($inv['list'] ?? []) as $v) { if (!is_array($v) || in_array($v['st'] ?? '', ['draft', 'void'], true)) { continue; } if (in_array($v['ck'] ?? '', $cks, true) || strtolower($v['c']['e'] ?? '') === $em) { $list[] = $v; } }
     $cost = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: []; $cp = [];
-    foreach ($cks as $ck) { if (isset($cost['cprof'][$ck]['dep0'])) { $cp[$ck] = ['dep0' => $cost['cprof'][$ck]['dep0']]; } }
+    foreach ($cks as $ck) { if (isset($cost['cprof'][$ck]['dep0'])) { $q = $cost['cprof'][$ck]; $cp[$ck] = ['dep0' => $q['dep0'], 'dep0d' => (string) ($q['dep0d'] ?? ''), 'dep0n' => (string) ($q['dep0n'] ?? ''), 'dep0m' => (string) ($q['dep0m'] ?? 'at')]; } }
     $LK = links_get($db); $lk = []; foreach (array_keys($mine) as $mk) { foreach (($LK[$mk] ?? []) as $ok2) { $lk[$mk][] = $ok2; foreach ($A as $k3 => $r3) { if (is_array($r3) && strtolower((string) $k3) === $ok2) { $mine[$k3] = $r3; } } } }
     $pay = null; foreach ($mine as $key => $rec) { $isBiz = substr((string) $key, -4) === '|biz' || ($rec['type'] ?? '') === 'biz'; if ($isBiz && in_array($rec['status'] ?? '', ['approved', 'active'], true)) { $pay = true; break; } } // bank details: approved wholesale partners only
     if ($pay) { $pc = json_decode((kv_get($db, 'noa-paycfg') ?: ['v' => '{}'])['v'], true) ?: []; $pay = []; foreach (['bank', 'acctName', 'routing', 'acct', 'wireRouting', 'bankAddr'] as $f) { if (trim((string) ($pc[$f] ?? '')) !== '') { $pay[$f] = (string) $pc[$f]; } } }
