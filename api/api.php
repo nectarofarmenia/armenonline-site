@@ -236,6 +236,17 @@ switch ($a) {
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); } push_admin($db, '🔔 Ծանուցումները աշխատում են', 'Nectar of Armenia · ադմին'); out(['ok' => true]);
   case 'push_latest': // admin: text for the newest notification (used by the service worker)
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); } $Q = json_decode((kv_get($db, '__pushq') ?: ['v' => '[]'])['v'], true) ?: []; out(['ok' => true, 'n' => $Q[0] ?? null]);
+  case 'my_dlv': // customer: who received an own order, when, signature and photo
+    $b = body(); $em = strtolower(trim((string) ($b['em'] ?? ''))); $tok = (string) ($b['tok'] ?? ''); $no = preg_replace('/[^A-Za-z0-9\-:]/', '', (string) ($b['no'] ?? ''));
+    if ($no === '' || (!cust_rec($db, $em, 'biz', $tok) && !cust_rec($db, $em, 'retail', $tok))) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $own = false; $W = json_decode((kv_get($db, 'noa-ws-orders|' . $em) ?: ['v' => '[]'])['v'], true) ?: []; foreach ($W as $o) { if (is_array($o) && strcasecmp((string) ($o['no'] ?? ''), $no) === 0) { $own = true; break; } }
+    if (!$own) { $pr = json_decode((kv_get($db, '__pay|' . $no) ?: ['v' => '{}'])['v'], true) ?: []; $own = strtolower((string) ($pr['email'] ?? '')) === $em; }
+    if (!$own) { out(['ok' => false, 'err' => 'notyours'], 403); }
+    $t = kv_get($db, '__apri_token'); if (!$t) { out(['ok' => true, 'none' => true]); }
+    $r = apri_rpc('nofa_delivery_proof', ['p_token' => $t['v'], 'p_id' => $no], $code); $j = json_decode((string) $r, true);
+    if (!is_array($j) || (empty($j['at']) && empty($j['sig']) && empty($j['photo']))) { out(['ok' => true, 'none' => true]); }
+    $img = function ($x) { return (is_string($x) && preg_match('#^data:image/(jpeg|png);base64,[A-Za-z0-9+/=]+$#', $x)) ? $x : ''; };
+    out(['ok' => true, 'at' => (string) ($j['at'] ?? ''), 'signer' => (string) ($j['signer'] ?? ''), 'sig' => $img($j['sig'] ?? ''), 'photo' => $img($j['photo'] ?? '')]);
   case 'admin_pw': // admin: set a new admin password (stored as a hash, server-only key)
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 403); }
     $b = body(); $pw = (string) ($b['pw'] ?? '');
