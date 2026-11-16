@@ -204,6 +204,22 @@ switch ($a) {
     foreach ($A as $key => $x) { if (is_array($x) && strtolower((string) ($x['email'] ?? '')) === $em) { $mine[strtolower((string) $key)] = $x; } }
     foreach ($mine as $key => $x) { $mine[$key]['tok'] = $rec['tok']; }
     out(['ok' => true, 'tok' => $rec['tok'], 'accounts' => $mine]);
+  case 'admin_reset_req': // anyone: email a one-time admin reset link to the owner's notice mailbox (fixed in admin settings, never from the request)
+    $ip = substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64); $fk = '__arr|' . $ip; $fr = kv_get($db, $fk); $fv = $fr ? (json_decode($fr['v'], true) ?: []) : [];
+    $fv = array_values(array_filter((array) $fv, function ($t) { return $t > now_ms() - 3600000; })); if (count($fv) >= 3) { out(['ok' => false, 'err' => 'rate'], 429); } $fv[] = now_ms(); kv_put($db, $fk, json_encode($fv));
+    $m = mail_cfg($db); $to = (string) ($m['notify'] ?? '') ?: (string) ($m['user'] ?? ''); if ($to === '' || empty($m['user'])) { out(['ok' => false, 'err' => 'nomail']); }
+    $tok = bin2hex(random_bytes(24)); kv_put($db, '__adminrst', json_encode(['h' => hash('sha256', $tok), 'exp' => now_ms() + 1800000]));
+    $https2 = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https'); $host2 = preg_replace('/[^a-z0-9.:-]/i', '', $_SERVER['HTTP_HOST'] ?? 'nectarofarmenia.com');
+    $link = ($https2 ? 'https://' : 'http://') . $host2 . '/Admin.dc.html?areset=' . $tok;
+    $e = null; $ok = smtp_send($m, $to, 'Admin password reset — Nectar of Armenia', mail_tpl('Admin password reset', '<p style="font-size:15px;margin:0 0 14px">Someone asked to reset the admin password of the Nectar of Armenia website. If it was you, open this link within 30 minutes and choose a new password:</p><p style="margin:0 0 14px"><a href="' . mail_esc($link) . '" style="display:inline-block;padding:12px 22px;border-radius:999px;background:#EBA93A;color:#133B30;font-weight:bold;text-decoration:none">Set a new admin password</a></p><p style="font-size:13px;color:#6B756F;margin:0">If it was not you, ignore this email. The current password keeps working.</p>'), $e);
+    $at = strpos($to, '@'); $mask = $at > 2 ? substr($to, 0, 2) . str_repeat('•', max(1, $at - 2)) . substr($to, $at) : $to;
+    out(['ok' => $ok, 'to' => $mask]);
+  case 'admin_reset_do': // anyone holding a valid emailed token: set a new admin password
+    $b = body(); $tok = (string) ($b['tok'] ?? ''); $pw = (string) ($b['pw'] ?? ''); $r = kv_get($db, '__adminrst'); $v = $r ? (json_decode($r['v'], true) ?: []) : [];
+    if ($tok === '' || empty($v['h']) || (int) ($v['exp'] ?? 0) < now_ms() || !hash_equals((string) $v['h'], hash('sha256', $tok))) { sleep(1); out(['ok' => false, 'err' => 'token'], 400); }
+    if (strlen($pw) < 8) { out(['ok' => false, 'err' => 'short'], 400); }
+    kv_put($db, '__adminpw', password_hash($pw, PASSWORD_DEFAULT)); kv_put($db, '__adminrst', '{}');
+    session_regenerate_id(true); $_SESSION['nofa_admin'] = 1; out(['ok' => true]);
   case 'admin_pw': // admin: set a new admin password (stored as a hash, server-only key)
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 403); }
     $b = body(); $pw = (string) ($b['pw'] ?? '');
