@@ -272,7 +272,7 @@ input:focus,select:focus{outline:2px solid #8CC5A2;border-color:#8CC5A2}input.ba
 })();
 
 </script>
-<style id="no-x-drift">html,body{max-width:100%;overflow-x:hidden}@supports (overflow:clip){html,body{overflow-x:clip}}</style><style id="safe-top">.hdr-stick,header.raise-header[style*="sticky"]{top:env(safe-area-inset-top,0px) !important}html::before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:#133B30;z-index:2147483600;pointer-events:none}</style><meta name="theme-color" content="#133B30"></head><body><div id="app"></div>
+<style id="no-x-drift">html,body{max-width:100%;overflow-x:hidden}@supports (overflow:clip){html,body{overflow-x:clip}}</style><style id="safe-top">.hdr-stick,header.raise-header[style*="sticky"]{top:0 !important;padding-top:env(safe-area-inset-top,0px);background-color:#133B30;-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0);-webkit-backface-visibility:hidden;backface-visibility:hidden;will-change:transform;transition:none !important}.hdr-stick *{transition-property:background-color,color,opacity !important}html::before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:#133B30;z-index:2147483600;pointer-events:none}</style><meta name="theme-color" content="#133B30"></head><body><div id="app"></div>
 <script>
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function b64d(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4){s+="=";}return JSON.parse(decodeURIComponent(escape(atob(s))));}
