@@ -280,7 +280,15 @@ setInterval(post,500);window.addEventListener("load",post);}catch(e){}})();</scr
 
 </script>
 <style id="nofa-no-wait">.po-wait,#po-wait-co{display:none !important}</style>
-<style id="mob-panel-right">.mob-panel .phone-only{flex-direction:column !important;align-items:center !important;justify-content:center !important}</style><style id="no-x-drift">html,body{max-width:100%;overflow-x:hidden}@supports (overflow:clip){html,body{overflow-x:clip}}</style><style id="safe-top">@media (max-width:700px){.hdr-stick,header.raise-header[style*="sticky"]{position:relative !important;top:auto !important}}</style><meta name="theme-color" content="#133B30"></head>
+<style id="mob-panel-right">.mob-panel .phone-only{flex-direction:column !important;align-items:center !important;justify-content:center !important}</style><style id="no-x-drift">html,body{max-width:100%;overflow-x:hidden}@supports (overflow:clip){html,body{overflow-x:clip}}</style><style id="safe-top">@media (max-width:700px){.hdr-stick,header.raise-header[style*="sticky"]{position:relative !important;top:auto !important}}</style><meta name="theme-color" content="#133B30"><style id="st-bar-css">.st-bar{display:none}
+@media (max-width:700px){.st-bar{display:flex;align-items:center;justify-content:center;gap:8px}.st-bar-a{flex:0 0 auto;width:40px;height:40px;border-radius:999px;border:1.5px solid rgba(235,169,58,.95);background:transparent;color:#F6E3B4;display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer}.st-bar-cur{flex:0 1 auto;min-width:0;max-width:60vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-height:44px;display:inline-flex;align-items:center;padding:0 20px;border-radius:999px;background:#133B30;color:#F6E3B4;font-weight:800;font-size:16px;border:1.5px solid #EBA93A;box-shadow:inset 0 0 0 3px #133B30,inset 0 0 0 4.5px rgba(235,169,58,.75),0 6px 14px rgba(0,0,0,.28)}.st-bar-m{flex:0 0 auto;width:44px;height:44px;border-radius:999px;border:1.5px solid rgba(235,169,58,.95);background:#133B30;color:#F6E3B4;display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.25)}
+html:not(.st-open) #history .st-names{display:none !important}html.st-open .st-bar-m{background:#EBA93A;color:#133B30}
+html.st-open #history .st-names{flex-direction:column !important;flex-wrap:nowrap !important;align-items:stretch !important;gap:0 !important;padding:8px 18px 12px !important;background:linear-gradient(180deg,#174A3C,#133B30);border:1.5px solid rgba(235,169,58,.55);border-radius:24px;box-shadow:inset 0 10px 14px -10px rgba(0,0,0,.45),0 18px 34px rgba(0,0,0,.3);animation:sheetDown .6s cubic-bezier(.25,.8,.25,1) both}
+html.st-open #history .st-name{opacity:1 !important;transform:none !important;background:transparent !important;box-shadow:none !important;border-radius:0 !important;border-bottom:1px solid rgba(255,255,255,.1) !important;min-height:50px;font-size:18px;text-align:left;padding:0 4px !important;margin:0 !important;color:#F7F3EA}
+html.st-open #history .st-name:last-child{border-bottom:none !important}html.st-open #history .st-name[aria-selected="true"]{color:#F6C35A}
+#history .st-stage > .st-arrow{display:none !important}}
+</style>
+</head>
 <body>
 <x-dc>
 <helmet>
@@ -491,6 +499,7 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 <span style="font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #F6C35A; font-weight: 800">{{t.navHistory}}</span>
 <h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 44px">{{t.histH2}}</h2>
 </div>
+<div class="st-bar"><button type="button" onClick="{{storyPrev}}" aria-label="Previous" class="st-bar-a"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button><span class="st-bar-cur">{{storyCur.n}}</span><button type="button" onClick="{{storyNext}}" aria-label="Next" class="st-bar-a"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button><button type="button" class="st-bar-m" aria-label="Menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button></div>
 <div role="tablist" aria-label="{{t.cultH2}}" class="st-names" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 4px; padding: 6px 0 4px">
 <sc-for list="{{storyNames}}" as="sn" hint-placeholder-count="9">
 <button type="button" role="tab" aria-selected="{{sn.aria}}" onClick="{{sn.pick}}" class="st-name {{sn.cls}}">{{sn.name}}</button>
@@ -1352,5 +1361,6 @@ return Object.assign(poVals, apVals, { isBizSess: !!(accU && accU.type === "biz"
   if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", go); } else { go(); }
 })();
 </script>
+<script id="nofa-st-menu">document.addEventListener("click", function (e) { var t = e.target; if (!t || !t.closest) { return; } var h = document.documentElement; if (t.closest(".st-bar-m")) { h.classList.toggle("st-open"); return; } if (t.closest("#history .st-name") && h.classList.contains("st-open")) { h.classList.remove("st-open"); } });</script>
 </body>
 </html>
