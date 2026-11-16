@@ -1808,7 +1808,7 @@ invite: function () { var em = (st.inv || "").trim(); if (!em || em.indexOf("@")
     var sk = "noa-apri-seen|" + KIND, first = true; try { first = !sessionStorage.getItem(sk); sessionStorage.setItem(sk, "1"); } catch (e) {}
     d.querySelector(".ap-act").addEventListener("click", function () { peek(); });
     if (ISMAIN) { d.classList.add("ap-main"); }
-    var start = function () { var mob = window.innerWidth <= 640; if (first) { if (!(mob && !ISMAIN)) { setTimeout(open, mob ? 6000 : 1200); } } else { i = Math.floor(Math.random() * 5) + 1; if (!mob) { setTimeout(peek, 600); } } };
+    var start = function () { var mob = window.innerWidth <= 640; if (first) { if (!(mob && !ISMAIN)) { setTimeout(open, mob ? 6000 : 1200); } else { setTimeout(peek, 1500); } } else { i = Math.floor(Math.random() * 5) + 1; setTimeout(peek, mob ? 1500 : 600); } };
     if (ISMAIN && (window.scrollY || 0) < 380) { var onS = function () { if ((window.scrollY || 0) >= 380) { window.removeEventListener("scroll", onS); start(); } }; window.addEventListener("scroll", onS, { passive: true }); } else { start(); }
   }
   if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", init); } else { init(); }
@@ -2075,7 +2075,7 @@ html:not(.ci-closed) .ci-tog{transform:rotate(180deg)}
   new MutationObserver(function () { clearTimeout(tick.t); tick.t = setTimeout(tick, 60); }).observe(document.documentElement, { childList: true, subtree: true }); setTimeout(tick, 400);
 })();
 </script>
-<script id="nofa-foot-in">(function () { var st = document.createElement("style"); st.textContent = "@media (max-width:700px){html.foot-in .ap-dock{opacity:0!important;visibility:hidden!important;transition:opacity .3s,visibility 0s .3s}}"; document.head.appendChild(st);
+<script id="nofa-foot-in">(function () { var st = document.createElement("style"); st.textContent = ""; document.head.appendChild(st);
   var tk = 0; function chk() { tk = 0; var f = document.querySelector("footer"); if (!f) { return; } var r = f.getBoundingClientRect(); document.documentElement.classList.toggle("foot-in", r.top < window.innerHeight - 40); }
   window.addEventListener("scroll", function () { if (!tk) { tk = requestAnimationFrame(chk); } }, { passive: true }); setTimeout(chk, 800); })();</script>
 <script id="nofa-hit">(function () { /* anonymous visit counter for the admin's Statistics page: page name, referring site, device type and language only */

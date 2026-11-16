@@ -1045,7 +1045,7 @@ place: function (e) { if (e && e.preventDefault) { e.preventDefault(); } if (!(s
   new MutationObserver(scan).observe(document.documentElement, { childList: true, subtree: true }); scan();
 })();
 </script>
-<script id="nofa-foot-in">(function () { var st = document.createElement("style"); st.textContent = "@media (max-width:700px){html.foot-in .ap-dock{opacity:0!important;visibility:hidden!important;transition:opacity .3s,visibility 0s .3s}}"; document.head.appendChild(st);
+<script id="nofa-foot-in">(function () { var st = document.createElement("style"); st.textContent = ""; document.head.appendChild(st);
   var tk = 0; function chk() { tk = 0; var f = document.querySelector("footer"); if (!f) { return; } var r = f.getBoundingClientRect(); document.documentElement.classList.toggle("foot-in", r.top < window.innerHeight - 40); }
   window.addEventListener("scroll", function () { if (!tk) { tk = requestAnimationFrame(chk); } }, { passive: true }); setTimeout(chk, 800); })();</script>
 <script id="nofa-hit">(function () { /* anonymous visit counter for the admin's Statistics page: page name, referring site, device type and language only */
