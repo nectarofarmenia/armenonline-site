@@ -2110,6 +2110,11 @@ body.nb-on a[href="Account.dc.html#logout"]:not(.nb-i),body.nb-on a[href="Partne
     en: { menu: "Menu", lang: "Language", toBiz: "Switch to wholesale account", toRet: "Switch to personal account", admin: "Admin page", site: "Home page", out: "Sign out" },
     ru: { menu: "Меню", lang: "Язык", toBiz: "Перейти в оптовый аккаунт", toRet: "Перейти в личный аккаунт", admin: "Админ-панель", site: "Главная", out: "Выйти" },
     es: { menu: "Menú", lang: "Idioma", toBiz: "Cambiar a cuenta mayorista", toRet: "Cambiar a cuenta personal", admin: "Panel de admin", site: "Inicio", out: "Cerrar sesión" } };
+  (function linkPrev() { try { var pv = JSON.parse(localStorage.getItem("noa-link-from") || "null"), cu = JSON.parse(localStorage.getItem("noa-user") || "null"); if (!pv || !cu || !cu.email) { return; }
+      var kp = pv.email.toLowerCase() + "|" + (pv.type === "biz" ? "biz" : "retail"), kc = cu.email.toLowerCase() + "|" + (cu.type === "biz" ? "biz" : "retail"); localStorage.removeItem("noa-link-from"); if (kp === kc) { return; }
+      var AX = JSON.parse(localStorage.getItem("noa-accounts") || "{}") || {}; if (!AX[kp]) { AX[kp] = pv; } if (!AX[kc]) { AX[kc] = cu; } localStorage.setItem("noa-accounts", JSON.stringify(AX));
+      [[kc, kp], [kp, kc]].forEach(function (pr) { var L = JSON.parse(localStorage.getItem("noa-links|" + pr[0]) || "[]") || []; if (L.indexOf(pr[1]) < 0) { L.push(pr[1]); } localStorage.setItem("noa-links|" + pr[0], JSON.stringify(L)); });
+      setTimeout(function () { location.reload(); }, 300); } catch (x) {} })();
   var isAdmin = false; try { isAdmin = !!localStorage.getItem("noa-dash-known|admin"); } catch (e) {}
   fetch("api/api.php?a=ping", { credentials: "same-origin", cache: "no-store" }).then(function (r) { return r.json(); }).then(function (j) { if (j && j.admin) { isAdmin = true; } }).catch(function () {});
   var pan = document.createElement("div"); pan.className = "nb-pan"; pan.setAttribute("role", "menu");
@@ -2120,8 +2125,9 @@ body.nb-on a[href="Account.dc.html#logout"]:not(.nb-i),body.nb-on a[href="Partne
     h += '<div class="nb-h">' + t.lang + '</div><div class="nb-langs">';
     lb.forEach(function (b, i) { h += '<button type="button" data-li="' + i + '" class="' + (b.getAttribute("aria-pressed") === "true" ? "on" : "") + '">' + b.textContent.trim() + "</button>"; });
     h += "</div>";
-    var sw = swEl();
-    if (sw) { h += '<a class="nb-i" href="' + sw.getAttribute("href") + '" data-sw="1">🔄 ' + (/Partner/.test(sw.getAttribute("href")) ? t.toBiz : t.toRet) + "</a>"; }
+    var onBiz = /PartnerAccount/.test(page), sw = swEl();
+    if (sw) { h += '<a class="nb-i" href="' + sw.getAttribute("href") + '" data-sw="1">🔄 ' + (onBiz ? t.toRet : t.toBiz) + "</a>"; }
+    else { h += '<a class="nb-i" href="Account.dc.html' + (onBiz ? "" : "#ws") + '" data-link="1">🔄 ' + (onBiz ? t.toRet : t.toBiz) + "</a>"; }
     if (isAdmin) { h += '<a class="nb-i adm" href="Admin.dc.html">🛠 ' + t.admin + "</a>"; }
     h += '<a class="nb-i" href="Main.dc.html">🏠 ' + t.site + "</a>";
     h += '<a class="nb-i" href="Account.dc.html#logout">🚪 ' + t.out + "</a>";
@@ -2130,6 +2136,8 @@ body.nb-on a[href="Account.dc.html#logout"]:not(.nb-i),body.nb-on a[href="Partne
   pan.addEventListener("click", function (e) {
     var li = e.target.closest("[data-li]");
     if (li) { var b = document.querySelectorAll("header .pill-group button")[+li.getAttribute("data-li")]; if (b) { b.click(); } setTimeout(render, 120); return; }
+    var lk = e.target.closest("[data-link]");
+    if (lk) { try { var cu = JSON.parse(localStorage.getItem("noa-user") || "null"); if (cu && cu.email) { localStorage.setItem("noa-link-from", JSON.stringify(cu)); localStorage.removeItem("noa-session"); localStorage.removeItem("noa-user"); } } catch (x) {} return; }
     var s = e.target.closest("[data-sw]");
     if (s) { var o = swEl(); if (o) { e.preventDefault(); o.click(); } }
   });
