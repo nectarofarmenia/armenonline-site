@@ -2443,5 +2443,24 @@ aside.sum-card .as-ttl{background:#1D5545 !important;margin:-10px -10px 6px !imp
   function alert0(m) { var d = document.createElement("div"); d.style.cssText = "position:fixed;left:50%;top:20px;transform:translateX(-50%);z-index:2147483000;max-width:min(420px,92vw);background:#FFF4DA;color:#5A430C;border:1.5px solid #EBA93A;border-radius:16px;padding:14px 16px;font:700 14px/1.5 Manrope,'Noto Sans Armenian',sans-serif;white-space:pre-line;box-shadow:0 14px 34px rgba(0,0,0,.25)"; d.textContent = m; d.onclick = function () { d.remove(); }; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 12000); }
   var n = 0, iv = setInterval(function () { btn(); if (++n > 30) { clearInterval(iv); } }, 1000);
 })();
+</script><script id="nofa-depsign-adm">
+(function () {
+  function esc(x) { return String(x || "").replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function list() { var out = []; for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && k.indexOf("noa-depsign|") === 0 && k !== "noa-depsign|demo") { try { var v = JSON.parse(localStorage.getItem(k) || "null"); if (v) { out.push([k, v]); } } catch (e) {} } } return out.sort(function (a, b) { return String(b[1].at || "") < String(a[1].at || "") ? -1 : 1; }); }
+  function render(box) {
+    var L = list(), h = '<h2 style="margin:0 0 6px;font-family:Fraunces,\'Noto Serif Armenian\',serif;font-weight:600;font-size:21px;color:#1D5545">✍️ Դեպոզիտի համաձայնագրեր</h2><p style="margin:0 0 10px;color:#5E6A63;font-size:13.5px">Եթե խանութը սխալ է լրացրել, վերադարձրեք համաձայնագիրը. խանութը կտեսնի պատճառը և նորից կստորագրի։</p>';
+    if (!L.length) { h += '<p style="margin:0;color:#8A8F86">Դեռ ստորագրված համաձայնագրեր չկան։</p>'; }
+    L.forEach(function (x) { var k = x[0], v = x[1], em = k.slice(12), d = v.at ? new Date(v.at).toLocaleString("hy-AM") : "";
+      if (v.reopen) { h += '<div style="padding:12px 14px;border:1.5px dashed #EBA93A;border-radius:14px;margin-top:8px;background:#FFF8E8"><b>' + esc((v.prev && v.prev.biz) || em) + '</b> · ' + esc(em) + '<br><span style="color:#7A5A12;font-weight:700">↩ Վերադարձված է նորից ստորագրելու · ' + d + (v.note ? ' · ' + esc(v.note) : '') + '</span></div>'; return; }
+      h += '<div style="padding:12px 14px;border:1px solid #E4DCC8;border-radius:14px;margin-top:8px;background:#fff;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center"><div style="flex:1 1 240px;min-width:0"><b>' + esc(v.biz || em) + '</b> · <span style="color:#6B756F">' + esc(em) + '</span><br>Ստորագրող՝ <b>' + esc(v.name) + '</b>, ' + esc(v.title) + ' · ' + d + ' · <span style="font-family:\'Brush Script MT\',cursive;font-size:20px">' + esc(v.sig) + '</span></div><button type="button" data-dsre="' + esc(k) + '" style="min-height:40px;padding:0 14px;border-radius:999px;border:1.5px solid #EBA93A;background:#FFF8E8;color:#7A5A12;font:800 13px Manrope,sans-serif;cursor:pointer">↩ Վերադարձնել ստորագրման</button></div>'; });
+    box.innerHTML = h;
+  }
+  document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest("[data-dsre]"); if (!b) { return; } var k = b.getAttribute("data-dsre"), v = null; try { v = JSON.parse(localStorage.getItem(k) || "null"); } catch (x) {} if (!v) { return; }
+    var note = window.prompt ? null : null; var box = b.parentNode; if (box.querySelector(".ds-note")) { return; }
+    var w = document.createElement("div"); w.className = "ds-note"; w.style.cssText = "flex:1 1 100%;display:flex;gap:8px;flex-wrap:wrap"; w.innerHTML = '<input placeholder="Պատճառը (օր.՝ սխալ անուն)" style="flex:1 1 200px;min-height:40px;border:1.5px solid #E4DCC8;border-radius:12px;padding:0 12px;font:14px inherit"><button type="button" style="min-height:40px;padding:0 14px;border-radius:999px;border:0;background:#1D5545;color:#F6E3B4;font:800 13px Manrope,sans-serif;cursor:pointer">Ուղարկել</button>'; box.appendChild(w);
+    w.querySelector("button").onclick = function () { var n = w.querySelector("input").value.trim().slice(0, 200); try { localStorage.setItem(k, JSON.stringify({ reopen: true, note: n, at: new Date().toISOString(), prev: v })); } catch (x) {} var c = document.getElementById("nofa-ds-card"); if (c) { render(c); } }; });
+  function mount() { var anchor = document.querySelector(".cu-hero"); if (!anchor || document.getElementById("nofa-ds-card")) { return; } var c = document.createElement("div"); c.id = "nofa-ds-card"; c.className = "card3d"; c.style.cssText = "border-radius:22px;padding:20px;margin:14px 0"; anchor.insertAdjacentElement("afterend", c); render(c); }
+  setInterval(mount, 1500);
+})();
 </script></body>
 </html>
