@@ -1409,5 +1409,15 @@ setInterval(function(){var l=L();if(l!==cur&&!pn.classList.contains("on")){cur=l
 })();
 </script>
 <style id="of-tab-big">@media (max-width:900px),(pointer:coarse){.of-tab{left:168px !important;right:auto !important;transform:none !important;bottom:20px !important;max-width:calc(100vw - 232px) !important;border-radius:999px !important;padding:11px 10px !important;min-height:46px !important;font-size:14px !important;gap:5px !important;letter-spacing:-.1px;overflow:hidden;box-shadow:0 6px 18px rgba(19,59,48,.32),0 0 0 2px rgba(255,255,255,.55) !important}.of-tab>span[aria-hidden="true"]:last-child{display:none}.of-tab svg{width:18px;height:18px;flex:none}}@media (max-width:359px){.of-tab{left:150px !important;font-size:14px !important;padding:10px 12px !important}}</style>
+<script id="of-tab-auto">
+(function () { if (window.__ofAuto) { return; } window.__ofAuto = 1;
+  var vis = {}; var always = /Cart\.dc\.html|Checkout\.dc\.html/.test(location.pathname);
+  function apply() { var t = document.querySelector(".of-tab"); if (!t) { return; } var hide = always || Object.keys(vis).some(function (k) { return vis[k]; }); t.classList.toggle("of-tab-hide", hide); }
+  var io = "IntersectionObserver" in window ? new IntersectionObserver(function (es) { es.forEach(function (e) { vis[e.target.__ofk] = e.isIntersecting; }); apply(); }, { threshold: 0.01 }) : null; var n = 0;
+  function watch() { if (!io) { apply(); return; } var L = document.querySelectorAll("#hero-buy, #shop, .fab-buy, .cart-page, [data-shop]"); Array.prototype.forEach.call(L, function (el) { if (el.__ofk) { return; } el.__ofk = "k" + (++n); io.observe(el); }); apply(); }
+  setInterval(watch, 1200); document.addEventListener("DOMContentLoaded", watch); watch();
+})();
+</script>
+<style id="of-tab-auto-css">.of-tab{transition:opacity .25s ease, translate .25s ease}.of-tab.of-tab-hide{opacity:0 !important;pointer-events:none !important;translate:0 16px}</style>
 </body>
 </html>
