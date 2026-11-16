@@ -1443,5 +1443,16 @@ setInterval(function(){var l=L();if(l!==cur&&!pn.classList.contains("on")){cur=l
 <style id="fold-hdr">@media (min-width:701px) and (max-width:1100px){.tab-only{display:none !important}.mob-panel .phone-only{display:flex !important}}</style>
 <style id="hdr-wave-same">.hdr-stick > header + div[aria-hidden="true"]{display:block !important;background:#133B30 !important;line-height:0 !important}.hdr-stick > header + div[aria-hidden="true"] svg{display:block !important;width:100% !important;height:46px !important}</style>
 <style id="buy-in-offer">.fab-buy{display:none !important}.of-pn .of-buy{background:linear-gradient(180deg,#FCDB82,#EDB040 55%,#D38A22) !important;color:#133B30 !important;border-color:#EBA93A !important;font-weight:800}</style>
+<script id="nofa-offer-save">
+(function () { if (window.__nofaOfSave) { return; } window.__nofaOfSave = 1;
+  document.addEventListener("click", function (e) { var a = e.target.closest && e.target.closest(".of-pn a[download], .of-pn a.of-bt[href$='.jpg'], .of-pn a.of-bt[href*='.jpg?'], .of-pn a.of-bt[href*='.pdf']"); if (!a) { return; } var href = a.getAttribute("href") || ""; if (!/\.(jpg|pdf)(\?|$)/i.test(href)) { return; }
+    e.preventDefault(); e.stopPropagation(); var isPdf = /\.pdf/i.test(href); var name = href.split("?")[0].split("/").pop(); var old = a.innerHTML; a.style.opacity = ".6";
+    fetch(href, { cache: "no-cache" }).then(function (r) { if (!r.ok) { throw 0; } return r.blob(); }).then(function (bl) { var file = new File([bl], name, { type: isPdf ? "application/pdf" : "image/jpeg" });
+      var touch = ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
+      if (touch && navigator.canShare && navigator.canShare({ files: [file] })) { return navigator.share({ files: [file], title: "Nectar of Armenia" }).catch(function () {}); }
+      var u = URL.createObjectURL(bl); var d = document.createElement("a"); d.href = u; d.download = name; d.style.display = "none"; document.body.appendChild(d); d.click(); d.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 5000);
+    }).catch(function () { window.open(href, "_blank"); }).then(function () { a.style.opacity = ""; a.innerHTML = old; }); }, true);
+})();
+</script>
 </body>
 </html>
