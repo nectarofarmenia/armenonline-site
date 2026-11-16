@@ -558,6 +558,19 @@ switch ($a) {
     if (!isset($D[$id]) || $x < time() || !hash_equals(hash_hmac('sha256', $id . '|' . $x, doc_secret($db)), $sg) || !is_file($D[$id]['f'])) { out(['ok' => false, 'err' => 'expired'], 403); }
     header('Content-Type: application/pdf'); header('Content-Disposition: inline; filename="' . basename($D[$id]['f']) . '"'); header('Cache-Control: private, no-store'); header('X-Robots-Tag: noindex');
     readfile($D[$id]['f']); exit;
+  case 'acct_upd': // customer: update own profile fields right away (name, store name, phone...), verified by email + token
+    $b = body(); $em = strtolower(trim((string) ($b['em'] ?? ''))); $tok = (string) ($b['tok'] ?? ''); $ty = ($b['type'] ?? '') === 'biz' ? 'biz' : 'retail';
+    if ($em === '' || strlen($tok) < 16) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $allow = $ty === 'biz' ? ['biz', 'bizType', 'opened', 'contact', 'role', 'phone', 'permit', 'ein', 'recv', 'freezer', 'web', 'dock'] : ['first', 'last', 'phone', 'dob'];
+    $f = is_array($b['f'] ?? null) ? $b['f'] : [];
+    $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $hit = null;
+    foreach ([$em . '|' . $ty, $em] as $k0) { if (isset($A[$k0]) && is_array($A[$k0]) && isset($A[$k0]['tok']) && hash_equals((string) $A[$k0]['tok'], $tok)) { $hit = $k0; break; } }
+    if ($hit === null) { out(['ok' => false, 'err' => 'pending']); }
+    foreach ($allow as $k1) { if (array_key_exists($k1, $f)) { $A[$hit][$k1] = mb_substr(trim((string) $f[$k1]), 0, 200); } }
+    if ($ty === 'biz' && trim((string) ($A[$hit]['biz'] ?? '')) === '') { out(['ok' => false, 'err' => 'empty'], 400); }
+    $A[$hit]['updatedAt'] = gmdate('c');
+    kv_put($db, 'noa-accounts', json_encode($A, JSON_UNESCAPED_UNICODE));
+    $ret = $A[$hit]; unset($ret['tok'], $ret['pwh'], $ret['pw']); out(['ok' => true, 'acct' => $ret]);
   case 'my': // customer: own data, verified by email + token
     $b = body(); $em = strtolower((string) ($b['em'] ?? '')); $tok = (string) ($b['tok'] ?? '');
     if ($em === '' || strlen($tok) < 16) { out(['ok' => false, 'err' => 'auth'], 401); }
