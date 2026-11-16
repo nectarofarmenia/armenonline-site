@@ -31,6 +31,9 @@ RewriteEngine On
 # Short links printed on cards: /wholesale and /wholesale/join
 RewriteRule ^wholesale/?$ /Wholesale.dc.html [R=302,L]
 RewriteRule ^wholesale/join/?$ /Wholesale.dc.html#apply [R=302,NE,L]
+# Invitation links with preview card: /i/CODE (retail), /iw/CODE (wholesale)
+RewriteRule ^i/([A-Za-z0-9]{1,16})/?$ /invite.php?r=$1 [L,QSA]
+RewriteRule ^iw/([A-Za-z0-9]{1,16})/?$ /invite.php?r=$1&w=1 [L,QSA]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/api/
