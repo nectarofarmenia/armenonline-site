@@ -2085,5 +2085,72 @@ html:not(.ci-closed) .ci-tog{transform:rotate(180deg)}
     var b = JSON.stringify({ p: location.pathname.split("/").pop() || "index.html", r: r, n: n, m: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 1 : 0, l: String(ls.getItem("noa-lang") || document.documentElement.lang || "").replace(/"/g, "") });
     if (navigator.sendBeacon) { navigator.sendBeacon("api/api.php?a=hit", new Blob([b], { type: "application/json" })); } else { fetch("api/api.php?a=hit", { method: "POST", body: b, keepalive: true }); }
   } catch (e) {} })();</script>
-</body>
+<style id="nofa-burger-css">
+body.nb-on header .pill-group,body.nb-on header .hdr-back{display:none !important}
+body.nb-on a[href="Account.dc.html#logout"]:not(.nb-i),body.nb-on a[href="PartnerAccount.dc.html"].btn-ghost:not(.nb-i),body.nb-on a[href="MyAccount.dc.html"].btn-gold:not(.nb-i){display:none !important}
+.nb-btn{width:48px;height:48px;flex:none;border-radius:999px;border:1.5px solid #EBA93A;background:#1D5545;color:#F6E3B4;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.nb-btn svg{width:22px;height:22px}
+.nb-pan{position:fixed;top:72px;right:12px;z-index:9500;width:min(300px,calc(100vw - 24px));background:#133B30;color:#F6E3B4;border:1.5px solid rgba(235,169,58,.6);border-radius:18px;box-shadow:0 18px 40px rgba(0,0,0,.35);padding:12px;display:none;font-family:Manrope,'Noto Sans Armenian',system-ui,sans-serif}
+.nb-pan.open{display:block}
+.nb-h{font-size:12px;font-weight:800;letter-spacing:.08em;color:#9FC2B2;margin:4px 6px 8px;text-transform:uppercase}
+.nb-langs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.nb-langs button{min-height:40px;border-radius:999px;border:1px solid rgba(235,169,58,.45);background:transparent;color:#E4ECE6;font:800 14px inherit;font-family:inherit;cursor:pointer}
+.nb-langs button.on{background:#EBA93A;color:#133B30;border-color:#EBA93A}
+.nb-i{display:flex;align-items:center;gap:12px;min-height:48px;padding:0 12px;border-radius:12px;color:#E4ECE6;text-decoration:none;font-weight:700;font-size:15px;border-top:1px solid rgba(246,195,90,.18);background:none;width:100%;text-align:left;border-left:0;border-right:0;border-bottom:0;font-family:inherit;cursor:pointer}
+.nb-i:hover{background:rgba(255,255,255,.07)}
+.nb-i.adm{color:#F6C35A}
+@media (max-width:700px){.nb-btn{width:38px;height:38px}.nb-btn svg{width:18px;height:18px}.nb-pan{top:64px}}
+</style>
+<script id="nofa-burger">
+(function () {
+  if (window.__nofaBurger) { return; } window.__nofaBurger = 1;
+  var page = location.pathname.split("/").pop();
+  var L = function () { try { return JSON.parse(localStorage.getItem("noa-lang") || '"hy"'); } catch (e) { return localStorage.getItem("noa-lang") || "hy"; } };
+  var T = { hy: { menu: "Մենյու", lang: "Լեզու", toBiz: "Անցնել մեծածախ հաշվին", toRet: "Անցնել անձնական հաշվին", admin: "Ադմինի էջ", site: "Գլխավոր էջ", out: "Դուրս գալ" },
+    en: { menu: "Menu", lang: "Language", toBiz: "Switch to wholesale account", toRet: "Switch to personal account", admin: "Admin page", site: "Home page", out: "Sign out" },
+    ru: { menu: "Меню", lang: "Язык", toBiz: "Перейти в оптовый аккаунт", toRet: "Перейти в личный аккаунт", admin: "Админ-панель", site: "Главная", out: "Выйти" },
+    es: { menu: "Menú", lang: "Idioma", toBiz: "Cambiar a cuenta mayorista", toRet: "Cambiar a cuenta personal", admin: "Panel de admin", site: "Inicio", out: "Cerrar sesión" } };
+  var isAdmin = false;
+  fetch("api/api.php?a=ping", { credentials: "same-origin", cache: "no-store" }).then(function (r) { return r.json(); }).then(function (j) { isAdmin = !!(j && j.admin); }).catch(function () {});
+  var pan = document.createElement("div"); pan.className = "nb-pan"; pan.setAttribute("role", "menu");
+  function swEl() { return document.querySelector('a[href="PartnerAccount.dc.html"].btn-ghost:not(.nb-i)') || document.querySelector('a[href="MyAccount.dc.html"].btn-gold:not(.nb-i)'); }
+  function render() {
+    var t = T[L()] || T.hy, h = "";
+    var lb = document.querySelectorAll("header .pill-group button");
+    h += '<div class="nb-h">' + t.lang + '</div><div class="nb-langs">';
+    lb.forEach(function (b, i) { h += '<button type="button" data-li="' + i + '" class="' + (b.getAttribute("aria-pressed") === "true" ? "on" : "") + '">' + b.textContent.trim() + "</button>"; });
+    h += "</div>";
+    var sw = swEl();
+    if (sw) { h += '<a class="nb-i" href="' + sw.getAttribute("href") + '" data-sw="1">🔄 ' + (/Partner/.test(sw.getAttribute("href")) ? t.toBiz : t.toRet) + "</a>"; }
+    if (isAdmin) { h += '<a class="nb-i adm" href="Admin.dc.html">🛠 ' + t.admin + "</a>"; }
+    h += '<a class="nb-i" href="Main.dc.html">🏠 ' + t.site + "</a>";
+    h += '<a class="nb-i" href="Account.dc.html#logout">🚪 ' + t.out + "</a>";
+    pan.innerHTML = h;
+  }
+  pan.addEventListener("click", function (e) {
+    var li = e.target.closest("[data-li]");
+    if (li) { var b = document.querySelectorAll("header .pill-group button")[+li.getAttribute("data-li")]; if (b) { b.click(); } setTimeout(render, 120); return; }
+    var s = e.target.closest("[data-sw]");
+    if (s) { var o = swEl(); if (o) { e.preventDefault(); o.click(); } }
+  });
+  function close() { pan.classList.remove("open"); var b = document.querySelector(".nb-btn"); if (b) { b.setAttribute("aria-expanded", "false"); } }
+  document.addEventListener("click", function (e) { if (!pan.classList.contains("open")) { return; } if (e.target.closest(".nb-pan") || e.target.closest(".nb-btn")) { return; } close(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") { close(); } });
+  function mount() {
+    var box = document.querySelector('header div[style*="margin-left: auto"]');
+    if (!box || box.querySelector(".nb-btn")) { return; }
+    if (!document.querySelector("header .pill-group")) { return; }
+    var b = document.createElement("button"); b.type = "button"; b.className = "nb-btn"; b.setAttribute("aria-haspopup", "menu"); b.setAttribute("aria-expanded", "false");
+    b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
+    b.onclick = function () { var t = T[L()] || T.hy; b.setAttribute("aria-label", t.menu); if (pan.classList.contains("open")) { close(); return; } render(); var hd = document.querySelector("header"); if (hd) { pan.style.top = Math.round(hd.getBoundingClientRect().bottom + 6) + "px"; } pan.classList.add("open"); b.setAttribute("aria-expanded", "true"); };
+    b.setAttribute("aria-label", (T[L()] || T.hy).menu);
+    box.appendChild(b);
+    if (!pan.parentNode) { document.body.appendChild(pan); }
+    document.body.classList.add("nb-on");
+  }
+  var n = 0, iv = setInterval(function () { mount(); if (++n > 40) { clearInterval(iv); } }, 500);
+  new MutationObserver(function () { mount(); }).observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>
+<script id="nofa-fab-fix">(function(){if(window.__fabFix){return;}window.__fabFix=1;function fix(){var up=document.querySelector(".pgx .up");if(!up){return;}var u=up.getBoundingClientRect();if(!u.width){return;}if(window.innerWidth<=700){var bo=Math.round(window.innerHeight-u.bottom);document.querySelectorAll('.pgx button[aria-label="Back"],.pgx button[aria-label="Forward"]').forEach(function(a){a.style.setProperty("bottom",bo+"px","important");});}document.querySelectorAll("body *").forEach(function(e){if(e===up||e.closest(".pgx")||e.closest(".of-pn")||e.closest(".nb-pan")){return;}var cs=getComputedStyle(e);if(cs.position!=="fixed"||cs.display==="none"){return;}var r=e.getBoundingClientRect();if(r.width<20||r.width>120||r.height>120){return;}if(r.right<u.left+4||r.left>u.right-4||r.bottom<u.top+2||r.top>u.bottom){return;}e.style.setProperty("bottom",Math.round(window.innerHeight-u.top+10)+"px","important");});}window.addEventListener("load",function(){fix();setTimeout(fix,1500);setTimeout(fix,4000);});window.addEventListener("resize",fix);var n=0,iv=setInterval(function(){fix();if(++n>10){clearInterval(iv);}},1000);})();</script></body>
 </html>
