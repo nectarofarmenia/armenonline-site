@@ -2110,8 +2110,8 @@ body.nb-on a[href="Account.dc.html#logout"]:not(.nb-i),body.nb-on a[href="Partne
     en: { menu: "Menu", lang: "Language", toBiz: "Switch to wholesale account", toRet: "Switch to personal account", admin: "Admin page", site: "Home page", out: "Sign out" },
     ru: { menu: "Меню", lang: "Язык", toBiz: "Перейти в оптовый аккаунт", toRet: "Перейти в личный аккаунт", admin: "Админ-панель", site: "Главная", out: "Выйти" },
     es: { menu: "Menú", lang: "Idioma", toBiz: "Cambiar a cuenta mayorista", toRet: "Cambiar a cuenta personal", admin: "Panel de admin", site: "Inicio", out: "Cerrar sesión" } };
-  var isAdmin = false;
-  fetch("api/api.php?a=ping", { credentials: "same-origin", cache: "no-store" }).then(function (r) { return r.json(); }).then(function (j) { isAdmin = !!(j && j.admin); }).catch(function () {});
+  var isAdmin = false; try { isAdmin = !!localStorage.getItem("noa-dash-known|admin"); } catch (e) {}
+  fetch("api/api.php?a=ping", { credentials: "same-origin", cache: "no-store" }).then(function (r) { return r.json(); }).then(function (j) { if (j && j.admin) { isAdmin = true; } }).catch(function () {});
   var pan = document.createElement("div"); pan.className = "nb-pan"; pan.setAttribute("role", "menu");
   function swEl() { return document.querySelector('a[href="PartnerAccount.dc.html"].btn-ghost:not(.nb-i)') || document.querySelector('a[href="MyAccount.dc.html"].btn-gold:not(.nb-i)'); }
   function render() {
