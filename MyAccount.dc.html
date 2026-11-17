@@ -1458,9 +1458,9 @@ return Object.assign(plVals, extVals, dzVals, lgVals, chVals, avVals, ivVals, rd
   var ind = {};
   function mk(dir) { var d = document.createElement("button"); d.type = "button"; d.className = "ms-arrow ms-" + dir; d.setAttribute("aria-label", dir === "dn" ? "Թերթել ներքև" : "Թերթել վերև"); d.innerHTML = dir === "dn" ? '<svg viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1.5l8 7 8-7"/></svg>' : '<svg viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 8.5l8-7 8 7"/></svg>'; d.style.display = "none"; document.body.appendChild(d); return d; }
   function aside() { return document.querySelector('aside.sum-card[style*="position: sticky"]') || document.querySelector('aside[style*="position: sticky"]'); }
-  function upd() { var el = aside(); if (!el) { return; } fit(el); if (!ind.dn) { ind.dn = mk("dn"); ind.up = mk("up"); ind.dn.onclick = function () { var a = aside(); if (a) { a = a.querySelector(".ma-scroll") || a; a.scrollBy({ top: a.clientHeight * 0.6, behavior: "smooth" }); } }; ind.up.onclick = function () { var a = aside(); if (a) { a = a.querySelector(".ma-scroll") || a; a.scrollBy({ top: -a.clientHeight * 0.6, behavior: "smooth" }); } }; }
+  function upd() { var el = aside(); if (!el) { return; } fit(el); if (!ind.dn) { ind.dn = mk("dn"); ind.up = mk("up"); ind.dn.onclick = function () { var a = aside(); if (a) { a = a.querySelector(".ma-scroll") || a; if (a.scrollHeight - a.clientHeight - a.scrollTop > 4) { a.scrollBy({ top: a.clientHeight * 0.6, behavior: "smooth" }); } else { a.scrollTo({ top: 0, behavior: "smooth" }); } } }; ind.up.onclick = function () { var a = aside(); if (a) { a = a.querySelector(".ma-scroll") || a; a.scrollBy({ top: -a.clientHeight * 0.6, behavior: "smooth" }); } }; }
     var r = el.getBoundingClientRect(); var sc = el.querySelector(".ma-scroll") || el; var more = sc.scrollHeight - sc.clientHeight - sc.scrollTop > 4; var less = sc.scrollTop > 4; var on = window.innerWidth >= 900 && r.height > 0;
-    ind.dn.style.display = on && more ? "flex" : "none"; ind.up.style.display = on && less ? "flex" : "none";
+    var can = sc.scrollHeight - sc.clientHeight > 4; ind.dn.style.display = on && can ? "flex" : "none"; ind.up.style.display = "none"; ind.dn.classList.toggle("ms-flip", !more); ind.dn.setAttribute("aria-label", more ? "Թերթել ներքև" : "Վերև");
     var hz = parseFloat(getComputedStyle(document.documentElement).zoom) || 1; if (document.body) { hz *= parseFloat(getComputedStyle(document.body).zoom) || 1; } var dk = /card3d-dark/.test(el.className); var inset = dk ? 15 : 10; ind.dn.style.left = ind.up.style.left = (r.right / hz - inset - 8) + "px"; ind.dn.style.top = (r.bottom / hz - 30) + "px"; var tt = el.querySelector(".as-ttl"); ind.up.style.top = (sc !== el ? sc.getBoundingClientRect().top / hz + 2 : r.top / hz + (tt ? tt.offsetHeight + 4 : 16)) + "px"; }
   window.addEventListener("resize", upd); window.addEventListener("scroll", upd, { passive: true }); document.addEventListener("scroll", function (e) { if (e.target && (e.target.tagName === "ASIDE" || (e.target.classList && e.target.classList.contains("ma-scroll")))) { upd(); } }, true);
   setInterval(upd, 600); setTimeout(upd, 300);
@@ -1602,7 +1602,8 @@ html:not(.ci-closed) .ci-tog{transform:rotate(180deg)}
   function orderOf(keys) { var p = prefs(); var o = (p.order || []).filter(function (k) { return keys.indexOf(k) >= 0; }); keys = defOrder(keys); keys.forEach(function (k) { if (o.indexOf(k) < 0) { o.push(k); } }); return o; }
   function apply() {
     var c = col(); if (!c) { return; }
-    if (!onHome()) { c.removeAttribute("data-dash"); styleEl.textContent = ""; var b0 = document.getElementById("dash-cfg-bar"); if (b0) { b0.remove(); } document.querySelectorAll(".dash-cfg-panel").forEach(function (x) { x.remove(); }); return; }
+    if (!onHome()) { c.removeAttribute("data-dash"); styleEl.textContent = ""; document.querySelectorAll(".dash-cfg-panel").forEach(function (x) { x.remove(); }); var bx = document.getElementById("dash-cfg-bar"); if (!bx || bx.parentElement !== c || !bx.hasAttribute("data-away")) { if (bx) { bx.remove(); } bx = document.createElement("div"); bx.id = "dash-cfg-bar"; bx.setAttribute("data-away", "1"); bx.innerHTML = '<button type="button" data-dc-go="1">' + T.btn + "</button>"; c.insertBefore(bx, c.firstChild); } return; }
+    var bA = document.getElementById("dash-cfg-bar"); if (bA && bA.hasAttribute("data-away")) { bA.remove(); }
     var secs = sections(); if (!secs.length) { return; }
     secs.forEach(function (s) { if (!s.el.hasAttribute("data-dk")) { s.el.setAttribute("data-dk", s.key); } });
     var keys = secs.map(function (s) { return s.key; }); if (JSON.stringify(known()) !== JSON.stringify(keys)) { S("noa-dash-known|" + uk(), keys); }
@@ -1616,8 +1617,9 @@ html:not(.ci-closed) .ci-tog{transform:rotate(180deg)}
   function body(withDone) { return '<h2 class="dc-h">' + T.h + '</h2><p class="dc-p">' + T.p + '</p><div class="dc-list">' + listHTML() + '</div><div class="dc-foot"><button type="button" class="dc-btn" data-dc-reset="1">' + T.reset + '</button>' + (withDone ? '<button type="button" class="dc-btn" data-dc-close="1" style="background:#1D5545;color:#fff;border-color:#1D5545">' + T.done + '</button>' : "") + '</div>'; }
   function redraw() { document.querySelectorAll(".dash-cfg-panel").forEach(function (x) { x.innerHTML = body(true); }); document.querySelectorAll(".dc-card").forEach(function (x) { x.innerHTML = body(false); }); apply(); }
   document.addEventListener("click", function (e) {
-    var t = e.target.closest("[data-dc-open],[data-dc-close],[data-dc-up],[data-dc-dn],[data-dc-reset]"); if (!t) { return; }
+    var t = e.target.closest("[data-dc-go],[data-dc-open],[data-dc-close],[data-dc-up],[data-dc-dn],[data-dc-reset]"); if (!t) { return; }
     var p = prefs(), keys = known(), o = orderOf(keys);
+    if (t.dataset.dcGo) { var a0 = document.querySelector("aside.sum-card .wa-nav") || document.querySelector("aside .wa-nav"); if (a0) { a0.click(); } var tries = 0; (function op() { var b1 = document.querySelector("#dash-cfg-bar:not([data-away]) [data-dc-open]"); if (b1) { b1.click(); window.scrollTo({ top: 0, behavior: "smooth" }); } else if (++tries < 20) { setTimeout(op, 150); } })(); return; }
     if (t.dataset.dcOpen) { var c = col(); if (!c) { return; } var ex = c.querySelector(".dash-cfg-panel"); if (ex) { ex.remove(); return; } var pn = document.createElement("section"); pn.className = "dash-cfg-panel"; pn.innerHTML = body(true); c.insertBefore(pn, c.children[1] || null); return; }
     if (t.dataset.dcClose) { var pl = document.querySelector(".dash-cfg-panel"); if (pl) { pl.remove(); } return; }
     if (t.dataset.dcReset) { S("noa-dash|" + uk(), { hide: [], order: [] }); redraw(); return; }
@@ -1850,5 +1852,6 @@ setInterval(function(){var l=L();if(l!==cur&&!pn.classList.contains("on")){cur=l
 })();
 </script>
 <style id="dash-cfg-tight">#dash-cfg-bar{margin-top:-14px !important;margin-bottom:-14px !important}#dash-cfg-bar button{min-height:34px !important;padding:0 12px !important;font-size:13px !important}@media (max-width:700px){#dash-cfg-bar{margin-top:-18px !important;margin-bottom:-16px !important}}</style>
+<style id="ms-flip-css">.ms-arrow.ms-flip svg{transform:rotate(180deg)}.ms-arrow svg{transition:transform .2s}</style>
 </body>
 </html>
