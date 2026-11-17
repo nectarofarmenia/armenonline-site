@@ -570,6 +570,13 @@ switch ($a) {
     $lines = array_map(function ($l) { return [$l[0], $l[1], $l[2]]; }, $lines);
     kv_put($db, '__pay|' . $ref, json_encode(['sid' => $j['id'], 'amt' => $sub, 'fee' => 0, 'cfee' => $fee, 't' => now_ms(), 'nos' => $nos, 'm' => $ach ? 'ACH' : 'Card', 'email' => $em, 'name' => (string) ($rec['biz'] ?? ''), 'phone' => (string) ($rec['phone'] ?? ''), 'lines' => $lines, 'site' => $base0 . '/PartnerAccount.dc.html'], JSON_UNESCAPED_UNICODE));
     out(['ok' => true, 'url' => $j['url'] ?? '', 'cs' => $j['client_secret'] ?? '', 'amt' => $sub, 'fee' => $fee, 'lines' => $lines]);
+  case 'zelle_sent': // wholesale customer says a Zelle transfer was sent: notify the owner to check the bank and confirm in admin
+    $b = body(); $me = cust_rec($db, $b['em'] ?? '', 'biz', $b['tok'] ?? ''); if (!$me) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $rec = $me[1]; $nos = []; foreach ((array) ($b['nos'] ?? []) as $n0) { $n0 = preg_replace('/[^A-Za-z0-9-]/', '', (string) $n0); if ($n0 !== '' && count($nos) < 10) { $nos[] = $n0; } } if (!$nos) { out(['ok' => false]); }
+    $amt = round(max(0, (float) ($b['amt'] ?? 0)), 2); $from = mb_substr(trim((string) ($b['from'] ?? '')), 0, 120); $biz = (string) ($rec['biz'] ?? $b['em']);
+    $kz = '__zelle|' . implode(',', $nos); if (!kv_get($db, $kz)) { kv_put($db, $kz, json_encode(['t' => now_ms(), 'em' => strtolower((string) $b['em']), 'amt' => $amt, 'from' => $from])); push_admin($db, '⚡ Zelle վճարում · $' . number_format($amt, 2) . ' · ստուգեք', $biz . ' · ' . implode(', ', $nos) . ($from !== '' ? ' · ուղարկող՝ ' . $from : '') . ' · հաստատեք ադմինում');
+      $m = mail_cfg($db); $own = (string) ($m['notify'] ?? ($m['user'] ?? '')); if (!empty($m['user']) && filter_var($own, FILTER_VALIDATE_EMAIL)) { $e = null; smtp_send($m, $own, '⚡ Zelle to confirm $' . number_format($amt, 2) . ' — ' . $biz, mail_tpl('Zelle payment to confirm', '<p style="margin:0 0 12px;font-size:15px"><b>' . mail_esc($biz) . '</b> says it sent a Zelle payment.</p><p style="margin:0;font-size:15px">Orders: <b>' . mail_esc(implode(', ', $nos)) . '</b><br>Amount: <b>$' . number_format($amt, 2) . '</b><br>Sent from: <b>' . mail_esc($from !== '' ? $from : '—') . '</b></p><p style="margin:14px 0 0;color:#6B756F;font-size:13px">Check the bank, then press “✓ Payment received” in the admin page (Wholesale orders). Do not deliver before confirming.</p>'), $e); } }
+    out(['ok' => true]);
   case 'pay_sync': // admin: confirm with Stripe any card payments whose customer never came back to the site
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $sk = stripe_sk($db); $L = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: []; $n = 0;
