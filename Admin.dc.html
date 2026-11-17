@@ -253,6 +253,9 @@ setInterval(upd,400);setTimeout(upd,300);})();</script>
         k.data.lots.forEach(function (lt) { if (!lt || !lt.id || lt.type === "bulk") { return; } var pi = apriIdx(lt.name || ""); var n = Math.round(+lt.packs || 0), pp = Math.round(+lt.perPack || 0);
           if (first) { AL[lt.id] = n; return; } if (pi < 0 || P[pi] <= 1) { if (AL[lt.id] == null) { AL[lt.id] = n; ch2 = true; } return; }
           var prev = AL[lt.id] == null ? 0 : +AL[lt.id]; var dn = n - prev; if (!dn) { return; } S[pi] = Math.max(0, (+S[pi] || 0) + dn); Lo[pi] = Math.max(0, (+Lo[pi] || 0) - dn * (pp || P[pi])); AL[lt.id] = n; ch2 = true; });
+        /* unpacked pieces: My Apri Work's own count (production − packed + the admin's corrections), taken as is */
+        var UN = {}, hasUn = false; (k.data.products || []).forEach(function (p) { if (!p || p.un == null) { return; } hasUn = true; var pi = apriIdx(p.name || ""); if (pi < 0 || P[pi] <= 1) { return; } UN[pi] = (UN[pi] || 0) + Math.max(0, Math.round(+p.un || 0)); });
+        if (hasUn) { Object.keys(UN).forEach(function (q) { if ((+Lo[q] || 0) !== UN[q]) { Lo[q] = UN[q]; ch2 = true; } }); }
         if (first || ch2) { LS("noa-apri-lots", JSON.stringify(AL)); } if (ch2) { LS("noa-stock", JSON.stringify(S)); LS("noa-stock-pcs", JSON.stringify(Lo)); } return changed || ch2; }).catch(function () { return changed; }); }).catch(function () { LS("noa-apri-st", JSON.stringify({ ok: false, err: "Կապի սխալ", at: new Date().toISOString() })); return false; });
   }
   /* Drivers (My Apri Work): push open stops assigned to My Apri drivers, pull delivery results. */
