@@ -281,7 +281,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
         if (nv !== lv) { LS(k, nv); ch = true; } });
       var inv = JSON.stringify({ list: j.inv || [] }); if (LG("noa-inv2") !== inv) { LS("noa-inv2", inv); ch = true; }
       if (j.pay && typeof j.pay === "object") { LS("noa-paycfg-priv", JSON.stringify(j.pay)); var PC = J("noa-paycfg", {}), PN = JSON.stringify(Object.assign({}, PC, j.pay)); if (LG("noa-paycfg") !== PN) { LS("noa-paycfg", PN); ch = true; } }
-      if (j.cprof && Object.keys(j.cprof).length) { var C = J("noa-cost-v2", {}); C.cprof = Object.assign({}, C.cprof || {}, j.cprof); LS("noa-cost-v2", JSON.stringify(C)); }
+      if (j.cprof && typeof j.cprof === "object") { var C = J("noa-cost-v2", {}); var CP0 = JSON.stringify(C.cprof || {}); C.cprof = Object.assign({}, C.cprof || {}, j.cprof); if (JSON.stringify(C.cprof) !== CP0) { LS("noa-cost-v2", JSON.stringify(C)); ch = true; } }
       return ch; }).catch(function () { return false; });
     return Promise.all([p1, p2]).then(function (r) { return r[0] || r[1]; });
   }
@@ -294,7 +294,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
     }).catch(function () { if (w) { w.close(); } }); };
   function startCustomer() {
     var first = !sessionStorage.getItem("noa-sync-once");
-    custSubmit().catch(function () {}).then(custPull).then(function (ch) { sessionStorage.setItem("noa-sync-once", "1"); if (ch && first && idle()) { location.reload(); } });
+    custSubmit().catch(function () {}).then(custPull).then(function (ch) { sessionStorage.setItem("noa-sync-once", "1"); if (ch && idle()) { location.reload(); } });
     setInterval(function () { custSubmit().catch(function () {}); }, 5000);
     setInterval(function () { custPull().then(function (ch) { if (ch && idle()) { location.reload(); } }); }, 40000);
     window.addEventListener("beforeunload", function () { custSubmit(); });
