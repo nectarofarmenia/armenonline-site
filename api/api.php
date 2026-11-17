@@ -496,12 +496,34 @@ switch ($a) {
     out(['ok' => true]);
   case 'pw_reset_do':
     $b = body(); $t = preg_replace('/[^a-f0-9]/', '', (string) ($b['t'] ?? '')); $pw = (string) ($b['pw'] ?? ''); if ($t === '' || strlen($pw) < 8 || strlen($pw) > 200) { out(['ok' => false, 'err' => 'bad']); }
-    $r = kv_get($db, '__pwr|' . $t); $v = $r ? (json_decode($r['v'], true) ?: []) : []; if (!$v || now_ms() - (int) ($v['t'] ?? 0) > 3600000) { out(['ok' => false, 'err' => 'expired']); }
+    $r = kv_get($db, '__pwr|' . $t); $v = $r ? (json_decode($r['v'], true) ?: []) : []; if (!$v || now_ms() - (int) ($v['t'] ?? 0) > (!empty($v['inv']) ? 1209600000 : 3600000)) { out(['ok' => false, 'err' => 'expired']); }
     $em = (string) $v['em']; $k = '__cpw|' . $em; $old = kv_get($db, $k); $old = $old ? (json_decode($old['v'], true) ?: []) : []; $tok = (string) ($old['tok'] ?? ''); $acc = (array) ($old['acc'] ?? []);
     if ($tok === '') { $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; foreach ($A as $key => $x) { if (is_array($x) && strtolower((string) ($x['email'] ?? '')) === $em) { if (!empty($x['tok'])) { $tok = (string) $x['tok']; } $acc[strtolower((string) $key)] = $x; } } }
     if ($tok === '') { $tok = bin2hex(random_bytes(16)); }
     kv_put($db, $k, json_encode(['h' => password_hash($pw, PASSWORD_DEFAULT), 'tok' => $tok, 'acc' => $acc, 't' => now_ms()], JSON_UNESCAPED_UNICODE)); kv_put($db, '__pwr|' . $t, json_encode(['used' => now_ms()]));
-    out(['ok' => true, 'em' => $em]);
+    if (!empty($v['inv'])) { $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $chg = false; foreach ($A as $key => $x) { if (is_array($x) && strtolower((string) ($x['email'] ?? '')) === $em && empty($x['joinedAt'])) { $A[$key]['joinedAt'] = gmdate('c'); $chg = true; } } if ($chg) { kv_put($db, 'noa-accounts', json_encode($A, JSON_UNESCAPED_UNICODE)); } }
+    out(['ok' => true, 'em' => $em, 'inv' => !empty($v['inv'])]);
+  case 'cinvite': // admin: create (or update) a customer account from the owner's data and make a one-time invite link for the customer to take it over
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $b = body(); $in = is_array($b['acc'] ?? null) ? $b['acc'] : []; $em = strtolower(trim((string) ($in['email'] ?? '')));
+    if (!filter_var($em, FILTER_VALIDATE_EMAIL)) { out(['ok' => false, 'err' => 'email'], 400); }
+    $ty = ($in['type'] ?? '') === 'biz' ? 'biz' : 'retail'; if ($ty === 'biz' && trim((string) ($in['biz'] ?? '')) === '') { out(['ok' => false, 'err' => 'biz'], 400); }
+    $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $key = $em . '|' . $ty; $rec = isset($A[$key]) && is_array($A[$key]) ? $A[$key] : [];
+    foreach (['first', 'last', 'contact', 'role', 'phone', 'biz', 'bizType', 'addr', 'city', 'zip', 'permit', 'ein', 'note'] as $f) { if (array_key_exists($f, $in) && trim((string) $in[$f]) !== '') { $rec[$f] = mb_substr(trim((string) $in[$f]), 0, 200); } }
+    $rec['type'] = $ty; $rec['email'] = $em; if (empty($rec['tok'])) { $rec['tok'] = bin2hex(random_bytes(16)); }
+    if (empty($rec['status']) || $rec['status'] === 'pending') { $rec['status'] = 'approved'; $rec['decidedAt'] = gmdate('c'); }
+    if (empty($rec['createdAt'])) { $rec['createdAt'] = gmdate('c'); $rec['via'] = 'admin'; $rec['byAdmin'] = 1; if ($ty === 'biz' && empty($rec['pid'])) { $rec['pid'] = 'W-' . random_int(1100, 1899); } }
+    $has = (bool) kv_get($db, '__cpw|' . $em); $link = ''; $sent = false; $merr = '';
+    if (!$has) { $t = bin2hex(random_bytes(20)); kv_put($db, '__pwr|' . $t, json_encode(['em' => $em, 't' => now_ms(), 'inv' => 1]));
+      $host = ($https ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'nectarofarmenia.com'); $base = $host . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '/api/api.php')), '/'); $link = $base . '/Account.dc.html?reset=' . $t . '&inv=' . $ty;
+      $rec['invitedAt'] = gmdate('c');
+      if (!empty($b['send'])) { $m = mail_cfg($db); if (!empty($m['user']) && !empty($m['pass'])) { $hy = (($b['lang'] ?? 'hy') === 'hy'); $who = $ty === 'biz' ? (string) ($rec['biz'] ?? '') : trim(($rec['first'] ?? '') . ' ' . ($rec['last'] ?? ''));
+        $btn = '<p style="margin:22px 0 0"><a href="' . mail_esc($link) . '" style="display:inline-block;background:#EBA93A;color:#133B30;padding:14px 30px;border-radius:999px;text-decoration:none;font-weight:700;font-size:16px;border-bottom:3px solid #C98A1E">' . ($hy ? 'Ընտրել գաղտնաբառ և մուտք գործել →' : 'Choose a password and sign in →') . '</a></p>';
+        $inner = $hy ? '<p style="margin:0 0 12px;font-size:16px">Բարև' . ($who !== '' ? ' ' . mail_esc($who) : '') . ',</p><p style="margin:0 0 14px"><b>Nectar of Armenia</b>-ն ձեզ համար ստեղծել է ' . ($ty === 'biz' ? 'մեծածախ գործընկերոջ' : 'անձնական') . ' էջ։ Այնտեղ կտեսնեք ձեր բոլոր գնումները, հաշիվները և փաստաթղթերը, կարող եք նաև պատվիրել։</p><p style="margin:0">Սեղմեք կոճակը, ընտրեք ձեր գաղտնաբառը, և էջը կդառնա ձերը։ Հղումը գործում է 14 օր։</p>' . $btn . '<p style="font-size:12.5px;color:#7A817C;margin:18px 0 0">Հարցերի դեպքում զանգահարեք +1 (515) 588-5555։</p>'
+          : '<p style="margin:0 0 12px;font-size:16px">Hello' . ($who !== '' ? ' ' . mail_esc($who) : '') . ',</p><p style="margin:0 0 14px"><b>Nectar of Armenia</b> has created a ' . ($ty === 'biz' ? 'wholesale partner' : 'personal') . ' account for you. There you can see all your purchases, invoices and documents, and place orders.</p><p style="margin:0">Press the button, choose your password and the account is yours. The link works for 14 days.</p>' . $btn . '<p style="font-size:12.5px;color:#7A817C;margin:18px 0 0">Questions? Call +1 (515) 588-5555.</p>';
+        $sent = smtp_send($m, $em, $hy ? 'Ձեր էջը Nectar of Armenia-ում պատրաստ է' : 'Your Nectar of Armenia account is ready', mail_tpl($hy ? 'Բարի գալուստ 🌿' : 'Welcome 🌿', $inner, $hy ? 'hy' : 'en'), $merr); if ($sent) { $rec['invSentAt'] = gmdate('c'); } } else { $merr = 'nomail'; } } }
+    $A[$key] = $rec; kv_put($db, 'noa-accounts', json_encode($A, JSON_UNESCAPED_UNICODE));
+    out(['ok' => true, 'key' => $key, 'acct' => $rec, 'has' => $has, 'link' => $link, 'sent' => $sent, 'merr' => $sent ? '' : (string) $merr]);
   case 'pay_inv': // wholesale customer: pay an invoice balance by card; amount computed here from the stored invoice
     $sk = stripe_sk($db); if ($sk === '') { out(['ok' => false, 'err' => 'off']); }
     $b = body(); $me = cust_rec($db, $b['em'] ?? '', 'biz', $b['tok'] ?? ''); if (!$me) { $me = cust_rec($db, $b['em'] ?? '', 'retail', $b['tok'] ?? ''); } if (!$me) { out(['ok' => false, 'err' => 'auth'], 401); }
