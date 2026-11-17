@@ -34,6 +34,8 @@ RewriteRule ^wholesale/join/?$ /Wholesale.dc.html#apply [R=302,NE,L]
 # Invitation links with preview card: /i/CODE (retail), /iw/CODE (wholesale)
 RewriteRule ^i/([A-Za-z0-9]{1,16})/?$ /invite.php?r=$1 [L,QSA]
 RewriteRule ^iw/([A-Za-z0-9]{1,16})/?$ /invite.php?r=$1&w=1 [L,QSA]
+# Unrendered template image paths ({{...}}) asked by the browser before the page script fills them: answer 404 at once, never redirect to the home page
+RewriteRule \{\{ - [R=404,L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/api/
