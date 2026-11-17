@@ -441,7 +441,7 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 <header class="raise-header" style="background: #1D5545; border-bottom: 1px solid #2E6A58; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 12px rgba(0,0,0,.15)">
 <div class="hdr-row" style="max-width: 1440px; margin: 0 auto; padding: 20px 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px">
 <a href="#page-top" onClick="{{goHome}}" aria-label="Nectar of Armenia home" title="Home" style="display: flex; align-items: center; text-decoration: none; cursor: pointer">
-<img src="img/cf4f14e5b2e161eced326c4ebe8644fd.webp" alt="Nectar of Armenia" class="logo3d" style="height: 84px; width: auto; display: block">
+<img decoding="async" src="img/cf4f14e5b2e161eced326c4ebe8644fd.webp" alt="Nectar of Armenia" class="logo3d" style="height: 84px; width: auto; display: block">
 </a>
 <nav aria-label="Main" class="nav-desk" style="flex: 1 1 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 16px; font-size: 19px; font-weight: 700; white-space: nowrap">
 <a href="Main.dc.html#shop" style="text-decoration: none; color: #F7F3EA">{{t.navShop}}</a>
@@ -541,12 +541,12 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 <button type="button" onClick="{{storyPrev}}" aria-label="Previous" class="btn-ghost st-arrow" style="flex: 0 0 auto; width: 54px; height: 54px; border-radius: 999px; border: 1.5px solid rgba(235,169,58,.85); background: transparent; color: #F6E3B4; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
 <div class="st-track" style="flex: 1 1 auto; min-width: 0; display: flex; align-items: flex-start; justify-content: center; gap: 22px">
 <button type="button" onClick="{{storyPrev}}" class="card3d-dark st-side" aria-label="{{storyPrevItem.n}}" style="flex: 1 1 0; max-width: 340px; min-width: 0; align-self: stretch; border: none; text-align: left; font-family: inherit; color: #F7F3EA; background: #276654; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px; cursor: pointer">
-<sc-if value="{{storyPrevItem.hasImg}}" hint-placeholder-val="{{false}}"><img class="photo3d-dark" src="{{storyPrevItem.img}}" alt="{{storyPrevItem.n}}" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; background: #2F7360"></sc-if><sc-if value="{{storyPrevItem.noImg}}" hint-placeholder-val="{{true}}"><div class="photo3d-dark" style="aspect-ratio: 4 / 3; border-radius: 16px; background: #2F7360; display: flex; align-items: center; justify-content: center; color: #CFE2D9; font-size: 14px; text-align: center; padding: 10px">[{{t.photo}}: {{storyPrevItem.n}}]</div></sc-if>
+<sc-if value="{{storyPrevItem.hasImg}}" hint-placeholder-val="{{false}}"><img decoding="async" class="photo3d-dark" src="{{storyPrevItem.img}}" alt="{{storyPrevItem.n}}" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; background: #2F7360"></sc-if><sc-if value="{{storyPrevItem.noImg}}" hint-placeholder-val="{{true}}"><div class="photo3d-dark" style="aspect-ratio: 4 / 3; border-radius: 16px; background: #2F7360; display: flex; align-items: center; justify-content: center; color: #CFE2D9; font-size: 14px; text-align: center; padding: 10px">[{{t.photo}}: {{storyPrevItem.n}}]</div></sc-if>
 <span style="font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 24px">{{storyPrevItem.n}}</span>
 <span style="font-size: 16px; line-height: 1.55; color: #CFE2D9">{{storyPrevItem.s}}</span>
 </button>
 <article class="card3d-dark st-main" style="flex: 1 1 0; max-width: 340px; min-width: 0; align-self: stretch; background: #276654; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px; color: #F7F3EA">
-<sc-if value="{{storyCur.hasImg}}" hint-placeholder-val="{{false}}"><img class="photo3d-dark" src="{{storyCur.img}}" alt="{{storyCur.n}}" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; background: #2F7360"></sc-if><sc-if value="{{storyCur.noImg}}" hint-placeholder-val="{{true}}"><div class="photo3d-dark" style="aspect-ratio: 4 / 3; border-radius: 16px; background: #2F7360; display: flex; align-items: center; justify-content: center; color: #CFE2D9; font-size: 14px; text-align: center; padding: 10px">[{{t.photo}}: {{storyCur.n}}]</div></sc-if>
+<sc-if value="{{storyCur.hasImg}}" hint-placeholder-val="{{false}}"><img decoding="async" class="photo3d-dark" src="{{storyCur.img}}" alt="{{storyCur.n}}" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; background: #2F7360"></sc-if><sc-if value="{{storyCur.noImg}}" hint-placeholder-val="{{true}}"><div class="photo3d-dark" style="aspect-ratio: 4 / 3; border-radius: 16px; background: #2F7360; display: flex; align-items: center; justify-content: center; color: #CFE2D9; font-size: 14px; text-align: center; padding: 10px">[{{t.photo}}: {{storyCur.n}}]</div></sc-if>
 <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
 <h3 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 24px">{{storyCur.n}}</h3>
 <span style="font-size: 14px; font-weight: 700; color: #F6C35A; white-space: nowrap">{{storyPos}}</span>
@@ -558,7 +558,7 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 <sc-if value="{{storyHasMore}}" hint-placeholder-val="{{true}}"><button type="button" onClick="{{toggleStory}}" style="align-self: flex-start; min-height: 44px; padding: 0 4px; border: none; background: transparent; color: #F6C35A; font-family: inherit; font-weight: 800; font-size: 16px; cursor: pointer">{{storyMoreLabel}}</button></sc-if>
 </article>
 <button type="button" onClick="{{storyNext}}" class="card3d-dark st-side" aria-label="{{storyNextItem.n}}" style="flex: 1 1 0; max-width: 340px; min-width: 0; align-self: stretch; border: none; text-align: left; font-family: inherit; color: #F7F3EA; background: #276654; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px; cursor: pointer">
-<sc-if value="{{storyNextItem.hasImg}}" hint-placeholder-val="{{false}}"><img class="photo3d-dark" src="{{storyNextItem.img}}" alt="{{storyNextItem.n}}" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; background: #2F7360"></sc-if><sc-if value="{{storyNextItem.noImg}}" hint-placeholder-val="{{true}}"><div class="photo3d-dark" style="aspect-ratio: 4 / 3; border-radius: 16px; background: #2F7360; display: flex; align-items: center; justify-content: center; color: #CFE2D9; font-size: 14px; text-align: center; padding: 10px">[{{t.photo}}: {{storyNextItem.n}}]</div></sc-if>
+<sc-if value="{{storyNextItem.hasImg}}" hint-placeholder-val="{{false}}"><img decoding="async" class="photo3d-dark" src="{{storyNextItem.img}}" alt="{{storyNextItem.n}}" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; background: #2F7360"></sc-if><sc-if value="{{storyNextItem.noImg}}" hint-placeholder-val="{{true}}"><div class="photo3d-dark" style="aspect-ratio: 4 / 3; border-radius: 16px; background: #2F7360; display: flex; align-items: center; justify-content: center; color: #CFE2D9; font-size: 14px; text-align: center; padding: 10px">[{{t.photo}}: {{storyNextItem.n}}]</div></sc-if>
 <span style="font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; font-size: 24px">{{storyNextItem.n}}</span>
 <span style="font-size: 16px; line-height: 1.55; color: #CFE2D9">{{storyNextItem.s}}</span>
 </button>
@@ -574,7 +574,7 @@ section[id],[id].cu-anchor{scroll-margin-top:160px}
 <div style="max-width: 1240px; margin: 0 auto; padding: 56px 24px 28px; display: flex; flex-direction: column; gap: 36px">
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 28px">
 <div style="display: flex; flex-direction: column; gap: 12px">
-<img src="img/cf4f14e5b2e161eced326c4ebe8644fd.webp" alt="Nectar of Armenia" style="height: 60px; width: auto; align-self: flex-start">
+<img decoding="async" src="img/cf4f14e5b2e161eced326c4ebe8644fd.webp" alt="Nectar of Armenia" style="height: 60px; width: auto; align-self: flex-start">
 <span style="font-size: 15px; line-height: 1.6">{{t.fTag}}</span>
 </div>
 <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px">
@@ -839,7 +839,7 @@ t.setSize,
 "6 " + t.pcs + " · 25 oz / 720 g"
 ];
 var prices = ["", "$19.95", "$15.95", "$60.00", "$24.95", "$24.95", "$34.95", "$34.95", "$20.95", "", ""];
-var PIMG = ["img/6830d83c7ec9c8d627f12f1f2a8c5eeb.jpg", "img/c8b0737505aa785eed93371b09c8e049.jpg", "img/c8b0737505aa785eed93371b09c8e049.jpg", "img/d3fbe1930c2f9c5d58eab675b2128cfd.png", "img/65940d08dd8a527a15d113ecd1854f3a.webp", "img/9eb33fd2c3ff435a1314ecd2f69f9245.webp", "img/645bf576eb7a0134b08d93cb48d381e7.webp", "img/a6aaa8aa5db20ba68bc42c3406095e44.webp", "img/6a86ac441cd9dd29b3e3ba1a16934988.webp", "img/0f5ce6e80b23a0e775ad415e85b7ef0d.webp", "img/135d0cd80fa69f4a118392eea9b8bcd6.webp"];
+var PIMG = ["img/6830d83c7ec9c8d627f12f1f2a8c5eeb.jpg", "img/c8b0737505aa785eed93371b09c8e049.jpg", "img/c8b0737505aa785eed93371b09c8e049.jpg", "img/d3fbe1930c2f9c5d58eab675b2128cfd.webp", "img/65940d08dd8a527a15d113ecd1854f3a.webp", "img/9eb33fd2c3ff435a1314ecd2f69f9245.webp", "img/645bf576eb7a0134b08d93cb48d381e7.webp", "img/a6aaa8aa5db20ba68bc42c3406095e44.webp", "img/6a86ac441cd9dd29b3e3ba1a16934988.webp", "img/0f5ce6e80b23a0e775ad415e85b7ef0d.webp", "img/135d0cd80fa69f4a118392eea9b8bcd6.webp"];
 var tagIdx = [-1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1];
 var cart = (this.state && this.state.cart) || null;
 if (!cart) { try { cart = JSON.parse(window.localStorage.getItem("noa-cart-v2") || "null"); } catch (e) { cart = null; } }
@@ -1228,7 +1228,7 @@ return Object.assign(poVals, apVals, { isBizSess: !!(accU && accU.type === "biz"
       document.addEventListener("visibilitychange", function () { if (document.hidden) { if (playing) { au.pause(); } } else if (playing) { au.play().catch(function () {}); } });
     }
     function logoTree() { var lg = document.querySelector("header img.logo3d"); if (!lg || document.querySelector(".nt-ltree")) { return; } var a = lg.closest("a") || lg; var par = a.parentNode; if (!par) { return; }
-      var w = document.createElement("span"); w.className = "nt-ltree"; w.setAttribute("aria-hidden", "true"); w.innerHTML = '<img src="ny/gtree.svg" alt="">';
+      var w = document.createElement("span"); w.className = "nt-ltree"; w.setAttribute("aria-hidden", "true"); w.innerHTML = '<img decoding="async" loading="lazy" src="ny/gtree.svg" alt="">';
       if (getComputedStyle(par).display.indexOf("flex") < 0) { var box = document.createElement("span"); box.style.cssText = "display:inline-flex;align-items:center;gap:10px"; par.insertBefore(box, a); box.appendChild(a); box.appendChild(w); } else { par.insertBefore(w, a.nextSibling); } }
     function go() { bar(); snow(); music(); logoTree(); }
     var lt = 0, liv = setInterval(function () { logoTree(); if (++lt > 20) { clearInterval(liv); } }, 400);

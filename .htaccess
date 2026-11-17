@@ -40,3 +40,18 @@ RewriteCond %{REQUEST_URI} !^/api/
 RewriteCond %{REQUEST_URI} !\.(png|jpe?g|webp|gif|svg|ico|css|js|json|pdf|woff2?|txt|xml|map)$ [NC]
 RewriteRule ^ / [R=302,L]
 </IfModule>
+
+# Speed: compress text files and let browsers keep images, fonts and scripts (image names change when the picture changes)
+<IfModule mod_deflate.c>
+AddOutputFilterByType DEFLATE text/html text/css text/plain application/javascript text/javascript application/json image/svg+xml
+</IfModule>
+<IfModule mod_expires.c>
+ExpiresActive On
+ExpiresByType image/webp "access plus 30 days"
+ExpiresByType image/jpeg "access plus 30 days"
+ExpiresByType image/png "access plus 30 days"
+ExpiresByType image/svg+xml "access plus 30 days"
+ExpiresByType font/woff2 "access plus 1 year"
+ExpiresByType text/css "access plus 1 day"
+ExpiresByType application/javascript "access plus 1 day"
+</IfModule>

@@ -83,7 +83,7 @@ h1{margin:2px 0 0;font-family:Fraunces,"Noto Serif Armenian",serif;font-weight:6
     else { sub = dayL(D.date); }
     var pill = "";
     if (s === 1 || s === 2) { pill = D.ahead === 0 ? tr("next") : D.ahead === 1 ? tr("ahead1") : tr("ahead", { n: D.ahead }); }
-    var html = '<section class="card"><div class="hero"><img src="img/c1999a6e0a1f0a5218be4d17335ab22d.webp" alt=""><div><div class="k">' + tr("k") + '</div><h1>' + h + '</h1></div></div>' +
+    var html = '<section class="card"><div class="hero"><img decoding="async" src="img/c1999a6e0a1f0a5218be4d17335ab22d.webp" alt=""><div><div class="k">' + tr("k") + '</div><h1>' + h + '</h1></div></div>' +
       '<div class="eta">' + (big ? "<b>" + big + "</b>" : "") + '<span>' + esc(sub) + '</span></div>' +
       (pill ? '<div class="pill' + (s === 2 ? '' : ' g') + '">🚚 ' + esc(pill) + '</div>' : '') +
       (D.driver && s >= 1 && s < 3 ? '<p class="muted" style="margin-top:10px">' + esc(tr("drv", { n: D.driver })) + '</p>' : '') +
