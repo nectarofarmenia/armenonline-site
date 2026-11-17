@@ -134,6 +134,26 @@ function geo_ip($db, $ip) { // country/city of a visitor's IP, cached 14 days by
   else { $j = json_decode($get('https://ipapi.co/' . rawurlencode($ip) . '/json/'), true); if (is_array($j) && empty($j['error'])) { $g = ['cc' => (string) ($j['country_code'] ?? ''), 'c' => (string) ($j['country_name'] ?? ''), 'ci' => (string) ($j['city'] ?? ''), 'rg' => (string) ($j['region'] ?? ''), 't' => time()]; } }
   kv_put($db, $hk, json_encode($g, JSON_UNESCAPED_UNICODE)); return $g;
 }
+// Warehouse → My Apri Work, done by the server itself whenever the stock keys change (no admin page needs to be open).
+// Same shape as the admin page's push: 11 fixed products, packs + loose pieces + pieces per pack.
+function apri_stock_items($db) {
+  $S = json_decode((kv_get($db, 'noa-stock') ?: ['v' => 'null'])['v'], true); if (!is_array($S) || count($S) !== 11) { return null; }
+  $L = json_decode((kv_get($db, 'noa-stock-pcs') ?: ['v' => 'null'])['v'], true); if (!is_array($L) || count($L) !== 11) { $L = array_fill(0, 11, 0); }
+  $P = [12, 1, 1, 1, 10, 35, 10, 10, 6, 6, 6]; $C = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: [];
+  $idm = ['gata' => 0, 'khinkali' => 4, 'pelmeni' => 5, 'blinchik' => 6, 'kufta' => 7, 'kiev' => 8, 'chcut' => 9, 'beefcut' => 10];
+  foreach ((array) ($C['prod'] ?? []) as $pp) { $id = $pp['id'] ?? ''; if (isset($idm[$id]) && (float) ($pp['packPcs'] ?? 0) > 0) { $P[$idm[$id]] = (float) $pp['packPcs']; } }
+  $N = ['Գաթա', 'Խաշ', 'Խաշի արգանակ', 'Խաշի հավաքածու', 'Խինկալի', 'Պելմենի', 'Բլինչիկ', 'Միջուկով քուֆթա', 'Կիևյան կոտլետ', 'Հավի կոտլետ', 'Տավարի կոտլետ'];
+  $it = []; for ($i = 0; $i < 11; $i++) { $it[] = ['i' => $i, 'name' => $N[$i], 'packs' => (float) ($S[$i] ?? 0), 'loose' => (float) ($L[$i] ?? 0), 'perPack' => $P[$i]]; }
+  return $it;
+}
+function apri_stock_sync($db, $force = false) {
+  $t = kv_get($db, '__apri_token'); if (!$t) { return false; }
+  $it = apri_stock_items($db); if ($it === null) { return false; }
+  $key = md5(json_encode($it)); $last = kv_get($db, '__apri_stock_last'); if (!$force && $last && $last['v'] === $key) { return true; }
+  $r = apri_rpc('nofa_push_stock', ['p_token' => $t['v'], 'p_data' => ['at' => gmdate('c'), 'items' => $it]], $code);
+  if ($r === false || $code >= 400) { return false; }
+  kv_put($db, '__apri_stock_last', $key); return true;
+}
 function kv_put($db, $k, $v) { $t = now_ms(); $s = $db->prepare('REPLACE INTO nofa_kv (k, v, t) VALUES (?, ?, ?)'); $s->execute([$k, $v, $t]); return $t; }
 
 // One-time price update (Nov 10): gata unpackaged $1.50/piece; pelmeni wholesale $22 / 900 g, packaged only.
@@ -301,6 +321,7 @@ switch ($a) {
       if ($v === null) { $db->prepare('DELETE FROM nofa_kv WHERE k = ?')->execute([$k]); $done[$k] = now_ms(); }
       else { $done[$k] = kv_put($db, $k, (string) $v); }
     }
+    if (array_intersect(array_keys($done), ['noa-stock', 'noa-stock-pcs', 'noa-cost-v2'])) { try { apri_stock_sync($db); } catch (Throwable $e) {} }
     out(['ok' => true, 't' => $done]);
   case 'inbox': // admin: read customer submissions
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
@@ -510,6 +531,8 @@ switch ($a) {
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     out(['ok' => true, 'paid' => json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: new stdClass()]);
   case 'pub': // anyone: public site settings (theme, stock, cities)
+    // safety net: at most every 10 minutes a site visit re-checks the warehouse sent to My Apri Work (sends only if it changed)
+    try { $ck = kv_get($db, '__apri_stock_chk'); if (!$ck || now_ms() - (int) $ck['t'] > 600000) { kv_put($db, '__apri_stock_chk', '1'); apri_stock_sync($db); } } catch (Throwable $e) {}
     $res = []; foreach ($PUBLIC as $k) { $r = kv_get($db, $k); if ($r) { $res[$k] = $r['v']; } }
     // wholesale prices from the admin cost/price page (prices only, never costs or recipes)
     $cr = kv_get($db, 'noa-cost-v2'); if ($cr) { $cv = json_decode($cr['v'], true) ?: []; $wp = []; $all = [];
