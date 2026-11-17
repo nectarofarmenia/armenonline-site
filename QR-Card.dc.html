@@ -473,5 +473,29 @@ return {};
   var mq = window.matchMedia && window.matchMedia("print"); if (mq && mq.addListener) { mq.addListener(function (m) { var el = document.querySelector('div[style*="width: 1050px"]'); if (el && m.matches) { el.style.zoom = ""; } else { fit(); } }); }
 })();</script>
 <style id="hdr-wave-same">.hdr-stick > header + div[aria-hidden="true"]{display:block !important;background:#133B30 !important;line-height:0 !important}.hdr-stick > header + div[aria-hidden="true"] svg{display:block !important;width:100% !important;height:46px !important}</style>
+<script id="nofa-ptr">
+/* Pull down from the top to reload — only in the home-screen app (iOS/Android give no pull-to-refresh there). The page and scroll stay. */
+(function () { if (window.__nofaPtr) { return; } window.__nofaPtr = 1;
+  var SK = "nofa-scroll|" + location.pathname + location.search;
+  function saveY() { try { sessionStorage.setItem(SK, JSON.stringify({ y: Math.round(window.scrollY), at: Date.now() })); } catch (e) {} }
+  window.addEventListener("pagehide", saveY);
+  try { var sv = JSON.parse(sessionStorage.getItem(SK) || "null"); sessionStorage.removeItem(SK); if (sv && Date.now() - sv.at < 1800000 && sv.y > 0) { var n = 0, iv = setInterval(function () { window.scrollTo(0, sv.y); if (++n > 12 || Math.abs(window.scrollY - sv.y) < 4) { clearInterval(iv); } }, 250); } } catch (e) {}
+  var standalone = window.navigator.standalone === true || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches); if (!standalone || window.self !== window.top) { return; }
+  var el = document.createElement("div"); el.setAttribute("aria-hidden", "true");
+  el.style.cssText = "position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);z-index:2147483000;width:40px;height:40px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(16,24,40,.2);display:flex;align-items:center;justify-content:center;opacity:0;transform:translate(-50%,-56px);pointer-events:none";
+  el.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#1D5545" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>';
+  var st = document.createElement("style"); st.textContent = "@keyframes nofaPtrSpin{to{transform:rotate(360deg)}}"; document.head.appendChild(st);
+  function add() { if (document.body && !el.parentNode) { document.body.appendChild(el); } } add(); document.addEventListener("DOMContentLoaded", add);
+  var y0 = null, pull = 0, TH = 70;
+  function scrolledUp(t) { for (var n = t; n && n !== document.body; n = n.parentElement) { if (n.scrollTop > 0) { return true; } } return false; }
+  function blocked(t) { return window.scrollY > 0 || !t || !t.closest || t.closest("input,textarea,select,[contenteditable],iframe,[data-noptr]") || scrolledUp(t); }
+  function set(v) { el.style.transform = "translate(-50%," + (Math.min(v, TH + 30) - 56) + "px) rotate(" + (v * 3) + "deg)"; el.style.opacity = Math.min(1, v / TH); el.querySelector("svg").setAttribute("stroke", v >= TH ? "#C98A12" : "#1D5545"); }
+  window.addEventListener("touchstart", function (e) { if (e.touches.length !== 1 || blocked(e.target)) { y0 = null; return; } y0 = e.touches[0].clientY; pull = 0; }, { passive: true });
+  window.addEventListener("touchmove", function (e) { if (y0 == null) { return; } if (window.scrollY > 0) { y0 = null; set(0); return; } pull = Math.max(0, (e.touches[0].clientY - y0) * 0.5); set(pull); }, { passive: true });
+  window.addEventListener("touchend", function () { if (y0 == null) { return; } y0 = null;
+    if (pull >= TH) { el.style.transform = "translate(-50%," + (TH - 40) + "px)"; el.querySelector("svg").style.animation = "nofaPtrSpin .7s linear infinite"; saveY(); setTimeout(function () { location.reload(); }, 150); }
+    else { el.style.transition = "transform .2s,opacity .2s"; set(0); setTimeout(function () { el.style.transition = ""; }, 220); } pull = 0; }, { passive: true });
+})();
+</script>
 </body>
 </html>
