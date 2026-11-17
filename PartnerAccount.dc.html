@@ -2304,7 +2304,7 @@ body.nb-on a[href="Account.dc.html#logout"]:not(.nb-i),body.nb-on a[href="Partne
   };
   TT.ru = Object.assign({}, TT.en, { h: "📈 Статистика", p: "Сколько вы купили и продали каждого товара. Укажите свою цену продажи — увидите прибыль.", yr: "Год", mo: "Месяц", allY: "Все годы", allM: "Весь год", cost: "Закупка", sale: "Продажи", prof: "Ваша прибыль", marg: "Маржа", prod: "Товар", qty: "Кол-во", buyP: "Закупка (за ед.)", sellP: "Ваша цена продажи", rev: "Продажи", pk: "уп.", pc: "шт", tot: "Итого", none: "В этом периоде заказов нет.", note: "Цена продажи сохраняется в вашем аккаунте. Количество — то, что вы купили у нас.", cmpH: "📊 Сравнить", cmpP: "Выберите два периода, чтобы сравнить продажи и прибыль.", ch: "Изменение", trH: "По месяцам", ms: ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"], mL: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"] });
   TT.es = Object.assign({}, TT.en, { h: "📈 Estadísticas", p: "Cuánto compró y vendió de cada producto. Ponga su precio de venta para ver su ganancia.", yr: "Año", mo: "Mes", allY: "Todos los años", allM: "Todo el año", cost: "Costo de compra", sale: "Ventas", prof: "Su ganancia", marg: "Margen", prod: "Producto", qty: "Cantidad", buyP: "Pagó (por unidad)", sellP: "Su precio de venta", rev: "Ventas", pk: "paq.", pc: "ud.", tot: "Total", none: "No hay pedidos en este período.", note: "Su precio de venta se guarda en su cuenta. Las cantidades son lo que nos compró.", cmpH: "📊 Comparar", cmpP: "Elija dos períodos para comparar ventas y ganancia.", ch: "Cambio", trH: "Por mes", ms: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"], mL: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"] });
-  var V = { y: "", m: "", aY: "", aM: "", bY: "", bM: "" };
+  var V = { y: "", m: "", aY: "", aM: "", bY: "", bM: "", p: "" };
   function D() { return window.__nofaStat || { orders: [], names: [], sizes: [], WP: [], WB: [], WBP: [], ppk: [], lang: "hy", ukey: "demo" }; }
   function T() { return TT[D().lang] || TT.en; }
   function money(v) { var n = Math.round((+v || 0) * 100) / 100; return (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
@@ -2320,14 +2320,16 @@ body.nb-on a[href="Account.dc.html#logout"]:not(.nb-i),body.nb-on a[href="Partne
     var tot = { cost: 0, rev: 0, prof: 0, priced: true };
     R.forEach(function (r) { r.sPk = +P[r.k + "|pk"] || 0; r.sPc = +P[r.k + "|pc"] || 0; r.bPk = r.pk ? X.WP[r.k] || 0 : 0; r.bPc = r.pc ? X.WB[r.k] || 0 : 0; r.rev = r.pk * r.sPk + r.pc * r.sPc; r.has = r.pk || r.pc; r.priced = (!r.pk || r.sPk > 0) && (!r.pc || r.sPc > 0); r.prof = r.priced ? r.rev - r.cost : null; if (r.has) { tot.cost += r.cost; if (r.priced) { tot.rev += r.rev; tot.prof += r.rev - r.cost; } else { tot.priced = false; } } });
     return { rows: R.filter(function (r) { return r.has; }), tot: tot }; }
+  function calcF(y, m) { var c = calc(y, m); if (V.p === "") { return c; } var rows = c.rows.filter(function (r) { return r.k === +V.p; }); var tot = { cost: 0, rev: 0, prof: 0, priced: true }; rows.forEach(function (r) { tot.cost += r.cost; if (r.priced) { tot.rev += r.rev; tot.prof += r.rev - r.cost; } else { tot.priced = false; } }); return { rows: rows, tot: tot }; }
   function years() { var ys = {}; D().orders.forEach(function (o) { ys[new Date(o.d).getFullYear()] = 1; }); var a = Object.keys(ys).map(Number).sort(function (a, b) { return b - a; }); if (!a.length) { a = [new Date().getFullYear()]; } return a; }
   function ySel(id, val, all) { var t = T(); return '<select id="' + id + '" class="stS">' + (all ? '<option value="">' + t.allY + "</option>" : "") + years().map(function (y) { return '<option value="' + y + '"' + (String(val) === String(y) ? " selected" : "") + ">" + y + "</option>"; }).join("") + "</select>"; }
   function mSel(id, val) { var t = T(); return '<select id="' + id + '" class="stS"><option value="">' + t.allM + "</option>" + t.mL.map(function (n, i) { return '<option value="' + i + '"' + (String(val) === String(i) ? " selected" : "") + ">" + n + "</option>"; }).join("") + "</select>"; }
   function pct(a, b) { if (!b) { return a ? "—" : "0%"; } var v = Math.round((a - b) / Math.abs(b) * 100); return (v > 0 ? "+" : "") + v + "%"; }
   function draw(root) { var t = T(), X = D(); if (V.y === "") { V.y = String(new Date().getFullYear()); if (years().indexOf(+V.y) < 0) { V.y = String(years()[0]); } }
     if (V.aY === "") { var nw = new Date(); V.aY = String(nw.getFullYear()); V.aM = String(nw.getMonth()); var pv = new Date(nw.getFullYear(), nw.getMonth() - 1, 1); V.bY = String(pv.getFullYear()); V.bM = String(pv.getMonth()); }
-    var c = calc(V.y, V.m), tt = c.tot;
+    var c = calcF(V.y, V.m), tt = c.tot;
     var h = '<div class="stWrap"><div><h2 class="stH">' + t.h + '</h2><p class="stP">' + t.p + "</p></div>";
+    h += '<div class="stPr" role="group">' + [["", ({ hy: "Բոլորը", ru: "Все", es: "Todos" })[X.lang] || "All"]].concat(X.names.map(function (n, k) { return [String(k), n]; })).map(function (x) { return '<button type="button" class="stChip' + (V.p === x[0] ? " on" : "") + '" data-stp="' + x[0] + '" aria-pressed="' + (V.p === x[0]) + '">' + esc(x[1]) + "</button>"; }).join("") + "</div>";
     h += '<div class="stF"><label>' + t.yr + ySel("stY", V.y, true) + "</label><label>" + t.mo + mSel("stM", V.m) + "</label></div>";
     h += '<div class="stK"><div class="stC"><small>' + t.cost + "</small><b>" + money(tt.cost) + '</b></div><div class="stC"><small>' + t.sale + "</small><b>" + (tt.priced ? money(tt.rev) : money(tt.rev) + "*") + '</b></div><div class="stC gr"><small>' + t.prof + "</small><b>" + money(tt.prof) + '</b></div><div class="stC"><small>' + t.marg + "</small><b>" + (tt.rev > 0 ? Math.round(tt.prof / tt.rev * 100) + "%" : "—") + "</b></div></div>";
     if (!c.rows.length) { h += '<p class="stE">' + t.none + "</p>"; }
@@ -2339,10 +2341,10 @@ body.nb-on a[href="Account.dc.html#logout"]:not(.nb-i),body.nb-on a[href="Partne
       h += "</tbody><tfoot><tr><td>" + t.tot + "</td><td></td><td>" + money(tt.cost) + "</td><td></td><td>" + money(tt.rev) + '</td><td class="' + (tt.prof >= 0 ? "pos" : "neg") + '">' + money(tt.prof) + "</td></tr></tfoot></table></div>"; }
     h += '<p class="stN">' + t.note + "</p>";
     /* months of the chosen year (or this year) */
-    var yy = V.y || String(new Date().getFullYear()), mx = 0, MS = t.ms.map(function (n, i) { var cc = calc(yy, String(i)).tot; mx = Math.max(mx, cc.cost, cc.rev, Math.abs(cc.prof)); return { n: n, c: cc }; });
+    var yy = V.y || String(new Date().getFullYear()), mx = 0, MS = t.ms.map(function (n, i) { var cc = calcF(yy, String(i)).tot; mx = Math.max(mx, cc.cost, cc.rev, Math.abs(cc.prof)); return { n: n, c: cc }; });
     h += '<div class="stBox"><h3>' + t.trH + " · " + yy + '</h3><div class="stLg"><i class="c1"></i>' + t.cost + ' <i class="c2"></i>' + t.sale + ' <i class="c3"></i>' + t.prof + '</div><div class="stChW"><div class="stCh">' + MS.map(function (m) { var f = function (v) { return mx ? Math.max(0, Math.round(v / mx * 100)) : 0; }; return '<div class="stCol" title="' + esc(m.n) + ": " + money(m.c.rev) + " / " + money(m.c.prof) + '"><div class="stBars"><i class="c1" style="height:' + f(m.c.cost) + '%"></i><i class="c2" style="height:' + f(m.c.rev) + '%"></i><i class="c3" style="height:' + f(m.c.prof) + '%"></i></div><span>' + m.n + "</span></div>"; }).join("") + "</div></div></div>";
     /* compare two periods */
-    var A = calc(V.aY, V.aM), B = calc(V.bY, V.bM);
+    var A = calcF(V.aY, V.aM), B = calcF(V.bY, V.bM);
     h += '<div class="stBox"><h3>' + t.cmpH + '</h3><p class="stP">' + t.cmpP + '</p><div class="stCmpF"><div><b class="tg a">' + t.A + "</b>" + ySel("stAY", V.aY, true) + mSel("stAM", V.aM) + '</div><div><b class="tg b">' + t.B + "</b>" + ySel("stBY", V.bY, true) + mSel("stBM", V.bM) + "</div></div>";
     var line = function (lb, a, b) { return "<tr><td>" + lb + "</td><td>" + money(a) + "</td><td>" + money(b) + '</td><td class="' + (a - b >= 0 ? "pos" : "neg") + '">' + money(a - b) + " · " + pct(a, b) + "</td></tr>"; };
     h += '<div class="stTw"><table class="stT cmp"><thead><tr><th></th><th>' + t.A + "</th><th>" + t.B + "</th><th>" + t.ch + "</th></tr></thead><tbody>" + line(t.cost, A.tot.cost, B.tot.cost) + line(t.sale, A.tot.rev, B.tot.rev) + line(t.prof, A.tot.prof, B.tot.prof);
@@ -2351,6 +2353,7 @@ body.nb-on a[href="Account.dc.html#logout"]:not(.nb-i),body.nb-on a[href="Partne
       h += '<tr class="sub"><td>' + esc(keys[k]) + "<small>" + qa + " → " + qb + "</small></td><td>" + money(pa) + "</td><td>" + money(pb) + '</td><td class="' + (pa - pb >= 0 ? "pos" : "neg") + '">' + pct(pa, pb) + "</td></tr>"; });
     h += "</tbody></table></div></div></div>";
     root.innerHTML = h; root.__stDone = 1; }
+  document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest("[data-stp]"); if (!b) { return; } V.p = b.getAttribute("data-stp"); draw(b.closest("#nofa-stat-root")); });
   document.addEventListener("change", function (e) { var el = e.target; if (!el || !el.closest || !el.closest("#nofa-stat-root")) { return; } var root = el.closest("#nofa-stat-root");
     var map = { stY: "y", stM: "m", stAY: "aY", stAM: "aM", stBY: "bY", stBM: "bM" }; if (map[el.id]) { V[map[el.id]] = el.value; draw(root); return; }
     if (el.dataset.sp) { savePrice(el.dataset.sp, Math.max(0, +el.value || 0)); var y = window.scrollY; draw(root); window.scrollTo(0, y); var n = root.querySelector('[data-sp="' + el.dataset.sp + '"]'); if (n) { n.blur(); } } });
@@ -2358,6 +2361,7 @@ body.nb-on a[href="Account.dc.html#logout"]:not(.nb-i),body.nb-on a[href="Partne
 })();
 </script>
 <style id="nofa-stat-css">
+.stPr{display:flex;flex-wrap:wrap;gap:8px}.stChip{min-height:40px;padding:0 16px;border-radius:999px;border:1.5px solid #E4DCC8;background:#fff;color:#1D5545;font:700 14px inherit;font-family:inherit;cursor:pointer}.stChip.on{background:#1D5545;border-color:#1D5545;color:#F6E3B4}
 #nofa-stat-root .stWrap{display:flex;flex-direction:column;gap:16px;min-width:0}
 .stH{margin:0;font-family:Fraunces,'Noto Serif Armenian',Lora,serif;font-weight:600;font-size:28px;color:#1D5545}.stP{margin:4px 0 0;color:#5E6A63;font-size:14.5px;line-height:1.5}
 .stF,.stCmpF{display:flex;flex-wrap:wrap;gap:10px}.stF label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:800;color:#8A7A55;letter-spacing:.04em}
