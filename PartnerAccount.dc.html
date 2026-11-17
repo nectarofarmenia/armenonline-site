@@ -352,6 +352,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
 .qo-t.on{background:#fff;border-color:#2F9E6B;box-shadow:0 8px 20px rgba(19,59,48,.12)}
 .qo-t.so{opacity:.6}
 .qo-top{display:flex;align-items:flex-start;gap:12px}
+.qo-qk{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}.qo-qk button{min-height:36px;border-radius:999px;border:1px solid rgba(29,85,69,.25);background:#fff;color:#1D5545;font-weight:800;font-size:14px;cursor:pointer}.qo-qk button:active{background:#EAF4EE}
 .qo-pack{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0 0 14px}
 .qo-pk{min-height:42px;padding:0 16px;border-radius:999px;border:1.5px solid #E3D6B5;background:#FBF9F4;color:#1D5545;font:700 14.5px inherit;font-family:inherit;cursor:pointer}
 .qo-pk.on{background:linear-gradient(180deg,#2A6B57,#1D5545);border-color:#1D5545;color:#fff;box-shadow:0 6px 14px rgba(19,59,48,.2)}
@@ -880,6 +881,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 <sc-if value="{{r.notSold}}" hint-placeholder-val="{{true}}"><div class="qty" role="group" aria-label="{{t.qty}}"><button type="button" onClick="{{r.dec}}">−</button><span>{{r.q}}</span><button type="button" onClick="{{r.inc}}">+</button></div></sc-if><sc-if value="{{r.sold}}" hint-placeholder-val="{{false}}"><span class="qo-sold">⛔ {{r.soldL}}</span></sc-if>
 <span class="qo-ln">{{r.line}}</span>
 </div>
+<sc-if value="{{r.showQuick}}" hint-placeholder-val="{{false}}"><div class="qo-qk" role="group" aria-label="{{t.qty}}"><sc-for list="{{r.quick}}" as="qb" hint-placeholder-count="4"><button type="button" onClick="{{qb.add}}">+{{qb.n}}</button></sc-for></div></sc-if>
 </div>
 </sc-for>
 </div>
@@ -1113,7 +1115,8 @@ var PACKM = (this.state && this.state.wsPack) || (function () { try { return win
 var BULK = PACKM === "bulk";
 var WU = BULK ? WB : WP;
 var rows = IDX.map(function (pi, k) { var naB = BULK && !WB[k]; sum += q[k] * WU[k]; units += q[k]; return { img: PIMGW[pi] || "", hasImg: !!PIMGW[pi], noImg: !PIMGW[pi], name: t.pn[pi], ini: (t.pn[pi] || '?').charAt(0), qcls: q[k] > 0 ? 'on' : (SOLD[pi] ? 'so' : ''), size: BULK && WB[k] ? "$" + WH[k].toFixed(2) + " / " + ({ hy: "հատ · առանց փաթեթի", en: "piece · unpackaged", ru: "шт · без упаковки", es: "pieza · sin empaque" }[lang] || "piece · unpackaged") : t.ps[pi], price: naB ? "—" : money(WU[k]), q: q[k], line: money(q[k] * WU[k]), sold: !!SOLD[pi] || naB, notSold: !SOLD[pi] && !naB, soldL: naB ? (NB[k] ? ({ hy: "Միայն փաթեթավորված", en: "Packaged only", ru: "Только в упаковке", es: "Solo empacado" }[lang] || "Packaged only") : ({ hy: "Առանց փաթեթի՝ շուտով", en: "Unpackaged: soon", ru: "Без упаковки: скоро", es: "Sin empaque: pronto" }[lang] || "Unpackaged: soon")) : SOLDL,
-inc: function () { if (SOLD[pi]) { return; } var n = q.slice(); n[k] = Math.min(BULK ? 9999 : 999, n[k] + 1); self.setState({ wq: n }); }, dec: function () { var n = q.slice(); n[k] = Math.max(0, n[k] - 1); self.setState({ wq: n }); } }; });
+inc: function () { if (SOLD[pi]) { return; } var n = q.slice(); n[k] = Math.min(BULK ? 9999 : 999, n[k] + 1); self.setState({ wq: n }); },
+  showQuick: BULK && !SOLD[pi] && !naB, quick: [10, 25, 60, 100].map(function (m) { return { n: m, add: function () { if (SOLD[pi]) { return; } var n = q.slice(); n[k] = Math.min(9999, n[k] + m); self.setState({ wq: n }); } }; }), dec: function () { var n = q.slice(); n[k] = Math.max(0, n[k] - 1); self.setState({ wq: n }); } }; });
 var WD = { hy: ["Կիր", "Երկ", "Երք", "Չրք", "Հնգ", "Ուրբ", "Շբթ"], en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], ru: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], es: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"] };
 var MO = { hy: ["հունվ", "փետր", "մարտ", "ապր", "մայիս", "հունիս", "հուլիս", "օգոստ", "սեպտ", "հոկտ", "նոյեմբ", "դեկտ"], en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], ru: ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"], es: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"] };
 var now = new Date();
