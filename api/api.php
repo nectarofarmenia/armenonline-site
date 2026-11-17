@@ -538,12 +538,13 @@ switch ($a) {
     $no = (string) ($v['no'] ?? $id); $ach = ($b['m'] ?? '') === 'ach'; $fee = $ach ? 0 : round($bal * 0.03, 2);
     $host = ($https ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'nectarofarmenia.com'); $base0 = $host . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '/api/api.php')), '/');
     $form = ['mode' => 'payment', 'client_reference_id' => 'INV:' . $id, 'metadata[invoice]' => $no, 'payment_intent_data[metadata][invoice]' => $no, 'line_items[0][price_data][currency]' => 'usd', 'line_items[0][price_data][product_data][name]' => 'Invoice #' . $no . ' — Nectar of Armenia Inc', 'line_items[0][price_data][unit_amount]' => (int) round($bal * 100), 'line_items[0][quantity]' => 1, 'payment_method_types[0]' => $ach ? 'us_bank_account' : 'card', 'submit_type' => 'pay', 'success_url' => $base0 . '/PartnerAccount.dc.html?invpaid={CHECKOUT_SESSION_ID}#invoices', 'cancel_url' => $base0 . '/PartnerAccount.dc.html#invoices'];
+    if (!empty($b['embed'])) { unset($form['success_url'], $form['cancel_url']); $form['ui_mode'] = 'embedded'; $form['return_url'] = $base0 . '/PartnerAccount.dc.html?invpaid={CHECKOUT_SESSION_ID}#invoices'; }
     if ($fee > 0) { $form['line_items[1][price_data][currency]'] = 'usd'; $form['line_items[1][price_data][product_data][name]'] = 'Card processing fee (3%)'; $form['line_items[1][price_data][unit_amount]'] = (int) round($fee * 100); $form['line_items[1][quantity]'] = 1; }
     if (filter_var($em, FILTER_VALIDATE_EMAIL)) { $form['customer_email'] = $em; }
     $r = stripe_api($sk, 'POST', 'checkout/sessions', $form, $code); $j = json_decode((string) $r, true) ?: [];
-    if ($code !== 200 || empty($j['url'])) { out(['ok' => false, 'err' => 'stripe', 'msg' => $j['error']['message'] ?? '']); }
+    if ($code !== 200 || (empty($j['url']) && empty($j['client_secret']))) { out(['ok' => false, 'err' => 'stripe', 'msg' => $j['error']['message'] ?? '']); }
     kv_put($db, '__pay|INV:' . $id, json_encode(['sid' => $j['id'], 'amt' => $bal, 'fee' => $fee, 't' => now_ms(), 'no' => $no, 'email' => $em, 'name' => $nm, 'lines' => [['Invoice #' . $no, 1, $bal]] + ($fee > 0 ? [1 => ['Card processing fee (3%)', 1, $fee]] : []), 'site' => $base0 . '/PartnerAccount.dc.html#invoices'], JSON_UNESCAPED_UNICODE));
-    out(['ok' => true, 'url' => $j['url'], 'amt' => $bal, 'fee' => $fee]);
+    out(['ok' => true, 'url' => $j['url'] ?? '', 'cs' => $j['client_secret'] ?? '', 'amt' => $bal, 'fee' => $fee, 'no' => $no]);
   case 'pay_wso': // wholesale customer: pay a new order before delivery (card +3% or ACH); amount computed here from our wholesale prices
     $sk = stripe_sk($db); if ($sk === '') { out(['ok' => false, 'err' => 'off']); }
     $b = body(); $me = cust_rec($db, $b['em'] ?? '', 'biz', $b['tok'] ?? ''); if (!$me) { out(['ok' => false, 'err' => 'auth'], 401); }
@@ -554,18 +555,21 @@ switch ($a) {
     foreach ($IDX as $k => $pi) { $PK[$pi] = $WP0[$k]; $PC[$pi] = $WH0[$k]; }
     $cv = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: []; foreach (($cv['prod'] ?? []) as $pd) { $k = array_search((string) ($pd['id'] ?? ''), $ids, true); if ($k === false || !in_array($k, $IDX, true)) { continue; } $r = (array) ($pd['pr'] ?? []); if ((float) ($r[2] ?? 0) > 0) { $PK[$k] = (float) $r[2]; } $PC[$k] = (float) ($r[3] ?? 0) > 0 ? (float) $r[3] : 0; }
     $pcs = ($b['pack'] ?? '') === 'pcs'; $days = max(1, min(10, (int) ($b['days'] ?? count($nos)))); $sub = 0; $lines = [];
-    foreach ((array) ($b['items'] ?? []) as $it) { $pi = (int) ($it[0] ?? -1); $q = (int) ($it[1] ?? 0); if (!in_array($pi, $IDX, true) || $q < 1 || $q > 5000) { continue; } $u = $pcs ? $PC[$pi] : $PK[$pi]; if ($u <= 0) { continue; } $sub += $u * $q * $days; $lines[] = [$N[$pi] . ($pcs ? ' (pcs)' : '') . ($days > 1 ? ' ×' . $days . ' days' : ''), $q * $days, round($u * $q * $days, 2)]; }
+    foreach ((array) ($b['items'] ?? []) as $it) { $pi = (int) ($it[0] ?? -1); $q = (int) ($it[1] ?? 0); if (!in_array($pi, $IDX, true) || $q < 1 || $q > 5000) { continue; } $u = $pcs ? $PC[$pi] : $PK[$pi]; if ($u <= 0) { continue; } $sub += $u * $q * $days; $lines[] = [$N[$pi] . ($pcs ? ' · by the piece' : ' · pack') . ($days > 1 ? ' · ' . $days . ' deliveries' : ''), $q * $days, round($u * $q * $days, 2), $u, $pi]; }
     $sub = round($sub, 2); if ($sub < 0.5) { out(['ok' => false, 'err' => 'empty']); }
     $ach = ($b['m'] ?? '') === 'ach'; $fee = $ach ? 0 : round($sub * 0.03, 2); $ref = 'WSO:' . substr(implode(',', $nos), 0, 180);
     $host = ($https ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'nectarofarmenia.com'); $base0 = $host . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '/api/api.php')), '/');
     $form = ['mode' => 'payment', 'client_reference_id' => $ref, 'metadata[order]' => $ref, 'payment_intent_data[metadata][order]' => $ref, 'payment_method_types[0]' => $ach ? 'us_bank_account' : 'card', 'submit_type' => 'pay', 'success_url' => $base0 . '/PartnerAccount.dc.html?wspaid={CHECKOUT_SESSION_ID}', 'cancel_url' => $base0 . '/PartnerAccount.dc.html?wscancel=1'];
-    foreach ($lines as $i => $l) { $form["line_items[$i][price_data][currency]"] = 'usd'; $form["line_items[$i][price_data][product_data][name]"] = $l[0]; $form["line_items[$i][price_data][unit_amount]"] = (int) round($l[2] * 100); $form["line_items[$i][quantity]"] = 1; }
+    $IMG = ['img/6830d83c7ec9c8d627f12f1f2a8c5eeb.jpg', 'img/c8b0737505aa785eed93371b09c8e049.jpg', 'img/c8b0737505aa785eed93371b09c8e049.jpg', 'img/d3fbe1930c2f9c5d58eab675b2128cfd.png', 'img/65940d08dd8a527a15d113ecd1854f3a.webp', 'img/9eb33fd2c3ff435a1314ecd2f69f9245.webp', 'img/645bf576eb7a0134b08d93cb48d381e7.webp', 'img/a6aaa8aa5db20ba68bc42c3406095e44.webp', 'img/6a86ac441cd9dd29b3e3ba1a16934988.webp', 'img/0f5ce6e80b23a0e775ad415e85b7ef0d.webp', 'img/135d0cd80fa69f4a118392eea9b8bcd6.webp'];
+    foreach ($lines as $i => $l) { $form["line_items[$i][price_data][currency]"] = 'usd'; $form["line_items[$i][price_data][product_data][name]"] = $l[0]; $form["line_items[$i][price_data][unit_amount]"] = (int) round($l[3] * 100); $form["line_items[$i][quantity]"] = (int) $l[1]; if ($https && !empty($IMG[$l[4]])) { $form["line_items[$i][price_data][product_data][images][0]"] = $base0 . '/' . $IMG[$l[4]]; } }
+    if (!empty($b['embed'])) { unset($form['success_url'], $form['cancel_url']); $form['ui_mode'] = 'embedded'; $form['return_url'] = $base0 . '/PartnerAccount.dc.html?wspaid={CHECKOUT_SESSION_ID}'; }
     if ($fee > 0) { $i = count($lines); $form["line_items[$i][price_data][currency]"] = 'usd'; $form["line_items[$i][price_data][product_data][name]"] = 'Card processing fee (3%)'; $form["line_items[$i][price_data][unit_amount]"] = (int) round($fee * 100); $form["line_items[$i][quantity]"] = 1; $lines[] = ['Card processing fee (3%)', 1, $fee]; }
     if (filter_var($em, FILTER_VALIDATE_EMAIL)) { $form['customer_email'] = $em; }
     $r = stripe_api($sk, 'POST', 'checkout/sessions', $form, $code); $j = json_decode((string) $r, true) ?: [];
-    if ($code !== 200 || empty($j['url'])) { out(['ok' => false, 'err' => 'stripe', 'msg' => $j['error']['message'] ?? '']); }
+    if ($code !== 200 || (empty($j['url']) && empty($j['client_secret']))) { out(['ok' => false, 'err' => 'stripe', 'msg' => $j['error']['message'] ?? '']); }
+    $lines = array_map(function ($l) { return [$l[0], $l[1], $l[2]]; }, $lines);
     kv_put($db, '__pay|' . $ref, json_encode(['sid' => $j['id'], 'amt' => $sub, 'fee' => 0, 'cfee' => $fee, 't' => now_ms(), 'nos' => $nos, 'm' => $ach ? 'ACH' : 'Card', 'email' => $em, 'name' => (string) ($rec['biz'] ?? ''), 'phone' => (string) ($rec['phone'] ?? ''), 'lines' => $lines, 'site' => $base0 . '/PartnerAccount.dc.html'], JSON_UNESCAPED_UNICODE));
-    out(['ok' => true, 'url' => $j['url'], 'amt' => $sub, 'fee' => $fee]);
+    out(['ok' => true, 'url' => $j['url'] ?? '', 'cs' => $j['client_secret'] ?? '', 'amt' => $sub, 'fee' => $fee, 'lines' => $lines]);
   case 'pay_sync': // admin: confirm with Stripe any card payments whose customer never came back to the site
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $sk = stripe_sk($db); $L = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: []; $n = 0;
