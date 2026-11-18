@@ -2206,7 +2206,7 @@ body.nb-on a[href="Account.dc.html#logout"]:not(.nb-i),body.nb-on a[href="Partne
 .nb-pan.open{display:block}
 .nb-h{font-size:12px;font-weight:800;letter-spacing:.08em;color:#9FC2B2;margin:4px 6px 8px;text-transform:uppercase}
 .nb-langs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
-.nb-langs button{min-height:40px;border-radius:999px;border:1px solid rgba(235,169,58,.45);background:transparent;color:#E4ECE6;font:800 14px inherit;font-family:inherit;cursor:pointer}
+.nb-langs button{min-height:32px !important;height:32px;padding:0 !important;font-size:13px !important;line-height:1 !important;border-radius:999px;border:1px solid rgba(235,169,58,.45);background:transparent;color:#E4ECE6;font:800 14px inherit;font-family:inherit;cursor:pointer}
 .nb-langs button.on{background:#EBA93A;color:#133B30;border-color:#EBA93A}
 .nb-i{display:flex;align-items:center;gap:12px;min-height:48px;padding:0 12px;border-radius:12px;color:#E4ECE6;text-decoration:none;font-weight:700;font-size:15px;border-top:1px solid rgba(246,195,90,.18);background:none;width:100%;text-align:left;border-left:0;border-right:0;border-bottom:0;font-family:inherit;cursor:pointer}
 .nb-i:hover{background:rgba(255,255,255,.07)}
@@ -2489,14 +2489,12 @@ button:active:not(:disabled),a.btn:active{filter:brightness(.93)}
   window.addEventListener("popstate", anim); last = tab();
 })();
 </script>
-<script id="nofa-fab-menu">(function(){if(window.self!==window.top)return;function go(){var h=document.querySelector('header.raise-header');if(!h||!('IntersectionObserver' in window)){return}
-var st=document.createElement('style');st.textContent='#nofa-hclone{position:fixed;left:0;right:0;top:0;z-index:9500;transform:translateY(-110%);transition:transform .2s ease;padding-top:env(safe-area-inset-top,0px);background:linear-gradient(180deg,#2E7A60 0%,#22604C 55%,#1A5040 100%);box-shadow:0 6px 18px rgba(0,0,0,.28);will-change:transform}#nofa-hclone.on{transform:none}#nofa-hclone header{position:static !important;box-shadow:none !important;background:transparent !important;padding-top:0 !important}#nofa-hclone header > div{padding-top:6px !important;padding-bottom:6px !important}#nofa-hclone .logo3d{height:44px !important}@media(min-width:761px){#nofa-hclone{display:none}}';document.head.appendChild(st);
-var w=document.createElement('div');w.id='nofa-hclone';w.setAttribute('aria-hidden','true');document.body.appendChild(w);
-function sync(){var c=h.cloneNode(true);c.querySelectorAll('[id]').forEach(function(e){e.removeAttribute('id')});c.querySelectorAll('.ad-lang').forEach(function(e){e.classList.remove('ad-lang');e.classList.add('ad-lang-c')});w.innerHTML='';w.appendChild(c)}sync();
-var q=function(r){return Array.prototype.slice.call(r.querySelectorAll('a,button'))};
-w.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('a,button');if(!t){return}e.preventDefault();e.stopPropagation();var i=q(w).indexOf(t),o=q(h)[i];if(!o){return}var isMenu=/menu/i.test(o.getAttribute('aria-label')||'')&&!o.classList.contains('nm-hb');if(isMenu){window.scrollTo(0,0);setTimeout(function(){o.click()},60)}else{o.click()}},true);
-var mo=new MutationObserver(function(){clearTimeout(mo.t);mo.t=setTimeout(sync,150)});mo.observe(h,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','src','href']});
-new IntersectionObserver(function(es){w.classList.toggle('on',!es[0].isIntersecting)},{threshold:0}).observe(h)}
-if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){setTimeout(go,600)})}else{setTimeout(go,600)}})();</script>
+<script id="nofa-fab-menu">(function(){if(window.self!==window.top)return;function go(){var h=document.querySelector('header.raise-header');if(!h)return;
+var st=document.createElement('style');st.textContent='@media(max-width:760px){html body header.raise-header.nofa-fixed{position:fixed !important;top:0 !important;left:0 !important;right:0 !important;z-index:9000 !important;padding-top:env(safe-area-inset-top,0px) !important;animation:nofaHdrIn .2s ease;box-shadow:0 6px 18px rgba(0,0,0,.28) !important}}@keyframes nofaHdrIn{from{transform:translateY(-100%)}to{transform:none}}';document.head.appendChild(st);
+var sp=document.createElement('div');sp.className='nofa-sp';sp.style.cssText='display:block !important;height:0;margin:0;padding:0';h.parentNode.insertBefore(sp,h);var on=false,tk=false;
+function upd(){tk=false;var h2=document.querySelector('header.raise-header');if(h2&&h2!==h){h=h2;on=false;h.parentNode.insertBefore(sp,h)}var mob=window.innerWidth<=760,H=h.offsetHeight,t=sp.getBoundingClientRect().top;var want=mob&&t<-H;if(want===on)return;on=want;if(on){sp.style.height=H+'px';h.classList.add('nofa-fixed')}else{h.classList.remove('nofa-fixed');sp.style.height='0'}}
+window.addEventListener('scroll',function(){if(!tk){tk=true;requestAnimationFrame(upd)}},{passive:true});window.addEventListener('resize',upd);upd()}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){setTimeout(go,300)})}else{setTimeout(go,300)}})();</script>
+<style id="nofa-acct-clean">@media(max-width:760px){html body .of-tab,html body .nt-mu,html body .ap-dock{display:none !important}}</style>
 </body>
 </html>
