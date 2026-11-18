@@ -7,6 +7,7 @@ require __DIR__ . '/push.php';
 $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
 session_set_cookie_params(['lifetime' => 60 * 60 * 24 * 30, 'path' => '/', 'secure' => $https, 'httponly' => true, 'samesite' => 'Lax']);
 session_name('NOFASESS'); session_start();
+if (function_exists('header_remove')) { @header_remove('X-Powered-By'); }
 function out($a, $code = 200) { http_response_code($code); echo json_encode($a, JSON_UNESCAPED_UNICODE); exit; }
 function body() { $r = file_get_contents('php://input'); if (strlen($r) > 6 * 1024 * 1024) { out(['ok' => false, 'err' => 'too_big'], 413); } $j = json_decode($r, true); return is_array($j) ? $j : []; }
 function now_ms() { return (int) round(microtime(true) * 1000); }
@@ -16,6 +17,11 @@ if ($a === 'ping') { $d = []; if (!empty($_GET['diag']) && $cfg) { $P = nofa_cfg
 if (!$cfg) { out(['ok' => false, 'err' => 'not_configured'], 503); }
 try { $db = nofa_db(); } catch (Exception $e) { out(['ok' => false, 'err' => 'db'], 503); }
 $isAdmin = !empty($_SESSION['nofa_admin']);
+if (!kv_get($db, '__mig_bot1')) { $mr = kv_get($db, '__stats|2026-11'); $M = $mr ? (json_decode($mr['v'], true) ?: null) : null;
+  if (is_array($M)) { $nb = 0; foreach ((array) ($M['ci'] ?? []) as $ck => $cv) { if (stripos($ck, 'Manchester') === 0) { $nb += (int) $cv; unset($M['ci'][$ck]); } }
+    if ($nb > 0) { $M['v'] = max(0, ($M['v'] ?? 0) - $nb); if (isset($M['cc']['GB'])) { $M['cc']['GB'] = max(0, $M['cc']['GB'] - $nb); if (!$M['cc']['GB']) { unset($M['cc']['GB']); } } if (isset($M['dv']['d'])) { $M['dv']['d'] = max(0, $M['dv']['d'] - $nb); } if (isset($M['lg']['en'])) { $M['lg']['en'] = max(0, $M['lg']['en'] - $nb); } if (isset($M['p']['index.html'])) { $M['p']['index.html'] = max(0, $M['p']['index.html'] - $nb); }
+      $M['bots'] = ($M['bots'] ?? 0) + $nb; $M['bo'] = array_merge((array) ($M['bo'] ?? []), ['Manchester data-centre (removed) · Manchester' => $nb]); kv_put($db, '__stats|2026-11', json_encode($M, JSON_UNESCAPED_UNICODE)); } }
+  kv_put($db, '__mig_bot1', '1'); }
 if (!kv_get($db, '__mig_pel3')) { $cr = kv_get($db, 'noa-cost-v2'); $cv = $cr ? (json_decode($cr['v'], true) ?: null) : null;
   if (is_array($cv) && isset($cv['prod']) && is_array($cv['prod'])) { foreach ($cv['prod'] as &$pp) { if (($pp['id'] ?? '') === 'pelmeni') { if (!isset($pp['pr']) || !is_array($pp['pr'])) { $pp['pr'] = [0, 0, 0, 0]; } $pp['pr'][0] = 32; $pp['pr'][2] = 24; } } unset($pp); $cv['prPel2'] = 1; $cv['prPel3'] = 1; kv_put($db, 'noa-cost-v2', json_encode($cv, JSON_UNESCAPED_UNICODE)); }
   kv_put($db, '__mig_pel3', '1'); }
@@ -126,13 +132,20 @@ function doc_secret($db) { $r = kv_get($db, '__docsec'); if ($r && strlen($r['v'
 function geo_ip($db, $ip) { // country/city of a visitor's IP, cached 14 days by a hash (the IP itself is never stored)
   if ($ip === '' || preg_match('/^(127\.|10\.|192\.168\.|::1$)/', $ip)) { return ['cc' => '', 'c' => '', 'ci' => '', 'rg' => '']; }
   $hk = '__geo|' . substr(hash('sha256', 'nofa-geo|' . $ip), 0, 24); $r = kv_get($db, $hk);
-  if ($r) { $g = json_decode($r['v'], true); if (is_array($g) && ($g['t'] ?? 0) > time() - 14 * 86400) { return $g; } }
+  if ($r) { $g = json_decode($r['v'], true); if (is_array($g) && ($g['t'] ?? 0) > time() - 14 * 86400 && (array_key_exists('dc', $g) || ($g['t'] ?? 0) > time() - 86400)) { return $g; } }
   $g = ['cc' => '', 'c' => '', 'ci' => '', 'rg' => '', 't' => time()];
   $get = function ($url) { if (!function_exists('curl_init')) { $c = @file_get_contents($url, false, stream_context_create(['http' => ['timeout' => 3]])); return $c ?: ''; } $ch = curl_init($url); curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 3, CURLOPT_CONNECTTIMEOUT => 2, CURLOPT_USERAGENT => 'NofA-site']); $c = curl_exec($ch); curl_close($ch); return is_string($c) ? $c : ''; };
-  $j = json_decode($get('https://ipwho.is/' . rawurlencode($ip) . '?fields=success,country,country_code,region,city'), true);
-  if (is_array($j) && !empty($j['success'])) { $g = ['cc' => (string) ($j['country_code'] ?? ''), 'c' => (string) ($j['country'] ?? ''), 'ci' => (string) ($j['city'] ?? ''), 'rg' => (string) ($j['region'] ?? ''), 't' => time()]; }
+  $j = json_decode($get('https://ipwho.is/' . rawurlencode($ip) . '?fields=success,country,country_code,region,city,connection'), true);
+  if (is_array($j) && !empty($j['success'])) { $org = trim((string) ($j['connection']['org'] ?? '') . ' ' . (string) ($j['connection']['isp'] ?? '')); $g = ['cc' => (string) ($j['country_code'] ?? ''), 'c' => (string) ($j['country'] ?? ''), 'ci' => (string) ($j['city'] ?? ''), 'rg' => (string) ($j['region'] ?? ''), 'org' => mb_substr($org, 0, 80), 'dc' => (int) (bool) preg_match('/amazon|aws|google cloud|google llc|microsoft|azure|digitalocean|ovh|hetzner|linode|akamai|m247|datacamp|leaseweb|choopa|vultr|contabo|scaleway|oracle|alibaba|tencent|hosting|server|cloud|data ?cent|colo|ionos|godaddy|hostinger|cdn77|quadranet|psychz|zenlayer|g-core|stark|clouvider|pulsant|iomart|ukfast|redstation|fasthosts/i', $org), 't' => time()]; }
   else { $j = json_decode($get('https://ipapi.co/' . rawurlencode($ip) . '/json/'), true); if (is_array($j) && empty($j['error'])) { $g = ['cc' => (string) ($j['country_code'] ?? ''), 'c' => (string) ($j['country_name'] ?? ''), 'ci' => (string) ($j['city'] ?? ''), 'rg' => (string) ($j['region'] ?? ''), 't' => time()]; } }
   kv_put($db, $hk, json_encode($g, JSON_UNESCAPED_UNICODE)); return $g;
+}
+function sec_log($db, $type, $alertAt = 0) { // security events by day for the agent; push alert to the owner when a burst happens
+  try { $tz = new DateTimeZone('America/Los_Angeles'); $d = (new DateTime('now', $tz))->format('Y-m-d'); $r = kv_get($db, '__sec'); $S = $r ? (json_decode($r['v'], true) ?: []) : [];
+    $S[$d][$type] = ($S[$d][$type] ?? 0) + 1; if (count($S) > 45) { ksort($S); $S = array_slice($S, -40, null, true); } kv_put($db, '__sec', json_encode($S));
+    if ($alertAt > 0) { $wk = '__secw|' . $type; $w = kv_get($db, $wk); $W = $w ? (json_decode($w['v'], true) ?: []) : []; $W = array_values(array_filter((array) ($W['t'] ?? []), function ($t) { return $t > time() - 900; })); $W[] = time(); $last = (int) (($w ? (json_decode($w['v'], true) ?: []) : [])['al'] ?? 0);
+      $al = $last; if (count($W) >= $alertAt && $last < time() - 3600) { $al = time(); $TT = ['admin_login_fail' => 'Ադմինի մուտքի անհաջող փորձեր', 'cust_login_fail' => 'Հաճախորդների մուտքի անհաջող փորձեր', 'submit_reject' => 'Կասկածելի տվյալների ուղարկում', 'agent_auth_fail' => 'Ագենտի բանալու սխալ փորձեր']; push_admin($db, '🛡 Անվտանգություն · ' . ($TT[$type] ?? $type), count($W) . ' փորձ վերջին 15 րոպեում։ Կայքը արգելափակել է դրանք. ստուգեք Ագենտ բաժինը։', 'Admin.dc.html#agent'); }
+      kv_put($db, $wk, json_encode(['t' => $W, 'al' => $al])); } } catch (Throwable $e) {}
 }
 // Warehouse → My Apri Work, done by the server itself whenever the stock keys change (no admin page needs to be open).
 // Same shape as the admin page's push: 11 fixed products, packs + loose pieces + pieces per pack.
@@ -179,10 +192,10 @@ switch ($a) {
   case 'login':
     $b = body(); $pw = (string) ($b['pw'] ?? '');
     $ip = substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64); $fk = '__alfail|' . $ip; $fr = kv_get($db, $fk); $fv = $fr ? (json_decode($fr['v'], true) ?: []) : [];
-    $fv = array_values(array_filter((array) $fv, function ($t) { return $t > now_ms() - 900000; })); if (count($fv) >= 8) { out(['ok' => false, 'err' => 'rate'], 429); }
+    $fv = array_values(array_filter((array) $fv, function ($t) { return $t > now_ms() - 900000; })); if (count($fv) >= 8) { sec_log($db, 'admin_login_blocked'); out(['ok' => false, 'err' => 'rate'], 429); }
     $apw = kv_get($db, '__adminpw'); $okpw = $pw !== '' && (password_verify($pw, (string) ($cfg['admin_hash'] ?? '')) || ($apw && password_verify($pw, (string) $apw['v'])));
     if ($okpw) { session_regenerate_id(true); $_SESSION['nofa_admin'] = 1; if ($fv) { kv_put($db, $fk, '[]'); } out(['ok' => true]); }
-    $fv[] = now_ms(); kv_put($db, $fk, json_encode($fv)); sleep(1); out(['ok' => false, 'err' => 'bad_password'], 401);
+    $fv[] = now_ms(); kv_put($db, $fk, json_encode($fv)); sec_log($db, 'admin_login_fail', 5); sleep(1); out(['ok' => false, 'err' => 'bad_password'], 401);
   case 'cpw_set': // customer: set or change the account password (needs the account token)
     $b = body(); $em = strtolower(trim((string) ($b['em'] ?? ''))); $tok = (string) ($b['tok'] ?? ''); $pw = (string) ($b['pw'] ?? '');
     if (!preg_match('/^[^@\s]+@[^@\s]+\.[^@\s]+$/', $em) || strlen($tok) < 16 || strlen($pw) < 8 || strlen($pw) > 200) { out(['ok' => false, 'err' => 'bad'], 400); }
@@ -225,7 +238,7 @@ switch ($a) {
     if (count($fv) >= 20) { out(['ok' => false, 'err' => 'rate'], 429); }
     $r = kv_get($db, '__cpw|' . $em); $rec = $r ? (json_decode($r['v'], true) ?: []) : [];
     if (!$rec) { $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $has = false; foreach ($A as $key => $x) { if (is_array($x) && strtolower((string) ($x['email'] ?? '')) === $em) { $has = true; } } if ($has) { out(['ok' => false, 'err' => 'nopw']); } }
-    if (!$rec || $pw === '' || !password_verify($pw, (string) ($rec['h'] ?? ''))) { $fv[] = now_ms(); kv_put($db, $fk, json_encode($fv)); sleep(1); out(['ok' => false, 'err' => 'bad'], 401); }
+    if (!$rec || $pw === '' || !password_verify($pw, (string) ($rec['h'] ?? ''))) { $fv[] = now_ms(); kv_put($db, $fk, json_encode($fv)); sec_log($db, 'cust_login_fail', 15); sleep(1); out(['ok' => false, 'err' => 'bad'], 401); }
     $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $mine = (array) ($rec['acc'] ?? []);
     foreach ($A as $key => $x) { if (is_array($x) && strtolower((string) ($x['email'] ?? '')) === $em) { $mine[strtolower((string) $key)] = $x; } }
     foreach ($mine as $key => $x) { $mine[$key]['tok'] = $rec['tok']; }
@@ -282,6 +295,7 @@ switch ($a) {
     $ref = strtolower(preg_replace('/[^A-Za-z0-9.-]/', '', (string) ($b['r'] ?? ''))); $ref = substr(preg_replace('/^www\./', '', $ref), 0, 60);
     $g = geo_ip($db, $ip); $tz = new DateTimeZone('America/Los_Angeles'); $now = new DateTime('now', $tz); $mk = '__stats|' . $now->format('Y-m'); $day = $now->format('j');
     $sr = kv_get($db, $mk); $st = $sr ? (json_decode($sr['v'], true) ?: []) : [];
+    if (!empty($g['dc'])) { $st['bots'] = ($st['bots'] ?? 0) + 1; $bo = mb_substr((string) ($g['org'] ?? '?'), 0, 40) . ' · ' . ($g['ci'] ?? ''); if (!isset($st['bo']) || !is_array($st['bo'])) { $st['bo'] = []; } $st['bo'][$bo] = ($st['bo'][$bo] ?? 0) + 1; if (count($st['bo']) > 60) { arsort($st['bo']); $st['bo'] = array_slice($st['bo'], 0, 50, true); } kv_put($db, $mk, json_encode($st, JSON_UNESCAPED_UNICODE)); out(['ok' => true]); }
     $inc = function (&$arr, $k, $n = 1) { if ($k === '' ) { $k = '?'; } $arr[$k] = ($arr[$k] ?? 0) + $n; };
     foreach (['d', 'cc', 'cn', 'ci', 'p', 'r', 'dv', 'lg', 'pu'] as $f) { if (!isset($st[$f]) || !is_array($st[$f])) { $st[$f] = []; } }
     $new = !empty($b['n']);
@@ -314,7 +328,7 @@ switch ($a) {
     out(['ok' => true]);
   case 'agent_feed': // site agent (key): read-only business + technical snapshot, customer personal data masked
   case 'agent_post': // site agent (key): add a report / proposal / question to the owner's agent thread
-    $AGH = '9cd31ccb3f827c86107a109ba384bd2ccf20f0b0980431d197c23c92266240bb'; $ak = (string) ($_SERVER['HTTP_X_AGENT_KEY'] ?? ($_GET['k'] ?? '')); if (strlen($ak) < 20 || !hash_equals($AGH, hash('sha256', $ak))) { usleep(400000); out(['ok' => false, 'err' => 'auth'], 401); }
+    $AGH = '9cd31ccb3f827c86107a109ba384bd2ccf20f0b0980431d197c23c92266240bb'; $ak = (string) ($_SERVER['HTTP_X_AGENT_KEY'] ?? ($_GET['k'] ?? '')); if (strlen($ak) < 20 || !hash_equals($AGH, hash('sha256', $ak))) { sec_log($db, 'agent_auth_fail', 10); usleep(400000); out(['ok' => false, 'err' => 'auth'], 401); }
     $J = function ($k, $d) use ($db) { $r = kv_get($db, $k); return $r ? (json_decode($r['v'], true) ?? $d) : $d; };
     if ($a === 'agent_post') { $b = body(); $T = $J('__agent_thread', []); $n = 0;
       foreach (array_slice((array) ($b['msgs'] ?? [$b]), 0, 20) as $m) { $ty = in_array(($m['type'] ?? ''), ['report', 'proposal', 'question', 'done', 'alert'], true) ? $m['type'] : 'report'; $ttl = mb_substr(trim((string) ($m['title'] ?? '')), 0, 160); $bd = mb_substr(trim((string) ($m['body'] ?? '')), 0, 8000); if ($ttl === '' && $bd === '') { continue; }
@@ -338,7 +352,7 @@ switch ($a) {
       'visitors' => [$m1 => $J('__stats|' . $m1, null), $m0 => $J('__stats|' . $m0, null)], 'ux' => [$m1 => $J('__ux|' . $m1, null), $m0 => $J('__ux|' . $m0, null)], 'js_errors' => array_values($J('__jserr', [])),
       'retail_orders' => $ret, 'wholesale_orders' => $ws, 'invoices' => $inv, 'payments' => $pays, 'zelle_claims' => $zl,
       'stock' => ['names' => $names, 'packs' => $J('noa-stock', null), 'pcs' => $J('noa-stock-pcs', null), 'soldout' => $J('noa-soldout', null), 'lots' => array_slice((array) $J('noa-apri-lots', []), -40)],
-      'prices' => array_map(function ($p) { return ['id' => $p['id'] ?? '', 'pr' => $p['pr'] ?? null]; }, (array) ($J('noa-cost-v2', [])['prod'] ?? [])), 'accounts' => $acc,
+      'prices' => array_map(function ($p) { return ['id' => $p['id'] ?? '', 'pr' => $p['pr'] ?? null]; }, (array) ($J('noa-cost-v2', [])['prod'] ?? [])), 'accounts' => $acc, 'security' => $J('__sec', []),
       'agent_thread' => array_slice((array) $T, -60)], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR); exit;
     } catch (Throwable $e) { out(['ok' => false, 'err' => 'feed', 'msg' => $e->getMessage(), 'line' => $e->getLine()], 500); }
   case 'agent_list': // admin: the agent thread
@@ -396,10 +410,12 @@ switch ($a) {
     $ins = $db->prepare((nofa_is_sqlite() ? 'INSERT OR IGNORE' : 'INSERT IGNORE') . ' INTO nofa_inbox (kind, em, h, data, ip, t) VALUES (?, ?, ?, ?, ?, ?)');
     $n = 0; $ev = [];
     foreach (array_slice($items, 0, 40) as $it) {
+      $kk0 = (string) ($it['k'] ?? ''); if (!preg_match($em !== '' ? '/^noa-(accounts|orders|(ws-orders|chat|members|deposit|depsign|rewards)\|.+)$/' : '/^noa-orders$/', $kk0)) { $GLOBALS['__secrej'] = ($GLOBALS['__secrej'] ?? 0) + 1; continue; }
       $kind = substr((string) ($it['kind'] ?? 'key'), 0, 20); $data = json_encode(['k' => $it['k'] ?? '', 'v' => $it['v'] ?? null, 'tok' => $tok], JSON_UNESCAPED_UNICODE);
       if (strlen($data) > 400000) { continue; }
       $ins->execute([$kind, $em, hash('sha256', $em . '|' . $data), $data, $ip, now_ms()]); if ($ins->rowCount() > 0) { $n++; $kk = (string) ($it['k'] ?? ''); if (preg_match('/^noa-(ws-orders|chat|accounts|orders|city-req|deposit|depsign|rewards)/', $kk, $mm)) { $ev[$mm[1]] = 1; } }
     }
+    if (!empty($GLOBALS['__secrej'])) { sec_log($db, 'submit_reject', 3); }
     if (!empty($ev)) { $TT = ['ws-orders' => ['🏪 Մեծածախ պատվեր', 'Նոր կամ թարմացված մեծածախ պատվեր'], 'orders' => ['🛒 Նոր պատվեր', 'Նոր մանրածախ պատվեր'], 'chat' => ['💬 Նոր նամակ', 'Հաճախորդը գրել է ձեզ'], 'accounts' => ['👤 Նոր գրանցում', 'Նոր կամ թարմացված հաճախորդի հաշիվ'], 'city-req' => ['📍 Նոր քաղաքի հայտ', 'Հաճախորդը առաջարկել է քաղաք'], 'deposit' => ['🤝 Դեպոզիտ', 'Դեպոզիտի թարմացում'], 'depsign' => ['✍️ Ստորագրություն', 'Խանութը ստորագրել է'], 'rewards' => ['🎁 Անվճար տուփի հայտ', 'Հաճախորդը ընտրել է անվճար տուփ']];
       $lk = json_decode((kv_get($db, '__pushlast') ?: ['v' => '{}'])['v'], true) ?: []; foreach (array_keys($ev) as $e1) { if (now_ms() - (int) ($lk[$e1 . '|' . $em] ?? 0) < 60000) { continue; } $lk[$e1 . '|' . $em] = now_ms(); push_admin($db, $TT[$e1][0], $TT[$e1][1] . ($em !== '' ? ' · ' . $em : '')); } kv_put($db, '__pushlast', json_encode($lk)); }
     out(['ok' => true, 'n' => $n]);

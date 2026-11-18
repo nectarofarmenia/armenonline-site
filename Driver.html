@@ -101,7 +101,7 @@ button{width:100%;min-height:50px;border:0;border-radius:999px;background:linear
   function acctTokOk(A, key, tok) { var r = A[key]; return !r || !r.tok || r.tok === tok; }
   function adminInbox() {
     return req("inbox").then(function (j) { if (!j.ok || !j.items.length) { return 0; } var ids = [], n = 0;
-      j.items.forEach(function (it) { ids.push(it.id); var d = {}; try { d = JSON.parse(it.data); } catch (e) { return; } var k = String(d.k || ""), v = d.v, em = String(it.em || "").toLowerCase(); if (!SHARED.test(k)) { return; }
+      j.items.forEach(function (it) { ids.push(it.id); var d = {}; try { d = JSON.parse(it.data); } catch (e) { return; } var k = String(d.k || ""), v = d.v, em = String(it.em || "").toLowerCase(); if (!SHARED.test(k)) { return; } if (!(em ? /^noa-(accounts|orders|(ws-orders|chat|members|deposit|depsign|rewards)\|.+)$/ : /^noa-orders$/).test(k)) { return; }
         var inc; try { inc = typeof v === "string" ? JSON.parse(v) : v; } catch (e) { return; }
         if (k === "noa-accounts") { var A = J("noa-accounts", {}); Object.keys(inc || {}).forEach(function (key) { var rec = inc[key]; if (!rec || String(rec.email || "").toLowerCase() !== em || key.indexOf(em + "|") !== 0) { return; } if (!acctTokOk(A, key, d.tok)) { return; } var old = A[key]; A[key] = Object.assign({}, old || {}, rec); if (old && old.status) { A[key].status = old.status; } if (old && old.tok) { A[key].tok = old.tok; } n++; }); LS("noa-accounts", JSON.stringify(A)); return; }
         var A2 = J("noa-accounts", {}); if (em && !acctTokOk(A2, em + "|biz", d.tok) && !acctTokOk(A2, em + "|retail", d.tok)) { return; }
