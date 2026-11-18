@@ -999,5 +999,6 @@ var sp=document.createElement('div');sp.className='nofa-sp';sp.style.cssText='di
 function upd(){tk=false;var h2=document.querySelector('header.raise-header');if(h2&&h2!==h){h=h2;on=false;h.parentNode.insertBefore(sp,h)}var mob=window.innerWidth<=760,H=h.offsetHeight,t=sp.getBoundingClientRect().top;var want=mob&&t<-H;if(want===on)return;on=want;if(on){sp.style.height=H+'px';h.classList.add('nofa-fixed')}else{h.classList.remove('nofa-fixed');sp.style.height='0'}}
 window.addEventListener('scroll',function(){if(!tk){tk=true;requestAnimationFrame(upd)}},{passive:true});window.addEventListener('resize',upd);upd()}
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){setTimeout(go,300)})}else{setTimeout(go,300)}})();</script>
+<style id="nofa-acct-clean">@media(max-width:760px){html body .nt-mu,html body .ap-dock{display:none !important}html body .of-tab{left:12px !important;right:auto !important;transform:none !important;bottom:calc(env(safe-area-inset-bottom,0px) + 14px) !important;min-height:38px !important;height:38px !important;padding:0 14px !important;font-size:13px !important}}</style>
 </body>
 </html>
