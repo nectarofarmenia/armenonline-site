@@ -26,6 +26,7 @@ if (!kv_get($db, '__mig_pel3')) { $cr = kv_get($db, 'noa-cost-v2'); $cv = $cr ? 
   if (is_array($cv) && isset($cv['prod']) && is_array($cv['prod'])) { foreach ($cv['prod'] as &$pp) { if (($pp['id'] ?? '') === 'pelmeni') { if (!isset($pp['pr']) || !is_array($pp['pr'])) { $pp['pr'] = [0, 0, 0, 0]; } $pp['pr'][0] = 32; $pp['pr'][2] = 24; } } unset($pp); $cv['prPel2'] = 1; $cv['prPel3'] = 1; kv_put($db, 'noa-cost-v2', json_encode($cv, JSON_UNESCAPED_UNICODE)); }
   kv_put($db, '__mig_pel3', '1'); }
 
+if (!kv_get($db, '__acc_bump1')) { kv_put($db, '__acc_bump1', '1'); $r9 = kv_get($db, 'noa-accounts'); if ($r9) { kv_put($db, 'noa-accounts', $r9['v']); } }
 if (!kv_get($db, '__acc_gone')) { kv_put($db, '__acc_gone', json_encode(['gary-s-mom-s-bakery.pending@nectarofarmenia.com|biz'])); }
 if (kv_get($db, '__mig_stores2') && !kv_get($db, '__mig_gary_em')) { kv_put($db, '__mig_gary_em', '1'); try { cinvite_do($db, ['acc' => ['type' => 'biz', 'biz' => "Gary's Mom's Bakery", 'email' => 'garysmomsbakery@gmail.com'], 'importName' => "Gary's Mom's Bakery"], $https); } catch (Throwable $e) {} }
 if (kv_get($db, '__mig_stores1') && !kv_get($db, '__mig_stores2')) { kv_put($db, '__mig_stores2', '1'); try { foreach (['gary-s-mom-s-bakery', 'voskevaz-market'] as $sl2) { $k2 = 'noa-ws-orders|' . $sl2 . '.pending@nectarofarmenia.com'; $L2 = json_decode((kv_get($db, $k2) ?: ['v' => '[]'])['v'], true) ?: []; $L2 = array_values(array_filter($L2, function ($o) { return !(is_array($o) && !empty($o['imported'])); })); kv_put($db, $k2, json_encode($L2, JSON_UNESCAPED_UNICODE)); }
@@ -514,16 +515,16 @@ switch ($a) {
     out(['ok' => true, 'kv' => $res, 'now' => $mx, 'count' => $n]);
   case 'put': // admin: save keys
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
-    $b = body(); $done = [];
+    $b = body(); $done = []; $merged = [];
     foreach (($b['items'] ?? []) as $it) {
       $k = (string) ($it['k'] ?? ''); if (!preg_match($SHARED, $k)) { continue; }
       $v = $it['v'] ?? null;
       if (!empty($it['backup'])) { $old = kv_get($db, $k); if ($old && $old['v'] !== $v) { $s = $db->prepare('INSERT INTO nofa_backup (k, v, t) VALUES (?, ?, ?)'); $s->execute([$k, $old['v'], now_ms()]); } }
       if ($v === null) { $db->prepare('DELETE FROM nofa_kv WHERE k = ?')->execute([$k]); $done[$k] = now_ms(); }
-      else { if ($k === 'noa-accounts') { $v = acc_merge($db, (string) $v); } $done[$k] = kv_put($db, $k, (string) $v); }
+      else { $v0 = (string) $v; if ($k === 'noa-accounts') { $v = acc_merge($db, $v0); if ($v !== $v0) { $merged[$k] = $v; } } $done[$k] = kv_put($db, $k, (string) $v); }
     }
     if (array_intersect(array_keys($done), ['noa-stock', 'noa-stock-pcs', 'noa-cost-v2'])) { try { apri_stock_sync($db); } catch (Throwable $e) {} }
-    out(['ok' => true, 't' => $done]);
+    out(['ok' => true, 't' => $done, 'v' => $merged]);
   case 'inbox': // admin: read customer submissions
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $rows = $db->query('SELECT id, kind, em, data, t FROM nofa_inbox ORDER BY id ASC LIMIT 300')->fetchAll(PDO::FETCH_ASSOC);

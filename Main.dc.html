@@ -123,7 +123,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
     Object.keys(m).forEach(function (k) { if (k.indexOf("__") !== 0 && SHARED.test(k) && LG(k) == null && m[k].h) { items.push({ k: k, v: null }); } });
     if (!items.length) { return Promise.resolve(); }
     busy = true;
-    return req("put", { items: items }).then(function (r) { var m2 = meta(); items.forEach(function (it) { if (r.t && r.t[it.k]) { if (it.v === null) { delete m2[it.k]; } else { m2[it.k] = { h: h(it.v), t: r.t[it.k] }; } m2.__t = Math.max(m2.__t || 0, r.t[it.k]); } }); setMeta(m2); }).finally(function () { busy = false; });
+    return req("put", { items: items }).then(function (r) { var m2 = meta(); items.forEach(function (it) { if (r.t && r.t[it.k]) { if (it.v === null) { delete m2[it.k]; } else { if (r.v && r.v[it.k] != null) { LS(it.k, r.v[it.k]); m2[it.k] = { h: h(r.v[it.k]), t: r.t[it.k] }; window.__nofaNeedReload = true; } else { m2[it.k] = { h: h(it.v), t: r.t[it.k] }; } } m2.__t = Math.max(m2.__t || 0, r.t[it.k]); } }); setMeta(m2); }).finally(function () { busy = false; });
   }
   function acctTokOk(A, key, tok) { var r = A[key]; return !r || !r.tok || r.tok === tok; }
   function adminInbox() {
