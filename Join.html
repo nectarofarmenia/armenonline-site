@@ -381,4 +381,20 @@ render();
     try { if (navigator.sendBeacon) { navigator.sendBeacon("api/api.php?a=ux", new Blob([b], { type: "application/json" })); } else { fetch("api/api.php?a=ux", { method: "POST", body: b, keepalive: true }); } } catch (x) {} }
   document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") { send(); } }); window.addEventListener("pagehide", send);
 } catch (e) {} })();</script>
+<style id="nofa-motion">
+/* smooth page changes: pages cross-fade (Chrome, Safari 18.2+), admin tabs ease in ~240 ms (NN/g & Material range) */
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.24s;animation-timing-function:cubic-bezier(.4,0,.2,1)}
+@keyframes nofaIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+main.nofa-in>*{animation:nofaIn .24s cubic-bezier(0,0,.2,1) both}main.nofa-in>*:nth-child(2){animation-delay:.04s}main.nofa-in>*:nth-child(n+3){animation-delay:.08s}
+@media (prefers-reduced-motion:reduce){main.nofa-in>*{animation:none!important}::view-transition-old(root),::view-transition-new(root){animation:none!important}}
+</style>
+<script id="nofa-motion-js">
+(function () { var last = null; function tab() { try { var s = window.history.state; return s && s.nofaTab != null ? s.nofaTab + "|" + (s.profKey || "") : null; } catch (e) { return null; } }
+  function anim() { var k = tab(); if (k === last) { return; } var first = last === null; last = k; if (first) { return; }
+    setTimeout(function () { var m = document.querySelector("main"); if (!m) { return; } m.classList.remove("nofa-in"); void m.offsetWidth; m.classList.add("nofa-in"); clearTimeout(anim.t); anim.t = setTimeout(function () { m.classList.remove("nofa-in"); }, 420); }, 0); }
+  ["pushState", "replaceState"].forEach(function (f) { var o = window.history[f]; window.history[f] = function () { var r = o.apply(this, arguments); anim(); return r; }; });
+  window.addEventListener("popstate", anim); last = tab();
+})();
+</script>
 </body></html>
