@@ -26,6 +26,10 @@ if (!kv_get($db, '__mig_pel3')) { $cr = kv_get($db, 'noa-cost-v2'); $cv = $cr ? 
   if (is_array($cv) && isset($cv['prod']) && is_array($cv['prod'])) { foreach ($cv['prod'] as &$pp) { if (($pp['id'] ?? '') === 'pelmeni') { if (!isset($pp['pr']) || !is_array($pp['pr'])) { $pp['pr'] = [0, 0, 0, 0]; } $pp['pr'][0] = 32; $pp['pr'][2] = 24; } } unset($pp); $cv['prPel2'] = 1; $cv['prPel3'] = 1; kv_put($db, 'noa-cost-v2', json_encode($cv, JSON_UNESCAPED_UNICODE)); }
   kv_put($db, '__mig_pel3', '1'); }
 
+if (!kv_get($db, '__mig_stores1')) { kv_put($db, '__mig_stores1', '1'); try { $cv9 = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: [];
+  foreach (["Gary's Mom's Bakery", 'Voskevaz Market'] as $sn) { $slug = preg_replace('/[^a-z0-9]+/', '-', strtolower($sn)); $slug = trim($slug, '-'); $ph = ''; $ad = ''; $ci = '';
+    foreach ((array) ($cv9['calls'] ?? []) as $c9) { if (is_array($c9) && ($c9['type'] ?? '') === 'w' && preg_replace('/[^a-z0-9]/', '', strtolower((string) ($c9['name'] ?? ''))) === preg_replace('/[^a-z0-9]/', '', strtolower($sn))) { if ($ph === '' && !empty($c9['phone'])) { $ph = (string) $c9['phone']; } if ($ad === '' && !empty($c9['addr'])) { $ad = (string) $c9['addr']; } if ($ci === '' && !empty($c9['city'])) { $ci = (string) $c9['city']; } } }
+    cinvite_do($db, ['acc' => ['type' => 'biz', 'biz' => $sn, 'email' => $slug . '.pending@nectarofarmenia.com', 'phone' => $ph, 'addr' => $ad, 'city' => $ci ?: 'Glendale', 'note' => 'Ստեղծված առանց email-ի · հրավիրելու համար գրեք խանութի email-ը'], 'importName' => $sn, 'noEmail' => 1], $https); } } catch (Throwable $e) {} }
 $SHARED = '/^noa-(accounts|orders|ws-orders(\|.*)?|chat(\|.*)?|cost-v2|inv2|invites(\|.*)?|drivers|paycfg|admin-ov|stock|stock-full|stock-pcs|soldout|apri-lots|prod|theme-sel|theme-dates|notify|cities|city-req|members\|.*|deposit\|.*|depsign\|.*|rewards\|.*|refs|geo|invoices|dlv)$/';
 $PUBLIC = ['noa-theme-sel', 'noa-theme-dates', 'noa-stock', 'noa-stock-pcs', 'noa-stock-full', 'noa-soldout', 'noa-cities', 'noa-paycfg'];
 function kv_get($db, $k) { $s = $db->prepare('SELECT v, t FROM nofa_kv WHERE k = ?'); $s->execute([$k]); $r = $s->fetch(PDO::FETCH_ASSOC); return $r ?: null; }
@@ -94,6 +98,51 @@ function apri_watch($db, $force = false) {
   kv_put($db, '__apriw', json_encode($P, JSON_UNESCAPED_UNICODE));
   foreach (array_slice($out, 0, 8) as $x) { push_admin($db, $x[0], $x[1], $x[2]); }
   return ['n' => count($out), 'first' => $first];
+}
+function cinvite_do($db, $b, $https) {
+    $in = is_array($b['acc'] ?? null) ? $b['acc'] : []; $em = strtolower(trim((string) ($in['email'] ?? '')));
+    if (!filter_var($em, FILTER_VALIDATE_EMAIL)) { return ['ok' => false, 'err' => 'email', '_code' => 400]; }
+    $ty = ($in['type'] ?? '') === 'biz' ? 'biz' : 'retail'; if ($ty === 'biz' && trim((string) ($in['biz'] ?? '')) === '') { return ['ok' => false, 'err' => 'biz', '_code' => 400]; }
+    $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $key = $em . '|' . $ty; $rec = isset($A[$key]) && is_array($A[$key]) ? $A[$key] : [];
+    $impName0 = trim((string) ($b['importName'] ?? '')); $nrm0 = function ($x) { return preg_replace('/[^a-z0-9]/', '', mb_strtolower((string) $x)); };
+    if ($ty === 'biz' && empty($b['noEmail'])) { foreach ($A as $k0 => $r0) { if (!is_array($r0) || empty($r0['noEmail']) || $k0 === $key) { continue; } if (($impName0 !== '' && $nrm0($r0['importedFrom'] ?? '') === $nrm0($impName0)) || $nrm0($r0['biz'] ?? '') === $nrm0($in['biz'] ?? '')) { $old = (string) ($r0['email'] ?? '');
+        $rec = array_merge($r0, $rec); unset($rec['noEmail'], $rec['invitedAt']); $rec['email'] = $em; unset($A[$k0]);
+        $oo = json_decode((kv_get($db, 'noa-ws-orders|' . $old) ?: ['v' => '[]'])['v'], true) ?: []; $nn = json_decode((kv_get($db, 'noa-ws-orders|' . $em) ?: ['v' => '[]'])['v'], true) ?: []; $hv = []; foreach ($nn as $o1) { if (is_array($o1)) { $hv[(string) ($o1['no'] ?? '')] = 1; } } foreach ($oo as $o1) { if (is_array($o1) && empty($hv[(string) ($o1['no'] ?? '')])) { $nn[] = $o1; } }
+        if ($nn) { kv_put($db, 'noa-ws-orders|' . $em, json_encode($nn, JSON_UNESCAPED_UNICODE)); } kv_put($db, 'noa-ws-orders|' . $old, '[]');
+        $cv0 = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: []; $ch0 = false; foreach ((array) ($cv0['cprof'] ?? []) as $ck0 => $q0) { if (is_array($q0) && ($q0['em'] ?? '') === $old) { $cv0['cprof'][$ck0]['em'] = $em; $ch0 = true; } } if ($ch0) { kv_put($db, 'noa-cost-v2', json_encode($cv0, JSON_UNESCAPED_UNICODE)); }
+        $rec['movedFrom'] = $old; break; } } }
+    if (!empty($b['noEmail'])) { $rec['noEmail'] = 1; }
+    foreach (['first', 'last', 'contact', 'role', 'phone', 'biz', 'bizType', 'addr', 'city', 'zip', 'permit', 'ein', 'note'] as $f) { if (array_key_exists($f, $in) && trim((string) $in[$f]) !== '') { $rec[$f] = mb_substr(trim((string) $in[$f]), 0, 200); } }
+    $rec['type'] = $ty; $rec['email'] = $em; if (empty($rec['tok'])) { $rec['tok'] = bin2hex(random_bytes(16)); }
+    if (empty($rec['status']) || $rec['status'] === 'pending') { $rec['status'] = 'approved'; $rec['decidedAt'] = gmdate('c'); }
+    if (empty($rec['createdAt'])) { $rec['createdAt'] = gmdate('c'); $rec['via'] = 'admin'; $rec['byAdmin'] = 1; if ($ty === 'biz' && empty($rec['pid'])) { $usedP = []; foreach ($A as $x0) { if (is_array($x0) && !empty($x0['pid'])) { $usedP[(string) $x0['pid']] = 1; } } for ($pi0 = 0; $pi0 < 50; $pi0++) { $rec['pid'] = 'W-' . random_int(1100, 1899); if (empty($usedP[$rec['pid']])) { break; } } if (!empty($usedP[$rec['pid']])) { $rec['pid'] = 'W-' . random_int(1900, 9999); } } }
+    $has = (bool) kv_get($db, '__cpw|' . $em); $link = ''; $sent = false; $merr = '';
+    if (!$has && empty($b['noEmail'])) { $t = bin2hex(random_bytes(20)); kv_put($db, '__pwr|' . $t, json_encode(['em' => $em, 't' => now_ms(), 'inv' => 1]));
+      $host = ($https ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'nectarofarmenia.com'); $base = $host . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '/api/api.php')), '/'); $link = $base . '/Account.dc.html?reset=' . $t . '&inv=' . $ty;
+      $rec['invitedAt'] = gmdate('c');
+      if (!empty($b['send'])) { $m = mail_cfg($db); if (!empty($m['user']) && !empty($m['pass'])) { $hy = (($b['lang'] ?? 'hy') === 'hy'); $who = $ty === 'biz' ? (string) ($rec['biz'] ?? '') : trim(($rec['first'] ?? '') . ' ' . ($rec['last'] ?? ''));
+        $btn = '<p style="margin:22px 0 0"><a href="' . mail_esc($link) . '" style="display:inline-block;background:#EBA93A;color:#133B30;padding:14px 30px;border-radius:999px;text-decoration:none;font-weight:700;font-size:16px;border-bottom:3px solid #C98A1E">' . ($hy ? 'Ընտրել գաղտնաբառ և մուտք գործել →' : 'Choose a password and sign in →') . '</a></p>';
+        $inner = $hy ? '<p style="margin:0 0 12px;font-size:16px">Բարև' . ($who !== '' ? ' ' . mail_esc($who) : '') . ',</p><p style="margin:0 0 14px"><b>Nectar of Armenia</b>-ն ձեզ համար ստեղծել է ' . ($ty === 'biz' ? 'մեծածախ գործընկերոջ' : 'անձնական') . ' էջ։ Այնտեղ կտեսնեք ձեր բոլոր գնումները, հաշիվները և փաստաթղթերը, կարող եք նաև պատվիրել։</p><p style="margin:0">Սեղմեք կոճակը, ընտրեք ձեր գաղտնաբառը, և էջը կդառնա ձերը։ Հղումը գործում է 14 օր։</p>' . $btn . '<p style="font-size:12.5px;color:#7A817C;margin:18px 0 0">Հարցերի դեպքում զանգահարեք +1 (515) 588-5555։</p>'
+          : '<p style="margin:0 0 12px;font-size:16px">Hello' . ($who !== '' ? ' ' . mail_esc($who) : '') . ',</p><p style="margin:0 0 14px"><b>Nectar of Armenia</b> has created a ' . ($ty === 'biz' ? 'wholesale partner' : 'personal') . ' account for you. There you can see all your purchases, invoices and documents, and place orders.</p><p style="margin:0">Press the button, choose your password and the account is yours. The link works for 14 days.</p>' . $btn . '<p style="font-size:12.5px;color:#7A817C;margin:18px 0 0">Questions? Call +1 (515) 588-5555.</p>';
+        $sent = smtp_send($m, $em, $hy ? 'Ձեր էջը Nectar of Armenia-ում պատրաստ է' : 'Your Nectar of Armenia account is ready', mail_tpl($hy ? 'Բարի գալուստ 🌿' : 'Welcome 🌿', $inner, $hy ? 'hy' : 'en'), $merr); if ($sent) { $rec['invSentAt'] = gmdate('c'); } } else { $merr = 'nomail'; } } }
+    $imp = 0; $impName = trim((string) ($b['importName'] ?? ''));
+    if ($ty === 'biz' && $impName !== '') { // previous phone orders of this store (cost sheet) become the store's order history
+      $nrm = function ($x) { return preg_replace('/[^a-z0-9]/', '', mb_strtolower((string) $x)); }; $want = $nrm($impName);
+      $cv = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: []; $PR = (array) ($cv['prod'] ?? []);
+      $SI = ['gata' => 0, 'khash' => 1, 'khbroth' => 2, 'khset' => 3, 'khinkali' => 4, 'pelmeni' => 5, 'blinchik' => 6, 'kufta' => 7, 'kiev' => 8, 'chcut' => 9, 'beefcut' => 10];
+      $ok0 = 'noa-ws-orders|' . $em; $RO = json_decode((kv_get($db, $ok0) ?: ['v' => '[]'])['v'], true) ?: []; $have = []; foreach ($RO as $o0) { if (is_array($o0)) { $have[(string) ($o0['no'] ?? '')] = 1; } }
+      $cprofKey = null; foreach ((array) ($cv['cprof'] ?? []) as $ck => $q) { if (substr((string) $ck, -2) === '|w' && $nrm(substr((string) $ck, 0, -2)) === $want) { $cprofKey = $ck; } }
+      foreach ((array) ($cv['calls'] ?? []) as $c) { if (!is_array($c) || ($c['type'] ?? '') !== 'w' || $nrm($c['name'] ?? '') !== $want) { continue; }
+        $no = 'NofA-T-' . substr((string) ($c['id'] ?? ''), -5); if (isset($have[$no])) { continue; }
+        $items = []; $tot = 0; $allPcs = true; foreach ((array) ($c['lines'] ?? []) as $l) { $pr = $PR[(int) ($l[0] ?? -1)] ?? null; if (!is_array($pr)) { continue; } $pcs = ((int) ($l[1] ?? 0)) === 1; if (!$pcs) { $allPcs = false; } $q = (float) ($l[2] ?? 0); $u = isset($l[3]) && $l[3] !== null ? (float) $l[3] : (float) (($pr['pr'] ?? [])[2 + ($pcs ? 1 : 0)] ?? 0); $tot += $q * $u; $si = $SI[(string) ($pr['id'] ?? '')] ?? null; if ($si !== null) { $items[] = [$si, $q]; } }
+        if (!$items) { continue; } $d = (string) ($c['ddate'] ?? ($c['date'] ?? '')); $iso = preg_match('/^\d{4}-\d{2}-\d{2}/', $d) ? substr($d, 0, 10) . 'T12:00:00.000Z' : gmdate('c');
+        if (empty($rec['phone']) && !empty($c['phone'])) { $rec['phone'] = mb_substr((string) $c['phone'], 0, 40); } if (empty($rec['addr']) && !empty($c['addr'])) { $rec['addr'] = mb_substr((string) $c['addr'], 0, 160); }
+        $RO[] = ['no' => $no, 'date' => $iso, 'reqDate' => $iso, 'at' => $iso, 'items' => $items, 'pack' => $allPcs ? 'pcs' : 'pk', 'amt' => round($tot, 2), 'st' => !empty($c['past']) ? 2 : 1, 'ap' => 'approved', 'paid' => !empty($c['paid']), 'pm' => !empty($c['paid']) ? (string) ($c['pm'] ?? 'Paid') : 'Invoice', 'by' => 'Nectar of Armenia', 'imported' => 1, 'src' => 'phone']; $have[$no] = 1; $imp++; }
+      if ($imp) { usort($RO, function ($x, $y) { return strcmp((string) ($x['date'] ?? ''), (string) ($y['date'] ?? '')); }); kv_put($db, $ok0, json_encode($RO, JSON_UNESCAPED_UNICODE)); }
+      if ($cprofKey) { $cv['cprof'][$cprofKey]['em'] = $em; kv_put($db, 'noa-cost-v2', json_encode($cv, JSON_UNESCAPED_UNICODE)); }
+      $rec['importedFrom'] = $impName; }
+    $A[$key] = $rec; kv_put($db, 'noa-accounts', json_encode($A, JSON_UNESCAPED_UNICODE));
+    return ['ok' => true, 'key' => $key, 'acct' => $rec, 'imported' => $imp, 'has' => $has, 'link' => $link, 'sent' => $sent, 'merr' => $sent ? '' : (string) $merr];
 }
 // Customer account verification (email + type + token), used by account linking.
 function cust_rec($db, $em, $type, $tok) {
@@ -647,41 +696,7 @@ switch ($a) {
     out(['ok' => true, 'em' => $em, 'inv' => !empty($v['inv'])]);
   case 'cinvite': // admin: create (or update) a customer account from the owner's data and make a one-time invite link for the customer to take it over
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
-    $b = body(); $in = is_array($b['acc'] ?? null) ? $b['acc'] : []; $em = strtolower(trim((string) ($in['email'] ?? '')));
-    if (!filter_var($em, FILTER_VALIDATE_EMAIL)) { out(['ok' => false, 'err' => 'email'], 400); }
-    $ty = ($in['type'] ?? '') === 'biz' ? 'biz' : 'retail'; if ($ty === 'biz' && trim((string) ($in['biz'] ?? '')) === '') { out(['ok' => false, 'err' => 'biz'], 400); }
-    $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $key = $em . '|' . $ty; $rec = isset($A[$key]) && is_array($A[$key]) ? $A[$key] : [];
-    foreach (['first', 'last', 'contact', 'role', 'phone', 'biz', 'bizType', 'addr', 'city', 'zip', 'permit', 'ein', 'note'] as $f) { if (array_key_exists($f, $in) && trim((string) $in[$f]) !== '') { $rec[$f] = mb_substr(trim((string) $in[$f]), 0, 200); } }
-    $rec['type'] = $ty; $rec['email'] = $em; if (empty($rec['tok'])) { $rec['tok'] = bin2hex(random_bytes(16)); }
-    if (empty($rec['status']) || $rec['status'] === 'pending') { $rec['status'] = 'approved'; $rec['decidedAt'] = gmdate('c'); }
-    if (empty($rec['createdAt'])) { $rec['createdAt'] = gmdate('c'); $rec['via'] = 'admin'; $rec['byAdmin'] = 1; if ($ty === 'biz' && empty($rec['pid'])) { $usedP = []; foreach ($A as $x0) { if (is_array($x0) && !empty($x0['pid'])) { $usedP[(string) $x0['pid']] = 1; } } for ($pi0 = 0; $pi0 < 50; $pi0++) { $rec['pid'] = 'W-' . random_int(1100, 1899); if (empty($usedP[$rec['pid']])) { break; } } if (!empty($usedP[$rec['pid']])) { $rec['pid'] = 'W-' . random_int(1900, 9999); } } }
-    $has = (bool) kv_get($db, '__cpw|' . $em); $link = ''; $sent = false; $merr = '';
-    if (!$has) { $t = bin2hex(random_bytes(20)); kv_put($db, '__pwr|' . $t, json_encode(['em' => $em, 't' => now_ms(), 'inv' => 1]));
-      $host = ($https ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'nectarofarmenia.com'); $base = $host . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '/api/api.php')), '/'); $link = $base . '/Account.dc.html?reset=' . $t . '&inv=' . $ty;
-      $rec['invitedAt'] = gmdate('c');
-      if (!empty($b['send'])) { $m = mail_cfg($db); if (!empty($m['user']) && !empty($m['pass'])) { $hy = (($b['lang'] ?? 'hy') === 'hy'); $who = $ty === 'biz' ? (string) ($rec['biz'] ?? '') : trim(($rec['first'] ?? '') . ' ' . ($rec['last'] ?? ''));
-        $btn = '<p style="margin:22px 0 0"><a href="' . mail_esc($link) . '" style="display:inline-block;background:#EBA93A;color:#133B30;padding:14px 30px;border-radius:999px;text-decoration:none;font-weight:700;font-size:16px;border-bottom:3px solid #C98A1E">' . ($hy ? 'Ընտրել գաղտնաբառ և մուտք գործել →' : 'Choose a password and sign in →') . '</a></p>';
-        $inner = $hy ? '<p style="margin:0 0 12px;font-size:16px">Բարև' . ($who !== '' ? ' ' . mail_esc($who) : '') . ',</p><p style="margin:0 0 14px"><b>Nectar of Armenia</b>-ն ձեզ համար ստեղծել է ' . ($ty === 'biz' ? 'մեծածախ գործընկերոջ' : 'անձնական') . ' էջ։ Այնտեղ կտեսնեք ձեր բոլոր գնումները, հաշիվները և փաստաթղթերը, կարող եք նաև պատվիրել։</p><p style="margin:0">Սեղմեք կոճակը, ընտրեք ձեր գաղտնաբառը, և էջը կդառնա ձերը։ Հղումը գործում է 14 օր։</p>' . $btn . '<p style="font-size:12.5px;color:#7A817C;margin:18px 0 0">Հարցերի դեպքում զանգահարեք +1 (515) 588-5555։</p>'
-          : '<p style="margin:0 0 12px;font-size:16px">Hello' . ($who !== '' ? ' ' . mail_esc($who) : '') . ',</p><p style="margin:0 0 14px"><b>Nectar of Armenia</b> has created a ' . ($ty === 'biz' ? 'wholesale partner' : 'personal') . ' account for you. There you can see all your purchases, invoices and documents, and place orders.</p><p style="margin:0">Press the button, choose your password and the account is yours. The link works for 14 days.</p>' . $btn . '<p style="font-size:12.5px;color:#7A817C;margin:18px 0 0">Questions? Call +1 (515) 588-5555.</p>';
-        $sent = smtp_send($m, $em, $hy ? 'Ձեր էջը Nectar of Armenia-ում պատրաստ է' : 'Your Nectar of Armenia account is ready', mail_tpl($hy ? 'Բարի գալուստ 🌿' : 'Welcome 🌿', $inner, $hy ? 'hy' : 'en'), $merr); if ($sent) { $rec['invSentAt'] = gmdate('c'); } } else { $merr = 'nomail'; } } }
-    $imp = 0; $impName = trim((string) ($b['importName'] ?? ''));
-    if ($ty === 'biz' && $impName !== '') { // previous phone orders of this store (cost sheet) become the store's order history
-      $nrm = function ($x) { return preg_replace('/[^a-z0-9]/', '', mb_strtolower((string) $x)); }; $want = $nrm($impName);
-      $cv = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: []; $PR = (array) ($cv['prod'] ?? []);
-      $SI = ['gata' => 0, 'khash' => 1, 'khbroth' => 2, 'khset' => 3, 'khinkali' => 4, 'pelmeni' => 5, 'blinchik' => 6, 'kufta' => 7, 'kiev' => 8, 'chcut' => 9, 'beefcut' => 10];
-      $ok0 = 'noa-ws-orders|' . $em; $RO = json_decode((kv_get($db, $ok0) ?: ['v' => '[]'])['v'], true) ?: []; $have = []; foreach ($RO as $o0) { if (is_array($o0)) { $have[(string) ($o0['no'] ?? '')] = 1; } }
-      $cprofKey = null; foreach ((array) ($cv['cprof'] ?? []) as $ck => $q) { if (substr((string) $ck, -2) === '|w' && $nrm(substr((string) $ck, 0, -2)) === $want) { $cprofKey = $ck; } }
-      foreach ((array) ($cv['calls'] ?? []) as $c) { if (!is_array($c) || ($c['type'] ?? '') !== 'w' || $nrm($c['name'] ?? '') !== $want) { continue; }
-        $no = 'NofA-T-' . substr((string) ($c['id'] ?? ''), -5); if (isset($have[$no])) { continue; }
-        $items = []; $tot = 0; $allPcs = true; foreach ((array) ($c['lines'] ?? []) as $l) { $pr = $PR[(int) ($l[0] ?? -1)] ?? null; if (!is_array($pr)) { continue; } $pcs = ((int) ($l[1] ?? 0)) === 1; if (!$pcs) { $allPcs = false; } $q = (float) ($l[2] ?? 0); $u = isset($l[3]) && $l[3] !== null ? (float) $l[3] : (float) (($pr['pr'] ?? [])[2 + ($pcs ? 1 : 0)] ?? 0); $tot += $q * $u; $si = $SI[(string) ($pr['id'] ?? '')] ?? null; if ($si !== null) { $items[] = [$si, $q]; } }
-        if (!$items) { continue; } $d = (string) ($c['ddate'] ?? ($c['date'] ?? '')); $iso = preg_match('/^\d{4}-\d{2}-\d{2}/', $d) ? substr($d, 0, 10) . 'T12:00:00.000Z' : gmdate('c');
-        if (empty($rec['phone']) && !empty($c['phone'])) { $rec['phone'] = mb_substr((string) $c['phone'], 0, 40); } if (empty($rec['addr']) && !empty($c['addr'])) { $rec['addr'] = mb_substr((string) $c['addr'], 0, 160); }
-        $RO[] = ['no' => $no, 'date' => $iso, 'reqDate' => $iso, 'at' => $iso, 'items' => $items, 'pack' => $allPcs ? 'pcs' : 'pk', 'amt' => round($tot, 2), 'st' => !empty($c['past']) ? 2 : 1, 'ap' => 'approved', 'paid' => !empty($c['paid']), 'pm' => !empty($c['paid']) ? (string) ($c['pm'] ?? 'Paid') : 'Invoice', 'by' => 'Nectar of Armenia', 'imported' => 1, 'src' => 'phone']; $have[$no] = 1; $imp++; }
-      if ($imp) { usort($RO, function ($x, $y) { return strcmp((string) ($x['date'] ?? ''), (string) ($y['date'] ?? '')); }); kv_put($db, $ok0, json_encode($RO, JSON_UNESCAPED_UNICODE)); }
-      if ($cprofKey) { $cv['cprof'][$cprofKey]['em'] = $em; kv_put($db, 'noa-cost-v2', json_encode($cv, JSON_UNESCAPED_UNICODE)); }
-      $rec['importedFrom'] = $impName; }
-    $A[$key] = $rec; kv_put($db, 'noa-accounts', json_encode($A, JSON_UNESCAPED_UNICODE));
-    out(['ok' => true, 'key' => $key, 'acct' => $rec, 'imported' => $imp, 'has' => $has, 'link' => $link, 'sent' => $sent, 'merr' => $sent ? '' : (string) $merr]);
+    $r0 = cinvite_do($db, body(), $https); $c0 = (int) ($r0['_code'] ?? 200); unset($r0['_code']); out($r0, $c0);
   case 'pay_inv': // wholesale customer: pay an invoice balance by card; amount computed here from the stored invoice
     $sk = stripe_sk($db); if ($sk === '') { out(['ok' => false, 'err' => 'off']); }
     $b = body(); $me = cust_rec($db, $b['em'] ?? '', 'biz', $b['tok'] ?? ''); if (!$me) { $me = cust_rec($db, $b['em'] ?? '', 'retail', $b['tok'] ?? ''); } if (!$me) { out(['ok' => false, 'err' => 'auth'], 401); }
