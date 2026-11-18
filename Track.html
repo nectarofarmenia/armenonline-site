@@ -150,5 +150,20 @@ h1{margin:2px 0 0;font-family:Fraunces,"Noto Serif Armenian",serif;font-weight:6
     else { el.style.transition = "transform .2s,opacity .2s"; set(0); setTimeout(function () { el.style.transition = ""; }, 220); } pull = 0; }, { passive: true });
 })();
 </script>
+<script id="nofa-ux">(function () { try {
+  if (window.__nofaUx || /(Admin\.dc|Cost|Invoices|Map|Driver|Invite)\.html$/i.test(location.pathname) || window.top !== window) { return; } window.__nofaUx = 1;
+  var C = [], RG = [], E = [], sd = 0, last = { k: "", t: 0, n: 0 }, sent = false, t0 = Date.now();
+  function lbl(el) { var x = el.closest && el.closest("button,a,[role=button],summary,label,input[type=checkbox],select,.wa-nav,.doc-row,.co-b"); if (!x) { return ""; } var s = (x.getAttribute("aria-label") || x.innerText || x.value || x.getAttribute("title") || "").replace(/\s+/g, " ").trim(); if (!s && x.tagName === "A") { s = "link:" + (x.getAttribute("href") || "").slice(0, 40); } return s.slice(0, 50); }
+  document.addEventListener("click", function (e) { var k = lbl(e.target); var now = Date.now(); if (!k) { k = "(not clickable) " + ((e.target.innerText || e.target.tagName || "").replace(/\s+/g, " ").trim().slice(0, 30)); }
+    if (k === last.k && now - last.t < 900) { last.n++; if (last.n === 3) { RG.push(k); } } else { last = { k: k, t: now, n: 1 }; } last.t = now; if (C.length < 30) { C.push(k); } }, true);
+  window.addEventListener("scroll", function () { var h = document.documentElement.scrollHeight - innerHeight; if (h > 0) { sd = Math.max(sd, Math.round(scrollY / h * 100)); } }, { passive: true });
+  window.addEventListener("error", function (e) { if (E.length < 5 && e && e.message) { E.push({ m: String(e.message).slice(0, 200), s: String(e.filename || "").split("/").pop() + ":" + (e.lineno || "") }); } });
+  window.addEventListener("unhandledrejection", function (e) { if (E.length < 5) { var r = e && e.reason; E.push({ m: "promise: " + String(r && r.message || r || "").slice(0, 180), s: "" }); } });
+  function send() { if (sent) { return; } sent = true; var lt = 0; try { var n = performance.getEntriesByType("navigation")[0]; lt = n ? Math.round(n.loadEventEnd || n.domContentLoadedEventEnd || 0) : 0; } catch (x) {}
+    if (!C.length && !E.length && Date.now() - t0 < 3000) { return; }
+    var b = JSON.stringify({ p: location.pathname.split("/").pop() || "index.html", c: C, rg: RG, sd: sd, lt: lt, e: E, m: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 1 : 0 });
+    try { if (navigator.sendBeacon) { navigator.sendBeacon("api/api.php?a=ux", new Blob([b], { type: "application/json" })); } else { fetch("api/api.php?a=ux", { method: "POST", body: b, keepalive: true }); } } catch (x) {} }
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") { send(); } }); window.addEventListener("pagehide", send);
+} catch (e) {} })();</script>
 </body>
 </html>

@@ -294,6 +294,59 @@ switch ($a) {
     $inc($st['dv'], !empty($b['m']) ? 'm' : 'd'); $lg = preg_replace('/[^a-z]/', '', strtolower(substr((string) ($b['l'] ?? ''), 0, 2))); $inc($st['lg'], $lg ?: '?');
     foreach (['ci', 'r'] as $f) { if (count($st[$f]) > 400) { arsort($st[$f]); $st[$f] = array_slice($st[$f], 0, 300, true); } }
     kv_put($db, $mk, json_encode($st, JSON_UNESCAPED_UNICODE)); out(['ok' => true]);
+  case 'ux': // public: anonymous user-experience events (clicks, rage clicks, scroll depth, load time, JS errors) aggregated by month; no personal data
+    $ua = (string) ($_SERVER['HTTP_USER_AGENT'] ?? ''); if ($ua === '' || preg_match('/bot|crawl|spider|headless|lighthouse|python|curl|wget/i', $ua)) { out(['ok' => true]); }
+    $ip = substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64); $hk = '__uxr|' . substr(hash('sha256', $ip), 0, 16); $hr = kv_get($db, $hk); $hv = $hr ? (json_decode($hr['v'], true) ?: []) : [];
+    $hv = array_values(array_filter((array) $hv, function ($t) { return $t > time() - 3600; })); if (count($hv) >= 120) { out(['ok' => true]); } $hv[] = time(); kv_put($db, $hk, json_encode($hv));
+    $b = body(); $cl = function ($x, $n) { return mb_substr(trim(preg_replace('/\s+/u', ' ', (string) $x)), 0, $n); };
+    $pg = preg_replace('/[^A-Za-z0-9._-]/', '', (string) ($b['p'] ?? '')); $pg = substr($pg, 0, 40) ?: 'index.html'; if ($pg === 'Main.dc.html') { $pg = 'index.html'; }
+    $tz = new DateTimeZone('America/Los_Angeles'); $mk = '__ux|' . (new DateTime('now', $tz))->format('Y-m'); $ur = kv_get($db, $mk); $U = $ur ? (json_decode($ur['v'], true) ?: []) : [];
+    if (!isset($U[$pg]) || !is_array($U[$pg])) { $U[$pg] = ['n' => 0, 'c' => [], 'rage' => [], 'sd' => [0, 0, 0, 0], 'lt' => [0, 0, 0, 0], 'm' => 0]; } $P = &$U[$pg]; $P['n']++; if (!empty($b['m'])) { $P['m'] = ($P['m'] ?? 0) + 1; }
+    foreach (array_slice((array) ($b['c'] ?? []), 0, 30) as $c) { $k = $cl($c, 50); if ($k !== '') { $P['c'][$k] = ($P['c'][$k] ?? 0) + 1; } }
+    foreach (array_slice((array) ($b['rg'] ?? []), 0, 10) as $c) { $k = $cl($c, 50); if ($k !== '') { $P['rage'][$k] = ($P['rage'][$k] ?? 0) + 1; } }
+    $sd = (int) ($b['sd'] ?? 0); $P['sd'][$sd >= 90 ? 3 : ($sd >= 50 ? 2 : ($sd >= 25 ? 1 : 0))]++;
+    $lt = (int) ($b['lt'] ?? 0); if ($lt > 0) { $P['lt'][$lt < 1500 ? 0 : ($lt < 3000 ? 1 : ($lt < 6000 ? 2 : 3))]++; }
+    foreach (['c', 'rage'] as $f) { if (count($P[$f]) > 150) { arsort($P[$f]); $P[$f] = array_slice($P[$f], 0, 120, true); } }
+    unset($P); kv_put($db, $mk, json_encode($U, JSON_UNESCAPED_UNICODE));
+    $errs = array_slice((array) ($b['e'] ?? []), 0, 5); if ($errs) { $er = kv_get($db, '__jserr'); $E = $er ? (json_decode($er['v'], true) ?: []) : [];
+      foreach ($errs as $e0) { $msg = $cl(is_array($e0) ? ($e0['m'] ?? '') : $e0, 200); if ($msg === '') { continue; } $key = md5($pg . $msg); if (isset($E[$key])) { $E[$key]['n']++; $E[$key]['last'] = gmdate('c'); } else { $E[$key] = ['p' => $pg, 'm' => $msg, 's' => $cl(is_array($e0) ? ($e0['s'] ?? '') : '', 80), 'n' => 1, 'first' => gmdate('c'), 'last' => gmdate('c'), 'ua' => $cl($ua, 90)]; } }
+      if (count($E) > 200) { uasort($E, function ($x, $y) { return strcmp($y['last'], $x['last']); }); $E = array_slice($E, 0, 150, true); } kv_put($db, '__jserr', json_encode($E, JSON_UNESCAPED_UNICODE)); }
+    out(['ok' => true]);
+  case 'agent_feed': // site agent (key): read-only business + technical snapshot, customer personal data masked
+  case 'agent_post': // site agent (key): add a report / proposal / question to the owner's agent thread
+    $AGH = '9cd31ccb3f827c86107a109ba384bd2ccf20f0b0980431d197c23c92266240bb'; $ak = (string) ($_SERVER['HTTP_X_AGENT_KEY'] ?? ($_GET['k'] ?? '')); if (strlen($ak) < 20 || !hash_equals($AGH, hash('sha256', $ak))) { usleep(400000); out(['ok' => false, 'err' => 'auth'], 401); }
+    $J = function ($k, $d) use ($db) { $r = kv_get($db, $k); return $r ? (json_decode($r['v'], true) ?? $d) : $d; };
+    if ($a === 'agent_post') { $b = body(); $T = $J('__agent_thread', []); $n = 0;
+      foreach (array_slice((array) ($b['msgs'] ?? [$b]), 0, 20) as $m) { $ty = in_array(($m['type'] ?? ''), ['report', 'proposal', 'question', 'done', 'alert'], true) ? $m['type'] : 'report'; $ttl = mb_substr(trim((string) ($m['title'] ?? '')), 0, 160); $bd = mb_substr(trim((string) ($m['body'] ?? '')), 0, 8000); if ($ttl === '' && $bd === '') { continue; }
+        $id = 'a' . now_ms() . random_int(10, 99); $T[] = ['id' => $id, 'from' => 'agent', 'type' => $ty, 'title' => $ttl, 'body' => $bd, 'ref' => mb_substr((string) ($m['ref'] ?? ''), 0, 40), 'prio' => in_array(($m['prio'] ?? ''), ['high', 'med', 'low'], true) ? $m['prio'] : 'med', 'at' => gmdate('c'), 'st' => $ty === 'proposal' || $ty === 'question' ? 'open' : 'info']; $n++;
+        if ($ty === 'proposal' || $ty === 'question' || $ty === 'alert') { push_admin($db, ($ty === 'alert' ? '🚨 ' : ($ty === 'proposal' ? '💡 ' : '❓ ')) . 'Ագենտ · ' . $ttl, mb_substr($bd, 0, 140), 'Admin.dc.html#agent'); } }
+      if (count($T) > 400) { $T = array_slice($T, -400); } kv_put($db, '__agent_thread', json_encode($T, JSON_UNESCAPED_UNICODE)); out(['ok' => true, 'n' => $n]); }
+    $since = time() - 86400 * 62; $tz = new DateTimeZone('America/Los_Angeles'); $m0 = (new DateTime('now', $tz))->format('Y-m'); $m1 = (new DateTime('first day of last month', $tz))->format('Y-m');
+    $num = function ($x) { return (float) preg_replace('/[^0-9.\-]/', '', (string) $x); }; $ts = function ($o) { foreach (['at', 'd', 'created', 'createdAt', 'day', 'date'] as $f) { if (!empty($o[$f])) { $t = is_numeric($o[$f]) ? ((float) $o[$f] > 1e11 ? (float) $o[$f] / 1000 : (float) $o[$f]) : strtotime((string) $o[$f]); if ($t) { return (int) $t; } } } return 0; };
+    $ret = []; foreach ((array) $J('noa-orders', []) as $o) { if (!is_array($o)) { continue; } $t = $ts($o); if ($t && $t < $since) { continue; } $ret[] = ['no' => $o['no'] ?? '', 'when' => $t ? gmdate('Y-m-d', $t) : '', 'total' => $num($o['total'] ?? 0), 'st' => $o['st'] ?? ($o['status'] ?? ''), 'paid' => !empty($o['paid']) || !empty($o['paidAt']), 'pay' => $o['pay'] ?? ($o['pm'] ?? ''), 'city' => $o['city'] ?? '', 'items' => $o['items'] ?? ($o['lines'] ?? null), 'del' => $o['del'] ?? ($o['delivery'] ?? '')]; }
+    $ws = []; $q = $db->query("SELECT k, v FROM nofa_kv WHERE k LIKE 'noa-ws-orders|%'"); $ACC = $J('noa-accounts', []); $bizOf = function ($em) use ($ACC) { foreach ((array) $ACC as $k => $r) { if (is_array($r) && strtolower((string) ($r['email'] ?? '')) === $em && !empty($r['biz'])) { return $r['biz']; } } return 'store-' . substr(md5($em), 0, 6); };
+    foreach ($q->fetchAll(PDO::FETCH_ASSOC) as $r) { $em = strtolower(substr($r['k'], 14)); $biz = $bizOf($em); foreach ((array) (json_decode($r['v'], true) ?: []) as $o) { if (!is_array($o)) { continue; } $t = $ts($o); if ($t && $t < $since) { continue; } $ws[] = ['store' => $biz, 'no' => $o['no'] ?? '', 'when' => $t ? gmdate('Y-m-d', $t) : '', 'day' => $o['reqDate'] ?? '', 'amt' => $num($o['amt'] ?? 0), 'ap' => $o['ap'] ?? '', 'st' => $o['st'] ?? 0, 'paid' => !empty($o['paid']), 'payDue' => !empty($o['payDue']) || !empty($o['auto']), 'pm' => $o['pm'] ?? '', 'zelle' => !empty($o['zelleAt']), 'rush' => !empty($o['rush']), 'items' => $o['items'] ?? null]; } }
+    $inv = []; foreach ((array) $J('noa-inv2', []) as $iv) { if (!is_array($iv)) { continue; } $inv[] = ['no' => $iv['no'] ?? ($iv['id'] ?? ''), 'store' => $iv['c']['n'] ?? ($iv['c']['biz'] ?? ''), 'date' => $iv['d'] ?? ($iv['date'] ?? ''), 'total' => $num($iv['total'] ?? ($iv['t'] ?? 0)), 'paid' => $num($iv['paid'] ?? 0), 'st' => $iv['st'] ?? '']; } $inv = array_slice($inv, -150);
+    $pays = []; $q = $db->query("SELECT k, v, t FROM nofa_kv WHERE k LIKE '\\_\\_pay|%' ESCAPE '\\' ORDER BY t DESC LIMIT 80"); $PW = $J('__paidweb', []); foreach ($q->fetchAll(PDO::FETCH_ASSOC) as $r) { $v = json_decode($r['v'], true) ?: []; $ref = substr($r['k'], 6); $pays[] = ['ref' => $ref, 'amt' => $v['amt'] ?? 0, 'm' => $v['m'] ?? 'Card', 'when' => gmdate('Y-m-d H:i', (int) ($r['t'] / 1000)), 'paid' => !empty($PW[$ref])]; }
+    $zl = []; $q = $db->query("SELECT k, v FROM nofa_kv WHERE k LIKE '\\_\\_zelle|%' ESCAPE '\\'"); foreach ($q->fetchAll(PDO::FETCH_ASSOC) as $r) { $v = json_decode($r['v'], true) ?: []; $zl[] = ['orders' => substr($r['k'], 8), 'amt' => $v['amt'] ?? 0, 'from' => $v['from'] ?? '', 'when' => gmdate('Y-m-d H:i', (int) (($v['t'] ?? 0) / 1000))]; }
+    $prod = $J('noa-prod', []); $names = []; foreach ((array) $prod as $i => $p) { $names[$i] = is_array($p) ? ($p['n'] ?? ($p['name'] ?? ($p['en'] ?? ('#' . $i)))) : ('#' . $i); }
+    $acc = ['retail' => 0, 'biz' => 0, 'biz_pending' => 0, 'invited_not_joined' => 0]; foreach ((array) $ACC as $r) { if (!is_array($r)) { continue; } if (($r['type'] ?? '') === 'biz') { $acc['biz']++; if (($r['status'] ?? '') === 'pending') { $acc['biz_pending']++; } } else { $acc['retail']++; } if (!empty($r['invitedAt']) && empty($r['joinedAt'])) { $acc['invited_not_joined']++; } }
+    $T = $J('__agent_thread', []);
+    out(['ok' => true, 'now' => gmdate('c'), 'site' => ['php' => PHP_VERSION, 'kv' => (int) $db->query('SELECT COUNT(*) FROM nofa_kv')->fetchColumn()],
+      'visitors' => [$m1 => $J('__stats|' . $m1, null), $m0 => $J('__stats|' . $m0, null)], 'ux' => [$m1 => $J('__ux|' . $m1, null), $m0 => $J('__ux|' . $m0, null)], 'js_errors' => array_values($J('__jserr', [])),
+      'retail_orders' => $ret, 'wholesale_orders' => $ws, 'invoices' => $inv, 'payments' => $pays, 'zelle_claims' => $zl,
+      'stock' => ['names' => $names, 'packs' => $J('noa-stock', null), 'pcs' => $J('noa-stock-pcs', null), 'soldout' => $J('noa-soldout', null), 'lots' => array_slice((array) $J('noa-apri-lots', []), -40)],
+      'prices' => array_map(function ($p) { return ['id' => $p['id'] ?? '', 'pr' => $p['pr'] ?? null]; }, (array) ($J('noa-cost-v2', [])['prod'] ?? [])), 'accounts' => $acc,
+      'agent_thread' => array_slice((array) $T, -60)]);
+  case 'agent_list': // admin: the agent thread
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $r = kv_get($db, '__agent_thread'); out(['ok' => true, 'thread' => $r ? (json_decode($r['v'], true) ?: []) : []]);
+  case 'agent_reply': // admin: approve / reject / comment on an agent message, or write a new task
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $b = body(); $r = kv_get($db, '__agent_thread'); $T = $r ? (json_decode($r['v'], true) ?: []) : []; $txt = mb_substr(trim((string) ($b['text'] ?? '')), 0, 4000); $dec = in_array(($b['decision'] ?? ''), ['approve', 'reject', 'comment', 'task'], true) ? $b['decision'] : 'comment'; $to = (string) ($b['id'] ?? '');
+    if ($to !== '') { foreach ($T as &$m) { if (($m['id'] ?? '') === $to) { if ($dec === 'approve') { $m['st'] = 'approved'; } elseif ($dec === 'reject') { $m['st'] = 'rejected'; } $m['decAt'] = gmdate('c'); } } unset($m); }
+    if ($txt !== '' || $dec !== 'comment') { $T[] = ['id' => 'o' . now_ms() . random_int(10, 99), 'from' => 'owner', 'type' => $dec, 're' => $to, 'body' => $txt, 'at' => gmdate('c'), 'st' => $dec === 'task' ? 'open' : 'info']; }
+    if (count($T) > 400) { $T = array_slice($T, -400); } kv_put($db, '__agent_thread', json_encode($T, JSON_UNESCAPED_UNICODE)); out(['ok' => true, 'thread' => $T]);
   case 'stats': // admin: visitor statistics by month
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $q = $db->query("SELECT k, v FROM nofa_kv WHERE k LIKE '\\_\\_stats|%' ESCAPE '\\'"); $res = [];
