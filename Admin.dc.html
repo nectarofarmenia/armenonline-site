@@ -986,6 +986,7 @@ input,select,textarea{box-shadow:inset 0 2px 5px rgba(60,40,0,.16)}
 <sc-if value="{{tab18}}" hint-placeholder-val="{{false}}">
 <div style="display: flex; flex-direction: column; gap: 20px">
 <div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 6px"><h1 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; color: #1D5545; font-size: 28px">⚙️ {{setH}}</h1><p style="margin: 0; color: #5E6A63; line-height: 1.5">{{setP}}</p></div>
+<div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 10px"><h2 style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; color: #1D5545; font-size: 22px">🔔 Ծանուցումներ</h2><p style="margin: 0; color: #5E6A63; font-size: 14px; line-height: 1.5">Պատվերների, վճարումների, Chef Apri-ի արտադրության և ագենտների ծանուցումները այս սարքի էկրանին։ Միացրեք յուրաքանչյուր սարքում առանձին (iPhone-ում՝ տան էկրանին ավելացված «NofA Admin»-ից)։</p><div id="set-push-slot" style="display: flex; flex-direction: column"></div></div>
 <div class="card3d" style="border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
 <h2 data-seth="1" style="margin: 0; font-family: Fraunces, 'Noto Serif Armenian', Lora, serif; font-weight: 600; color: #1D5545; font-size: 22px">🏦 {{t.cfgH}}</h2>
 <p style="margin: 0; color: #5E6A63; font-size: 14px; line-height: 1.5">{{payNote}}</p>
@@ -2444,8 +2445,8 @@ aside.sum-card .as-ttl{background:#1D5545 !important;margin:-10px -10px 6px !imp
   var standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
   var ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
   function btn() {
-    var tt = document.querySelector(".as-ttl"); if (!tt || document.getElementById("nofa-pushbtn")) { return; }
-    var b = document.createElement("button"); b.id = "nofa-pushbtn"; b.type = "button"; b.style.cssText = "display:block;margin-top:8px;width:100%;border:1px solid rgba(235,169,58,.6);background:rgba(235,169,58,.12);color:#F6E3B4;border-radius:999px;padding:8px 10px;font:800 12.5px Manrope,sans-serif;cursor:pointer";
+    var tt = document.getElementById("set-push-slot"); if (!tt) { return; } var ex = document.getElementById("nofa-pushbtn"); if (ex) { if (ex.parentNode !== tt) { tt.appendChild(ex); } return; }
+    var b = document.createElement("button"); b.id = "nofa-pushbtn"; b.type = "button"; b.style.cssText = "display:inline-flex;align-items:center;justify-content:center;min-height:46px;max-width:100%;border:0;background:#1D5545;color:#FFFFFF;border-radius:999px;padding:10px 20px;font:800 14px Manrope,'Noto Sans Armenian',sans-serif;cursor:pointer;align-self:flex-start";
     var on = ok && Notification.permission === "granted";
     b.textContent = on ? "🔔 Ծանուցումները միացված են · փորձել" : "🔔 Միացնել ծանուցումները այս հեռախոսում";
     b.onclick = function () {
@@ -2460,7 +2461,7 @@ aside.sum-card .as-ttl{background:#1D5545 !important;margin:-10px -10px 6px !imp
     tt.appendChild(b);
   }
   function alert0(m) { var d = document.createElement("div"); d.style.cssText = "position:fixed;left:50%;top:20px;transform:translateX(-50%);z-index:2147483000;max-width:min(420px,92vw);background:#FFF4DA;color:#5A430C;border:1.5px solid #EBA93A;border-radius:16px;padding:14px 16px;font:700 14px/1.5 Manrope,'Noto Sans Armenian',sans-serif;white-space:pre-line;box-shadow:0 14px 34px rgba(0,0,0,.25)"; d.textContent = m; d.onclick = function () { d.remove(); }; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 12000); }
-  var n = 0, iv = setInterval(function () { btn(); if (++n > 30) { clearInterval(iv); } }, 1000);
+  setInterval(btn, 700);
 })();
 </script><script id="nofa-depsign-adm">
 (function () {
@@ -2613,7 +2614,7 @@ header.raise-header .nm-hb svg{width:26px;height:26px}
 <script id="nofa-agent-adm">(function () {
   function esc(x) { return String(x == null ? "" : x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function md(x) { return esc(x).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "<code>$1</code>").replace(/^\s*[-•] (.*)$/gm, "<li>$1</li>").replace(/<\/li>\n/g, "</li>").replace(/(<li>[\s\S]*<\/li>)/, "<ul>$1</ul>").replace(/\n/g, "<br>"); }
-  var css = "#ag-btn{position:fixed;left:16px;bottom:16px;z-index:2147480500;height:52px;padding:0 18px 0 14px;border-radius:999px;border:0;background:linear-gradient(180deg,#2C7A62,#1D5545);color:#F6E3B4;font:800 15px Manrope,'Noto Sans Armenian',sans-serif;box-shadow:0 10px 24px rgba(0,0,0,.3);cursor:pointer;display:flex;align-items:center;gap:8px;border:1.5px solid #EBA93A}#ag-btn .av{width:40px;height:40px;border-radius:999px;object-fit:cover;margin-left:-8px;border:1.5px solid #EBA93A;background:#1a0d06}#ag-ov .hav{width:58px;height:58px;border-radius:999px;object-fit:cover;border:2px solid #EBA93A;box-shadow:0 4px 14px rgba(0,0,0,.35);background:#1a0d06}#ag-ov .who{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;color:#5E4A1E}#ag-ov .who img{width:34px;height:34px;border-radius:999px;object-fit:cover;border:1.5px solid #EBA93A;background:#1a0d06}#ag-btn .n{min-width:22px;height:22px;border-radius:999px;background:#B03A2E;color:#fff;font-size:12px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}"
+  var css = "#ag-btn{position:fixed;left:16px;bottom:16px;z-index:2147480500;height:52px;padding:0 18px 0 14px;border-radius:999px;border:0;background:linear-gradient(180deg,#2C7A62,#1D5545);color:#F6E3B4;font:800 15px Manrope,'Noto Sans Armenian',sans-serif;box-shadow:0 10px 24px rgba(0,0,0,.3);cursor:pointer;display:flex;align-items:center;gap:8px;border:1.5px solid #EBA93A}#ag-btn.in-side{position:static;width:100%;margin-top:8px;height:48px;justify-content:center;box-shadow:0 4px 12px rgba(29,85,69,.25);z-index:auto}#ag-btn.in-side .av{margin-left:0;width:34px;height:34px}#ag-btn.in-side .t{display:inline !important}#ag-btn .av{width:40px;height:40px;border-radius:999px;object-fit:cover;margin-left:-8px;border:1.5px solid #EBA93A;background:#1a0d06}#ag-ov .hav{width:58px;height:58px;border-radius:999px;object-fit:cover;border:2px solid #EBA93A;box-shadow:0 4px 14px rgba(0,0,0,.35);background:#1a0d06}#ag-ov .who{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;color:#5E4A1E}#ag-ov .who img{width:34px;height:34px;border-radius:999px;object-fit:cover;border:1.5px solid #EBA93A;background:#1a0d06}#ag-btn .n{min-width:22px;height:22px;border-radius:999px;background:#B03A2E;color:#fff;font-size:12px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}"
     + "#ag-ov{position:fixed;inset:0;z-index:2147481200;background:rgba(10,30,24,.6);display:flex;justify-content:flex-end;font-family:Manrope,'Noto Sans Armenian',system-ui,sans-serif}#ag-ov .pn{width:min(720px,100%);height:100%;background:#F7F3EA;display:flex;flex-direction:column;box-shadow:-20px 0 50px rgba(0,0,0,.3)}"
     + "#ag-ov .hd{background:linear-gradient(180deg,#2C7A62,#1D5545);color:#F6E3B4;padding:16px 18px;display:flex;align-items:center;gap:12px}#ag-ov .hd h2{margin:0;flex:1;font:600 22px Fraunces,'Noto Serif Armenian',serif;color:#fff}#ag-ov .hd p{margin:2px 0 0;font-size:12.5px;color:#CFE2D9}#ag-ov .x{width:40px;height:40px;border-radius:999px;border:1.5px solid #EBA93A;background:transparent;color:#F6E3B4;font-size:18px;cursor:pointer}"
     + "#ag-ov .flt{display:flex;gap:6px;padding:10px 14px;background:#EFE9DC;flex-wrap:wrap}#ag-ov .flt button{min-height:36px;padding:0 14px;border-radius:999px;border:1.5px solid #D9CFB7;background:#fff;color:#1D5545;font:800 13px Manrope,'Noto Sans Armenian',sans-serif;cursor:pointer}#ag-ov .flt button.on{background:#1D5545;color:#F6E3B4;border-color:#1D5545}"
@@ -2654,7 +2655,10 @@ header.raise-header .nm-hb svg{width:26px;height:26px}
       if (k === "send") { var tx = o.querySelector("textarea").value.trim(); if (!tx) { return; } b.disabled = true; api("agent_reply", { id: reTo, decision: reTo ? "comment" : "task", text: tx }).then(function (j) { b.disabled = false; if (j && j.ok) { T = j.thread; o.querySelector("textarea").value = ""; reTo = ""; flt = "all"; badge(); paint(); } }).catch(function () { b.disabled = false; }); } });
     paint(); load(); }
   function mount() { if (document.getElementById("ag-btn") || !document.body) { return; } if (!document.getElementById("ag-css")) { var st = document.createElement("style"); st.id = "ag-css"; st.textContent = css; document.head.appendChild(st); } var b = document.createElement("button"); b.type = "button"; b.id = "ag-btn"; b.addEventListener("click", open); document.body.appendChild(b); badge(); }
-  function start() { mount(); load(); setInterval(load, 120000); if (location.hash === "#agent") { setTimeout(open, 600); } }
+  function place() { var b = document.getElementById("ag-btn"); if (!b) { return; } var tt = document.querySelector("aside.sum-card .as-ttl"); var side = tt && tt.offsetParent !== null && window.innerWidth >= 900;
+    if (side) { var pb = document.getElementById("nofa-pushbtn"); var ref = pb && pb.parentNode === tt ? pb : null; if (b.parentNode !== tt || (ref && b.previousElementSibling !== ref)) { if (ref) { ref.insertAdjacentElement("afterend", b); } else { tt.appendChild(b); } } b.classList.add("in-side"); }
+    else if (b.classList.contains("in-side")) { b.classList.remove("in-side"); document.body.appendChild(b); } }
+  function start() { mount(); place(); var pt = 0, pi = setInterval(function () { place(); if (++pt > 20) { clearInterval(pi); } }, 500); window.addEventListener("resize", place); load(); setInterval(load, 120000); if (location.hash === "#agent") { setTimeout(open, 600); } }
   if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", start); } else { start(); }
   window.nofaAgentOpen = open;
 })();</script>
@@ -2690,7 +2694,7 @@ aside.card3d-dark.sum-card .as-ttl span:nth-child(2){color:#1D5545 !important;fo
 aside.card3d-dark.sum-card .as-ttl small{color:#8A958F !important}
 aside.card3d-dark.sum-card .as-ttl,aside.card3d-dark.sum-card .as-ttl *{text-shadow:none !important}
 aside.card3d-dark.sum-card .as-eye{background:#F3F5F2 !important;color:#33403A !important;border:1px solid #E1E6E0 !important}
-aside.card3d-dark.sum-card .as-ttl a,aside.card3d-dark.sum-card .as-ttl button:not(#nofa-pushbtn):not(.as-eye){color:#1D5545 !important}
+aside.card3d-dark.sum-card .as-ttl a,aside.card3d-dark.sum-card .as-ttl button:not(#nofa-pushbtn):not(.as-eye):not(#ag-btn){color:#1D5545 !important}aside.card3d-dark.sum-card #ag-btn,aside.card3d-dark.sum-card #ag-btn *{color:#F6E3B4 !important}aside.card3d-dark.sum-card #ag-btn .n{color:#fff !important}
 aside.card3d-dark.sum-card #nofa-pushbtn{background:#F3F7F4 !important;color:#1D5545 !important;border:1px solid #CFE0D6 !important;text-shadow:none !important}
 aside.card3d-dark.sum-card .wa-nav{color:#2E3A34 !important;font-weight:600 !important;text-shadow:none !important}
 aside.card3d-dark.sum-card .wa-nav > span:first-child{filter:grayscale(1);opacity:.7;width:22px;text-align:center}
