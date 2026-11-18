@@ -2676,5 +2676,11 @@ button:active:not(:disabled),a.btn:active{filter:brightness(.93)}
   window.addEventListener("popstate", anim); last = tab();
 })();
 </script>
+<script id="ag-lightbox">(function(){function full(src){return src.replace(/agent-(nectar|apri)(-192)?\.(webp|png)$/,"agent-$1-full.webp")}
+document.addEventListener("click",function(e){var im=e.target.closest&&e.target.closest("#ag-ov .hav, #ag-ov .who img");if(!im){return}e.preventDefault();e.stopPropagation();var nm=/apri/.test(im.getAttribute("src"))?"Chef Apri ագենտ":"Nectar ագենտ";
+var d=document.createElement("div");d.id="ag-lb";d.setAttribute("role","dialog");d.setAttribute("aria-label",nm);d.style.cssText="position:fixed;inset:0;z-index:2147483000;background:rgba(8,6,4,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;cursor:zoom-out;animation:aglb .18s ease-out";
+d.innerHTML='<style>@keyframes aglb{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}</style><img src="'+full(im.getAttribute("src"))+'" alt="'+nm+'" style="max-width:100%;max-height:calc(100vh - 110px);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);border:2px solid #EBA93A"><div style="color:#F6E3B4;font:600 22px Fraunces,\'Noto Serif Armenian\',serif">'+nm+'</div><button type="button" aria-label="Փակել" style="position:absolute;top:16px;right:16px;width:46px;height:46px;border-radius:999px;border:1.5px solid #EBA93A;background:rgba(0,0,0,.4);color:#F6E3B4;font-size:20px;cursor:pointer">✕</button>';
+function cl(){d.remove();document.removeEventListener("keydown",ky,true)}function ky(ev){if(ev.key==="Escape"){ev.stopPropagation();cl()}}d.addEventListener("click",cl);document.addEventListener("keydown",ky,true);document.body.appendChild(d)},true);
+var st=document.createElement("style");st.textContent="#ag-ov .hav,#ag-ov .who img{cursor:zoom-in;transition:transform .15s}#ag-ov .hav:hover,#ag-ov .who img:hover{transform:scale(1.06)}";document.head.appendChild(st)})();</script>
 </body>
 </html>
