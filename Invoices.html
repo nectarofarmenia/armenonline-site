@@ -1,5 +1,7 @@
 <!doctype html>
-<html lang="hy"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<html lang="hy"><head>
+<script>(function(){function q(e){var t=e&&e.viewTransition;if(t){var n=function(){};try{t.ready.catch(n);t.finished.catch(n);t.updateCallbackDone&&t.updateCallbackDone.catch(n);}catch(x){}}}window.addEventListener("pageswap",q);window.addEventListener("pagereveal",q);})();</script>
+<style id="nofa-vt">@view-transition{navigation:auto}</style><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
 <title>Nectar of Armenia — Invoice</title><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="192x192" href="/img/icon-192.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+Armenian:wght@400;600;700&family=Noto+Serif+Armenian:wght@600&family=Fraunces:wght@600&family=Oswald:wght@500&family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
@@ -96,7 +98,16 @@ html.solo .vgrid{display:flex;flex-direction:column-reverse;gap:12px}html.solo .
   function mergeChat(local, inc) { local = local || {}; inc = inc || {}; var out = JSON.parse(JSON.stringify(local)); if (!out.th) { out.th = {}; } Object.keys(inc).forEach(function (k) { if (k !== "th" && out[k] == null) { out[k] = inc[k]; } });
     Object.keys(inc.th || {}).forEach(function (t) { var a = out.th[t] || { msgs: [] }, b = inc.th[t] || {}; var m = uniq((a.msgs || []).concat(b.msgs || []), function (x) { return (x.at || "") + "|" + (x.f || "") + "|" + (x.x || ""); }); m.sort(function (x, y) { return String(x.at).localeCompare(String(y.at)); }); var r = Object.assign({}, b, a); r.msgs = m; if (b.ra && (!a.ra || b.ra > a.ra)) { r.ra = b.ra; } if (b.rs && (!a.rs || b.rs > a.rs)) { r.rs = b.rs; } out.th[t] = r; }); return out; }
   function byNo(x) { return String((x && (x.no || x.id)) || JSON.stringify(x)); }
-  function mergeList(local, inc, adminWins) { var L = (local || []).slice(), idx = {}; L.forEach(function (x, i) { idx[byNo(x)] = i; }); (inc || []).forEach(function (x) { var k = byNo(x); if (idx[k] == null) { idx[k] = L.length; L.push(x); } else if (!adminWins) { L[idx[k]] = Object.assign({}, L[idx[k]], x); } }); return L; }
+  function mergeList(local, inc, adminWins) { var L = (local || []).slice(), idx = {}; L.forEach(function (x, i) { idx[byNo(x)] = i; }); (inc || []).forEach(function (x) { var k = byNo(x); if (idx[k] == null) { idx[k] = L.length; L.push(x); } else { var lu = +((L[idx[k]] || {}).u || 0), iu = +((x || {}).u || 0); if (iu > lu) { L[idx[k]] = x; } else if (iu === lu && !adminWins) { L[idx[k]] = Object.assign({}, L[idx[k]], x); } } }); return L; }
+  /* wholesale orders coming from a store: new orders are added; on existing orders only the store's own actions are taken (cancel, accept a proposed day, Zelle/ACH notice, payer approval), never payment or delivery status */
+  function wsMergeIn(local, inc) { var L = (local || []).slice(), idx = {}; L.forEach(function (x, i) { idx[byNo(x)] = i; }); (inc || []).forEach(function (x) { if (!x || typeof x !== "object") { return; } var k = byNo(x);
+      if (idx[k] == null) { var n = Object.assign({}, x); delete n.paid; delete n.chargedAt; delete n.deliveredAt; delete n.doneAt; delete n.roadAt; if (n.st !== 3) { n.st = 0; } idx[k] = L.length; L.push(n); return; }
+      var o = L[idx[k]] || {}, lu = +(o.u || 0), iu = +(x.u || 0); if (iu <= lu) { return; } var p = {}, st0 = o.st || 0;
+      if (x.ap === "cancelled" && o.ap !== "cancelled" && o.ap !== "rejected" && !o.paid && (st0 === 0 || st0 === 3)) { p.ap = "cancelled"; p.payDue = false; p.cancelledAt = x.cancelledAt || new Date().toISOString(); p.cancelledBy = String(x.cancelledBy || "store").slice(0, 80); }
+      else if (x.ap === "approved" && o.ap === "proposed") { p.ap = "approved"; p.date = o.pd || x.date; p.acceptedAt = x.acceptedAt || new Date().toISOString(); }
+      else if (o.await && x.await === false) { p.await = false; p.st = 0; p.ap = "pending"; ["pm", "paidAt", "paidBy", "reqDate"].forEach(function (f) { if (x[f] != null) { p[f] = x[f]; } }); }
+      if (!o.paid && o.ap !== "cancelled" && p.ap !== "cancelled" && x.payProc && !o.payProc && (x.pm === "Zelle" || x.pm === "ACH")) { p.payProc = true; p.pm = x.pm; if (x.zelleAt) { p.zelleAt = x.zelleAt; } if (x.zelleFrom != null) { p.zelleFrom = String(x.zelleFrom).slice(0, 120); } }
+      if (Object.keys(p).length) { p.u = iu; L[idx[k]] = Object.assign({}, o, p); } }); return L; }
 
   /* ---------- login overlay for admin pages ---------- */
   function gate(cb) {
@@ -119,6 +130,7 @@ html.solo .vgrid{display:flex;flex-direction:column-reverse;gap:12px}html.solo .
       Object.keys(j.kv).forEach(function (k) { if (!SHARED.test(k)) { return; } var sv = j.kv[k].v, lv = LG(k), mk = m[k] || {};
         if (lv === sv) { m[k] = { h: h(sv), t: j.kv[k].t }; return; }
         var localDirty = lv != null && mk.h !== h(lv);
+        if (localDirty && !firstDevice && /^noa-ws-orders\|/.test(k)) { var mg = JSON.stringify(mergeList(J(k, []), JSON.parse(sv || "[]") || [], true)); if (mg !== lv) { LS(k, mg); changed = true; } m[k] = { h: h(sv), t: j.kv[k].t }; return; }
         if (firstDevice && lv != null) { if (String(lv).length > String(sv).length) { toPush.push({ k: k, v: lv, backup: true }); return; } }
         else if (localDirty && mk.t && mk.t >= j.kv[k].t) { return; }
         LS(k, sv); m[k] = { h: h(sv), t: j.kv[k].t }; changed = true; });
@@ -146,7 +158,7 @@ html.solo .vgrid{display:flex;flex-direction:column-reverse;gap:12px}html.solo .
         if (k.indexOf("|") > 0 && k.split("|").slice(1).join("|").replace(/^retail:/, "") !== em) { return; }
         var curv = J(k, null);
         if (k.indexOf("noa-chat|") === 0) { LS(k, JSON.stringify(mergeChat(curv, inc))); }
-        else if (Array.isArray(inc)) { LS(k, JSON.stringify(mergeList(curv || [], inc, true))); }
+        else if (Array.isArray(inc)) { LS(k, JSON.stringify(k.indexOf("noa-ws-orders|") === 0 ? wsMergeIn(curv || [], inc) : mergeList(curv || [], inc, true))); }
         else if (inc && typeof inc === "object") { LS(k, JSON.stringify(Object.assign({}, inc, curv || {}))); }
         n++; });
       return req("ack", { ids: ids }).then(function () { return n; }); });
@@ -180,7 +192,7 @@ html.solo .vgrid{display:flex;flex-direction:column-reverse;gap:12px}html.solo .
     var ch = false, paid = (+r.cash || 0) + (+r.zelle || 0);
     // website wholesale orders: mark delivered so the customer sees it in their account
     for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (!k || k.indexOf("noa-ws-orders|") !== 0) { continue; } var L = J(k, []); var hit = false;
-      (L || []).forEach(function (o) { if (o && String(o.no || "").replace(/^NOA-/, "NofA-") === id && o.st !== 2) { o.st = 2; o.deliveredAt = r.at || new Date().toISOString(); if (paid > 0 && !o.chargedAt) { o.chargedAt = r.at || new Date().toISOString(); } hit = true; } });
+      (L || []).forEach(function (o) { if (o && String(o.no || "").replace(/^NOA-/, "NofA-") === id && o.st !== 2) { o.st = 2; o.u = Math.max(Date.now(), (+o.u || 0) + 1); o.deliveredAt = r.at || new Date().toISOString(); if (paid > 0 && !o.chargedAt) { o.chargedAt = r.at || new Date().toISOString(); } hit = true; } });
       if (hit) { LS(k, JSON.stringify(L)); ch = true; } }
     // phone / book orders: mark served, record payment on the order and its invoice
     var C = J("noa-cost-v2", null); var call = null;
@@ -716,7 +728,6 @@ if(/emb/.test(document.documentElement.className)){document.documentElement.styl
     else { el.style.transition = "transform .2s,opacity .2s"; set(0); setTimeout(function () { el.style.transition = ""; }, 220); } pull = 0; }, { passive: true });
 })();
 </script>
-<script>(function(){function q(e){var t=e&&e.viewTransition;if(t){var n=function(){};try{t.ready.catch(n);t.finished.catch(n);t.updateCallbackDone&&t.updateCallbackDone.catch(n);}catch(x){}}}window.addEventListener("pageswap",q);window.addEventListener("pagereveal",q);})();</script>
 <style id="nofa-motion">
 /* smooth page changes: pages cross-fade (Chrome, Safari 18.2+), admin tabs ease in ~240 ms (NN/g & Material range) */
 @view-transition{navigation:auto}

@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script>(function(){function q(e){var t=e&&e.viewTransition;if(t){var n=function(){};try{t.ready.catch(n);t.finished.catch(n);t.updateCallbackDone&&t.updateCallbackDone.catch(n);}catch(x){}}}window.addEventListener("pageswap",q);window.addEventListener("pagereveal",q);})();</script>
+<style id="nofa-vt">@view-transition{navigation:auto}</style>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
@@ -165,7 +167,6 @@ h1{margin:2px 0 0;font-family:Fraunces,"Noto Serif Armenian",serif;font-weight:6
     try { if (navigator.sendBeacon) { navigator.sendBeacon("api/api.php?a=ux", new Blob([b], { type: "application/json" })); } else { fetch("api/api.php?a=ux", { method: "POST", body: b, keepalive: true }); } } catch (x) {} }
   document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") { send(); } }); window.addEventListener("pagehide", send);
 } catch (e) {} })();</script>
-<script>(function(){function q(e){var t=e&&e.viewTransition;if(t){var n=function(){};try{t.ready.catch(n);t.finished.catch(n);t.updateCallbackDone&&t.updateCallbackDone.catch(n);}catch(x){}}}window.addEventListener("pageswap",q);window.addEventListener("pagereveal",q);})();</script>
 <style id="nofa-motion">
 /* smooth page changes: pages cross-fade (Chrome, Safari 18.2+), admin tabs ease in ~240 ms (NN/g & Material range) */
 @view-transition{navigation:auto}

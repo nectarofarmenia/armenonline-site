@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="hy">
-<head><script id="nofa-stay-in">(function(){try{if(location.hash||/[?&](demo|embed|add|reset|ref)=/.test(location.search)){return;}var se=localStorage.getItem("noa-session"),u=JSON.parse(localStorage.getItem("noa-user")||"null");if(se&&u&&u.email&&se.indexOf(String(u.email).toLowerCase())===0){location.replace(/\|biz$/.test(se)?"PartnerAccount.dc.html":"MyAccount.dc.html");}}catch(e){}})();</script>
+<head>
+<script>(function(){function q(e){var t=e&&e.viewTransition;if(t){var n=function(){};try{t.ready.catch(n);t.finished.catch(n);t.updateCallbackDone&&t.updateCallbackDone.catch(n);}catch(x){}}}window.addEventListener("pageswap",q);window.addEventListener("pagereveal",q);})();</script>
+<style id="nofa-vt">@view-transition{navigation:auto}</style><script id="nofa-stay-in">(function(){try{if(location.hash||/[?&](demo|embed|add|reset|ref)=/.test(location.search)){return;}var se=localStorage.getItem("noa-session"),u=JSON.parse(localStorage.getItem("noa-user")||"null");if(se&&u&&u.email&&se.indexOf(String(u.email).toLowerCase())===0){location.replace(/\|biz$/.test(se)?"PartnerAccount.dc.html":"MyAccount.dc.html");}}catch(e){}})();</script>
 <script id="nofa-geo">window.nofaGeo = function (q, lim) {
   var m = /^\s*(\d+[A-Za-z]?)\s+/.exec(q || ""), num = m ? m[1] : "";
   var D = { n: "North", s: "South", e: "East", w: "West", ne: "Northeast", nw: "Northwest", se: "Southeast", sw: "Southwest" };
@@ -85,7 +87,16 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
   function mergeChat(local, inc) { local = local || {}; inc = inc || {}; var out = JSON.parse(JSON.stringify(local)); if (!out.th) { out.th = {}; } Object.keys(inc).forEach(function (k) { if (k !== "th" && out[k] == null) { out[k] = inc[k]; } });
     Object.keys(inc.th || {}).forEach(function (t) { var a = out.th[t] || { msgs: [] }, b = inc.th[t] || {}; var m = uniq((a.msgs || []).concat(b.msgs || []), function (x) { return (x.at || "") + "|" + (x.f || "") + "|" + (x.x || ""); }); m.sort(function (x, y) { return String(x.at).localeCompare(String(y.at)); }); var r = Object.assign({}, b, a); r.msgs = m; if (b.ra && (!a.ra || b.ra > a.ra)) { r.ra = b.ra; } if (b.rs && (!a.rs || b.rs > a.rs)) { r.rs = b.rs; } out.th[t] = r; }); return out; }
   function byNo(x) { return String((x && (x.no || x.id)) || JSON.stringify(x)); }
-  function mergeList(local, inc, adminWins) { var L = (local || []).slice(), idx = {}; L.forEach(function (x, i) { idx[byNo(x)] = i; }); (inc || []).forEach(function (x) { var k = byNo(x); if (idx[k] == null) { idx[k] = L.length; L.push(x); } else if (!adminWins) { L[idx[k]] = Object.assign({}, L[idx[k]], x); } }); return L; }
+  function mergeList(local, inc, adminWins) { var L = (local || []).slice(), idx = {}; L.forEach(function (x, i) { idx[byNo(x)] = i; }); (inc || []).forEach(function (x) { var k = byNo(x); if (idx[k] == null) { idx[k] = L.length; L.push(x); } else { var lu = +((L[idx[k]] || {}).u || 0), iu = +((x || {}).u || 0); if (iu > lu) { L[idx[k]] = x; } else if (iu === lu && !adminWins) { L[idx[k]] = Object.assign({}, L[idx[k]], x); } } }); return L; }
+  /* wholesale orders coming from a store: new orders are added; on existing orders only the store's own actions are taken (cancel, accept a proposed day, Zelle/ACH notice, payer approval), never payment or delivery status */
+  function wsMergeIn(local, inc) { var L = (local || []).slice(), idx = {}; L.forEach(function (x, i) { idx[byNo(x)] = i; }); (inc || []).forEach(function (x) { if (!x || typeof x !== "object") { return; } var k = byNo(x);
+      if (idx[k] == null) { var n = Object.assign({}, x); delete n.paid; delete n.chargedAt; delete n.deliveredAt; delete n.doneAt; delete n.roadAt; if (n.st !== 3) { n.st = 0; } idx[k] = L.length; L.push(n); return; }
+      var o = L[idx[k]] || {}, lu = +(o.u || 0), iu = +(x.u || 0); if (iu <= lu) { return; } var p = {}, st0 = o.st || 0;
+      if (x.ap === "cancelled" && o.ap !== "cancelled" && o.ap !== "rejected" && !o.paid && (st0 === 0 || st0 === 3)) { p.ap = "cancelled"; p.payDue = false; p.cancelledAt = x.cancelledAt || new Date().toISOString(); p.cancelledBy = String(x.cancelledBy || "store").slice(0, 80); }
+      else if (x.ap === "approved" && o.ap === "proposed") { p.ap = "approved"; p.date = o.pd || x.date; p.acceptedAt = x.acceptedAt || new Date().toISOString(); }
+      else if (o.await && x.await === false) { p.await = false; p.st = 0; p.ap = "pending"; ["pm", "paidAt", "paidBy", "reqDate"].forEach(function (f) { if (x[f] != null) { p[f] = x[f]; } }); }
+      if (!o.paid && o.ap !== "cancelled" && p.ap !== "cancelled" && x.payProc && !o.payProc && (x.pm === "Zelle" || x.pm === "ACH")) { p.payProc = true; p.pm = x.pm; if (x.zelleAt) { p.zelleAt = x.zelleAt; } if (x.zelleFrom != null) { p.zelleFrom = String(x.zelleFrom).slice(0, 120); } }
+      if (Object.keys(p).length) { p.u = iu; L[idx[k]] = Object.assign({}, o, p); } }); return L; }
 
   /* ---------- login overlay for admin pages ---------- */
   function gate(cb) {
@@ -108,6 +119,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
       Object.keys(j.kv).forEach(function (k) { if (!SHARED.test(k)) { return; } var sv = j.kv[k].v, lv = LG(k), mk = m[k] || {};
         if (lv === sv) { m[k] = { h: h(sv), t: j.kv[k].t }; return; }
         var localDirty = lv != null && mk.h !== h(lv);
+        if (localDirty && !firstDevice && /^noa-ws-orders\|/.test(k)) { var mg = JSON.stringify(mergeList(J(k, []), JSON.parse(sv || "[]") || [], true)); if (mg !== lv) { LS(k, mg); changed = true; } m[k] = { h: h(sv), t: j.kv[k].t }; return; }
         if (firstDevice && lv != null) { if (String(lv).length > String(sv).length) { toPush.push({ k: k, v: lv, backup: true }); return; } }
         else if (localDirty && mk.t && mk.t >= j.kv[k].t) { return; }
         LS(k, sv); m[k] = { h: h(sv), t: j.kv[k].t }; changed = true; });
@@ -135,7 +147,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
         if (k.indexOf("|") > 0 && k.split("|").slice(1).join("|").replace(/^retail:/, "") !== em) { return; }
         var curv = J(k, null);
         if (k.indexOf("noa-chat|") === 0) { LS(k, JSON.stringify(mergeChat(curv, inc))); }
-        else if (Array.isArray(inc)) { LS(k, JSON.stringify(mergeList(curv || [], inc, true))); }
+        else if (Array.isArray(inc)) { LS(k, JSON.stringify(k.indexOf("noa-ws-orders|") === 0 ? wsMergeIn(curv || [], inc) : mergeList(curv || [], inc, true))); }
         else if (inc && typeof inc === "object") { LS(k, JSON.stringify(Object.assign({}, inc, curv || {}))); }
         n++; });
       return req("ack", { ids: ids }).then(function () { return n; }); });
@@ -169,7 +181,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
     var ch = false, paid = (+r.cash || 0) + (+r.zelle || 0);
     // website wholesale orders: mark delivered so the customer sees it in their account
     for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (!k || k.indexOf("noa-ws-orders|") !== 0) { continue; } var L = J(k, []); var hit = false;
-      (L || []).forEach(function (o) { if (o && String(o.no || "").replace(/^NOA-/, "NofA-") === id && o.st !== 2) { o.st = 2; o.deliveredAt = r.at || new Date().toISOString(); if (paid > 0 && !o.chargedAt) { o.chargedAt = r.at || new Date().toISOString(); } hit = true; } });
+      (L || []).forEach(function (o) { if (o && String(o.no || "").replace(/^NOA-/, "NofA-") === id && o.st !== 2) { o.st = 2; o.u = Math.max(Date.now(), (+o.u || 0) + 1); o.deliveredAt = r.at || new Date().toISOString(); if (paid > 0 && !o.chargedAt) { o.chargedAt = r.at || new Date().toISOString(); } hit = true; } });
       if (hit) { LS(k, JSON.stringify(L)); ch = true; } }
     // phone / book orders: mark served, record payment on the order and its invoice
     var C = J("noa-cost-v2", null); var call = null;
@@ -1025,7 +1037,6 @@ goIn: function () { self.setState({ mode: "in", err: "", ver: null }); }, goUp: 
     try { if (navigator.sendBeacon) { navigator.sendBeacon("api/api.php?a=ux", new Blob([b], { type: "application/json" })); } else { fetch("api/api.php?a=ux", { method: "POST", body: b, keepalive: true }); } } catch (x) {} }
   document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") { send(); } }); window.addEventListener("pagehide", send);
 } catch (e) {} })();</script>
-<script>(function(){function q(e){var t=e&&e.viewTransition;if(t){var n=function(){};try{t.ready.catch(n);t.finished.catch(n);t.updateCallbackDone&&t.updateCallbackDone.catch(n);}catch(x){}}}window.addEventListener("pageswap",q);window.addEventListener("pagereveal",q);})();</script>
 <style id="nofa-motion">
 /* smooth page changes: pages cross-fade (Chrome, Safari 18.2+), admin tabs ease in ~240 ms (NN/g & Material range) */
 @view-transition{navigation:auto}

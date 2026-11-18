@@ -1,5 +1,7 @@
 <!doctype html>
-<html lang="hy"><head><script id="nofa-webp-fb">(function () {
+<html lang="hy"><head>
+<script>(function(){function q(e){var t=e&&e.viewTransition;if(t){var n=function(){};try{t.ready.catch(n);t.finished.catch(n);t.updateCallbackDone&&t.updateCallbackDone.catch(n);}catch(x){}}}window.addEventListener("pageswap",q);window.addEventListener("pagereveal",q);})();</script>
+<style id="nofa-vt">@view-transition{navigation:auto}</style><script id="nofa-webp-fb">(function () {
   /* Older Safari (before macOS Big Sur) cannot show WebP images: swap them for JPG/PNG copies. */
   var M = {"0f5ce6e80b23a0e775ad415e85b7ef0d":"j","135d0cd80fa69f4a118392eea9b8bcd6":"j","1c1170ea552448c772716318143a3c45":"p","2571b64d12e186d54c2591031e538957":"j","2e13e2a29372cd73025958546269e785":"j","2fc668d693fee0e6607551e82b831db8":"p","32c5e8684bfdef6cb6aa876203be146e":"j","4c3be5aa8f8c066b21e7db3bf8e1cbaf":"j","60cf8a3c2218a3e5d79caed873a2883d":"j","645bf576eb7a0134b08d93cb48d381e7":"j","65940d08dd8a527a15d113ecd1854f3a":"j","694aba8a1723dd6f05e5c9dc4a4b80fc":"j","6a86ac441cd9dd29b3e3ba1a16934988":"j","85bd1a1af6a266bd807c5b882cd849b4":"j","88e8751182c785d43c5bd18576ebe169":"j","8a47925b65b04cee7ac978e787689593":"j","94525798ce3df192c2fd40bf0abec73b":"j","9a580a459d40f07e1e5447273060935e":"j","9d91996f4ebb65c55fc461bb8efdcd00":"p","9eb33fd2c3ff435a1314ecd2f69f9245":"j","a478e8b679045ec0e4be7aae32b0e96d":"p","a6aaa8aa5db20ba68bc42c3406095e44":"j","c1999a6e0a1f0a5218be4d17335ab22d":"p","cf4f14e5b2e161eced326c4ebe8644fd":"p","d6103de8acf18a5ec32795735ec79205":"j","d78e37aae45585ef207c38b383cf4849":"j","f550783da0db12a4738aed9c8d1ecf2d":"j","f9280bbbf31cb7aba245e670f4e5ae57":"p","apri":"p","logo_w":"p"};
   function fb(u) { return String(u).replace(/((?:img|vendor\/inv)\/([A-Za-z0-9_-]+))\.webp/g, function (m, b, k) { return b + "." + (M[k] === "p" ? "png" : "jpg"); }); }
@@ -59,7 +61,16 @@ button{width:100%;min-height:50px;border:0;border-radius:999px;background:linear
   function mergeChat(local, inc) { local = local || {}; inc = inc || {}; var out = JSON.parse(JSON.stringify(local)); if (!out.th) { out.th = {}; } Object.keys(inc).forEach(function (k) { if (k !== "th" && out[k] == null) { out[k] = inc[k]; } });
     Object.keys(inc.th || {}).forEach(function (t) { var a = out.th[t] || { msgs: [] }, b = inc.th[t] || {}; var m = uniq((a.msgs || []).concat(b.msgs || []), function (x) { return (x.at || "") + "|" + (x.f || "") + "|" + (x.x || ""); }); m.sort(function (x, y) { return String(x.at).localeCompare(String(y.at)); }); var r = Object.assign({}, b, a); r.msgs = m; if (b.ra && (!a.ra || b.ra > a.ra)) { r.ra = b.ra; } if (b.rs && (!a.rs || b.rs > a.rs)) { r.rs = b.rs; } out.th[t] = r; }); return out; }
   function byNo(x) { return String((x && (x.no || x.id)) || JSON.stringify(x)); }
-  function mergeList(local, inc, adminWins) { var L = (local || []).slice(), idx = {}; L.forEach(function (x, i) { idx[byNo(x)] = i; }); (inc || []).forEach(function (x) { var k = byNo(x); if (idx[k] == null) { idx[k] = L.length; L.push(x); } else if (!adminWins) { L[idx[k]] = Object.assign({}, L[idx[k]], x); } }); return L; }
+  function mergeList(local, inc, adminWins) { var L = (local || []).slice(), idx = {}; L.forEach(function (x, i) { idx[byNo(x)] = i; }); (inc || []).forEach(function (x) { var k = byNo(x); if (idx[k] == null) { idx[k] = L.length; L.push(x); } else { var lu = +((L[idx[k]] || {}).u || 0), iu = +((x || {}).u || 0); if (iu > lu) { L[idx[k]] = x; } else if (iu === lu && !adminWins) { L[idx[k]] = Object.assign({}, L[idx[k]], x); } } }); return L; }
+  /* wholesale orders coming from a store: new orders are added; on existing orders only the store's own actions are taken (cancel, accept a proposed day, Zelle/ACH notice, payer approval), never payment or delivery status */
+  function wsMergeIn(local, inc) { var L = (local || []).slice(), idx = {}; L.forEach(function (x, i) { idx[byNo(x)] = i; }); (inc || []).forEach(function (x) { if (!x || typeof x !== "object") { return; } var k = byNo(x);
+      if (idx[k] == null) { var n = Object.assign({}, x); delete n.paid; delete n.chargedAt; delete n.deliveredAt; delete n.doneAt; delete n.roadAt; if (n.st !== 3) { n.st = 0; } idx[k] = L.length; L.push(n); return; }
+      var o = L[idx[k]] || {}, lu = +(o.u || 0), iu = +(x.u || 0); if (iu <= lu) { return; } var p = {}, st0 = o.st || 0;
+      if (x.ap === "cancelled" && o.ap !== "cancelled" && o.ap !== "rejected" && !o.paid && (st0 === 0 || st0 === 3)) { p.ap = "cancelled"; p.payDue = false; p.cancelledAt = x.cancelledAt || new Date().toISOString(); p.cancelledBy = String(x.cancelledBy || "store").slice(0, 80); }
+      else if (x.ap === "approved" && o.ap === "proposed") { p.ap = "approved"; p.date = o.pd || x.date; p.acceptedAt = x.acceptedAt || new Date().toISOString(); }
+      else if (o.await && x.await === false) { p.await = false; p.st = 0; p.ap = "pending"; ["pm", "paidAt", "paidBy", "reqDate"].forEach(function (f) { if (x[f] != null) { p[f] = x[f]; } }); }
+      if (!o.paid && o.ap !== "cancelled" && p.ap !== "cancelled" && x.payProc && !o.payProc && (x.pm === "Zelle" || x.pm === "ACH")) { p.payProc = true; p.pm = x.pm; if (x.zelleAt) { p.zelleAt = x.zelleAt; } if (x.zelleFrom != null) { p.zelleFrom = String(x.zelleFrom).slice(0, 120); } }
+      if (Object.keys(p).length) { p.u = iu; L[idx[k]] = Object.assign({}, o, p); } }); return L; }
 
   /* ---------- login overlay for admin pages ---------- */
   function gate(cb) {
@@ -82,6 +93,7 @@ button{width:100%;min-height:50px;border:0;border-radius:999px;background:linear
       Object.keys(j.kv).forEach(function (k) { if (!SHARED.test(k)) { return; } var sv = j.kv[k].v, lv = LG(k), mk = m[k] || {};
         if (lv === sv) { m[k] = { h: h(sv), t: j.kv[k].t }; return; }
         var localDirty = lv != null && mk.h !== h(lv);
+        if (localDirty && !firstDevice && /^noa-ws-orders\|/.test(k)) { var mg = JSON.stringify(mergeList(J(k, []), JSON.parse(sv || "[]") || [], true)); if (mg !== lv) { LS(k, mg); changed = true; } m[k] = { h: h(sv), t: j.kv[k].t }; return; }
         if (firstDevice && lv != null) { if (String(lv).length > String(sv).length) { toPush.push({ k: k, v: lv, backup: true }); return; } }
         else if (localDirty && mk.t && mk.t >= j.kv[k].t) { return; }
         LS(k, sv); m[k] = { h: h(sv), t: j.kv[k].t }; changed = true; });
@@ -109,7 +121,7 @@ button{width:100%;min-height:50px;border:0;border-radius:999px;background:linear
         if (k.indexOf("|") > 0 && k.split("|").slice(1).join("|").replace(/^retail:/, "") !== em) { return; }
         var curv = J(k, null);
         if (k.indexOf("noa-chat|") === 0) { LS(k, JSON.stringify(mergeChat(curv, inc))); }
-        else if (Array.isArray(inc)) { LS(k, JSON.stringify(mergeList(curv || [], inc, true))); }
+        else if (Array.isArray(inc)) { LS(k, JSON.stringify(k.indexOf("noa-ws-orders|") === 0 ? wsMergeIn(curv || [], inc) : mergeList(curv || [], inc, true))); }
         else if (inc && typeof inc === "object") { LS(k, JSON.stringify(Object.assign({}, inc, curv || {}))); }
         n++; });
       return req("ack", { ids: ids }).then(function () { return n; }); });
@@ -143,7 +155,7 @@ button{width:100%;min-height:50px;border:0;border-radius:999px;background:linear
     var ch = false, paid = (+r.cash || 0) + (+r.zelle || 0);
     // website wholesale orders: mark delivered so the customer sees it in their account
     for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (!k || k.indexOf("noa-ws-orders|") !== 0) { continue; } var L = J(k, []); var hit = false;
-      (L || []).forEach(function (o) { if (o && String(o.no || "").replace(/^NOA-/, "NofA-") === id && o.st !== 2) { o.st = 2; o.deliveredAt = r.at || new Date().toISOString(); if (paid > 0 && !o.chargedAt) { o.chargedAt = r.at || new Date().toISOString(); } hit = true; } });
+      (L || []).forEach(function (o) { if (o && String(o.no || "").replace(/^NOA-/, "NofA-") === id && o.st !== 2) { o.st = 2; o.u = Math.max(Date.now(), (+o.u || 0) + 1); o.deliveredAt = r.at || new Date().toISOString(); if (paid > 0 && !o.chargedAt) { o.chargedAt = r.at || new Date().toISOString(); } hit = true; } });
       if (hit) { LS(k, JSON.stringify(L)); ch = true; } }
     // phone / book orders: mark served, record payment on the order and its invoice
     var C = J("noa-cost-v2", null); var call = null;
@@ -343,7 +355,6 @@ form();
     else { el.style.transition = "transform .2s,opacity .2s"; set(0); setTimeout(function () { el.style.transition = ""; }, 220); } pull = 0; }, { passive: true });
 })();
 </script>
-<script>(function(){function q(e){var t=e&&e.viewTransition;if(t){var n=function(){};try{t.ready.catch(n);t.finished.catch(n);t.updateCallbackDone&&t.updateCallbackDone.catch(n);}catch(x){}}}window.addEventListener("pageswap",q);window.addEventListener("pagereveal",q);})();</script>
 <style id="nofa-motion">
 /* smooth page changes: pages cross-fade (Chrome, Safari 18.2+), admin tabs ease in ~240 ms (NN/g & Material range) */
 @view-transition{navigation:auto}
