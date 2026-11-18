@@ -2648,6 +2648,8 @@ header.raise-header .nm-hb svg{width:26px;height:26px}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.24s;animation-timing-function:cubic-bezier(.4,0,.2,1)}
 @keyframes nofaIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 main.nofa-in>*{animation:nofaIn .24s cubic-bezier(0,0,.2,1) both}main.nofa-in>*:nth-child(2){animation-delay:.04s}main.nofa-in>*:nth-child(n+3){animation-delay:.08s}
+/* nofa-press: buttons answer the finger at once (~100 ms) */
+button:active:not(:disabled),a.btn:active{filter:brightness(.93)}
 @media (prefers-reduced-motion:reduce){main.nofa-in>*{animation:none!important}::view-transition-old(root),::view-transition-new(root){animation:none!important}}
 </style>
 <script id="nofa-motion-js">
