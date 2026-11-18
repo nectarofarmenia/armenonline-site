@@ -511,6 +511,7 @@ switch ($a) {
     $since = (int) ($_GET['since'] ?? 0);
     $s = $db->prepare("SELECT k, v, t FROM nofa_kv WHERE t > ? AND k NOT LIKE '\\_\\_%' ESCAPE '\\'"); $s->execute([$since]);
     $res = []; $mx = $since; foreach ($s->fetchAll(PDO::FETCH_ASSOC) as $r) { $res[$r['k']] = ['v' => $r['v'], 't' => (int) $r['t']]; if ($r['t'] > $mx) { $mx = (int) $r['t']; } }
+    if (!isset($res['noa-accounts'])) { $ra = kv_get($db, 'noa-accounts'); if ($ra) { $res['noa-accounts'] = ['v' => $ra['v'], 't' => (int) $ra['t']]; } } // always send the customer list so every admin browser converges
     $n = (int) $db->query("SELECT COUNT(*) FROM nofa_kv WHERE k NOT LIKE '\\_\\_%' ESCAPE '\\'")->fetchColumn();
     out(['ok' => true, 'kv' => $res, 'now' => $mx, 'count' => $n]);
   case 'put': // admin: save keys
