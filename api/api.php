@@ -428,8 +428,9 @@ switch ($a) {
     $r = kv_get($db, '__agent_thread'); out(['ok' => true, 'thread' => $r ? (json_decode($r['v'], true) ?: []) : []]);
   case 'agent_reply': // admin: approve / reject / comment on an agent message, or write a new task
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
-    $b = body(); $r = kv_get($db, '__agent_thread'); $T = $r ? (json_decode($r['v'], true) ?: []) : []; $txt = mb_substr(trim((string) ($b['text'] ?? '')), 0, 4000); $dec = in_array(($b['decision'] ?? ''), ['approve', 'reject', 'comment', 'task'], true) ? $b['decision'] : 'comment'; $to = (string) ($b['id'] ?? '');
-    if ($to !== '') { foreach ($T as &$m) { if (($m['id'] ?? '') === $to) { if ($dec === 'approve') { $m['st'] = 'approved'; } elseif ($dec === 'reject') { $m['st'] = 'rejected'; } $m['decAt'] = gmdate('c'); } } unset($m); }
+    $b = body(); $r = kv_get($db, '__agent_thread'); $T = $r ? (json_decode($r['v'], true) ?: []) : []; $txt = mb_substr(trim((string) ($b['text'] ?? '')), 0, 4000); $dec = in_array(($b['decision'] ?? ''), ['approve', 'reject', 'comment', 'task', 'readall'], true) ? $b['decision'] : 'comment'; $to = (string) ($b['id'] ?? '');
+    if ($dec === 'readall') { foreach ($T as &$m) { if (($m['from'] ?? '') === 'agent' && ($m['st'] ?? '') === 'open') { $m['st'] = 'seen'; $m['seenAt'] = gmdate('c'); } } unset($m); kv_put($db, '__agent_thread', json_encode($T, JSON_UNESCAPED_UNICODE)); out(['ok' => true, 'thread' => $T]); }
+    if ($to !== '') { foreach ($T as &$m) { if (($m['id'] ?? '') === $to) { if ($dec === 'approve') { $m['st'] = 'approved'; } elseif ($dec === 'reject') { $m['st'] = 'rejected'; } elseif ($dec === 'comment' && $txt !== '' && ($m['st'] ?? '') === 'open') { $m['st'] = 'answered'; } $m['decAt'] = gmdate('c'); } } unset($m); }
     if ($txt !== '' || $dec !== 'comment') { $T[] = ['id' => 'o' . now_ms() . random_int(10, 99), 'from' => 'owner', 'type' => $dec, 're' => $to, 'body' => $txt, 'at' => gmdate('c'), 'st' => $dec === 'task' ? 'open' : 'info']; }
     if (count($T) > 400) { $T = array_slice($T, -400); } kv_put($db, '__agent_thread', json_encode($T, JSON_UNESCAPED_UNICODE)); out(['ok' => true, 'thread' => $T]);
   case 'stats': // admin: visitor statistics by month
