@@ -506,13 +506,14 @@ return {};
     if (k === last.k && now - last.t < 900) { last.n++; if (last.n === 3) { RG.push(k); } } else { last = { k: k, t: now, n: 1 }; } last.t = now; if (C.length < 30) { C.push(k); } }, true);
   window.addEventListener("scroll", function () { var h = document.documentElement.scrollHeight - innerHeight; if (h > 0) { sd = Math.max(sd, Math.round(scrollY / h * 100)); } }, { passive: true });
   window.addEventListener("error", function (e) { if (E.length < 5 && e && e.message) { E.push({ m: String(e.message).slice(0, 200), s: String(e.filename || "").split("/").pop() + ":" + (e.lineno || "") }); } });
-  window.addEventListener("unhandledrejection", function (e) { if (E.length < 5) { var r = e && e.reason; E.push({ m: "promise: " + String(r && r.message || r || "").slice(0, 180), s: "" }); } });
+  window.addEventListener("unhandledrejection", function (e) { var r = e && e.reason; if (r && /Transition was (aborted|skipped)/i.test(String(r.message))) { return; } if (E.length < 5) { E.push({ m: "promise: " + String(r && r.message || r || "").slice(0, 180), s: "" }); } });
   function send() { if (sent) { return; } sent = true; var lt = 0; try { var n = performance.getEntriesByType("navigation")[0]; lt = n ? Math.round(n.loadEventEnd || n.domContentLoadedEventEnd || 0) : 0; } catch (x) {}
     if (!C.length && !E.length && Date.now() - t0 < 3000) { return; }
     var b = JSON.stringify({ p: location.pathname.split("/").pop() || "index.html", c: C, rg: RG, sd: sd, lt: lt, e: E, m: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 1 : 0 });
     try { if (navigator.sendBeacon) { navigator.sendBeacon("api/api.php?a=ux", new Blob([b], { type: "application/json" })); } else { fetch("api/api.php?a=ux", { method: "POST", body: b, keepalive: true }); } } catch (x) {} }
   document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") { send(); } }); window.addEventListener("pagehide", send);
 } catch (e) {} })();</script>
+<script>(function(){function q(e){var t=e&&e.viewTransition;if(t){var n=function(){};try{t.ready.catch(n);t.finished.catch(n);t.updateCallbackDone&&t.updateCallbackDone.catch(n);}catch(x){}}}window.addEventListener("pageswap",q);window.addEventListener("pagereveal",q);})();</script>
 <style id="nofa-motion">
 /* smooth page changes: pages cross-fade (Chrome, Safari 18.2+), admin tabs ease in ~240 ms (NN/g & Material range) */
 @view-transition{navigation:auto}

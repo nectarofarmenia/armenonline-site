@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /Admin.dc.html
+Disallow: /Cost.html
+Disallow: /Driver.html
+Disallow: /Invite.html
+Disallow: /Invoice.html
+Disallow: /Invoices.html
+Disallow: /MyInvoices.html
+Disallow: /Map.html
+Disallow: /TeamJoin.html
+Disallow: /QR-Card.dc.html
+Disallow: /MyAccount.dc.html
+Disallow: /PartnerAccount.dc.html
+Disallow: /Checkout.dc.html
+Disallow: /Cart.dc.html
+Disallow: /Track.html
+Disallow: /Join.html
+
+Sitemap: https://nectarofarmenia.com/sitemap.xml

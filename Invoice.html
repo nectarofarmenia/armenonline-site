@@ -436,6 +436,7 @@ if(/emb/.test(document.documentElement.className)){document.documentElement.styl
     else { el.style.transition = "transform .2s,opacity .2s"; set(0); setTimeout(function () { el.style.transition = ""; }, 220); } pull = 0; }, { passive: true });
 })();
 </script>
+<script>(function(){function q(e){var t=e&&e.viewTransition;if(t){var n=function(){};try{t.ready.catch(n);t.finished.catch(n);t.updateCallbackDone&&t.updateCallbackDone.catch(n);}catch(x){}}}window.addEventListener("pageswap",q);window.addEventListener("pagereveal",q);})();</script>
 <style id="nofa-motion">
 /* smooth page changes: pages cross-fade (Chrome, Safari 18.2+), admin tabs ease in ~240 ms (NN/g & Material range) */
 @view-transition{navigation:auto}
