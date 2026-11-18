@@ -37,6 +37,64 @@ function apri_rpc($fn, $args, &$code) {
   return $r;
 }
 
+// ---- rich owner notifications (title = who, body = what happened), like a phone app notice ----
+function pn_names() { return ['Գաթա', 'Խաշ', 'Խաշի արգանակ', 'Խաշի հավաքածու', 'Խինկալի', 'Պելմենի', 'Բլինչիկ', 'Միջուկով քուֆթա', 'Կիևյան կոտլետ', 'Հավի կոտլետ', 'Տավարի կոտլետ']; }
+function pn_who($db, $em) {
+  $em = strtolower(trim((string) $em)); if ($em === '') { return 'Nectar of Armenia'; }
+  $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: [];
+  foreach ($A as $rec) { if (is_array($rec) && strtolower((string) ($rec['email'] ?? '')) === $em) { $n = trim((string) ($rec['biz'] ?? ($rec['company'] ?? ''))); if ($n === '') { $n = trim((string) ($rec['name'] ?? (($rec['first'] ?? '') . ' ' . ($rec['last'] ?? '')))); } if ($n !== '') { return mb_substr($n, 0, 60); } } }
+  return $em;
+}
+function pn_items($its, $pk) { $N = pn_names(); $o = []; $tot = 0; foreach ((array) $its as $it) { $pi = (int) ($it[0] ?? -1); $q = (int) ($it[1] ?? 0); if ($q < 1) { continue; } $tot += $q; if (count($o) < 4) { $o[] = ($N[$pi] ?? ('#' . $pi)) . ' ' . $q; } } return [$o ? implode(', ', $o) . (count((array) $its) > 4 ? '…' : '') : '', $tot . ($pk === 'pcs' ? ' հատ' : ' տուփ')]; }
+// wholesale orders: notice for a new order, a cancel, a payment step; old orders are recorded silently
+function pn_wso($db, $em, $v) {
+  $L = is_string($v) ? json_decode($v, true) : $v; if (!is_array($L)) { return 0; } $who = pn_who($db, $em); $n = 0;
+  $S = json_decode((kv_get($db, '__pnws|' . $em) ?: ['v' => '{}'])['v'], true) ?: []; $ch = false;
+  foreach (array_slice($L, -60) as $o) { if (!is_array($o) || empty($o['no'])) { continue; } $no = (string) $o['no'];
+    $sig = (int) ($o['st'] ?? 0) . '|' . (!empty($o['paid']) ? 1 : 0) . '|' . (!empty($o['payProc']) ? 1 : 0) . '|' . (!empty($o['zelleAt']) ? 1 : 0);
+    if (($S[$no] ?? null) === $sig) { continue; } $was = $S[$no] ?? null; $S[$no] = $sig; $ch = true;
+    $d = strtotime((string) ($o['at'] ?? ($o['date'] ?? ''))) ?: 0; if ($was === null && ($d < time() - 3 * 86400 || !empty($o['imported']))) { continue; }
+    [$lst, $cnt] = pn_items($o['items'] ?? [], (string) ($o['pack'] ?? '')); $amt = (float) ($o['amt'] ?? 0); $A = $amt > 0 ? ' · $' . number_format($amt, 2) : '';
+    $day = (string) ($o['reqDate'] ?? ''); $day = $day !== '' ? ' · առաքում ' . date('m/d', strtotime($day) ?: time()) : '';
+    if ($was === null) { push_admin($db, '🏪 ' . $who, 'Նոր պատվեր ' . $no . $A . ' · ' . $cnt . ($lst !== '' ? ' — ' . $lst : '') . $day, 'Admin.dc.html#ws'); $n++; }
+    elseif ((int) ($o['st'] ?? 0) === 2 && strpos((string) $was, '2|') !== 0) { push_admin($db, '❌ ' . $who, 'Չեղարկեց պատվերը ' . $no . $A, 'Admin.dc.html#ws'); $n++; }
+    elseif (!empty($o['payProc']) && (explode('|', (string) $was)[2] ?? '0') !== '1') { push_admin($db, '⏳ ' . $who, 'Վճարումը մշակվում է (ACH) · ' . $no . $A, 'Admin.dc.html#ws'); $n++; }
+  }
+  if ($ch) { if (count($S) > 300) { $S = array_slice($S, -300, null, true); } kv_put($db, '__pnws|' . $em, json_encode($S)); }
+  return $n;
+}
+function pn_retail($db, $em, $v) {
+  $L = is_string($v) ? json_decode($v, true) : $v; if (!is_array($L)) { return 0; } $n = 0;
+  foreach (array_slice($L, -10) as $o) { if (!is_array($o) || empty($o['no'])) { continue; } $k = '__pnr|' . preg_replace('/[^A-Za-z0-9-]/', '', (string) $o['no']); if (kv_get($db, $k)) { continue; } kv_put($db, $k, '1');
+    $c = 0; $nm = []; foreach ((array) ($o['items'] ?? []) as $it) { $q = (int) (is_array($it) ? ($it['qty'] ?? ($it['q'] ?? ($it[1] ?? 1))) : 1); $c += max(1, $q); $t0 = is_array($it) ? (string) ($it['name'] ?? ($it['n'] ?? '')) : ''; if ($t0 !== '' && count($nm) < 3) { $nm[] = $t0 . ' ' . max(1, $q); } }
+    push_admin($db, '🛒 ' . ($em !== '' ? pn_who($db, $em) : 'Նոր հաճախորդ'), 'Նոր պատվեր ' . $o['no'] . ' · ' . (string) ($o['total'] ?? '') . ' · ' . $c . ' ապրանք' . ($nm ? ' — ' . implode(', ', $nm) : '') . (!empty($o['day']) ? ' · ' . date('m/d', strtotime((string) $o['day']) ?: time()) : ''), 'Admin.dc.html'); $n++; }
+  return $n;
+}
+// Chef Apri: production approved, packed boxes, finished deliveries (read here with the server's own token, so a ping can't inject data)
+function apri_watch($db, $force = false) {
+  $last = (int) ((kv_get($db, '__apriw_t') ?: ['v' => '0'])['v']); if (!$force && time() - $last < 40) { return ['skip' => 1]; } kv_put($db, '__apriw_t', (string) time());
+  $t = kv_get($db, '__apri_token'); if (!$t) { return ['err' => 'no_token']; }
+  $P = json_decode((kv_get($db, '__apriw') ?: ['v' => '{}'])['v'], true) ?: []; $first = empty($P); $out = [];
+  $code = 0; $r = apri_rpc('nofa_stock', ['p_token' => $t['v']], $code); $sk = json_decode((string) $r, true);
+  if (is_array($sk) && isset($sk['products'])) { $mk = []; $pkd = []; $un = [];
+    foreach ((array) $sk['products'] as $pr) { $id = (string) ($pr['id'] ?? ''); if ($id === '') { continue; } $nm = (string) ($pr['name'] ?? $id); $m = (float) ($pr['made'] ?? 0); $pp = (float) ($pr['packedPcs'] ?? 0); $u = (float) ($pr['un'] ?? 0);
+      if (!$first && isset($P['m'][$id])) { $dm = $m - (float) $P['m'][$id]; $dp = $pp - (float) ($P['p'][$id] ?? $pp);
+        if ($dm >= 1) { $out[] = ['👨‍🍳 Chef Apri · արտադրություն', '+' . (int) $dm . ' ' . $nm . ' հաստատվեց · պահեստում հիմա՝ ' . (int) $u . ' հատ', 'Admin.dc.html#stock']; }
+        elseif ($dm <= -1) { $out[] = ['⚠️ Chef Apri · արտադրություն', $nm . '՝ ' . (int) $dm . ' հատ (ուղղում կամ մերժում) · պահեստում՝ ' . (int) $u, 'Admin.dc.html#stock']; }
+        if ($dp >= 1) { $out[] = ['📦 Chef Apri · փաթեթավորում', $nm . '՝ +' . (int) $dp . ' հատ փաթեթավորվեց · չփաթեթավորված մնաց՝ ' . (int) $u, 'Admin.dc.html#stock']; } }
+      $mk[$id] = $m; $pkd[$id] = $pp; $un[$id] = $u; }
+    $P['m'] = $mk; $P['p'] = $pkd; $P['u'] = $un; }
+  $c2 = 0; $since = (string) ($P['ds'] ?? gmdate('c', time() - 3600)); $r2 = apri_rpc('nofa_delivery_status', ['p_token' => $t['v'], 'p_since' => $since], $c2); $ds = json_decode((string) $r2, true);
+  if (is_array($ds)) { $seen = (array) ($P['dn'] ?? []); $mx = $since;
+    foreach ($ds as $d) { $id = (string) ($d['id'] ?? ''); $st = (string) ($d['status'] ?? ''); $u0 = (string) ($d['updated_at'] ?? ''); if ($u0 > $mx) { $mx = $u0; } if ($id === '' || ($seen[$id] ?? '') === $st) { continue; } $seen[$id] = $st;
+      if ($first) { continue; } $rs = (array) ($d['result'] ?? []);
+      if (in_array($st, ['done', 'delivered'], true)) { $out[] = ['🚚 Առաքված · ' . $id, 'Ստացավ՝ ' . mb_substr((string) ($rs['signer'] ?? '—'), 0, 40) . (!empty($d['has_photo']) ? ' · 📷' : '') . (!empty($d['has_sig']) ? ' · ✍️' : ''), 'Admin.dc.html']; }
+      elseif (in_array($st, ['failed', 'skipped', 'problem'], true)) { $out[] = ['⚠️ Առաքումը չկայացավ · ' . $id, mb_substr((string) ($rs['note'] ?? ($rs['reason'] ?? $st)), 0, 120), 'Admin.dc.html']; } }
+    if (count($seen) > 400) { $seen = array_slice($seen, -400, null, true); } $P['dn'] = $seen; $P['ds'] = $mx; }
+  kv_put($db, '__apriw', json_encode($P, JSON_UNESCAPED_UNICODE));
+  foreach (array_slice($out, 0, 8) as $x) { push_admin($db, $x[0], $x[1], $x[2]); }
+  return ['n' => count($out), 'first' => $first];
+}
 // Customer account verification (email + type + token), used by account linking.
 function cust_rec($db, $em, $type, $tok) {
   $em = strtolower(trim((string) $em)); $type = $type === 'biz' ? 'biz' : 'retail'; $tok = (string) $tok;
@@ -267,8 +325,11 @@ switch ($a) {
     out(['ok' => true, 'n' => count($S)]);
   case 'push_test': // admin: send a test notification to all admin devices
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); } push_admin($db, '🔔 Ծանուցումները աշխատում են', 'Nectar of Armenia · ադմին'); out(['ok' => true]);
+  case 'apri_ping': // anyone (Chef Apri app after a save): check Chef Apri now; reads with our own token, takes no input
+    if (function_exists('fastcgi_finish_request')) { header('Content-Type: application/json'); echo '{"ok":true}'; fastcgi_finish_request(); try { apri_watch($db); } catch (Throwable $e) {} exit; }
+    $w = []; try { $w = apri_watch($db); } catch (Throwable $e) {} out(['ok' => true] + ($isAdmin ? $w : []));
   case 'push_latest': // admin: text for the newest notification (used by the service worker)
-    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); } $Q = json_decode((kv_get($db, '__pushq') ?: ['v' => '[]'])['v'], true) ?: []; out(['ok' => true, 'n' => $Q[0] ?? null]);
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); } $Q = json_decode((kv_get($db, '__pushq') ?: ['v' => '[]'])['v'], true) ?: []; out(['ok' => true, 'n' => $Q[0] ?? null, 'q' => array_slice($Q, 0, 6)]);
   case 'my_dlv': // customer: who received an own order, when, signature and photo
     $b = body(); $em = strtolower(trim((string) ($b['em'] ?? ''))); $tok = (string) ($b['tok'] ?? ''); $no = preg_replace('/[^A-Za-z0-9\-:]/', '', (string) ($b['no'] ?? ''));
     if ($no === '' || (!cust_rec($db, $em, 'biz', $tok) && !cust_rec($db, $em, 'retail', $tok))) { out(['ok' => false, 'err' => 'auth'], 401); }
@@ -328,12 +389,13 @@ switch ($a) {
     out(['ok' => true]);
   case 'agent_feed': // site agent (key): read-only business + technical snapshot, customer personal data masked
   case 'agent_post': // site agent (key): add a report / proposal / question to the owner's agent thread
-    $AGH = '9cd31ccb3f827c86107a109ba384bd2ccf20f0b0980431d197c23c92266240bb'; $ak = (string) ($_SERVER['HTTP_X_AGENT_KEY'] ?? ($_GET['k'] ?? '')); if (strlen($ak) < 20 || !hash_equals($AGH, hash('sha256', $ak))) { sec_log($db, 'agent_auth_fail', 10); usleep(400000); out(['ok' => false, 'err' => 'auth'], 401); }
+    $AGH = '9cd31ccb3f827c86107a109ba384bd2ccf20f0b0980431d197c23c92266240bb'; $AGA = 'c07c120d8154cadce353c8cd33a8a574f467da61f9768e1b8724706fa81da197'; $ak = (string) ($_SERVER['HTTP_X_AGENT_KEY'] ?? ($_GET['k'] ?? '')); $agFrom = (strlen($ak) >= 20 && $a === 'agent_post' && hash_equals($AGA, hash('sha256', $ak))) ? 'apri' : 'nectar'; if (strlen($ak) < 20 || ($agFrom === 'nectar' && !hash_equals($AGH, hash('sha256', $ak)))) { sec_log($db, 'agent_auth_fail', 10); usleep(400000); out(['ok' => false, 'err' => 'auth'], 401); }
     $J = function ($k, $d) use ($db) { $r = kv_get($db, $k); return $r ? (json_decode($r['v'], true) ?? $d) : $d; };
+    if ($a === 'agent_feed') { try { apri_watch($db); } catch (Throwable $e) {} }
     if ($a === 'agent_post') { $b = body(); $T = $J('__agent_thread', []); $n = 0;
       foreach (array_slice((array) ($b['msgs'] ?? [$b]), 0, 20) as $m) { $ty = in_array(($m['type'] ?? ''), ['report', 'proposal', 'question', 'done', 'alert'], true) ? $m['type'] : 'report'; $ttl = mb_substr(trim((string) ($m['title'] ?? '')), 0, 160); $bd = mb_substr(trim((string) ($m['body'] ?? '')), 0, 8000); if ($ttl === '' && $bd === '') { continue; }
-        $id = 'a' . now_ms() . random_int(10, 99); $T[] = ['id' => $id, 'from' => 'agent', 'type' => $ty, 'title' => $ttl, 'body' => $bd, 'ref' => mb_substr((string) ($m['ref'] ?? ''), 0, 40), 'prio' => in_array(($m['prio'] ?? ''), ['high', 'med', 'low'], true) ? $m['prio'] : 'med', 'at' => gmdate('c'), 'st' => $ty === 'proposal' || $ty === 'question' ? 'open' : 'info']; $n++;
-        if ($ty === 'proposal' || $ty === 'question' || $ty === 'alert') { push_admin($db, ($ty === 'alert' ? '🚨 ' : ($ty === 'proposal' ? '💡 ' : '❓ ')) . 'Ագենտ · ' . $ttl, mb_substr($bd, 0, 140), 'Admin.dc.html#agent'); } }
+        $id = 'a' . now_ms() . random_int(10, 99); $T[] = ['id' => $id, 'from' => 'agent', 'ag' => $agFrom, 'type' => $ty, 'title' => $ttl, 'body' => $bd, 'ref' => mb_substr((string) ($m['ref'] ?? ''), 0, 40), 'prio' => in_array(($m['prio'] ?? ''), ['high', 'med', 'low'], true) ? $m['prio'] : 'med', 'at' => gmdate('c'), 'st' => $ty === 'proposal' || $ty === 'question' ? 'open' : 'info']; $n++;
+        if (($m['notify'] ?? true) !== false) { $ic = ['alert' => '🚨', 'proposal' => '💡', 'question' => '❓', 'done' => '✅', 'report' => '📋'][$ty]; push_admin($db, $ic . ' ' . ($agFrom === 'apri' ? 'Chef Apri ագենտ' : 'Nectar ագենտ'), ($ttl !== '' ? $ttl . ($bd !== '' ? ' — ' : '') : '') . mb_substr(preg_replace('/\s+/u', ' ', $bd), 0, 150), 'Admin.dc.html#agent'); } }
       if (count($T) > 400) { $T = array_slice($T, -400); } kv_put($db, '__agent_thread', json_encode($T, JSON_UNESCAPED_UNICODE)); out(['ok' => true, 'n' => $n]); }
     @ini_set('memory_limit', '512M'); set_error_handler(function ($no, $str, $file, $line) { if (!(error_reporting() & $no)) { return false; } throw new ErrorException($str, 0, $no, $file, $line); }, E_ALL & ~E_DEPRECATED & ~E_NOTICE & ~E_WARNING);
     try {
@@ -419,11 +481,11 @@ switch ($a) {
       $kk0 = (string) ($it['k'] ?? ''); if (!preg_match($em !== '' ? '/^noa-(accounts|orders|(ws-orders|chat|members|deposit|depsign|rewards)\|.+)$/' : '/^noa-orders$/', $kk0)) { $GLOBALS['__secrej'] = ($GLOBALS['__secrej'] ?? 0) + 1; continue; }
       $kind = substr((string) ($it['kind'] ?? 'key'), 0, 20); $data = json_encode(['k' => $it['k'] ?? '', 'v' => $it['v'] ?? null, 'tok' => $tok], JSON_UNESCAPED_UNICODE);
       if (strlen($data) > 400000) { continue; }
-      $ins->execute([$kind, $em, hash('sha256', $em . '|' . $data), $data, $ip, now_ms()]); if ($ins->rowCount() > 0) { $n++; $kk = (string) ($it['k'] ?? ''); if (preg_match('/^noa-(ws-orders|chat|accounts|orders|city-req|deposit|depsign|rewards)/', $kk, $mm)) { $ev[$mm[1]] = 1; } }
+      $ins->execute([$kind, $em, hash('sha256', $em . '|' . $data), $data, $ip, now_ms()]); if ($ins->rowCount() > 0) { $n++; $kk = (string) ($it['k'] ?? ''); if (preg_match('/^noa-(ws-orders|chat|accounts|orders|city-req|deposit|depsign|rewards)/', $kk, $mm)) { $ev[$mm[1]] = 1; if ($mm[1] === 'ws-orders' && $em !== '') { try { pn_wso($db, $em, $it['v'] ?? null); } catch (Throwable $e) {} unset($ev['ws-orders']); } elseif ($mm[1] === 'orders') { try { pn_retail($db, $em, $it['v'] ?? null); } catch (Throwable $e) {} unset($ev['orders']); } } }
     }
     if (!empty($GLOBALS['__secrej'])) { sec_log($db, 'submit_reject', 3); }
     if (!empty($ev)) { $TT = ['ws-orders' => ['🏪 Մեծածախ պատվեր', 'Նոր կամ թարմացված մեծածախ պատվեր'], 'orders' => ['🛒 Նոր պատվեր', 'Նոր մանրածախ պատվեր'], 'chat' => ['💬 Նոր նամակ', 'Հաճախորդը գրել է ձեզ'], 'accounts' => ['👤 Նոր գրանցում', 'Նոր կամ թարմացված հաճախորդի հաշիվ'], 'city-req' => ['📍 Նոր քաղաքի հայտ', 'Հաճախորդը առաջարկել է քաղաք'], 'deposit' => ['🤝 Դեպոզիտ', 'Դեպոզիտի թարմացում'], 'depsign' => ['✍️ Ստորագրություն', 'Խանութը ստորագրել է'], 'rewards' => ['🎁 Անվճար տուփի հայտ', 'Հաճախորդը ընտրել է անվճար տուփ']];
-      $lk = json_decode((kv_get($db, '__pushlast') ?: ['v' => '{}'])['v'], true) ?: []; foreach (array_keys($ev) as $e1) { if (now_ms() - (int) ($lk[$e1 . '|' . $em] ?? 0) < 60000) { continue; } $lk[$e1 . '|' . $em] = now_ms(); push_admin($db, $TT[$e1][0], $TT[$e1][1] . ($em !== '' ? ' · ' . $em : '')); } kv_put($db, '__pushlast', json_encode($lk)); }
+      $lk = json_decode((kv_get($db, '__pushlast') ?: ['v' => '{}'])['v'], true) ?: []; foreach (array_keys($ev) as $e1) { if (now_ms() - (int) ($lk[$e1 . '|' . $em] ?? 0) < 60000) { continue; } $lk[$e1 . '|' . $em] = now_ms(); push_admin($db, mb_substr($TT[$e1][0], 0, 2) . ' ' . ($em !== '' ? pn_who($db, $em) : 'Nectar of Armenia'), $TT[$e1][1]); } kv_put($db, '__pushlast', json_encode($lk)); }
     out(['ok' => true, 'n' => $n]);
   case 'apri_cfg': // admin: save Chef Apri link token (stored server-side only)
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
@@ -601,8 +663,24 @@ switch ($a) {
         $inner = $hy ? '<p style="margin:0 0 12px;font-size:16px">Բարև' . ($who !== '' ? ' ' . mail_esc($who) : '') . ',</p><p style="margin:0 0 14px"><b>Nectar of Armenia</b>-ն ձեզ համար ստեղծել է ' . ($ty === 'biz' ? 'մեծածախ գործընկերոջ' : 'անձնական') . ' էջ։ Այնտեղ կտեսնեք ձեր բոլոր գնումները, հաշիվները և փաստաթղթերը, կարող եք նաև պատվիրել։</p><p style="margin:0">Սեղմեք կոճակը, ընտրեք ձեր գաղտնաբառը, և էջը կդառնա ձերը։ Հղումը գործում է 14 օր։</p>' . $btn . '<p style="font-size:12.5px;color:#7A817C;margin:18px 0 0">Հարցերի դեպքում զանգահարեք +1 (515) 588-5555։</p>'
           : '<p style="margin:0 0 12px;font-size:16px">Hello' . ($who !== '' ? ' ' . mail_esc($who) : '') . ',</p><p style="margin:0 0 14px"><b>Nectar of Armenia</b> has created a ' . ($ty === 'biz' ? 'wholesale partner' : 'personal') . ' account for you. There you can see all your purchases, invoices and documents, and place orders.</p><p style="margin:0">Press the button, choose your password and the account is yours. The link works for 14 days.</p>' . $btn . '<p style="font-size:12.5px;color:#7A817C;margin:18px 0 0">Questions? Call +1 (515) 588-5555.</p>';
         $sent = smtp_send($m, $em, $hy ? 'Ձեր էջը Nectar of Armenia-ում պատրաստ է' : 'Your Nectar of Armenia account is ready', mail_tpl($hy ? 'Բարի գալուստ 🌿' : 'Welcome 🌿', $inner, $hy ? 'hy' : 'en'), $merr); if ($sent) { $rec['invSentAt'] = gmdate('c'); } } else { $merr = 'nomail'; } } }
+    $imp = 0; $impName = trim((string) ($b['importName'] ?? ''));
+    if ($ty === 'biz' && $impName !== '') { // previous phone orders of this store (cost sheet) become the store's order history
+      $nrm = function ($x) { return preg_replace('/[^a-z0-9]/', '', mb_strtolower((string) $x)); }; $want = $nrm($impName);
+      $cv = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: []; $PR = (array) ($cv['prod'] ?? []);
+      $SI = ['gata' => 0, 'khash' => 1, 'khbroth' => 2, 'khset' => 3, 'khinkali' => 4, 'pelmeni' => 5, 'blinchik' => 6, 'kufta' => 7, 'kiev' => 8, 'chcut' => 9, 'beefcut' => 10];
+      $ok0 = 'noa-ws-orders|' . $em; $RO = json_decode((kv_get($db, $ok0) ?: ['v' => '[]'])['v'], true) ?: []; $have = []; foreach ($RO as $o0) { if (is_array($o0)) { $have[(string) ($o0['no'] ?? '')] = 1; } }
+      $cprofKey = null; foreach ((array) ($cv['cprof'] ?? []) as $ck => $q) { if (substr((string) $ck, -2) === '|w' && $nrm(substr((string) $ck, 0, -2)) === $want) { $cprofKey = $ck; } }
+      foreach ((array) ($cv['calls'] ?? []) as $c) { if (!is_array($c) || ($c['type'] ?? '') !== 'w' || $nrm($c['name'] ?? '') !== $want) { continue; }
+        $no = 'NofA-T-' . substr((string) ($c['id'] ?? ''), -5); if (isset($have[$no])) { continue; }
+        $items = []; $tot = 0; $allPcs = true; foreach ((array) ($c['lines'] ?? []) as $l) { $pr = $PR[(int) ($l[0] ?? -1)] ?? null; if (!is_array($pr)) { continue; } $pcs = ((int) ($l[1] ?? 0)) === 1; if (!$pcs) { $allPcs = false; } $q = (float) ($l[2] ?? 0); $u = isset($l[3]) && $l[3] !== null ? (float) $l[3] : (float) (($pr['pr'] ?? [])[2 + ($pcs ? 1 : 0)] ?? 0); $tot += $q * $u; $si = $SI[(string) ($pr['id'] ?? '')] ?? null; if ($si !== null) { $items[] = [$si, $q]; } }
+        if (!$items) { continue; } $d = (string) ($c['ddate'] ?? ($c['date'] ?? '')); $iso = preg_match('/^\d{4}-\d{2}-\d{2}/', $d) ? substr($d, 0, 10) . 'T12:00:00.000Z' : gmdate('c');
+        if (empty($rec['phone']) && !empty($c['phone'])) { $rec['phone'] = mb_substr((string) $c['phone'], 0, 40); } if (empty($rec['addr']) && !empty($c['addr'])) { $rec['addr'] = mb_substr((string) $c['addr'], 0, 160); }
+        $RO[] = ['no' => $no, 'date' => $iso, 'reqDate' => $iso, 'at' => $iso, 'items' => $items, 'pack' => $allPcs ? 'pcs' : 'pk', 'amt' => round($tot, 2), 'st' => !empty($c['past']) ? 2 : 1, 'ap' => 'approved', 'paid' => !empty($c['paid']), 'pm' => !empty($c['paid']) ? (string) ($c['pm'] ?? 'Paid') : 'Invoice', 'by' => 'Nectar of Armenia', 'imported' => 1, 'src' => 'phone']; $have[$no] = 1; $imp++; }
+      if ($imp) { usort($RO, function ($x, $y) { return strcmp((string) ($x['date'] ?? ''), (string) ($y['date'] ?? '')); }); kv_put($db, $ok0, json_encode($RO, JSON_UNESCAPED_UNICODE)); }
+      if ($cprofKey) { $cv['cprof'][$cprofKey]['em'] = $em; kv_put($db, 'noa-cost-v2', json_encode($cv, JSON_UNESCAPED_UNICODE)); }
+      $rec['importedFrom'] = $impName; }
     $A[$key] = $rec; kv_put($db, 'noa-accounts', json_encode($A, JSON_UNESCAPED_UNICODE));
-    out(['ok' => true, 'key' => $key, 'acct' => $rec, 'has' => $has, 'link' => $link, 'sent' => $sent, 'merr' => $sent ? '' : (string) $merr]);
+    out(['ok' => true, 'key' => $key, 'acct' => $rec, 'imported' => $imp, 'has' => $has, 'link' => $link, 'sent' => $sent, 'merr' => $sent ? '' : (string) $merr]);
   case 'pay_inv': // wholesale customer: pay an invoice balance by card; amount computed here from the stored invoice
     $sk = stripe_sk($db); if ($sk === '') { out(['ok' => false, 'err' => 'off']); }
     $b = body(); $me = cust_rec($db, $b['em'] ?? '', 'biz', $b['tok'] ?? ''); if (!$me) { $me = cust_rec($db, $b['em'] ?? '', 'retail', $b['tok'] ?? ''); } if (!$me) { out(['ok' => false, 'err' => 'auth'], 401); }
