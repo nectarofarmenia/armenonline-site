@@ -210,14 +210,16 @@ setInterval(upd,400);setTimeout(upd,300);})();</script>
   function sharedKeys() { var out = []; for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && SHARED.test(k)) { out.push(k); } } return out; }
   function adminPull(first) {
     return req("all").then(function (j) { if (!j.ok) { throw j; } var m = meta(), changed = false, firstDevice = !m.__init, toPush = [];
-      Object.keys(j.kv).forEach(function (k) { if (!SHARED.test(k)) { return; } var sv = j.kv[k].v, lv = LG(k), mk = m[k] || {};
+      var kk = Object.keys(j.kv); kk.sort(function (x, y) { return (y === "noa-accounts") - (x === "noa-accounts"); }); kk.forEach(function (k) { try { syncKey(k); } catch (eK) { window.__nofaSyncErr = (window.__nofaSyncErr || []).concat(k + ": " + (eK && eK.message || eK)); } });
+      function syncKey(k) { if (!SHARED.test(k)) { return; } var sv = j.kv[k].v, lv = LG(k), mk = m[k] || {};
         if (lv === sv) { m[k] = { h: h(sv), t: j.kv[k].t }; return; }
         var localDirty = lv != null && mk.h !== h(lv);
         if (localDirty && k === "noa-accounts") { var LA = J(k, {}), SA = {}; try { SA = JSON.parse(sv || "{}") || {}; } catch (e0) {} var MA = {}; Object.keys(SA).forEach(function (q) { MA[q] = SA[q]; }); Object.keys(LA).forEach(function (q) { var l = LA[q], r = SA[q]; if (!r) { if (l && l.noEmail) { return; } MA[q] = l; return; } var lt = Date.parse((l && (l.decidedAt || l.createdAt)) || "") || 0, rt = Date.parse((r && (r.decidedAt || r.createdAt)) || "") || 0; MA[q] = lt > rt ? Object.assign({}, r, l) : Object.assign({}, l, r); }); var ms = JSON.stringify(MA); if (ms !== lv) { LS(k, ms); changed = true; } m[k] = { h: h(sv), t: j.kv[k].t }; return; }
         if (localDirty && !firstDevice && /^noa-ws-orders\|/.test(k)) { var mg = JSON.stringify(mergeList(J(k, []), JSON.parse(sv || "[]") || [], true)); if (mg !== lv) { LS(k, mg); changed = true; } m[k] = { h: h(sv), t: j.kv[k].t }; return; }
         if (firstDevice && lv != null) { if (String(lv).length > String(sv).length) { toPush.push({ k: k, v: lv, backup: true }); return; } }
         else if (localDirty && mk.t && mk.t >= j.kv[k].t) { return; }
-        LS(k, sv); m[k] = { h: h(sv), t: j.kv[k].t }; changed = true; });
+        LS(k, sv); m[k] = { h: h(sv), t: j.kv[k].t }; changed = true; }
+      if (window.__nofaSyncErr && window.__nofaSyncErr.length) { try { navigator.sendBeacon("/api/api.php?a=ux", new Blob([JSON.stringify({ p: "Admin.dc.html", e: window.__nofaSyncErr.slice(0, 5).map(function (x) { return { m: "sync " + x }; }) })], { type: "application/json" })); } catch (eB) {} window.__nofaSyncErr = []; }
       m.__t = Math.max(m.__t || 0, j.now || 0);
       if (firstDevice) { m.__init = Date.now(); }
       setMeta(m);
@@ -339,7 +341,7 @@ setInterval(upd,400);setTimeout(upd,300);})();</script>
   window.nofaApriSync = apriSync;
   function startAdmin() {
     logoutBtn(); setInterval(logoutBtn, 1500);
-    adminPull(true).then(function (changed) { return adminInbox().then(function (n) { return adminPush().then(function () { if (changed || n) { location.reload(); } else { toast("✓ Տվյալները համաժամեցված են սերվերի հետ"); } }); }); }).catch(function (e) { if (e && e.err === "auth") { toast("🔒 Մուտքի ժամկետը լրացել է — մուտք գործեք նորից"); setTimeout(function () { location.reload(); }, 1800); } else { toast("⚠️ Սերվերի հետ կապ չկա — ստուգեք ինտերնետը և թարմացրեք էջը"); } });
+    adminPull(true).then(function (changed) { return adminInbox().then(function (n) { return adminPush().then(function () { if (changed || n) { location.reload(); } else { toast("✓ Տվյալները համաժամեցված են սերվերի հետ"); } }); }); }).catch(function (e) { if (e && e.err === "auth") { toast("🔒 Մուտքի ժամկետը լրացել է — մուտք գործեք նորից"); setTimeout(function () { location.reload(); }, 1800); } else { try { navigator.sendBeacon("/api/api.php?a=ux", new Blob([JSON.stringify({ p: "Admin.dc.html", e: [{ m: "sync fail " + String(e && (e.message || e.err || e.__status) || e).slice(0, 150) }] })], { type: "application/json" })); } catch (eB) {} toast("⚠️ Սերվերի հետ կապ չկա — ստուգեք ինտերնետը և թարմացրեք էջը"); } });
     setInterval(function () { adminPush().catch(function () {}); }, 4000);
     setInterval(function () { adminInbox().then(function (n) { if (n) { toast("📥 Նոր տվյալներ հաճախորդներից"); return adminPush().then(function () { if (idle()) { location.reload(); } }); } }).catch(function () {}); }, 30000);
     setTimeout(function () { apriSync().then(function (c) { if (c) { return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 2500);
