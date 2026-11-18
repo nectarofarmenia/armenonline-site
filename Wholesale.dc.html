@@ -107,6 +107,7 @@ aside.card3d-dark, .card3d-dark.sum-card { background: linear-gradient(180deg,#3
       Object.keys(j.kv).forEach(function (k) { if (!SHARED.test(k)) { return; } var sv = j.kv[k].v, lv = LG(k), mk = m[k] || {};
         if (lv === sv) { m[k] = { h: h(sv), t: j.kv[k].t }; return; }
         var localDirty = lv != null && mk.h !== h(lv);
+        if (localDirty && k === "noa-accounts") { var LA = J(k, {}), SA = {}; try { SA = JSON.parse(sv || "{}") || {}; } catch (e0) {} var MA = {}; Object.keys(SA).forEach(function (q) { MA[q] = SA[q]; }); Object.keys(LA).forEach(function (q) { var l = LA[q], r = SA[q]; if (!r) { if (l && l.noEmail) { return; } MA[q] = l; return; } var lt = Date.parse((l && (l.decidedAt || l.createdAt)) || "") || 0, rt = Date.parse((r && (r.decidedAt || r.createdAt)) || "") || 0; MA[q] = lt > rt ? Object.assign({}, r, l) : Object.assign({}, l, r); }); var ms = JSON.stringify(MA); if (ms !== lv) { LS(k, ms); changed = true; } m[k] = { h: h(sv), t: j.kv[k].t }; return; }
         if (localDirty && !firstDevice && /^noa-ws-orders\|/.test(k)) { var mg = JSON.stringify(mergeList(J(k, []), JSON.parse(sv || "[]") || [], true)); if (mg !== lv) { LS(k, mg); changed = true; } m[k] = { h: h(sv), t: j.kv[k].t }; return; }
         if (firstDevice && lv != null) { if (String(lv).length > String(sv).length) { toPush.push({ k: k, v: lv, backup: true }); return; } }
         else if (localDirty && mk.t && mk.t >= j.kv[k].t) { return; }

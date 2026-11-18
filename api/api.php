@@ -26,6 +26,7 @@ if (!kv_get($db, '__mig_pel3')) { $cr = kv_get($db, 'noa-cost-v2'); $cv = $cr ? 
   if (is_array($cv) && isset($cv['prod']) && is_array($cv['prod'])) { foreach ($cv['prod'] as &$pp) { if (($pp['id'] ?? '') === 'pelmeni') { if (!isset($pp['pr']) || !is_array($pp['pr'])) { $pp['pr'] = [0, 0, 0, 0]; } $pp['pr'][0] = 32; $pp['pr'][2] = 24; } } unset($pp); $cv['prPel2'] = 1; $cv['prPel3'] = 1; kv_put($db, 'noa-cost-v2', json_encode($cv, JSON_UNESCAPED_UNICODE)); }
   kv_put($db, '__mig_pel3', '1'); }
 
+if (!kv_get($db, '__acc_gone')) { kv_put($db, '__acc_gone', json_encode(['gary-s-mom-s-bakery.pending@nectarofarmenia.com|biz'])); }
 if (kv_get($db, '__mig_stores2') && !kv_get($db, '__mig_gary_em')) { kv_put($db, '__mig_gary_em', '1'); try { cinvite_do($db, ['acc' => ['type' => 'biz', 'biz' => "Gary's Mom's Bakery", 'email' => 'garysmomsbakery@gmail.com'], 'importName' => "Gary's Mom's Bakery"], $https); } catch (Throwable $e) {} }
 if (kv_get($db, '__mig_stores1') && !kv_get($db, '__mig_stores2')) { kv_put($db, '__mig_stores2', '1'); try { foreach (['gary-s-mom-s-bakery', 'voskevaz-market'] as $sl2) { $k2 = 'noa-ws-orders|' . $sl2 . '.pending@nectarofarmenia.com'; $L2 = json_decode((kv_get($db, $k2) ?: ['v' => '[]'])['v'], true) ?: []; $L2 = array_values(array_filter($L2, function ($o) { return !(is_array($o) && !empty($o['imported'])); })); kv_put($db, $k2, json_encode($L2, JSON_UNESCAPED_UNICODE)); }
   foreach (["Gary's Mom's Bakery", 'Voskevaz Market'] as $sn2) { $sl2 = trim(preg_replace('/[^a-z0-9]+/', '-', strtolower($sn2)), '-'); cinvite_do($db, ['acc' => ['type' => 'biz', 'biz' => $sn2, 'email' => $sl2 . '.pending@nectarofarmenia.com'], 'importName' => $sn2, 'noEmail' => 1], $https); } } catch (Throwable $e) {} }
@@ -113,7 +114,7 @@ function cinvite_do($db, $b, $https) {
         $oo = json_decode((kv_get($db, 'noa-ws-orders|' . $old) ?: ['v' => '[]'])['v'], true) ?: []; $nn = json_decode((kv_get($db, 'noa-ws-orders|' . $em) ?: ['v' => '[]'])['v'], true) ?: []; $hv = []; foreach ($nn as $o1) { if (is_array($o1)) { $hv[(string) ($o1['no'] ?? '')] = 1; } } foreach ($oo as $o1) { if (is_array($o1) && empty($hv[(string) ($o1['no'] ?? '')])) { $nn[] = $o1; } }
         if ($nn) { kv_put($db, 'noa-ws-orders|' . $em, json_encode($nn, JSON_UNESCAPED_UNICODE)); } kv_put($db, 'noa-ws-orders|' . $old, '[]');
         $cv0 = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: []; $ch0 = false; foreach ((array) ($cv0['cprof'] ?? []) as $ck0 => $q0) { if (is_array($q0) && ($q0['em'] ?? '') === $old) { $cv0['cprof'][$ck0]['em'] = $em; $ch0 = true; } } if ($ch0) { kv_put($db, 'noa-cost-v2', json_encode($cv0, JSON_UNESCAPED_UNICODE)); }
-        $rec['movedFrom'] = $old; break; } } }
+        $rec['movedFrom'] = $old; $GN = json_decode((kv_get($db, '__acc_gone') ?: ['v' => '[]'])['v'], true) ?: []; $GN[] = $k0; kv_put($db, '__acc_gone', json_encode(array_values(array_unique($GN)))); break; } } }
     if (!empty($b['noEmail'])) { $rec['noEmail'] = 1; }
     foreach (['first', 'last', 'contact', 'role', 'phone', 'biz', 'bizType', 'addr', 'city', 'zip', 'permit', 'ein', 'note'] as $f) { if (array_key_exists($f, $in) && trim((string) $in[$f]) !== '') { $rec[$f] = mb_substr(trim((string) $in[$f]), 0, 200); } }
     $rec['type'] = $ty; $rec['email'] = $em; if (empty($rec['tok'])) { $rec['tok'] = bin2hex(random_bytes(16)); }
@@ -146,6 +147,14 @@ function cinvite_do($db, $b, $https) {
       $rec['importedFrom'] = $impName; }
     $A[$key] = $rec; kv_put($db, 'noa-accounts', json_encode($A, JSON_UNESCAPED_UNICODE));
     return ['ok' => true, 'key' => $key, 'acct' => $rec, 'imported' => $imp, 'has' => $has, 'link' => $link, 'sent' => $sent, 'merr' => $sent ? '' : (string) $merr];
+}
+// accounts sent by an admin browser replace the server copy; keep accounts the server created meanwhile (invites, store imports) and never bring back moved ones
+function acc_merge($db, $v) {
+  $IN = json_decode($v, true); if (!is_array($IN)) { return $v; } $CUR = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: [];
+  $GONE = json_decode((kv_get($db, '__acc_gone') ?: ['v' => '[]'])['v'], true) ?: []; $ch = false;
+  foreach ($CUR as $k => $r) { if (isset($IN[$k]) || !is_array($r)) { continue; } $t = max(strtotime((string) ($r['createdAt'] ?? '')) ?: 0, strtotime((string) ($r['invitedAt'] ?? '')) ?: 0, strtotime((string) ($r['decidedAt'] ?? '')) ?: 0); if (!empty($r['byAdmin']) || !empty($r['importedFrom']) || $t > time() - 30 * 86400) { $IN[$k] = $r; $ch = true; } }
+  foreach ($GONE as $g) { if (isset($IN[$g])) { unset($IN[$g]); $ch = true; } }
+  return $ch ? json_encode($IN, JSON_UNESCAPED_UNICODE) : $v;
 }
 // Customer account verification (email + type + token), used by account linking.
 function cust_rec($db, $em, $type, $tok) {
@@ -511,7 +520,7 @@ switch ($a) {
       $v = $it['v'] ?? null;
       if (!empty($it['backup'])) { $old = kv_get($db, $k); if ($old && $old['v'] !== $v) { $s = $db->prepare('INSERT INTO nofa_backup (k, v, t) VALUES (?, ?, ?)'); $s->execute([$k, $old['v'], now_ms()]); } }
       if ($v === null) { $db->prepare('DELETE FROM nofa_kv WHERE k = ?')->execute([$k]); $done[$k] = now_ms(); }
-      else { $done[$k] = kv_put($db, $k, (string) $v); }
+      else { if ($k === 'noa-accounts') { $v = acc_merge($db, (string) $v); } $done[$k] = kv_put($db, $k, (string) $v); }
     }
     if (array_intersect(array_keys($done), ['noa-stock', 'noa-stock-pcs', 'noa-cost-v2'])) { try { apri_stock_sync($db); } catch (Throwable $e) {} }
     out(['ok' => true, 't' => $done]);
