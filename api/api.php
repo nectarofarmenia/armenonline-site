@@ -147,7 +147,7 @@ function sec_log($db, $type, $alertAt = 0) { // security events by day for the a
       $al = $last; if (count($W) >= $alertAt && $last < time() - 3600) { $al = time(); $TT = ['admin_login_fail' => 'Ադմինի մուտքի անհաջող փորձեր', 'cust_login_fail' => 'Հաճախորդների մուտքի անհաջող փորձեր', 'submit_reject' => 'Կասկածելի տվյալների ուղարկում', 'agent_auth_fail' => 'Ագենտի բանալու սխալ փորձեր']; push_admin($db, '🛡 Անվտանգություն · ' . ($TT[$type] ?? $type), count($W) . ' փորձ վերջին 15 րոպեում։ Կայքը արգելափակել է դրանք. ստուգեք Ագենտ բաժինը։', 'Admin.dc.html#agent'); }
       kv_put($db, $wk, json_encode(['t' => $W, 'al' => $al])); } } catch (Throwable $e) {}
 }
-// Warehouse → My Apri Work, done by the server itself whenever the stock keys change (no admin page needs to be open).
+// Warehouse → Chef Apri, done by the server itself whenever the stock keys change (no admin page needs to be open).
 // Same shape as the admin page's push: 11 fixed products, packs + loose pieces + pieces per pack.
 function apri_stock_items($db) {
   $S = json_decode((kv_get($db, 'noa-stock') ?: ['v' => 'null'])['v'], true); if (!is_array($S) || count($S) !== 11) { return null; }
@@ -419,12 +419,12 @@ switch ($a) {
     if (!empty($ev)) { $TT = ['ws-orders' => ['🏪 Մեծածախ պատվեր', 'Նոր կամ թարմացված մեծածախ պատվեր'], 'orders' => ['🛒 Նոր պատվեր', 'Նոր մանրածախ պատվեր'], 'chat' => ['💬 Նոր նամակ', 'Հաճախորդը գրել է ձեզ'], 'accounts' => ['👤 Նոր գրանցում', 'Նոր կամ թարմացված հաճախորդի հաշիվ'], 'city-req' => ['📍 Նոր քաղաքի հայտ', 'Հաճախորդը առաջարկել է քաղաք'], 'deposit' => ['🤝 Դեպոզիտ', 'Դեպոզիտի թարմացում'], 'depsign' => ['✍️ Ստորագրություն', 'Խանութը ստորագրել է'], 'rewards' => ['🎁 Անվճար տուփի հայտ', 'Հաճախորդը ընտրել է անվճար տուփ']];
       $lk = json_decode((kv_get($db, '__pushlast') ?: ['v' => '{}'])['v'], true) ?: []; foreach (array_keys($ev) as $e1) { if (now_ms() - (int) ($lk[$e1 . '|' . $em] ?? 0) < 60000) { continue; } $lk[$e1 . '|' . $em] = now_ms(); push_admin($db, $TT[$e1][0], $TT[$e1][1] . ($em !== '' ? ' · ' . $em : '')); } kv_put($db, '__pushlast', json_encode($lk)); }
     out(['ok' => true, 'n' => $n]);
-  case 'apri_cfg': // admin: save My Apri link token (stored server-side only)
+  case 'apri_cfg': // admin: save Chef Apri link token (stored server-side only)
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $b = body(); $tok = preg_replace('/[^a-zA-Z0-9]/', '', (string) ($b['token'] ?? ''));
     if (strlen($tok) < 16) { out(['ok' => false, 'err' => 'bad_token'], 400); }
     kv_put($db, '__apri_token', $tok); out(['ok' => true]);
-  case 'apri_pull': // admin: approved production from My Apri Work (sums only)
+  case 'apri_pull': // admin: approved production from Chef Apri (sums only)
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $t = kv_get($db, '__apri_token'); if (!$t) { out(['ok' => false, 'err' => 'no_token']); }
     $from = preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['from'] ?? '') ? $_GET['from'] : date('Y-m-d', time() - 60 * 86400);
@@ -435,14 +435,14 @@ switch ($a) {
     if ($r === false || $code >= 400) { out(['ok' => false, 'err' => 'apri_http', 'code' => $code, 'body' => substr((string) $r, 0, 300)]); }
     $rows = json_decode($r, true); if (!is_array($rows)) { out(['ok' => false, 'err' => 'apri_bad']); }
     out(['ok' => true, 'rows' => $rows, 'from' => $from, 'to' => $to]);
-  case 'apri_drivers': // admin: drivers registered in My Apri Work (names only)
-  case 'apri_push':    // admin: open stops for My Apri drivers (full snapshot)
+  case 'apri_drivers': // admin: drivers registered in Chef Apri (names only)
+  case 'apri_push':    // admin: open stops for Chef Apri drivers (full snapshot)
   case 'apri_dstatus': // admin: delivery results since a time
   case 'apri_proof':   // admin: photo + signature of one stop
   case 'apri_routes':  // admin: drivers' planned routes (order, miles, times, earnings)
-  case 'apri_stock':   // admin: warehouse from My Apri Work (made, packed, lots with expiry)
-  case 'apri_stock_push': // admin: this site's warehouse (packs + loose pieces) to My Apri Work
-  case 'apri_cost_push':  // admin: cost sheet summary (cost per piece/pack, price list, recipe cost) to My Apri Work (admin-only there)
+  case 'apri_stock':   // admin: warehouse from Chef Apri (made, packed, lots with expiry)
+  case 'apri_stock_push': // admin: this site's warehouse (packs + loose pieces) to Chef Apri
+  case 'apri_cost_push':  // admin: cost sheet summary (cost per piece/pack, price list, recipe cost) to Chef Apri (admin-only there)
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $t = kv_get($db, '__apri_token'); if (!$t) { out(['ok' => false, 'err' => 'no_token']); }
     if ($a === 'apri_drivers') { $fn = 'nofa_drivers'; $args = []; }
@@ -659,7 +659,7 @@ switch ($a) {
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     out(['ok' => true, 'paid' => json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: new stdClass()]);
   case 'pub': // anyone: public site settings (theme, stock, cities)
-    // safety net: at most every 10 minutes a site visit re-checks the warehouse sent to My Apri Work (sends only if it changed)
+    // safety net: at most every 10 minutes a site visit re-checks the warehouse sent to Chef Apri (sends only if it changed)
     try { $ck = kv_get($db, '__apri_stock_chk'); if (!$ck || now_ms() - (int) $ck['t'] > 600000) { kv_put($db, '__apri_stock_chk', '1'); apri_stock_sync($db); } } catch (Throwable $e) {}
     $res = []; foreach ($PUBLIC as $k) { $r = kv_get($db, $k); if ($r) { $res[$k] = $r['v']; } }
     // wholesale prices from the admin cost/price page (prices only, never costs or recipes)

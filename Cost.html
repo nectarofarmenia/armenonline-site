@@ -441,7 +441,7 @@ button.cn{border:0;background:none;padding:0;font:inherit;font-weight:800;color:
       return req("ack", { ids: ids }).then(function () { return n; }); });
   }
 
-  /* ---------- My Apri Work: approved production -> warehouse ---------- */
+  /* ---------- Chef Apri: approved production -> warehouse ---------- */
   function apriIdx(name) { var n = String(name || "").toLowerCase(); if (/kiev|կիև|կիեվ/.test(n)) { return 8; } if (/gata|գաթա/.test(n)) { return 0; } if (/khinkal|խինկալ/.test(n)) { return 4; } if (/pelmen|պելմեն/.test(n)) { return 5; } if (/blinch|բլինչ/.test(n)) { return 6; } if (/kuft|kyuft|քուֆթ|քյուֆթ/.test(n)) { return 7; } if (/beef|տավար/.test(n)) { return 10; } if (/chick|հավ/.test(n)) { return 9; } if (/khash|խաշ/.test(n)) { return 1; } return -1; }
   function ppk() { var P = [12, 1, 1, 1, 10, 35, 10, 10, 6, 6, 6]; try { var C = J("noa-cost-v2", {}); var idm = { gata: 0, khinkali: 4, pelmeni: 5, blinchik: 6, kufta: 7, kiev: 8, chcut: 9, beefcut: 10 }; (C.prod || []).forEach(function (p) { if (idm[p.id] != null && +p.packPcs > 0) { P[idm[p.id]] = +p.packPcs; } }); } catch (e) {} return P; }
   function apriSync() {
@@ -456,7 +456,7 @@ button.cn{border:0;background:none;padding:0;font:inherit;font-weight:800;color:
       if (changed) { LS("noa-prod", JSON.stringify(L)); LS("noa-stock", JSON.stringify(S)); LS("noa-stock-pcs", JSON.stringify(Lo)); }
       return changed; }).catch(function () { LS("noa-apri-st", JSON.stringify({ ok: false, err: "Կապի սխալ", at: new Date().toISOString() })); return false; });
   }
-  /* Drivers (My Apri Work): push open stops assigned to My Apri drivers, pull delivery results. */
+  /* Drivers (Chef Apri): push open stops assigned to Chef Apri drivers, pull delivery results. */
   var drvBusy = false;
   function drvPush() {
     var S = window.__nofaStops; if (!S || !S.ready) { return Promise.resolve(false); }
@@ -499,7 +499,7 @@ button.cn{border:0;background:none;padding:0;font:inherit;font-weight:800;color:
   }
   function drvSync() { if (drvBusy) { return Promise.resolve(0); } drvBusy = true; var auto = 0; return drvAuto().then(function (x) { auto = x; }).then(drvPush).catch(function () {}).then(drvPull).then(function (n) { return n + auto; }).catch(function () { return 0; }).finally(function () { drvBusy = false; }); }
   window.nofaDrvSync = drvSync;
-  /* Drivers registered in My Apri join the website list on their own; matched by My Apri id, email, phone, then name. */
+  /* Drivers registered in Chef Apri join the website list on their own; matched by Chef Apri id, email, phone, then name. */
   function dg10(x) { var d = String(x || "").replace(/\D/g, ""); return d.length >= 10 ? d.slice(-10) : ""; }
   function drvMerge(L) {
     var a = J("noa-drivers", null); if (!Array.isArray(a) || !a.length) { a = [{ name: "Arsen", phone: "", email: "", st: "demo" }, { name: "Gor", phone: "", email: "", st: "demo" }, { name: "Narek", phone: "", email: "", st: "demo" }]; }
@@ -517,7 +517,7 @@ button.cn{border:0;background:none;padding:0;font:inherit;font-weight:800;color:
     return { n: (L || []).length, add: add, link: link, ch: ch };
   }
   window.nofaDrvLoad = function () { return req("apri_drivers").then(function (j) { if (!j.ok) { throw j; } LS("noa-dlv-dt", String(Date.now())); return drvMerge(j.data || []); }); };
-  function drvAuto() { if (Date.now() - (+LG("noa-dlv-dt") || 0) < 300000) { return Promise.resolve(0); } return window.nofaDrvLoad().then(function (r) { if (r.add) { toast("🚚 Նոր վարորդ My Apri-ից"); } return r.ch ? 1 : 0; }).catch(function () { LS("noa-dlv-dt", String(Date.now())); return 0; }); }
+  function drvAuto() { if (Date.now() - (+LG("noa-dlv-dt") || 0) < 300000) { return Promise.resolve(0); } return window.nofaDrvLoad().then(function (r) { if (r.add) { toast("🚚 Նոր վարորդ Chef Apri-ից"); } return r.ch ? 1 : 0; }).catch(function () { LS("noa-dlv-dt", String(Date.now())); return 0; }); }
   window.nofaApriDrivers = function () { return req("apri_drivers").then(function (j) { if (!j.ok) { throw j; } return j.data || []; }); };
   window.nofaApriSave = function (tok) { return req("apri_cfg", { token: tok }).then(function (j) { if (!j.ok) { throw j; } return apriSync(); }); };
   window.nofaApriSync = apriSync;
@@ -527,7 +527,7 @@ button.cn{border:0;background:none;padding:0;font:inherit;font-weight:800;color:
     setInterval(function () { adminPush().catch(function () {}); }, 4000);
     setInterval(function () { adminInbox().then(function (n) { if (n) { toast("📥 Նոր տվյալներ հաճախորդներից"); return adminPush().then(function () { if (idle()) { location.reload(); } }); } }).catch(function () {}); }, 30000);
     setTimeout(function () { apriSync().then(function (c) { if (c) { return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 2500);
-    setInterval(function () { apriSync().then(function (c) { if (c) { toast("🏭 Նոր արտադրություն My Apri-ից"); return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 180000);
+    setInterval(function () { apriSync().then(function (c) { if (c) { toast("🏭 Նոր արտադրություն Chef Apri-ից"); return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 180000);
     setTimeout(function () { drvSync().then(function (n) { if (n) { return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 6000);
     setInterval(function () { drvSync().then(function (n) { if (n) { return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 60000);
     setInterval(function () { if (!idle()) { return; } adminPull(false).then(function (c) { if (c && idle()) { location.reload(); } }).catch(function () {}); }, 45000);
