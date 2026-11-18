@@ -3,7 +3,7 @@ self.addEventListener("install", function () { self.skipWaiting(); });
 self.addEventListener("activate", function (e) { e.waitUntil(self.clients.claim()); });
 self.addEventListener("push", function (e) {
   e.waitUntil(fetch("/api/api.php?a=push_latest", { credentials: "include", cache: "no-store" }).then(function (r) { return r.json(); }).catch(function () { return {}; }).then(function (j) {
-    var show = function (n) { return self.registration.showNotification(n.title || "Nectar of Armenia", { body: n.body || "", icon: "/img/icon-192-green.png", badge: "/img/icon-192-green.png", tag: "nofa-" + (n.t || Date.now()), timestamp: n.t || Date.now(), data: { url: "/" + String(n.url || "Admin.dc.html").replace(/^\//, "") } }); };
+    var show = function (n) { var tt = String(n.title || ""); var ic = /Chef Apri ագենտ/.test(tt) ? "/img/agent-apri-192.png" : (/Nectar ագենտ/.test(tt) ? "/img/agent-nectar-192.png" : "/img/icon-192-green.png"); return self.registration.showNotification(n.title || "Nectar of Armenia", { body: n.body || "", icon: ic, badge: "/img/icon-192-green.png", tag: "nofa-" + (n.t || Date.now()), timestamp: n.t || Date.now(), data: { url: "/" + String(n.url || "Admin.dc.html").replace(/^\//, "") } }); };
     var Q = (j && j.q) || (j && j.n ? [j.n] : []); if (!Q.length) { return show({ title: "Nectar of Armenia", body: "Նոր ծանուցում ադմինում", url: "Admin.dc.html" }); }
     // show every notice not shown yet (several can arrive together), newest last
     return caches.open("nofa-sw").then(function (c) { return c.match("/__pushlast").then(function (r) { return r ? r.text() : "0"; }).then(function (lt) {
