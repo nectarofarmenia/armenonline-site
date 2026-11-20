@@ -148,6 +148,7 @@ Array.prototype.forEach.call(p.querySelectorAll('.nm-l'),function(b){b.onclick=f
 function bar(){var main=document.querySelector('.two-col > main');if(!main){return null;}var b=document.getElementById('nm-bar');if(!b){b=document.createElement('div');b.id='nm-bar';b.className='nm-bar';b.innerHTML='<button type="button" class="nm-btn">☰ Մենյու</button><span class="nm-cur"></span><button type="button" class="nm-eye" data-priv="1">👁</button>';main.parentNode.insertBefore(b,main);b.querySelector('.nm-btn').onclick=function(e){e.stopPropagation();open();};}return b;}
 function upd(){var ob=document.getElementById('nm-bar');if(ob){ob.remove();}if(window.innerWidth>=760){close();}}document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.nm-hb');if(b){e.stopPropagation();if(document.getElementById('nm-panel')){close();}else{open();}}});
 setInterval(upd,400);setTimeout(upd,300);})();</script>
+<script id="nofa-reload-idle">(function(){if(window.nofaReload)return;function typing(){var ae=document.activeElement;return !!(ae&&(ae.tagName==="INPUT"||ae.tagName==="TEXTAREA"||ae.tagName==="SELECT"||ae.isContentEditable));}function overlay(){if(document.getElementById("nm-panel")||document.getElementById("ag-ov")||document.getElementById("ci-ov")||document.querySelector("[role=dialog]"))return true;var e=document.elementFromPoint(window.innerWidth/2,window.innerHeight/2);for(var i=0;e&&e!==document.body&&i<40;i++,e=e.parentElement){var cs=getComputedStyle(e);if(cs.position==="fixed"&&e.getBoundingClientRect().height>window.innerHeight*0.5)return true;}return false;}var wait=0;window.nofaBusy=function(){return typing()||overlay();};window.nofaReload=function(must){if(typing()&&!must)return;if(!typing()&&!overlay()){location.reload();return;}if(wait)return;wait=setInterval(function(){if(typing()&&!must){clearInterval(wait);wait=0;return;}if(!typing()&&!overlay()){clearInterval(wait);wait=0;location.reload();}},1500);};})();</script>
 <script id="nofa-sync">
 (function () {
   if (window.__nofaSync) { return; } window.__nofaSync = 1;
@@ -342,14 +343,14 @@ setInterval(upd,400);setTimeout(upd,300);})();</script>
   window.nofaApriSync = apriSync;
   function startAdmin() {
     logoutBtn(); setInterval(logoutBtn, 1500);
-    adminPull(true).then(function (changed) { return adminInbox().then(function (n) { return adminPush().then(function () { if (changed || n) { location.reload(); } else { toast("✓ Տվյալները համաժամեցված են սերվերի հետ"); } }); }); }).catch(function (e) { if (e && e.err === "auth") { toast("🔒 Մուտքի ժամկետը լրացել է — մուտք գործեք նորից"); setTimeout(function () { location.reload(); }, 1800); } else { try { navigator.sendBeacon("/api/api.php?a=ux", new Blob([JSON.stringify({ p: "Admin.dc.html", e: [{ m: "sync fail " + String(e && (e.message || e.err || e.__status) || e).slice(0, 150) }] })], { type: "application/json" })); } catch (eB) {} toast("⚠️ Սերվերի հետ կապ չկա — ստուգեք ինտերնետը և թարմացրեք էջը"); } });
+    adminPull(true).then(function (changed) { return adminInbox().then(function (n) { return adminPush().then(function () { if (changed || n) { window.nofaReload(true); } else { toast("✓ Տվյալները համաժամեցված են սերվերի հետ"); } }); }); }).catch(function (e) { if (e && e.err === "auth") { toast("🔒 Մուտքի ժամկետը լրացել է — մուտք գործեք նորից"); setTimeout(function () { location.reload(); }, 1800); } else { try { navigator.sendBeacon("/api/api.php?a=ux", new Blob([JSON.stringify({ p: "Admin.dc.html", e: [{ m: "sync fail " + String(e && (e.message || e.err || e.__status) || e).slice(0, 150) }] })], { type: "application/json" })); } catch (eB) {} toast("⚠️ Սերվերի հետ կապ չկա — ստուգեք ինտերնետը և թարմացրեք էջը"); } });
     setInterval(function () { adminPush().catch(function () {}); }, 4000);
-    setInterval(function () { adminInbox().then(function (n) { if (n) { toast("📥 Նոր տվյալներ հաճախորդներից"); return adminPush().then(function () { if (idle()) { location.reload(); } }); } }).catch(function () {}); }, 30000);
-    setTimeout(function () { apriSync().then(function (c) { if (c) { return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 2500);
-    setInterval(function () { apriSync().then(function (c) { if (c) { toast("🏭 Նոր արտադրություն Chef Apri-ից"); return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 180000);
-    setTimeout(function () { drvSync().then(function (n) { if (n) { return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 6000);
-    setInterval(function () { drvSync().then(function (n) { if (n) { return adminPush().then(function () { if (idle()) { location.reload(); } }); } }); }, 60000);
-    setInterval(function () { if (!idle()) { return; } adminPull(false).then(function (c) { if (c && idle()) { location.reload(); } }).catch(function () {}); }, 45000);
+    setInterval(function () { adminInbox().then(function (n) { if (n) { toast("📥 Նոր տվյալներ հաճախորդներից"); return adminPush().then(function () { if (idle()) { window.nofaReload(); } }); } }).catch(function () {}); }, 30000);
+    setTimeout(function () { apriSync().then(function (c) { if (c) { return adminPush().then(function () { if (idle()) { window.nofaReload(); } }); } }); }, 2500);
+    setInterval(function () { apriSync().then(function (c) { if (c) { toast("🏭 Նոր արտադրություն Chef Apri-ից"); return adminPush().then(function () { if (idle()) { window.nofaReload(); } }); } }); }, 180000);
+    setTimeout(function () { drvSync().then(function (n) { if (n) { return adminPush().then(function () { if (idle()) { window.nofaReload(); } }); } }); }, 6000);
+    setInterval(function () { drvSync().then(function (n) { if (n) { return adminPush().then(function () { if (idle()) { window.nofaReload(); } }); } }); }, 60000);
+    setInterval(function () { if (!idle()) { return; } adminPull(false).then(function (c) { if (c && idle()) { window.nofaReload(); } }).catch(function () {}); }, 45000);
     window.addEventListener("beforeunload", function () { try { var m = meta(), items = []; sharedKeys().forEach(function (k) { var v = LG(k); if (!m[k] || m[k].h !== h(v)) { items.push({ k: k, v: v }); } }); if (items.length) { fetch(API + "?a=put", { method: "POST", credentials: "same-origin", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items: items }) }); } } catch (e) {} });
   }
 
@@ -386,9 +387,9 @@ setInterval(upd,400);setTimeout(upd,300);})();</script>
   }
   function startCustomer() {
     var first = !sessionStorage.getItem("noa-sync-once");
-    custSubmit().catch(function () {}).then(custPull).then(function (ch) { sessionStorage.setItem("noa-sync-once", "1"); if (ch && idle()) { location.reload(); } });
+    custSubmit().catch(function () {}).then(custPull).then(function (ch) { sessionStorage.setItem("noa-sync-once", "1"); if (ch && idle()) { window.nofaReload(); } });
     setInterval(function () { custSubmit().catch(function () {}); }, 5000);
-    setInterval(function () { custPull().then(function (ch) { if (ch && idle()) { location.reload(); } }); }, 40000);
+    setInterval(function () { custPull().then(function (ch) { if (ch && idle()) { window.nofaReload(); } }); }, 40000);
     window.addEventListener("beforeunload", function () { custSubmit(); });
   }
 
@@ -2315,7 +2316,7 @@ window.azSet=function(d){z=Math.round(Math.min(1.6,Math.max(0.9,z+d))*100)/100;a
     try { var D = JSON.parse(localStorage.getItem("noa-inv2") || "null"); if (D && Array.isArray(D.list)) { var dch = false; D.list.forEach(function (v) { var r = v && P["INV:" + v.id]; if (r && v.st !== "paid") { var day = new Date(r.t || Date.now()); var d = day.getFullYear() + "-" + ("0" + (day.getMonth() + 1)).slice(-2) + "-" + ("0" + day.getDate()).slice(-2); var prev = +((v.paid || {}).amt) || 0; var cr = r.base != null ? +r.base : (+r.amt || 0); v.paid = { d: d, m: "Card (Stripe)", amt: Math.round((prev + cr) * 100) / 100 }; v.st = "paid"; (v.log = v.log || []).push([new Date().toISOString(), "Վճարում $" + cr.toFixed(2) + " · քարտով (Stripe)" + (r.fee ? " + 3% վճար $" + (+r.fee).toFixed(2) : "")]); dch = true; } }); if (dch) { localStorage.setItem("noa-inv2", JSON.stringify(D)); ch = true; } } } catch (e) {}
     return ch; }
   function syncPay() { return api("pay_sync").then(function (j) { if (j && j.ok) { return applyPaid(j.paid || {}); } return false; }).catch(function () { return false; }); }
-  syncPay().then(function (ch) { if (ch && !document.querySelector("input:focus,textarea:focus")) { setTimeout(function () { location.reload(); }, 4500); } });
+  syncPay().then(function (ch) { if (ch) { setTimeout(function () { if (window.nofaReload) { window.nofaReload(); } else if (!document.querySelector("input:focus,textarea:focus")) { location.reload(); } }, 4500); } });
   setInterval(function () { syncPay().then(function (ch) { if (ch) { try { var t = document.createElement("div"); t.textContent = "💳 Նոր քարտային վճարում"; t.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:99999;background:#1D5545;color:#F6E3B4;padding:12px 16px;border-radius:14px;font:700 14px system-ui"; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 5000); } catch (e) {} } }); }, 120000);
   function info() { var st = document.getElementById("stripe-st"); if (!st) { return; } api("stripe_info").then(function (j) { if (!j || !j.ok) { st.textContent = "Սերվերի հետ կապ չկա"; return; } st.style.color = j.on ? "#2F7A55" : "#B03A2E"; st.textContent = j.on ? ("✓ Միացված է · " + (j.mode === "live" ? "ԻՐԱԿԱՆ (live)" : "ԹԵՍՏ (test)") + " · …" + j.tail + (j.pk ? (j.pkmode && j.pkmode !== j.mode ? " · ⚠ Publishable key-ը " + j.pkmode + " է, պետք է " + j.mode : " · քարտը կայքի էջում ✓") : " · Publishable key չկա")) : "✕ Միացված չէ"; if (j.on && j.pk && j.pkmode && j.pkmode !== j.mode) { st.style.color = "#B03A2E"; } }).catch(function () { st.textContent = "Սերվերի հետ կապ չկա"; }); }
   var iv = setInterval(function () { if (document.getElementById("stripe-st")) { clearInterval(iv); info(); } }, 500);
