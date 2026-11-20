@@ -36,6 +36,7 @@
 })();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="robots" content="noindex">
 <title>Nectar of Armenia — Admin</title><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="192x192" href="/img/icon-192.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2"><link rel="manifest" href="/admin.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="NofA Admin">
 <script src="./support.js"></script>
@@ -404,7 +405,7 @@ setInterval(upd,400);setTimeout(upd,300);})();</script>
 })();
 
 </script>
-<style id="safe-top">@media (max-width:700px){.hdr-stick,header.raise-header[style*="sticky"]{position:relative !important;top:auto !important}}</style><meta name="theme-color" content="#133B30"><style id="date-fit">@media (max-width:700px){input[type="date"],input[type="time"],input[type="datetime-local"]{-webkit-appearance:none;appearance:none;display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;text-align:left}input[type="date"]::-webkit-date-and-time-value,input[type="time"]::-webkit-date-and-time-value{text-align:left;margin:0}.lbl{min-width:0;max-width:100%}}</style>
+<style id="safe-top">@media (max-width:700px){.hdr-stick,header.raise-header[style*="sticky"]{position:relative !important;top:auto !important}}</style><meta name="theme-color" content="#1D5545"><style id="date-fit">@media (max-width:700px){input[type="date"],input[type="time"],input[type="datetime-local"]{-webkit-appearance:none;appearance:none;display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;text-align:left}input[type="date"]::-webkit-date-and-time-value,input[type="time"]::-webkit-date-and-time-value{text-align:left;margin:0}.lbl{min-width:0;max-width:100%}}</style>
 <style>@media (max-width: 700px){.ad-bellpop{position:fixed!important;left:12px!important;right:12px!important;width:auto!important;top:calc(env(safe-area-inset-top,0px) + 96px)!important;max-height:72vh;overflow-y:auto;-webkit-overflow-scrolling:touch}}</style></head>
 <body>
 <x-dc>
@@ -2746,7 +2747,7 @@ el.querySelector(".ds-more").onclick=function(){var n=[].slice.call(document.que
 function load(el){if(busy)return;busy=true;fetch("api/api.php?a=stats",{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(j){busy=false;last=Date.now();if(j&&j.ok){DATA=j.months||{};render(el)}}).catch(function(){busy=false})}
 setInterval(function(){var el=document.getElementById("nofa-dash-stats");if(!el)return;if(!el.firstChild&&DATA){render(el)}if(!DATA||Date.now()-last>300000){load(el)}},800)})();</script>
 <style>.ds-card{border-radius:22px;padding:18px 20px;background:#fff;margin-bottom:14px;display:flex;flex-direction:column;gap:10px}.ds-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.ds-top h2{margin:0;font-family:Fraunces,'Noto Serif Armenian',Lora,serif;font-weight:600;font-size:20px;color:#1D5545}.ds-more{border:1.5px solid #E4DCC8;background:#fff;border-radius:999px;padding:7px 14px;font:700 13px Manrope,'Noto Sans Armenian',sans-serif;color:#1D5545;cursor:pointer}.ds-k{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.ds-k>div{padding:10px 12px;border-radius:14px;background:#FBF9F4;border:1px solid #ECE3CF;display:flex;flex-direction:column;gap:2px;min-width:0}.ds-k span{font-size:12px;font-weight:700;color:#6B756F}.ds-k b{font-size:22px;color:#133B30}.ds-k small{font-size:11px;color:#8A8F86}.ds-l{font-size:13px;color:#33403A}@media(max-width:600px){.ds-k{grid-template-columns:repeat(2,minmax(0,1fr))}}</style>
-<style id="nofa-safe-top">body{padding-top:env(safe-area-inset-top,0px) !important}#nofa-sa{position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:#1D5545;z-index:2147483000;pointer-events:none}</style>
+<style id="nofa-safe-top">body{padding-top:env(safe-area-inset-top,0px) !important}html{background:#1D5545}#nofa-sa{position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:#1D5545;z-index:2147483000;pointer-events:none}</style>
 <div id="nofa-sa" aria-hidden="true"></div>
 </body>
 </html>
