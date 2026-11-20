@@ -1133,7 +1133,7 @@ window.addEventListener('scroll',function(){if(!tk){tk=true;requestAnimationFram
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){setTimeout(go,300)})}else{setTimeout(go,300)}})();</script>
 <style id="nofa-acct-clean">@media(max-width:760px){html body .ap-dock{display:none !important}html body .nt-mu{width:44px !important;height:44px !important}html body .of-tab{left:12px !important;right:auto !important;transform:none !important;bottom:calc(env(safe-area-inset-bottom,0px) + 14px) !important;min-height:38px !important;height:38px !important;padding:0 14px !important;font-size:13px !important}}</style>
 <style id="nofa-ws-hdr">@media(max-width:480px){html body header.raise-header > div > a:first-child > span{display:none !important}html body header.raise-header a.btn-gold{padding:0 12px !important;min-height:36px !important;font-size:13px !important}}</style>
-<style id="nofa-safe-top">body{padding-top:env(safe-area-inset-top,0px) !important}html{background:#1D5545}#nofa-sa{position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:#1D5545;z-index:2147483000;pointer-events:none}</style>
+<style id="nofa-safe-top">body{padding-top:env(safe-area-inset-top,0px) !important}html{background:#1D5545}#nofa-sa{position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:#1D5545;z-index:2147483000;pointer-events:none}html:has(header.raise-header.nofa-fixed) #nofa-sa{height:calc(env(safe-area-inset-top,0px) + 8px);z-index:8999}html body header.raise-header.nofa-fixed{box-shadow:0 6px 18px rgba(0,0,0,.28) !important}</style>
 <div id="nofa-sa" aria-hidden="true"></div>
 </body>
 </html>
