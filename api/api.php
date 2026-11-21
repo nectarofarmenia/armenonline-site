@@ -81,6 +81,21 @@ function pn_retail($db, $em, $v) {
   return $n;
 }
 // Chef Apri: production approved, packed boxes, finished deliveries (read here with the server's own token, so a ping can't inject data)
+// Chef Apri product name → this site's warehouse slot (same rules as the admin page's apriIdx)
+function apri_idx($name) { $n = mb_strtolower((string) $name);
+  if (preg_match('/kiev|կիև|կիեվ/u', $n)) { return 8; } if (preg_match('/gata|գաթա/u', $n)) { return 0; } if (preg_match('/khinkal|խինկալ/u', $n)) { return 4; }
+  if (preg_match('/pelmen|պելմեն/u', $n)) { return 5; } if (preg_match('/blinch|բլինչ/u', $n)) { return 6; } if (preg_match('/kuft|kyuft|քուֆթ|քյուֆթ/u', $n)) { return 7; }
+  if (preg_match('/beef|տավար/u', $n)) { return 10; } if (preg_match('/chick|հավ/u', $n)) { return 9; } if (preg_match('/khash|խաշ/u', $n)) { return 1; } return -1; }
+// set the loose (unpacked) pieces from Chef Apri's 'un' (production − packed + admin corrections); boxes are left alone
+function apri_loose_set($db, $products) {
+  $UN = []; $has = false;
+  foreach ($products as $pr) { if (!is_array($pr) || !array_key_exists('un', $pr)) { continue; } $has = true; $i = apri_idx($pr['name'] ?? ''); if ($i < 0 || in_array($i, [1, 2, 3], true)) { continue; } $UN[$i] = ($UN[$i] ?? 0) + max(0, (int) round((float) $pr['un'])); }
+  if (!$has) { return false; }
+  $L = json_decode((kv_get($db, 'noa-stock-pcs') ?: ['v' => 'null'])['v'], true); if (!is_array($L) || count($L) !== 11) { $L = array_fill(0, 11, 0); }
+  $ch = false; foreach ($UN as $i => $v) { if ((int) ($L[$i] ?? 0) !== $v) { $L[$i] = $v; $ch = true; } }
+  if ($ch) { kv_put($db, 'noa-stock-pcs', json_encode(array_values($L))); apri_stock_sync($db); }
+  return $ch;
+}
 function apri_watch($db, $force = false) {
   $last = (int) ((kv_get($db, '__apriw_t') ?: ['v' => '0'])['v']); if (!$force && time() - $last < 40) { return ['skip' => 1]; } kv_put($db, '__apriw_t', (string) time());
   $t = kv_get($db, '__apri_token'); if (!$t) { return ['err' => 'no_token']; }
@@ -93,7 +108,9 @@ function apri_watch($db, $force = false) {
         elseif ($dm <= -1) { $out[] = ['⚠️ Chef Apri · արտադրություն', $nm . '՝ ' . (int) $dm . ' հատ (ուղղում կամ մերժում) · պահեստում՝ ' . (int) $u, 'Admin.dc.html#stock']; }
         if ($dp >= 1) { $out[] = ['📦 Chef Apri · փաթեթավորում', $nm . '՝ +' . (int) $dp . ' հատ փաթեթավորվեց · չփաթեթավորված մնաց՝ ' . (int) $u, 'Admin.dc.html#stock']; } }
       $mk[$id] = $m; $pkd[$id] = $pp; $un[$id] = $u; }
-    $P['m'] = $mk; $P['p'] = $pkd; $P['u'] = $un; }
+    $P['m'] = $mk; $P['p'] = $pkd; $P['u'] = $un;
+    // warehouse: unpacked pieces are Chef Apri's own count, set here on the server (no admin page needed)
+    try { apri_loose_set($db, (array) $sk['products']); } catch (Throwable $e) {} }
   $c2 = 0; $since = (string) ($P['ds'] ?? gmdate('c', time() - 3600)); $r2 = apri_rpc('nofa_delivery_status', ['p_token' => $t['v'], 'p_since' => $since], $c2); $ds = json_decode((string) $r2, true);
   if (is_array($ds)) { $seen = (array) ($P['dn'] ?? []); $mx = $since;
     foreach ($ds as $d) { $id = (string) ($d['id'] ?? ''); $st = (string) ($d['status'] ?? ''); $u0 = (string) ($d['updated_at'] ?? ''); if ($u0 > $mx) { $mx = $u0; } if ($id === '' || ($seen[$id] ?? '') === $st) { continue; } $seen[$id] = $st;
