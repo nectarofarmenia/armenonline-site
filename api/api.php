@@ -535,6 +535,18 @@ switch ($a) {
     $no = preg_replace('/[^A-Za-z0-9-]/', '', (string) ($_GET['no'] ?? '')); $r = kv_get($db, '__pay|' . $no); if (!$r) { out(['ok' => false, 'err' => 'none']); }
     $v = json_decode($r['v'], true) ?: []; $pw = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: [];
     unset($v['sid'], $v['site']); out(['ok' => true, 'rec' => $v, 'paid' => isset($pw[$no]) || !empty($v['paid'])]);
+  case 'stores': // admin: fresh customer contact info for phone-order autocomplete
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $L = [];
+    foreach ($A as $k => $r) { if (!is_array($r) || ($r['status'] ?? '') === 'gone') { continue; } $w = ($r['type'] ?? '') === 'biz' || substr((string) $k, -4) === '|biz';
+      $nm = $w ? (string) ($r['biz'] ?? ($r['company'] ?? '')) : trim(($r['first'] ?? '') . ' ' . ($r['last'] ?? '')); if ($nm === '') { continue; }
+      $st = trim((string) ($r['addr'] ?? ($r['address'] ?? ($r['street'] ?? '')))); if (!empty($r['apt'])) { $st .= ' ' . $r['apt']; }
+      $ad = $st !== '' ? implode(', ', array_filter([$st, $r['city'] ?? '', trim(($r['state'] ?? 'CA') . ' ' . ($r['zip'] ?? ''))])) : '';
+      $em = strtolower((string) ($r['email'] ?? '')); if (strpos($em, '.pending@') !== false) { $em = ''; }
+      $L[] = ['name' => $nm, 'type' => $w ? 'w' : 'r', 'phone' => (string) ($r['phone'] ?? ($r['tel'] ?? '')), 'addr' => $ad, 'email' => $em]; }
+    $C = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: []; $P = [];
+    foreach ((array) ($C['cprof'] ?? []) as $k => $r) { if (is_array($r)) { $P[$k] = ['addr' => (string) ($r['addr'] ?? ''), 'phone' => (string) ($r['phone'] ?? ''), 'email' => (string) ($r['email'] ?? '')]; } }
+    out(['ok' => true, 'acc' => $L, 'cprof' => $P]);
   case 'all': // admin: everything
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $since = (int) ($_GET['since'] ?? 0);
