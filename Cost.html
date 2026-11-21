@@ -706,7 +706,7 @@ document.addEventListener("click",function(e){var cmc=e.target.closest("[data-cm
   else if(act==="dldel"){S.draft.lines.splice(ri,1);if(!S.draft.lines.length){S.draft.lines=[[0,0,1]];}}
   else if(act==="dsave"){var d0=S.draft;var ls=d0.lines.filter(function(l){return num(l[2])>0;});if(!ls.length){alert("Ավելացրեք գոնե մեկ ապրանք։");return;}var phd=String(d0.phone||"").replace(/\D/g,"");if(!d0.past&&phd.length<10){alert("Գրեք հաճախորդի հեռախոսահամարը (10 թիվ)։ Պատվերի հաստատումը ուղարկվում է SMS-ով։");return;}
   if(d0.past&&!String(d0.name||"").trim()&&phd.length<10){alert("Գրեք հաճախորդի անունը կամ հեռախոսը։");return;}
-  if(!d0.past&&!/^\s*\d+[A-Za-z\-\/]*\s+\S+/.test(String(d0.addr||""))){alert("Գրեք ամբողջական հասցեն՝ տան համարով (օր.՝ 64 N Mar Vista Ave)։");var ai=document.querySelector('input[data-k="dr.addr"]');if(ai){ai.focus();}return;}var NC0={id:Date.now(),past:!!d0.past,ddate:d0.ddate||"",slot:d0.slot||"",drv:+d0.drv,date:d0.date||today(),name:d0.name,phone:d0.phone,addr:d0.addr,email:d0.email||"",promo:!!d0.promo,type:d0.type,pay:d0.pay,paid:!!d0.paid,lines:ls.map(function(l){return [+l[0],+l[1],num(l[2])];})};S.calls.push(NC0);try{invEnsure(NC0);}catch(e){}var keep={type:d0.type,pay:d0.pay};var wasPast=!!d0.past;S.draft=newDraft();S.draft.type=keep.type;S.draft.pay=keep.pay;if(wasPast){S.draft.past=true;S.draft.paid=true;S.draft.date=d0.date;S.draft.ddate=d0.ddate;S.justSaved=null;}else{S.justSaved=S.calls.length-1;}}
+  if(!d0.past&&!/^\s*\d+[A-Za-z\-\/]*\s+\S+/.test(String(d0.addr||""))){alert("Գրեք ամբողջական հասցեն՝ տան համարով (օր.՝ 64 N Mar Vista Ave)։");var ai=document.querySelector('input[data-k="dr.addr"]');if(ai){ai.focus();}return;}var NC0={id:Date.now(),past:!!d0.past,ddate:d0.ddate||"",slot:d0.slot||"",drv:+d0.drv,date:d0.date||today(),name:d0.name,phone:d0.phone,addr:d0.addr,email:d0.email||"",promo:!!d0.promo,type:d0.type,pay:d0.pay,paid:!!d0.paid,lines:ls.map(function(l){return [+l[0],+l[1],num(l[2])];})};S.calls.push(NC0);try{invEnsure(NC0);}catch(e){}try{stkOut(NC0);}catch(e){}var keep={type:d0.type,pay:d0.pay};var wasPast=!!d0.past;S.draft=newDraft();S.draft.type=keep.type;S.draft.pay=keep.pay;if(wasPast){S.draft.past=true;S.draft.paid=true;S.draft.date=d0.date;S.draft.ddate=d0.ddate;S.justSaved=null;}else{S.justSaved=S.calls.length-1;}}
   else if(act==="qclr"){S.q="";}
   else if(act==="cmpgo"){if((S.cmpSel||[]).length<2){return;}S.cmpBack=S.tab;S.tab="cmp";hpush();save();render();window.scrollTo(0,0);return;}
   else if(act==="cmpclr"){S.cmpSel=[];}
@@ -719,7 +719,7 @@ document.addEventListener("click",function(e){var cmc=e.target.closest("[data-cm
   else if(act==="cmpback"){if(history.state&&history.state.ct==="cmp"){history.back();return;}S.tab=S.cmpBack||"orders";}
   else if(act==="smsdone"){S.justSaved=null;save();setTimeout(render,50);return;}
   else if(act==="cpaid"){var cc=S.calls[ri];cc.paid=!cc.paid;}
-  else if(act==="cdel"){if(!confirm("Ջնջե՞լ այս պատվերը")){return;}S.calls.splice(ri,1);}
+  else if(act==="cdel"){if(!confirm("Ջնջե՞լ այս պատվերը")){return;}var dc=S.calls[ri];S.calls.splice(ri,1);try{stkBack(dc);}catch(e){}}
   else if(act==="addfix"){S.fixed.push(["Նոր ծախս",0]);}
   else if(act==="delfix"){S.fixed.splice(ri,1);}
   else if(act==="clearmonth"){S.month={};}
@@ -1312,6 +1312,14 @@ function invEnsure(c){if(!c||!c.id||!c.name||!(c.lines||[]).length)return false;
 function invEnsureRecent(){var td=today(),n=0;(S.calls||[]).forEach(function(c){if(c&&!c.past&&!c.book&&String(c.ddate||c.date||"")>=td){if(invEnsure(c))n++;}});return n;}
 </script>
 <script>setTimeout(function(){try{if(invEnsureRecent()){var y0=window.scrollY;render();window.scrollTo(0,y0);}}catch(e){}},8000);</script>
+<script id="nofa-stkout">
+var STK_SLOT={gata:0,khash:1,khinkali:4,pelmeni:5,blinchik:6,kufta:7,kiev:8,chcut:9,beefcut:10};
+function stkItems(c,sg){var it=[];(c.lines||[]).forEach(function(l){var p=S.prod[+l[0]];if(!p||STK_SLOT[p.id]==null)return;var q=num(l[2])*sg;if(!q)return;it.push(+l[1]===1?[STK_SLOT[p.id],0,q]:[STK_SLOT[p.id],q,0]);});return it;}
+function stkSend(ref,it){if(!it.length)return Promise.resolve(null);return fetch("api/api.php?a=stock_out",{method:"POST",credentials:"same-origin",cache:"no-store",headers:{"Content-Type":"application/json"},body:JSON.stringify({ref:ref,items:it})}).then(function(r){return r.json();}).then(function(j){if(j&&j.ok&&Array.isArray(j.stock)&&Array.isArray(j.pcs)){try{localStorage.setItem("noa-stock",JSON.stringify(j.stock));localStorage.setItem("noa-stock-pcs",JSON.stringify(j.pcs));}catch(e){}}return j;}).catch(function(){return null;});}
+function stkOut(c){if(!c||c.past||c.book||!c.id)return;stkSend("call:"+c.id,stkItems(c,1));}
+function stkBack(c){if(!c||c.past||c.book||!c.id)return;stkSend("del:"+c.id,stkItems(c,-1));}
+setTimeout(function(){try{var td=today();(S.calls||[]).forEach(function(c){if(c&&!c.past&&!c.book&&String(c.date||"")>=td)stkOut(c);});}catch(e){}},9000);
+</script>
 <script id="nofa-cac">(function(){
 function J(k,d){try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}}
 function list(){var M={};function add(o){var n=String(o.name||"").trim();if(!n||/@/.test(n)&&!o.acc){if(!o.acc)return;}var key=nrm(n)+"|"+o.type;if(!nrm(n))return;var c=M[key]||(M[key]={name:n,type:o.type,phone:"",addr:"",email:"",n:0,last:"",acc:false});if(o.phone&&!c.phone)c.phone=o.phone;if(o.addr&&!c.addr)c.addr=o.addr;if(o.email&&!c.email)c.email=o.email;if(o.acc)c.acc=true;if(o.date){c.n++;if(o.date>c.last){c.last=o.date;if(o.phone)c.phone=o.phone;if(o.addr)c.addr=o.addr;}}}

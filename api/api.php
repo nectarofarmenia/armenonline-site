@@ -99,14 +99,47 @@ function apri_loose_set($db, $products) {
   foreach ($products as $pr) { if (!is_array($pr) || !array_key_exists('un', $pr)) { continue; } $has = true; $i = apri_idx($pr['name'] ?? ''); if ($i < 0 || in_array($i, [1, 2, 3], true)) { continue; } $UN[$i] = ($UN[$i] ?? 0) + max(0, (int) round((float) $pr['un'])); }
   if (!$has) { return false; }
   $L = json_decode((kv_get($db, 'noa-stock-pcs') ?: ['v' => 'null'])['v'], true); if (!is_array($L) || count($L) !== 11) { $L = array_fill(0, 11, 0); }
+  $PT = stock_pend_tot($db); foreach ($UN as $i => $v) { $UN[$i] = max(0, (int) round($v - ($PT[$i] ?? 0))); }
   $ch = false; foreach ($UN as $i => $v) { if ((int) ($L[$i] ?? 0) !== $v) { $L[$i] = $v; $ch = true; } }
   if ($ch) { kv_put($db, 'noa-stock-pcs', json_encode(array_values($L))); apri_stock_sync($db); }
   return $ch;
+}
+// ---- orders take stock out of the warehouse (boxes here; loose pieces are Chef Apri's count, so they are sent there) ----
+function stock_pend_tot($db) { $P = json_decode((kv_get($db, '__stock_pend') ?: ['v' => '{}'])['v'], true) ?: []; $T = array_fill(0, 11, 0); foreach ($P as $r) { foreach ((array) ($r['it'] ?? []) as $x) { $i = (int) ($x[0] ?? -1); if ($i >= 0 && $i < 11) { $T[$i] += (float) ($x[1] ?? 0); } } } return $T; }
+function stock_pend_flush($db, $products = null) {
+  $P = json_decode((kv_get($db, '__stock_pend') ?: ['v' => '{}'])['v'], true) ?: []; if (!$P) { return 0; }
+  $t = kv_get($db, '__apri_token'); if (!$t) { return 0; }
+  if ($products === null) { $c0 = 0; $sk = json_decode((string) apri_rpc('nofa_stock', ['p_token' => $t['v']], $c0), true); $products = is_array($sk) ? (array) ($sk['products'] ?? []) : []; }
+  $ID = []; foreach ((array) $products as $pr) { $i = apri_idx($pr['name'] ?? ''); if ($i >= 0 && !isset($ID[$i]) && !empty($pr['id'])) { $ID[$i] = (string) $pr['id']; } }
+  if (!$ID) { return 0; } $n = 0;
+  foreach ($P as $ref => $r) { $it = []; foreach ((array) ($r['it'] ?? []) as $x) { $i = (int) ($x[0] ?? -1); if (!isset($ID[$i])) { continue; } $it[] = ['id' => $ID[$i], 'pcs' => (float) ($x[1] ?? 0)]; }
+    $c = 0; $res = json_decode((string) apri_rpc('nofa_stock_out', ['p_token' => $t['v'], 'p_ref' => (string) $ref, 'p_items' => $it], $c), true);
+    if ($c >= 200 && $c < 300 && is_array($res) && !empty($res['ok'])) { unset($P[$ref]); $n++; } elseif ($c === 404) { break; } }
+  kv_put($db, '__stock_pend', json_encode($P ?: new stdClass(), JSON_UNESCAPED_UNICODE)); return $n;
+}
+// items: [[slot 0..10, packs, pieces]] (negative = put back). Same ref is applied once.
+function stock_out($db, $ref, $items) {
+  $D = json_decode((kv_get($db, '__stock_done') ?: ['v' => '{}'])['v'], true) ?: []; if (isset($D[$ref])) { return false; } if (strpos($ref, 'del:') === 0) { $o = $D['call:' . substr($ref, 4)] ?? null; if (!is_array($o) || !isset($o['a'])) { return false; } $items = array_map(function ($x) { return [$x[0], -$x[1], -$x[2]]; }, (array) $o['a']); }
+  $S = json_decode((kv_get($db, 'noa-stock') ?: ['v' => 'null'])['v'], true); if (!is_array($S) || count($S) !== 11) { $S = array_fill(0, 11, 0); }
+  $L = json_decode((kv_get($db, 'noa-stock-pcs') ?: ['v' => 'null'])['v'], true); if (!is_array($L) || count($L) !== 11) { $L = array_fill(0, 11, 0); }
+  $PP = [12, 1, 1, 1, 10, 35, 10, 10, 6, 6, 6]; $it0 = apri_stock_items($db); if ($it0) { foreach ($it0 as $x) { $PP[$x['i']] = max(1, (float) $x['perPack']); } }
+  $loose = []; $A = [];
+  foreach ((array) $items as $x) { $i = (int) ($x[0] ?? -1); if ($i < 0 || $i > 10) { continue; } $pk = (float) ($x[1] ?? 0); $pc = (float) ($x[2] ?? 0); $pkU = $pk;
+    if ($pk > 0) { $have = (float) $S[$i]; $use = min($have, $pk); $pkU = $use; $S[$i] = $have - $use; $rest = $pk - $use; if ($rest > 0 && $PP[$i] > 1) { $pc += $rest * $PP[$i]; } }
+    elseif ($pk < 0) { $S[$i] = (float) $S[$i] - $pk; }
+    $A[] = [$i, $pkU, $pc];
+    if ($pc != 0) { if ($PP[$i] > 1) { $loose[] = [$i, $pc]; $L[$i] = max(0, (float) $L[$i] - $pc); } else { $S[$i] = max(0, (float) $S[$i] - $pc); } } }
+  kv_put($db, 'noa-stock', json_encode(array_values($S))); kv_put($db, 'noa-stock-pcs', json_encode(array_values($L)));
+  if ($loose) { $P = json_decode((kv_get($db, '__stock_pend') ?: ['v' => '{}'])['v'], true) ?: []; $P[$ref] = ['it' => $loose, 't' => time()]; kv_put($db, '__stock_pend', json_encode($P, JSON_UNESCAPED_UNICODE)); }
+  $D[$ref] = ['t' => time(), 'a' => $A]; if (count($D) > 3000) { $D = array_slice($D, -2500, null, true); } kv_put($db, '__stock_done', json_encode($D));
+  try { stock_pend_flush($db); } catch (Throwable $e) {} try { apri_stock_sync($db); } catch (Throwable $e) {}
+  return true;
 }
 function apri_watch($db, $force = false) {
   $last = (int) ((kv_get($db, '__apriw_t') ?: ['v' => '0'])['v']); if (!$force && time() - $last < 40) { return ['skip' => 1]; } kv_put($db, '__apriw_t', (string) time());
   $t = kv_get($db, '__apri_token'); if (!$t) { return ['err' => 'no_token']; }
   $P = json_decode((kv_get($db, '__apriw') ?: ['v' => '{}'])['v'], true) ?: []; $first = empty($P); $out = [];
+  try { stock_pend_flush($db); } catch (Throwable $e) {}
   $code = 0; $r = apri_rpc('nofa_stock', ['p_token' => $t['v']], $code); $sk = json_decode((string) $r, true);
   if (is_array($sk) && isset($sk['products'])) { $mk = []; $pkd = []; $un = [];
     foreach ((array) $sk['products'] as $pr) { $id = (string) ($pr['id'] ?? ''); if ($id === '') { continue; } $nm = (string) ($pr['name'] ?? $id); $m = (float) ($pr['made'] ?? 0); $pp = (float) ($pr['packedPcs'] ?? 0); $u = (float) ($pr['un'] ?? 0);
@@ -535,6 +568,12 @@ switch ($a) {
     $no = preg_replace('/[^A-Za-z0-9-]/', '', (string) ($_GET['no'] ?? '')); $r = kv_get($db, '__pay|' . $no); if (!$r) { out(['ok' => false, 'err' => 'none']); }
     $v = json_decode($r['v'], true) ?: []; $pw = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: [];
     unset($v['sid'], $v['site']); out(['ok' => true, 'rec' => $v, 'paid' => isset($pw[$no]) || !empty($v['paid'])]);
+  case 'stock_out': // admin: an order took goods out of the warehouse (idempotent per ref)
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $b = json_decode(file_get_contents('php://input'), true) ?: []; $ref = substr(preg_replace('/[^A-Za-z0-9:_\-]/', '', (string) ($b['ref'] ?? '')), 0, 60);
+    if ($ref === '' || !is_array($b['items'] ?? null)) { out(['ok' => false, 'err' => 'bad']); }
+    $did = stock_out($db, $ref, array_slice($b['items'], 0, 30));
+    out(['ok' => true, 'did' => $did, 'stock' => json_decode((kv_get($db, 'noa-stock') ?: ['v' => 'null'])['v'], true), 'pcs' => json_decode((kv_get($db, 'noa-stock-pcs') ?: ['v' => 'null'])['v'], true), 't' => ['noa-stock' => (kv_get($db, 'noa-stock') ?: ['t' => 0])['t'], 'noa-stock-pcs' => (kv_get($db, 'noa-stock-pcs') ?: ['t' => 0])['t']]]);
   case 'stores': // admin: fresh customer contact info for phone-order autocomplete
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $L = [];
