@@ -27,6 +27,7 @@ if (!kv_get($db, '__mig_pel3')) { $cr = kv_get($db, 'noa-cost-v2'); $cv = $cr ? 
   if (is_array($cv) && isset($cv['prod']) && is_array($cv['prod'])) { foreach ($cv['prod'] as &$pp) { if (($pp['id'] ?? '') === 'pelmeni') { if (!isset($pp['pr']) || !is_array($pp['pr'])) { $pp['pr'] = [0, 0, 0, 0]; } $pp['pr'][0] = 32; $pp['pr'][2] = 24; } } unset($pp); $cv['prPel2'] = 1; $cv['prPel3'] = 1; kv_put($db, 'noa-cost-v2', json_encode($cv, JSON_UNESCAPED_UNICODE)); }
   kv_put($db, '__mig_pel3', '1'); }
 
+if (!kv_get($db, '__mig_stk_calls1')) { kv_put($db, '__mig_stk_calls1', '1'); try { stock_from_calls($db); } catch (Throwable $e) {} }
 if (!kv_get($db, '__mig_vosk_addr')) { kv_put($db, '__mig_vosk_addr', '1'); try {
   $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $chA = false;
   foreach ($A as $k => $r) { if (is_array($r) && preg_replace('/[^a-z]/', '', strtolower((string) ($r['biz'] ?? ''))) === 'voskevazmarket') { $A[$k]['addr'] = '1317 E Colorado St'; $A[$k]['city'] = 'Glendale'; $A[$k]['state'] = 'CA'; $A[$k]['zip'] = '91205'; $chA = true; } }
@@ -135,10 +136,22 @@ function stock_out($db, $ref, $items) {
   try { stock_pend_flush($db); } catch (Throwable $e) {} try { apri_stock_sync($db); } catch (Throwable $e) {}
   return true;
 }
+// phone orders saved on the cost page → take their goods out (server side, so no page has to stay open)
+function stock_from_calls($db) {
+  $C = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: []; $PR = (array) ($C['prod'] ?? []);
+  $D = json_decode((kv_get($db, '__stock_done') ?: ['v' => '{}'])['v'], true) ?: [];
+  $SL = ['gata' => 0, 'khash' => 1, 'khinkali' => 4, 'pelmeni' => 5, 'blinchik' => 6, 'kufta' => 7, 'kiev' => 8, 'chcut' => 9, 'beefcut' => 10]; $n = 0;
+  foreach ((array) ($C['calls'] ?? []) as $c) { if (!is_array($c)) { continue; } $id = (string) ($c['id'] ?? ''); if ($id === '' || (float) $id < 1795248000000 || !empty($c['past']) || !empty($c['book'])) { continue; }
+    if (isset($D['call:' . $id])) { continue; } $it = [];
+    foreach ((array) ($c['lines'] ?? []) as $l) { $p = $PR[(int) ($l[0] ?? -1)] ?? null; $pid = is_array($p) ? (string) ($p['id'] ?? '') : ''; if (!isset($SL[$pid])) { continue; } $q = (float) ($l[2] ?? 0); if ($q <= 0) { continue; } $it[] = ((int) ($l[1] ?? 0)) === 1 ? [$SL[$pid], 0, $q] : [$SL[$pid], $q, 0]; }
+    if ($it && stock_out($db, 'call:' . $id, $it)) { $n++; $D = json_decode((kv_get($db, '__stock_done') ?: ['v' => '{}'])['v'], true) ?: []; } }
+  return $n;
+}
 function apri_watch($db, $force = false) {
   $last = (int) ((kv_get($db, '__apriw_t') ?: ['v' => '0'])['v']); if (!$force && time() - $last < 40) { return ['skip' => 1]; } kv_put($db, '__apriw_t', (string) time());
   $t = kv_get($db, '__apri_token'); if (!$t) { return ['err' => 'no_token']; }
   $P = json_decode((kv_get($db, '__apriw') ?: ['v' => '{}'])['v'], true) ?: []; $first = empty($P); $out = [];
+  try { stock_from_calls($db); } catch (Throwable $e) {}
   try { stock_pend_flush($db); } catch (Throwable $e) {}
   $code = 0; $r = apri_rpc('nofa_stock', ['p_token' => $t['v']], $code); $sk = json_decode((string) $r, true);
   if (is_array($sk) && isset($sk['products'])) { $mk = []; $pkd = []; $un = [];
@@ -604,6 +617,7 @@ switch ($a) {
       if ($v === null) { $db->prepare('DELETE FROM nofa_kv WHERE k = ?')->execute([$k]); $done[$k] = now_ms(); }
       else { $v0 = (string) $v; if ($k === 'noa-accounts') { $v = acc_merge($db, $v0); if ($v !== $v0) { $merged[$k] = $v; } } $done[$k] = kv_put($db, $k, (string) $v); }
     }
+    if (isset($done['noa-cost-v2'])) { try { stock_from_calls($db); } catch (Throwable $e) {} }
     if (array_intersect(array_keys($done), ['noa-stock', 'noa-stock-pcs', 'noa-cost-v2'])) { try { apri_stock_sync($db); } catch (Throwable $e) {} }
     out(['ok' => true, 't' => $done, 'v' => $merged]);
   case 'inbox': // admin: read customer submissions
