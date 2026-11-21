@@ -683,6 +683,7 @@ switch ($a) {
     $r = apri_rpc($fn, ['p_token' => $t['v']] + $args, $code);
     if ($r === false || $code >= 400) { out(['ok' => false, 'err' => 'apri_http', 'code' => $code, 'body' => substr((string) $r, 0, 300)]); }
     $j = json_decode($r, true);
+    if ($a === 'apri_stock' && is_array($j) && is_array($j['products'] ?? null)) { $PT = stock_pend_tot($db); foreach ($j['products'] as &$pq) { if (!is_array($pq) || !isset($pq['un'])) { continue; } $ix = apri_idx($pq['name'] ?? ''); if ($ix < 0 || empty($PT[$ix])) { continue; } $take = min((float) $pq['un'], $PT[$ix]); $pq['un'] = (float) $pq['un'] - $take; $PT[$ix] -= $take; } unset($pq); }
     if ($a === 'apri_proof' && ($_GET['html'] ?? '') === '1') {
       header('Content-Type: text/html; charset=utf-8'); header("Content-Security-Policy: default-src 'none'; img-src data:; style-src 'unsafe-inline'");
       $h = fn($x) => htmlspecialchars((string) $x, ENT_QUOTES, 'UTF-8'); $img = fn($x) => (is_string($x) && preg_match('#^data:image/(jpeg|png);base64,[A-Za-z0-9+/=]+$#', $x)) ? $x : '';
