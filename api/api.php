@@ -27,6 +27,7 @@ if (!kv_get($db, '__mig_pel3')) { $cr = kv_get($db, 'noa-cost-v2'); $cv = $cr ? 
   if (is_array($cv) && isset($cv['prod']) && is_array($cv['prod'])) { foreach ($cv['prod'] as &$pp) { if (($pp['id'] ?? '') === 'pelmeni') { if (!isset($pp['pr']) || !is_array($pp['pr'])) { $pp['pr'] = [0, 0, 0, 0]; } $pp['pr'][0] = 32; $pp['pr'][2] = 24; } } unset($pp); $cv['prPel2'] = 1; $cv['prPel3'] = 1; kv_put($db, 'noa-cost-v2', json_encode($cv, JSON_UNESCAPED_UNICODE)); }
   kv_put($db, '__mig_pel3', '1'); }
 
+try { if (!kv_get($db, '__stk_site_seed')) { stock_from_site($db); } } catch (Throwable $e) {}
 if (!kv_get($db, '__mig_stk_calls1')) { kv_put($db, '__mig_stk_calls1', '1'); try { stock_from_calls($db); } catch (Throwable $e) {} }
 if (!kv_get($db, '__mig_vosk_addr')) { kv_put($db, '__mig_vosk_addr', '1'); try {
   $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $chA = false;
@@ -144,24 +145,48 @@ function stock_from_calls($db) {
   foreach ((array) ($C['calls'] ?? []) as $c) { if (!is_array($c)) { continue; } $id = (string) ($c['id'] ?? ''); if ($id === '' || (float) $id < 1795248000000 || !empty($c['past']) || !empty($c['book'])) { continue; }
     if (isset($D['call:' . $id])) { continue; } $it = [];
     foreach ((array) ($c['lines'] ?? []) as $l) { $p = $PR[(int) ($l[0] ?? -1)] ?? null; $pid = is_array($p) ? (string) ($p['id'] ?? '') : ''; if (!isset($SL[$pid])) { continue; } $q = (float) ($l[2] ?? 0); if ($q <= 0) { continue; } $it[] = ((int) ($l[1] ?? 0)) === 1 ? [$SL[$pid], 0, $q] : [$SL[$pid], $q, 0]; }
-    if ($it && stock_out($db, 'call:' . $id, $it)) { $n++; $D = json_decode((kv_get($db, '__stock_done') ?: ['v' => '{}'])['v'], true) ?: []; } }
+    if ($it && stock_out($db, 'call:' . $id, $it)) { $n++; stock_log($db, 'call:' . $id, $it); $D = json_decode((kv_get($db, '__stock_done') ?: ['v' => '{}'])['v'], true) ?: []; } }
   return $n;
+}
+// website orders (retail paid orders, approved wholesale orders) → take their goods out. Orders that existed before this was switched on are only marked, never taken.
+function stock_from_site($db) {
+  $D = json_decode((kv_get($db, '__stock_done') ?: ['v' => '{}'])['v'], true) ?: []; $seed = !kv_get($db, '__stk_site_seed'); $todo = [];
+  $ref = function ($pfx, $o) { $no = (string) ($o['no'] ?? ($o['id'] ?? '')); return $pfx . ($no !== '' ? preg_replace('/[^A-Za-z0-9\-_]/', '', $no) : substr(md5(json_encode($o)), 0, 12)); };
+  foreach ((array) json_decode((kv_get($db, 'noa-orders') ?: ['v' => '[]'])['v'], true) as $o) { if (!is_array($o) || empty($o['items'])) { continue; } $r = $ref('ro:', $o); if (isset($D[$r])) { continue; }
+    $it = []; foreach ((array) $o['items'] as $x) { $i = (int) ($x[0] ?? -1); $q = (float) ($x[1] ?? 0); if ($i >= 0 && $i <= 10 && $q > 0) { $it[] = [$i, $q, 0]; } } $todo[$r] = $it; }
+  $s = $db->query("SELECT k, v FROM nofa_kv WHERE k LIKE 'noa-ws-orders|%'"); foreach ($s->fetchAll(PDO::FETCH_ASSOC) as $row) { if ($row['k'] === 'noa-ws-orders|demo') { continue; }
+    foreach ((array) json_decode($row['v'], true) as $o) { if (!is_array($o) || ($o['ap'] ?? '') !== 'approved' || !empty($o['imported'])) { continue; } $r = $ref('wo:', $o); if (isset($D[$r])) { continue; } $pc = ($o['pack'] ?? '') === 'pcs';
+      $it = []; foreach ((array) ($o['items'] ?? []) as $x) { $i = (int) ($x[0] ?? -1); $q = (float) ($x[1] ?? 0); if ($i >= 0 && $i <= 10 && $q > 0) { $it[] = $pc ? [$i, 0, $q] : [$i, $q, 0]; } } $todo[$r] = $it; } }
+  if ($seed) { foreach ($todo as $r => $it) { $D[$r] = ['t' => time(), 'seed' => 1]; } kv_put($db, '__stock_done', json_encode($D)); kv_put($db, '__stk_site_seed', (string) time()); return 0; }
+  $n = 0; foreach ($todo as $r => $it) { if ($it && stock_out($db, $r, $it)) { $n++; stock_log($db, $r, $it); } } return $n;
+}
+function stock_log($db, $ref, $it) { $L = json_decode((kv_get($db, '__stock_log') ?: ['v' => '[]'])['v'], true) ?: []; $L[] = [gmdate('c'), $ref, $it]; kv_put($db, '__stock_log', json_encode(array_slice($L, -60), JSON_UNESCAPED_UNICODE)); }
+// for the agents: is the warehouse moving with production and sales, and do the site and Chef Apri agree?
+function stock_audit($db) {
+  $S = json_decode((kv_get($db, 'noa-stock') ?: ['v' => 'null'])['v'], true); $L = json_decode((kv_get($db, 'noa-stock-pcs') ?: ['v' => 'null'])['v'], true);
+  $W = json_decode((kv_get($db, '__apriw') ?: ['v' => '{}'])['v'], true) ?: []; $PT = stock_pend_tot($db); $UN = array_fill(0, 11, null);
+  $names = (array) ($W['n'] ?? []); foreach ((array) ($W['u'] ?? []) as $id => $u) { $i = apri_idx($names[$id] ?? ''); if ($i >= 0) { $UN[$i] = ($UN[$i] ?? 0) + (float) $u; } }
+  $mis = []; for ($i = 0; $i < 11; $i++) { if ($UN[$i] === null || !is_array($L)) { continue; } $exp = max(0, $UN[$i] - $PT[$i]); if (abs($exp - (float) ($L[$i] ?? 0)) >= 1) { $mis[] = ['slot' => $i, 'site_loose' => (float) ($L[$i] ?? 0), 'apri_un_minus_pending' => $exp]; } }
+  $P = json_decode((kv_get($db, '__stock_pend') ?: ['v' => '{}'])['v'], true) ?: []; $old = 0; foreach ($P as $r) { if ((int) ($r['t'] ?? 0) < time() - 3600) { $old++; } }
+  $lw = (int) ((kv_get($db, '__apriw_t') ?: ['v' => '0'])['v']);
+  return ['names' => pn_names(), 'packs' => $S, 'loose' => $L, 'apri_un' => $UN, 'pending_to_apri' => $PT, 'pending_orders' => count($P), 'pending_older_1h' => $old, 'sql_stock_out_missing' => $old > 0, 'mismatch' => $mis, 'last_apri_sync_min_ago' => $lw ? round((time() - $lw) / 60) : null, 'recent_moves' => array_slice((array) json_decode((kv_get($db, '__stock_log') ?: ['v' => '[]'])['v'], true), -15), 'ok' => !$mis && !$old && $lw > time() - 3 * 3600];
 }
 function apri_watch($db, $force = false) {
   $last = (int) ((kv_get($db, '__apriw_t') ?: ['v' => '0'])['v']); if (!$force && time() - $last < 40) { return ['skip' => 1]; } kv_put($db, '__apriw_t', (string) time());
   $t = kv_get($db, '__apri_token'); if (!$t) { return ['err' => 'no_token']; }
   $P = json_decode((kv_get($db, '__apriw') ?: ['v' => '{}'])['v'], true) ?: []; $first = empty($P); $out = [];
   try { stock_from_calls($db); } catch (Throwable $e) {}
+  try { stock_from_site($db); } catch (Throwable $e) {}
   try { stock_pend_flush($db); } catch (Throwable $e) {}
   $code = 0; $r = apri_rpc('nofa_stock', ['p_token' => $t['v']], $code); $sk = json_decode((string) $r, true);
-  if (is_array($sk) && isset($sk['products'])) { $mk = []; $pkd = []; $un = [];
+  if (is_array($sk) && isset($sk['products'])) { $mk = []; $pkd = []; $un = []; $nmm = [];
     foreach ((array) $sk['products'] as $pr) { $id = (string) ($pr['id'] ?? ''); if ($id === '') { continue; } $nm = (string) ($pr['name'] ?? $id); $m = (float) ($pr['made'] ?? 0); $pp = (float) ($pr['packedPcs'] ?? 0); $u = (float) ($pr['un'] ?? 0);
       if (!$first && isset($P['m'][$id])) { $dm = $m - (float) $P['m'][$id]; $dp = $pp - (float) ($P['p'][$id] ?? $pp);
         if ($dm >= 1) { $out[] = ['👨‍🍳 Chef Apri · արտադրություն', '+' . (int) $dm . ' ' . $nm . ' հաստատվեց · պահեստում հիմա՝ ' . (int) $u . ' հատ', 'Admin.dc.html#stock']; }
         elseif ($dm <= -1) { $out[] = ['⚠️ Chef Apri · արտադրություն', $nm . '՝ ' . (int) $dm . ' հատ (ուղղում կամ մերժում) · պահեստում՝ ' . (int) $u, 'Admin.dc.html#stock']; }
         if ($dp >= 1) { $out[] = ['📦 Chef Apri · փաթեթավորում', $nm . '՝ +' . (int) $dp . ' հատ փաթեթավորվեց · չփաթեթավորված մնաց՝ ' . (int) $u, 'Admin.dc.html#stock']; } }
-      $mk[$id] = $m; $pkd[$id] = $pp; $un[$id] = $u; }
-    $P['m'] = $mk; $P['p'] = $pkd; $P['u'] = $un;
+      $mk[$id] = $m; $pkd[$id] = $pp; $un[$id] = $u; $nmm[$id] = $nm; }
+    $P['m'] = $mk; $P['p'] = $pkd; $P['u'] = $un; $P['n'] = $nmm ?? [];
     // warehouse: unpacked pieces are Chef Apri's own count, set here on the server (no admin page needed)
     try { apri_loose_set($db, (array) $sk['products']); } catch (Throwable $e) {} }
   $c2 = 0; $since = (string) ($P['ds'] ?? gmdate('c', time() - 3600)); $r2 = apri_rpc('nofa_delivery_status', ['p_token' => $t['v'], 'p_since' => $since], $c2); $ds = json_decode((string) $r2, true);
@@ -551,6 +576,7 @@ switch ($a) {
     echo json_encode(['ok' => true, 'now' => gmdate('c'), 'site' => ['php' => PHP_VERSION, 'kv' => (int) $db->query('SELECT COUNT(*) FROM nofa_kv')->fetchColumn()],
       'visitors' => [$m1 => $J('__stats|' . $m1, null), $m0 => $J('__stats|' . $m0, null)], 'ux' => [$m1 => $J('__ux|' . $m1, null), $m0 => $J('__ux|' . $m0, null)], 'js_errors' => array_values($J('__jserr', [])),
       'retail_orders' => $ret, 'wholesale_orders' => $ws, 'invoices' => $inv, 'payments' => $pays, 'zelle_claims' => $zl,
+      'stock_audit' => (function () use ($db) { try { return stock_audit($db); } catch (Throwable $e) { return ['err' => $e->getMessage()]; } })(),
       'stock' => ['names' => $names, 'packs' => $J('noa-stock', null), 'pcs' => $J('noa-stock-pcs', null), 'soldout' => $J('noa-soldout', null), 'lots' => array_slice((array) $J('noa-apri-lots', []), -40)],
       'prices' => array_map(function ($p) { return ['id' => $p['id'] ?? '', 'pr' => $p['pr'] ?? null]; }, (array) ($J('noa-cost-v2', [])['prod'] ?? [])), 'accounts' => $acc, 'customers_index' => (function () use ($J, $ACC) { $cv = $J('noa-cost-v2', []); $w = []; $r = 0; $src = [];
       foreach ((array) ($cv['cprof'] ?? []) as $k => $q) { if (substr((string) $k, -2) === '|w') { $w[substr((string) $k, 0, -2)][] = 'cost-profile'; } }
@@ -618,6 +644,7 @@ switch ($a) {
       else { $v0 = (string) $v; if ($k === 'noa-accounts') { $v = acc_merge($db, $v0); if ($v !== $v0) { $merged[$k] = $v; } } $done[$k] = kv_put($db, $k, (string) $v); }
     }
     if (isset($done['noa-cost-v2'])) { try { stock_from_calls($db); } catch (Throwable $e) {} }
+    foreach (array_keys($done) as $dk) { if ($dk === 'noa-orders' || strpos($dk, 'noa-ws-orders|') === 0) { try { stock_from_site($db); } catch (Throwable $e) {} break; } }
     if (array_intersect(array_keys($done), ['noa-stock', 'noa-stock-pcs', 'noa-cost-v2'])) { try { apri_stock_sync($db); } catch (Throwable $e) {} }
     out(['ok' => true, 't' => $done, 'v' => $merged]);
   case 'inbox': // admin: read customer submissions
