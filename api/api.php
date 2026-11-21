@@ -344,7 +344,7 @@ function pay_mails($db, $ref, $amt) { // after a confirmed payment: receipt to t
   $own = (string) ($m['notify'] ?? $m['user']); if (filter_var($own, FILTER_VALIDATE_EMAIL)) { smtp_send($m, $own, '💳 New payment $' . number_format((float) $amt, 2) . ' — ' . $label, mail_tpl('New payment received', '<p style="margin:0 0 14px;font-size:15px"><b>' . mail_esc($label) . '</b><br>' . mail_esc($pv['name'] ?? '') . ' · ' . mail_esc($cust) . ' · ' . mail_esc($pv['phone'] ?? '') . '</p>' . $tbl . $extra)); }
 }
 function links_get($db) { return json_decode((kv_get($db, '__links') ?: ['v' => '{}'])['v'], true) ?: []; }
-function nofa_docs() { return ['1' => ['f' => __DIR__ . '/private/glendale-business-registration.pdf', 'no' => 'BRC-003767-2025', 'exp' => '2027-05-14'], '3' => ['f' => __DIR__ . '/private/cdph-processed-food-registration.pdf', 'no' => '126550', 'exp' => '2027-10-06']]; }
+function nofa_docs() { return ['1' => ['f' => __DIR__ . '/private/glendale-business-registration.pdf', 'no' => 'BRC-003767-2025', 'exp' => '2027-05-14'], '2' => ['f' => __DIR__ . '/private/cdtfa-sellers-permit.pdf', 'no' => '261389408-00001', 'exp' => ''], '3' => ['f' => __DIR__ . '/private/cdph-processed-food-registration.pdf', 'no' => '126550', 'exp' => '2027-10-06']]; }
 function doc_secret($db) { $r = kv_get($db, '__docsec'); if ($r && strlen($r['v']) >= 32) { return $r['v']; } $k = bin2hex(random_bytes(32)); kv_put($db, '__docsec', $k); return $k; }
 function geo_ip($db, $ip) { // country/city of a visitor's IP, cached 14 days by a hash (the IP itself is never stored)
   if ($ip === '' || preg_match('/^(127\.|10\.|192\.168\.|::1$)/', $ip)) { return ['cc' => '', 'c' => '', 'ci' => '', 'rg' => '']; }
