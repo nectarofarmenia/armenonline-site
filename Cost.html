@@ -1285,6 +1285,7 @@ function list(){var M={};function add(o){var n=String(o.name||"").trim();if(!n||
  var A=J("noa-accounts",{});Object.keys(A).forEach(function(k){var a=A[k];if(!a||a.status==="gone")return;var w=a.type==="biz"||/\|biz$/.test(k);var nm=w?(a.biz||a.company||""):((a.first||"")+" "+(a.last||"")).trim();var ad=a.addr||a.address||[a.street,a.city,a.zip].filter(Boolean).join(", ");add({name:nm||a.email,type:w?"w":"r",phone:a.phone||a.tel||"",addr:ad,email:a.email||"",acc:true});});
  try{sales().forEach(function(s){if(s.src==="site"&&s.type==="r")return;add({name:s.name,type:s.type,phone:s.phone,addr:s.addr,date:s.date});});}catch(e){}
  (S.calls||[]).forEach(function(c){var m=M[nrm(c.name)+"|"+c.type];if(m&&c.email&&!m.email)m.email=c.email;});
+ Object.keys(M).forEach(function(k){var cp=(S.cprof||{})[k];if(!cp)return;var c=M[k];if(cp.addr)c.addr=cp.addr;if(cp.phone)c.phone=cp.phone;if(cp.email)c.email=cp.email;});
  return Object.keys(M).map(function(k){return M[k]});}
 function hl(t,q){t=String(t||"");if(!q)return esc(t);var i=t.toLowerCase().indexOf(q.toLowerCase());if(i<0)return esc(t);return esc(t.slice(0,i))+"<mark>"+esc(t.slice(i,i+q.length))+"</mark>"+esc(t.slice(i+q.length));}
 var box=null,items=[],sel=-1,inp=null;

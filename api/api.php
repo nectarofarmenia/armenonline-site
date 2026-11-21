@@ -27,6 +27,13 @@ if (!kv_get($db, '__mig_pel3')) { $cr = kv_get($db, 'noa-cost-v2'); $cv = $cr ? 
   if (is_array($cv) && isset($cv['prod']) && is_array($cv['prod'])) { foreach ($cv['prod'] as &$pp) { if (($pp['id'] ?? '') === 'pelmeni') { if (!isset($pp['pr']) || !is_array($pp['pr'])) { $pp['pr'] = [0, 0, 0, 0]; } $pp['pr'][0] = 32; $pp['pr'][2] = 24; } } unset($pp); $cv['prPel2'] = 1; $cv['prPel3'] = 1; kv_put($db, 'noa-cost-v2', json_encode($cv, JSON_UNESCAPED_UNICODE)); }
   kv_put($db, '__mig_pel3', '1'); }
 
+if (!kv_get($db, '__mig_vosk_addr')) { kv_put($db, '__mig_vosk_addr', '1'); try {
+  $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $chA = false;
+  foreach ($A as $k => $r) { if (is_array($r) && preg_replace('/[^a-z]/', '', strtolower((string) ($r['biz'] ?? ''))) === 'voskevazmarket') { $A[$k]['addr'] = '1317 E Colorado St'; $A[$k]['city'] = 'Glendale'; $A[$k]['state'] = 'CA'; $A[$k]['zip'] = '91205'; $chA = true; } }
+  if ($chA) { kv_put($db, 'noa-accounts', json_encode($A, JSON_UNESCAPED_UNICODE)); }
+  $C = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true);
+  if (is_array($C)) { if (!isset($C['cprof']) || !is_array($C['cprof'])) { $C['cprof'] = []; } $pk = 'voskevazmarket|w'; if (!isset($C['cprof'][$pk]) || !is_array($C['cprof'][$pk])) { $C['cprof'][$pk] = []; } $C['cprof'][$pk]['addr'] = '1317 E Colorado St, Glendale, CA 91205'; kv_put($db, 'noa-cost-v2', json_encode($C, JSON_UNESCAPED_UNICODE)); }
+} catch (Throwable $e) {} }
 if (!kv_get($db, '__acc_bump1')) { kv_put($db, '__acc_bump1', '1'); $r9 = kv_get($db, 'noa-accounts'); if ($r9) { kv_put($db, 'noa-accounts', $r9['v']); } }
 if (!kv_get($db, '__acc_gone')) { kv_put($db, '__acc_gone', json_encode(['gary-s-mom-s-bakery.pending@nectarofarmenia.com|biz'])); }
 if (kv_get($db, '__mig_stores2') && !kv_get($db, '__mig_gary_em')) { kv_put($db, '__mig_gary_em', '1'); try { cinvite_do($db, ['acc' => ['type' => 'biz', 'biz' => "Gary's Mom's Bakery", 'email' => 'garysmomsbakery@gmail.com'], 'importName' => "Gary's Mom's Bakery"], $https); } catch (Throwable $e) {} }
@@ -172,6 +179,7 @@ function acc_merge($db, $v) {
   $IN = json_decode($v, true); if (!is_array($IN)) { return $v; } $CUR = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: [];
   $GONE = json_decode((kv_get($db, '__acc_gone') ?: ['v' => '[]'])['v'], true) ?: []; $ch = false;
   foreach ($CUR as $k => $r) { if (isset($IN[$k]) || !is_array($r)) { continue; } $t = max(strtotime((string) ($r['createdAt'] ?? '')) ?: 0, strtotime((string) ($r['invitedAt'] ?? '')) ?: 0, strtotime((string) ($r['decidedAt'] ?? '')) ?: 0); if (!empty($r['byAdmin']) || !empty($r['importedFrom']) || $t > time() - 30 * 86400) { $IN[$k] = $r; $ch = true; } }
+  foreach ($CUR as $k => $r) { if (!is_array($r) || !isset($IN[$k]) || !is_array($IN[$k])) { continue; } foreach (['addr', 'city', 'state', 'zip', 'phone'] as $f9) { if (!empty($r[$f9]) && empty($IN[$k][$f9])) { $IN[$k][$f9] = $r[$f9]; $ch = true; } } }
   foreach ($GONE as $g) { if (isset($IN[$g])) { unset($IN[$g]); $ch = true; } }
   return $ch ? json_encode($IN, JSON_UNESCAPED_UNICODE) : $v;
 }
