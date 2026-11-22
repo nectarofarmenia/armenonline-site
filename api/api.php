@@ -613,6 +613,18 @@ switch ($a) {
     if ($ref === '' || !is_array($b['items'] ?? null)) { out(['ok' => false, 'err' => 'bad']); }
     $did = stock_out($db, $ref, array_slice($b['items'], 0, 30));
     out(['ok' => true, 'did' => $did, 'stock' => json_decode((kv_get($db, 'noa-stock') ?: ['v' => 'null'])['v'], true), 'pcs' => json_decode((kv_get($db, 'noa-stock-pcs') ?: ['v' => 'null'])['v'], true), 't' => ['noa-stock' => (kv_get($db, 'noa-stock') ?: ['t' => 0])['t'], 'noa-stock-pcs' => (kv_get($db, 'noa-stock-pcs') ?: ['t' => 0])['t']]]);
+  case 'ads_cfg': // anyone: public ad/analytics IDs (these IDs are public by nature; no secrets)
+    $c = json_decode((kv_get($db, '__ads') ?: ['v' => '{}'])['v'], true) ?: []; out(['ok' => true, 'cfg' => ['pixel' => (string) ($c['pixel'] ?? ''), 'ga' => (string) ($c['ga'] ?? ''), 'ads' => (string) ($c['ads'] ?? ''), 'adsLabel' => (string) ($c['adsLabel'] ?? '')]]);
+  case 'ads_set': // admin: save ad/analytics IDs (validated formats only)
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $b = json_decode(file_get_contents('php://input'), true) ?: []; $v = [];
+    $px = trim((string) ($b['pixel'] ?? '')); $ga = strtoupper(trim((string) ($b['ga'] ?? ''))); $aw = strtoupper(trim((string) ($b['ads'] ?? ''))); $lb = trim((string) ($b['adsLabel'] ?? ''));
+    if ($px !== '' && !preg_match('/^\d{10,20}$/', $px)) { out(['ok' => false, 'err' => 'pixel']); }
+    if ($ga !== '' && !preg_match('/^G-[A-Z0-9]{4,14}$/', $ga)) { out(['ok' => false, 'err' => 'ga']); }
+    if ($aw !== '' && !preg_match('/^AW-\d{6,14}$/', $aw)) { out(['ok' => false, 'err' => 'ads']); }
+    if ($lb !== '' && !preg_match('/^[A-Za-z0-9_\-]{4,40}$/', $lb)) { out(['ok' => false, 'err' => 'label']); }
+    kv_put($db, '__ads', json_encode(['pixel' => $px, 'ga' => $ga, 'ads' => $aw, 'adsLabel' => $lb]));
+    out(['ok' => true]);
   case 'stores': // admin: fresh customer contact info for phone-order autocomplete
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $L = [];
