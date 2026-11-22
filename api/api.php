@@ -326,6 +326,20 @@ function sms_tick($db, $force = false) {
   $cut = now_ms() - 60 * 86400000; foreach ($SENT as $k => $v) { if ((int) ($v['t'] ?? 0) < $cut) { unset($SENT[$k]); } }
   kv_put($db, '__sms_sent', json_encode($SENT)); return ['ok' => true, 'orders' => count($O), 'sent' => $sent, 'err' => $errs];
 }
+// ---- "Notify me" for items that are coming soon: one email/SMS when packs appear on the site ----
+function notify_tick($db) {
+  $R = json_decode((kv_get($db, '__notify') ?: ['v' => '[]'])['v'], true) ?: []; if (!$R) { return ['n' => 0]; }
+  $S = json_decode((kv_get($db, 'noa-stock') ?: ['v' => 'null'])['v'], true); $SO = json_decode((kv_get($db, 'noa-soldout') ?: ['v' => '[]'])['v'], true) ?: [];
+  if (!is_array($S)) { return ['n' => 0]; } $N = ['Gata', 'Khash', 'Khash Broth', 'Khash Set', 'Khinkali', 'Pelmeni', 'Blinchik', 'Mijukov Kufta', 'Chicken Kiev', 'Chicken Cutlets', 'Beef Cutlets']; $NH = pn_names();
+  $m = mail_cfg($db); $c = sms_conf($db); $sent = 0; $ch = false;
+  foreach ($R as $k => $r) { if (!empty($r['done'])) { continue; } $i = (int) ($r['i'] ?? -1); if ($i < 0 || $i > 10 || (float) ($S[$i] ?? 0) <= 0 || !empty($SO[$i])) { continue; }
+    $hy = ($r['l'] ?? '') === 'hy'; $nm = $hy ? $NH[$i] : $N[$i]; $u = 'https://nectarofarmenia.com/Main.dc.html#shop'; $ok = false;
+    if (!empty($r['em']) && !empty($m['user'])) { $e = null; $ok = smtp_send($m, $r['em'], $hy ? ('Արդեն վաճառքում է՝ ' . $nm) : ($nm . ' is now available'), mail_tpl($hy ? 'Արդեն վաճառքում է' : 'Now available', '<p style="font-size:15px;margin:0 0 14px">' . ($hy ? 'Դուք խնդրել էիք տեղեկացնել. <b>' . mail_esc($nm) . '</b> արդեն հասանելի է պատվերի համար։' : 'You asked us to let you know: <b>' . mail_esc($nm) . '</b> is now available to order.') . '</p><p style="margin:0"><a href="' . $u . '" style="display:inline-block;background:#1D5545;color:#F7F3EA;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:bold">' . ($hy ? 'Պատվիրել' : 'Order now') . '</a></p>', $hy ? 'hy' : 'en'), $e) || $ok; }
+    if (!empty($r['sms']) && !empty($r['ph']) && !empty($c['key'])) { $to = sms_e164($r['ph']); if ($to !== '') { $e = null; $ok = sms_one($c, $to, $hy ? ('Nectar of Armenia: արդեն վաճառքում է՝ ' . $nm . '։ nectarofarmenia.com STOP՝ դադարեցնել') : ('Nectar of Armenia: ' . $nm . ' is now available. nectarofarmenia.com Reply STOP to opt out.'), $e) || $ok; } }
+    $R[$k]['done'] = now_ms(); $R[$k]['ok'] = $ok; $ch = true; if ($ok) { $sent++; } if ($sent >= 40) { break; } }
+  if ($ch) { kv_put($db, '__notify', json_encode(array_values(array_filter($R, function ($r) { return empty($r['done']) || (int) $r['done'] > now_ms() - 90 * 86400000; })), JSON_UNESCAPED_UNICODE)); }
+  return ['n' => $sent];
+}
 function sms_one($c, $to, $text, &$err) {
   if (($c['provider'] ?? '') === 'twilio') { $url = (getenv('NOFA_SMS_URL') ?: 'https://api.twilio.com/2010-04-01/Accounts/') . rawurlencode($c['sid']) . '/Messages.json'; $hdr = ['Authorization: Basic ' . base64_encode($c['sid'] . ':' . $c['key']), 'Content-Type: application/x-www-form-urlencoded']; $payload = http_build_query(['To' => $to, 'From' => $c['from'], 'Body' => $text]); }
   else { $url = getenv('NOFA_SMS_URL') ?: 'https://api.telnyx.com/v2/messages'; $hdr = ['Authorization: Bearer ' . $c['key'], 'Content-Type: application/json']; $payload = json_encode(['from' => $c['from'], 'to' => $to, 'text' => $text], JSON_UNESCAPED_UNICODE); }
@@ -645,6 +659,7 @@ switch ($a) {
       'visitors' => [$m1 => $J('__stats|' . $m1, null), $m0 => $J('__stats|' . $m0, null)], 'ux' => [$m1 => $J('__ux|' . $m1, null), $m0 => $J('__ux|' . $m0, null)], 'js_errors' => array_values($J('__jserr', [])),
       'retail_orders' => $ret, 'wholesale_orders' => $ws, 'invoices' => $inv, 'payments' => $pays, 'zelle_claims' => $zl,
       'stock_audit' => (function () use ($db) { try { return stock_audit($db); } catch (Throwable $e) { return ['err' => $e->getMessage()]; } })(),
+      'notify_waiting' => (function () use ($db) { $R = json_decode((kv_get($db, '__notify') ?: ['v' => '[]'])['v'], true) ?: []; $c = []; $N = pn_names(); foreach ($R as $r) { if (empty($r['done'])) { $k = $N[(int) ($r['i'] ?? 0)] ?? '?'; $c[$k] = ($c[$k] ?? 0) + 1; } } return $c; })(),
       'sms_auto' => (function () use ($db) { $L = json_decode((kv_get($db, '__sms_log') ?: ['v' => '[]'])['v'], true) ?: []; $c = sms_conf($db); $tk = (int) ((kv_get($db, '__sms_tick') ?: ['v' => '0'])['v']); return ['provider_on' => !empty($c['key']), 'last_tick_min_ago' => $tk ? round((time() - $tk) / 60) : null, 'last' => array_map(function ($x) { return [$x[0], $x[1], $x[2], $x[3], $x[4] ?? '']; }, array_slice($L, -20)), 'failed_24h' => count(array_filter($L, function ($x) { return empty($x[3]) && strtotime($x[0]) > time() - 86400; }))]; })(),
       'stock' => ['names' => $names, 'packs' => $J('noa-stock', null), 'pcs' => $J('noa-stock-pcs', null), 'soldout' => $J('noa-soldout', null), 'lots' => array_slice((array) $J('noa-apri-lots', []), -40)],
       'prices' => array_map(function ($p) { return ['id' => $p['id'] ?? '', 'pr' => $p['pr'] ?? null]; }, (array) ($J('noa-cost-v2', [])['prod'] ?? [])), 'accounts' => $acc, 'customers_index' => (function () use ($J, $ACC) { $cv = $J('noa-cost-v2', []); $w = []; $r = 0; $src = [];
@@ -726,6 +741,7 @@ switch ($a) {
     }
     if (isset($done['noa-cost-v2'])) { try { stock_from_calls($db); } catch (Throwable $e) {} }
     if (isset($done['noa-cost-v2']) || isset($done['noa-inv2'])) { try { sms_tick($db, true); } catch (Throwable $e) {} }
+    if (isset($done['noa-stock']) || isset($done['noa-soldout'])) { try { notify_tick($db); } catch (Throwable $e) {} }
     foreach (array_keys($done) as $dk) { if ($dk === 'noa-orders' || strpos($dk, 'noa-ws-orders|') === 0) { try { stock_from_site($db); } catch (Throwable $e) {} break; } }
     if (array_intersect(array_keys($done), ['noa-stock', 'noa-stock-pcs', 'noa-cost-v2'])) { try { apri_stock_sync($db); } catch (Throwable $e) {} }
     out(['ok' => true, 't' => $done, 'v' => $merged]);
@@ -830,8 +846,21 @@ switch ($a) {
     $or = kv_get($db, '__sms_optin'); $ov = $or ? (json_decode($or['v'], true) ?: []) : [];
     $ov[$ph] = ['on' => !empty($b['on']), 't' => now_ms(), 'src' => substr(preg_replace('/[^a-z_]/', '', (string) ($b['src'] ?? 'checkout')), 0, 20), 'ip' => $ip, 'txt' => substr((string) ($b['txt'] ?? ''), 0, 400), 'l' => ($b['l'] ?? '') === 'hy' ? 'hy' : 'en'];
     kv_put($db, '__sms_optin', json_encode($ov)); out(['ok' => true]);
+  case 'notify_req': // public: "notify me when available" for a coming-soon item
+    $b = body(); $i = (int) ($b['i'] ?? -1); $em = strtolower(trim((string) ($b['em'] ?? ''))); $ph = preg_replace('/\D/', '', (string) ($b['ph'] ?? ''));
+    if ($i < 0 || $i > 10) { out(['ok' => false, 'err' => 'item']); } if (!filter_var($em, FILTER_VALIDATE_EMAIL)) { $em = ''; } if (strlen($ph) < 10) { $ph = ''; } if ($em === '' && $ph === '') { out(['ok' => false, 'err' => 'contact']); }
+    $ip = substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64); $rk = '__ntfr|' . $ip; $rr = kv_get($db, $rk); $rv = $rr ? (json_decode($rr['v'], true) ?: []) : []; $rv = array_values(array_filter((array) $rv, function ($t) { return $t > now_ms() - 3600000; })); if (count($rv) >= 20) { out(['ok' => false, 'err' => 'rate'], 429); } $rv[] = now_ms(); kv_put($db, $rk, json_encode($rv));
+    $R = json_decode((kv_get($db, '__notify') ?: ['v' => '[]'])['v'], true) ?: [];
+    foreach ($R as $r) { if (empty($r['done']) && (int) ($r['i'] ?? -1) === $i && (($em !== '' && ($r['em'] ?? '') === $em) || ($ph !== '' && ($r['ph'] ?? '') === $ph))) { out(['ok' => true, 'dup' => true]); } }
+    $sms = !empty($b['sms']) && $ph !== ''; $R[] = ['i' => $i, 'em' => $em, 'ph' => $ph, 'sms' => $sms, 'l' => ($b['l'] ?? '') === 'hy' ? 'hy' : 'en', 't' => now_ms()];
+    if ($sms) { $p164 = sms_e164($ph); $or = kv_get($db, '__sms_optin'); $ov = $or ? (json_decode($or['v'], true) ?: []) : []; if (empty($ov[$p164]['on'])) { $ov[$p164] = ['on' => false, 'one' => 'notify', 't' => now_ms(), 'src' => 'notify', 'ip' => $ip, 'l' => ($b['l'] ?? '') === 'hy' ? 'hy' : 'en']; kv_put($db, '__sms_optin', json_encode($ov)); } }
+    kv_put($db, '__notify', json_encode(array_slice($R, -2000), JSON_UNESCAPED_UNICODE)); out(['ok' => true]);
+  case 'notify_list': // admin: who is waiting for which item
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $R = json_decode((kv_get($db, '__notify') ?: ['v' => '[]'])['v'], true) ?: []; $cnt = array_fill(0, 11, 0); foreach ($R as $r) { if (empty($r['done'])) { $cnt[(int) ($r['i'] ?? 0)]++; } } out(['ok' => true, 'waiting' => $cnt, 'names' => pn_names()]);
   case 'sms_tick': // public & idempotent: send any order SMS that is due (Hostinger cron calls this every 5 minutes); rate limited to once a minute
-    out(sms_tick($db) + ['ok' => true]);
+    $nt = ['n' => 0]; try { $nt = notify_tick($db); } catch (Throwable $e) {}
+    out(sms_tick($db) + ['ok' => true, 'notified' => $nt['n']]);
   case 'sms_auto': // admin: turn automatic order SMS on/off, see the last messages
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $b = body(); $A = json_decode((kv_get($db, '__sms_auto') ?: ['v' => '{"on":true}'])['v'], true) ?: []; if (isset($b['on'])) { $A['on'] = !empty($b['on']); kv_put($db, '__sms_auto', json_encode($A)); }
