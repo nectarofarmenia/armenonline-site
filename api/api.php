@@ -29,6 +29,7 @@ if (!kv_get($db, '__mig_pel3')) { $cr = kv_get($db, 'noa-cost-v2'); $cv = $cr ? 
 
 try { if (!kv_get($db, '__stk_site_seed')) { stock_from_site($db); } } catch (Throwable $e) {}
 if (!kv_get($db, '__mig_stk_calls1')) { kv_put($db, '__mig_stk_calls1', '1'); try { stock_from_calls($db); } catch (Throwable $e) {} }
+if (!kv_get($db, '__mig_ga1')) { kv_put($db, '__mig_ga1', '1'); try { $c0 = json_decode((kv_get($db, '__ads') ?: ['v' => '{}'])['v'], true) ?: []; if (empty($c0['ga'])) { $c0['ga'] = 'G-Q45C7456ZS'; kv_put($db, '__ads', json_encode($c0)); } } catch (Throwable $e) {} }
 if (!kv_get($db, '__mig_pixel1')) { kv_put($db, '__mig_pixel1', '1'); try { $c0 = json_decode((kv_get($db, '__ads') ?: ['v' => '{}'])['v'], true) ?: []; if (empty($c0['pixel'])) { $c0['pixel'] = '1907536647068672'; kv_put($db, '__ads', json_encode($c0)); } } catch (Throwable $e) {} }
 if (!kv_get($db, '__mig_vosk_addr')) { kv_put($db, '__mig_vosk_addr', '1'); try {
   $A = json_decode((kv_get($db, 'noa-accounts') ?: ['v' => '{}'])['v'], true) ?: []; $chA = false;
