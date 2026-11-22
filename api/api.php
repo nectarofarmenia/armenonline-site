@@ -299,7 +299,7 @@ function smtp_send($m, $to, $subject, $html, &$err = null) {
   $dom = substr(strrchr($user, '@'), 1) ?: 'localhost';
   if (!$cmd(null, '220') || !$cmd('EHLO ' . $dom, '250') || !$cmd('AUTH LOGIN', '334') || !$cmd(base64_encode($user), '334') || !$cmd(base64_encode($pass), '235') || !$cmd('MAIL FROM:<' . $user . '>', '250') || !$cmd('RCPT TO:<' . $to . '>', ['250', '251']) || !$cmd('DATA', '354')) { fclose($fp); return false; }
   $enc = function ($s) { return '=?UTF-8?B?' . base64_encode($s) . '?='; };
-  $h = 'Date: ' . date('r') . "\r\nFrom: " . $enc('Nectar of Armenia') . ' <' . $user . ">\r\nTo: <" . $to . ">\r\nReply-To: <" . $user . ">\r\nSubject: " . $enc($subject) . "\r\nMessage-ID: <" . bin2hex(random_bytes(12)) . '@' . $dom . ">\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n";
+  $h = 'Date: ' . date('r') . "\r\nFrom: " . $enc('Nectar of Armenia') . ' <' . $user . ">\r\nTo: <" . $to . ">\r\nReply-To: <" . (preg_match('/payment|receipt|invoice|zelle|վճար|հաշիվ/iu', $subject) && !preg_match('/^(💳|⚡)/u', $subject) ? 'billing@nectarofarmenia.com' : (preg_match('/reset your password|welcome|account is ready|էջը|բարի գալուստ/iu', $subject) ? 'info@nectarofarmenia.com' : $user)) . ">\r\nSubject: " . $enc($subject) . "\r\nMessage-ID: <" . bin2hex(random_bytes(12)) . '@' . $dom . ">\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n";
   $body = chunk_split(base64_encode($html));
   fwrite($fp, $h . $body . "\r\n.\r\n"); $ok = $cmd(null, '250'); $cmd('QUIT', ['221', '250']); fclose($fp); return $ok;
 }
@@ -330,7 +330,7 @@ function mail_tpl($title, $inner, $lang = '') {
   . '<img src="' . $u . '/img/email/arev.png" width="34" height="34" alt="" style="display:block;margin:0 auto 8px;border:0;opacity:.9">'
   . '<div style="' . $f . ';font-size:17px;color:#F6E3B4;font-weight:600">Nectar of Armenia Inc</div>'
   . '<div>6222 San Fernando Rd, Glendale, CA 91201</div>'
-  . '<div><a href="tel:+15155885555" style="color:#F6C35A;text-decoration:none;font-weight:bold">+1 (515) 588-5555</a> · <a href="mailto:orders@nectarofarmenia.com" style="color:#F6C35A;text-decoration:none">orders@nectarofarmenia.com</a></div>'
+  . '<div><a href="tel:+15155885555" style="color:#F6C35A;text-decoration:none;font-weight:bold">+1 (515) 588-5555</a> · <a href="mailto:info@nectarofarmenia.com" style="color:#F6C35A;text-decoration:none">info@nectarofarmenia.com</a></div>'
   . '<div style="margin-top:12px"><a href="' . $u . '" style="color:#FFFFFF;text-decoration:none;font-weight:bold">' . ($hy ? 'Կայք' : 'Website') . '</a> &nbsp;·&nbsp; <a href="https://www.instagram.com/nectar_of_armenia/" style="color:#FFFFFF;text-decoration:none">Instagram</a> &nbsp;·&nbsp; <a href="https://www.facebook.com/profile.php?id=61574622277482" style="color:#FFFFFF;text-decoration:none">Facebook</a> &nbsp;·&nbsp; <a href="https://www.youtube.com/channel/UCgOrvhFCGnhkaffhzbVLzkg" style="color:#FFFFFF;text-decoration:none">YouTube</a></div>'
   . '</td></tr></table>'
   . '<div style="max-width:600px;padding:14px 10px 0;color:#8A8F86;font-size:11.5px;line-height:1.5">' . ($hy ? 'Այս նամակն ուղարկվել է Nectar of Armenia-ի կայքից։' : 'This email was sent by the Nectar of Armenia website.') . '</div>'
