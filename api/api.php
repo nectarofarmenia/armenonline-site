@@ -281,8 +281,8 @@ function sms_conf($db) { $r = kv_get($db, '__sms'); return $r ? (json_decode($r[
 function sms_e164($p) { $d = preg_replace('/\D/', '', (string) $p); if (strlen($d) === 10) { return '+1' . $d; } if (strlen($d) === 11 && $d[0] === '1') { return '+' . $d; } return ''; }
 // ---- automatic order SMS (only to customers who agreed): confirmed → delivery-day morning → driver on the way (with tracking link) → delivered ----
 function sms_tpl($k, $l, $v) {
-  $hy = ['c' => 'Nectar of Armenia: պատվեր {no} ընդունված է։ Առաքում՝ {d}։ STOP՝ դադարեցնել', 'cp' => 'Nectar of Armenia: պատվեր {no} ընդունված է։ Վերցնել՝ {d}։ STOP՝ դադարեցնել', 't' => 'Nectar of Armenia: այսօր կբերենք ձեր պատվերը{eta}', 'w' => 'Nectar of Armenia: վարորդը ճանապարհին է, կհասնի ~30 րոպեում {link}', 'd' => 'Nectar of Armenia: պատվերը առաքված է։ Շնորհակալություն, բարի ախորժակ!'];
-  $en = ['c' => 'Nectar of Armenia: order {no} confirmed. Delivery {d}. Reply STOP to opt out.', 'cp' => 'Nectar of Armenia: order {no} confirmed. Pickup {d}. Reply STOP to opt out.', 't' => 'Nectar of Armenia: we deliver your order today{eta}.', 'w' => 'Nectar of Armenia: your driver is on the way, arriving in ~30 min. {link}', 'd' => 'Nectar of Armenia: order {no} delivered. Thank you, enjoy!'];
+  $hy = ['c' => 'Nectar of Armenia: պատվեր {no} ընդունված է։ Առաքում՝ {d}։ STOP՝ դադարեցնել', 'cp' => 'Nectar of Armenia: պատվեր {no} ընդունված է։ Վերցնել՝ {d}։ STOP՝ դադարեցնել', 't' => 'Nectar of Armenia: այսօր կբերենք ձեր պատվերը{eta}', 'w' => 'Nectar of Armenia: վարորդը ճանապարհին է, կհասնի ~30 րոպեում {link}', 'd' => 'Nectar of Armenia: պատվերը առաքված է։ Շնորհակալություն, բարի ախորժակ!', 'p' => 'Nectar of Armenia: վճարումը ստացվել է{amt}։ Շնորհակալություն!'];
+  $en = ['c' => 'Nectar of Armenia: order {no} confirmed. Delivery {d}. Reply STOP to opt out.', 'cp' => 'Nectar of Armenia: order {no} confirmed. Pickup {d}. Reply STOP to opt out.', 't' => 'Nectar of Armenia: we deliver your order today{eta}.', 'w' => 'Nectar of Armenia: your driver is on the way, arriving in ~30 min. {link}', 'd' => 'Nectar of Armenia: order {no} delivered. Thank you, enjoy!', 'p' => 'Nectar of Armenia: payment received{amt} for order {no}. Thank you!'];
   $T = $l === 'hy' ? $hy : $en; $s = $T[$k] ?? ''; foreach ($v as $a => $b) { $s = str_replace('{' . $a . '}', (string) $b, $s); } return trim(preg_replace('/\s+/u', ' ', $s));
 }
 function sms_day($iso, $l) { $t = strtotime((string) $iso); if (!$t) { return $l === 'hy' ? 'շուտով' : 'soon'; } return $l === 'hy' ? date('d.m', $t) : date('D n/j', $t); }
@@ -302,7 +302,10 @@ function sms_tick($db, $force = false) {
     $O[(string) $no] = ['no' => (string) $no, 'ph' => $ph, 'l' => ($OP[$ph]['l'] ?? 'en') === 'hy' ? 'hy' : 'en', 'day' => (string) ($p['day'] ?? ''), 'pk' => ($p['fm'] ?? 'del') !== 'del']; }
   $C = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: [];
   foreach ((array) ($C['calls'] ?? []) as $cl) { if (!is_array($cl) || empty($cl['sms']) || !empty($cl['past']) || !empty($cl['book']) || (float) ($cl['id'] ?? 0) < $since) { continue; } $ph = sms_e164($cl['phone'] ?? ''); if ($ph === '') { continue; }
-    $id = 'NofA-T-' . substr((string) $cl['id'], -5); $O[$id] = ['no' => $id, 'ph' => $ph, 'l' => ($cl['smsl'] ?? 'hy') === 'en' ? 'en' : 'hy', 'day' => (string) ($cl['ddate'] ?? ''), 'pk' => false]; }
+    $id = 'NofA-T-' . substr((string) $cl['id'], -5); $O[$id] = ['no' => $id, 'ph' => $ph, 'l' => ($cl['smsl'] ?? 'hy') === 'en' ? 'en' : 'hy', 'day' => (string) ($cl['ddate'] ?? ''), 'pk' => false, 'cid' => (string) $cl['id'], 'paid' => !empty($cl['paid']), 'amt' => 0]; }
+  // phone orders: paid when the admin ticks "paid" or its invoice is marked paid (Zelle checked by the admin, cash/Zelle taken by the driver)
+  $IV = json_decode((kv_get($db, 'noa-inv2') ?: ['v' => '{}'])['v'], true) ?: [];
+  foreach ((array) ($IV['list'] ?? []) as $v) { if (!is_array($v) || ($v['st'] ?? '') !== 'paid') { continue; } foreach ((array) ($v['ord'] ?? []) as $oid) { foreach ($O as $k0 => $o0) { if (($o0['cid'] ?? '') !== '' && (string) $oid === $o0['cid']) { $O[$k0]['paid'] = true; $O[$k0]['amt'] = (float) (($v['paid'] ?? [])['amt'] ?? 0); } } } }
   // Chef Apri: delivery status, date, ETA and tracking code of each stop
   $TK = []; $tk = kv_get($db, '__apri_token'); $live = [];
   foreach ($O as $id => $o) { if (empty($SENT[$id . '|d']) && !$o['pk']) { $live[] = $id; } }
@@ -312,6 +315,7 @@ function sms_tick($db, $force = false) {
     $L = json_decode((kv_get($db, '__sms_log') ?: ['v' => '[]'])['v'], true) ?: []; $L[] = [gmdate('c'), $id, $k, $ok, $ok ? '' : $e]; kv_put($db, '__sms_log', json_encode(array_slice($L, -100), JSON_UNESCAPED_UNICODE)); };
   foreach ($O as $id => $o) { $l = $o['l']; $r = $TK[$id] ?? null; $st = (string) ($r['status'] ?? ''); $dd = (string) ($r['ddate'] ?? '') ?: $o['day'];
     if (empty($SENT[$id . '|c'])) { $send($id, 'c', sms_tpl($o['pk'] ? 'cp' : 'c', $l, ['no' => $o['no'], 'd' => sms_day($dd, $l)]), $o['ph']); continue; }
+    if (!empty($o['paid']) && empty($SENT[$id . '|p'])) { $am = $o['amt'] > 0 ? ($l === 'hy' ? ', $' : ', $') . number_format($o['amt'], 2) : ''; $send($id, 'p', sms_tpl('p', $l, ['no' => $o['no'], 'amt' => $l === 'hy' ? $am : ($am !== '' ? ' (' . substr($am, 2) . ')' : '')]), $o['ph']); }
     if ($o['pk'] || $st === 'failed') { continue; }
     if ($st === 'delivered') { $dt = strtotime((string) ($r['done_at'] ?? '')); if (!$dt || $dt > time() - 6 * 3600) { $send($id, 'd', sms_tpl('d', $l, ['no' => $o['no']]), $o['ph']); } else { $SENT[$id . '|d'] = ['t' => now_ms(), 'skip' => 1]; } continue; }
     if ($dd !== $today) { continue; }
@@ -721,7 +725,7 @@ switch ($a) {
       else { $v0 = (string) $v; if ($k === 'noa-accounts') { $v = acc_merge($db, $v0); if ($v !== $v0) { $merged[$k] = $v; } } $done[$k] = kv_put($db, $k, (string) $v); }
     }
     if (isset($done['noa-cost-v2'])) { try { stock_from_calls($db); } catch (Throwable $e) {} }
-    if (isset($done['noa-cost-v2'])) { try { sms_tick($db, true); } catch (Throwable $e) {} }
+    if (isset($done['noa-cost-v2']) || isset($done['noa-inv2'])) { try { sms_tick($db, true); } catch (Throwable $e) {} }
     foreach (array_keys($done) as $dk) { if ($dk === 'noa-orders' || strpos($dk, 'noa-ws-orders|') === 0) { try { stock_from_site($db); } catch (Throwable $e) {} break; } }
     if (array_intersect(array_keys($done), ['noa-stock', 'noa-stock-pcs', 'noa-cost-v2'])) { try { apri_stock_sync($db); } catch (Throwable $e) {} }
     out(['ok' => true, 't' => $done, 'v' => $merged]);
