@@ -18,6 +18,11 @@ if ($a === 'ping') { $d = []; if (!empty($_GET['diag']) && $cfg) { $P = nofa_cfg
 if (!$cfg) { out(['ok' => false, 'err' => 'not_configured'], 503); }
 try { $db = nofa_db(); } catch (Exception $e) { out(['ok' => false, 'err' => 'db'], 503); }
 $isAdmin = !empty($_SESSION['nofa_admin']);
+if (!kv_get($db, '__mig_bot2')) { kv_put($db, '__mig_bot2', '1'); try { $mr = kv_get($db, '__stats|2026-11'); $M = $mr ? (json_decode($mr['v'], true) ?: null) : null;
+  if (is_array($M) && !empty($M['d'])) { $sv = 0; foreach ($M['d'] as $dd) { $sv += (int) ($dd['v'] ?? 0); } $real = (int) ($M['v'] ?? 0);
+    if ($sv > $real && $sv > 0) { $f = $real / $sv; $su = 0; foreach ($M['d'] as $k => $dd) { $M['d'][$k] = ['v' => (int) round(($dd['v'] ?? 0) * $f), 'u' => (int) round(($dd['u'] ?? 0) * $f)]; $su += $M['d'][$k]['u']; }
+      $old = (int) ($M['u'] ?? 0); $M['u'] = $su; if (isset($M['pu']['index.html'])) { $M['pu']['index.html'] = max(0, (int) $M['pu']['index.html'] - ($old - $su)); } if (isset($M['r']['(direct)'])) { $M['r']['(direct)'] = max(0, (int) $M['r']['(direct)'] - ($old - $su)); }
+      kv_put($db, '__stats|2026-11', json_encode($M, JSON_UNESCAPED_UNICODE)); } } } catch (Throwable $e) {} }
 if (!kv_get($db, '__mig_bot1')) { $mr = kv_get($db, '__stats|2026-11'); $M = $mr ? (json_decode($mr['v'], true) ?: null) : null;
   if (is_array($M)) { $nb = 0; foreach ((array) ($M['ci'] ?? []) as $ck => $cv) { if (stripos($ck, 'Manchester') === 0) { $nb += (int) $cv; unset($M['ci'][$ck]); } }
     if ($nb > 0) { $M['v'] = max(0, ($M['v'] ?? 0) - $nb); if (isset($M['cc']['GB'])) { $M['cc']['GB'] = max(0, $M['cc']['GB'] - $nb); if (!$M['cc']['GB']) { unset($M['cc']['GB']); } } if (isset($M['dv']['d'])) { $M['dv']['d'] = max(0, $M['dv']['d'] - $nb); } if (isset($M['lg']['en'])) { $M['lg']['en'] = max(0, $M['lg']['en'] - $nb); } if (isset($M['p']['index.html'])) { $M['p']['index.html'] = max(0, $M['p']['index.html'] - $nb); }
@@ -348,6 +353,18 @@ function pay_mails($db, $ref, $amt) { // after a confirmed payment: receipt to t
 function links_get($db) { return json_decode((kv_get($db, '__links') ?: ['v' => '{}'])['v'], true) ?: []; }
 function nofa_docs() { return ['1' => ['f' => __DIR__ . '/private/glendale-business-registration.pdf', 'no' => 'BRC-003767-2025', 'exp' => '2027-05-14'], '2' => ['f' => __DIR__ . '/private/cdtfa-sellers-permit.pdf', 'no' => '261389408-00001', 'exp' => ''], '3' => ['f' => __DIR__ . '/private/cdph-processed-food-registration.pdf', 'no' => '126550', 'exp' => '2027-10-06'], '4' => ['f' => __DIR__ . '/private/coi-general-liability.pdf', 'no' => 'CSB-00274061-01', 'exp' => '2027-05-05']]; }
 function doc_secret($db) { $r = kv_get($db, '__docsec'); if ($r && strlen($r['v']) >= 32) { return $r['v']; } $k = bin2hex(random_bytes(32)); kv_put($db, '__docsec', $k); return $k; }
+function hit_src($ref, $s, $ua) { // which platform a visit came from (Instagram, Facebook, Google, ...)
+  $s = strtolower((string) $s); $ref = strtolower((string) $ref); $ua = (string) $ua; $us = ''; if (preg_match('/source=([a-z0-9._-]+)/', $s, $m)) { $us = $m[1]; }
+  if (strpos($s, 'gclid') !== false || preg_match('/(cpc|ppc|paid)/', $s) && preg_match('/google/', $us)) { return 'gads'; }
+  if ($us !== '') { if (preg_match('/^(ig|insta)/', $us)) { return 'ig'; } if (preg_match('/^(fb|facebook|meta)/', $us)) { return 'fb'; } if (strpos($us, 'google') !== false) { return 'google'; } if (strpos($us, 'yelp') !== false) { return 'yelp'; } if (strpos($us, 'tiktok') !== false) { return 'tiktok'; } if (preg_match('/mail|newsletter/', $us)) { return 'email'; } if (preg_match('/qr|card|flyer|print/', $us)) { return 'qr'; } }
+  if (preg_match('/Instagram/i', $ua) || strpos($ref, 'instagram') !== false || strpos($s, 'igsh') !== false) { return 'ig'; }
+  if (preg_match('/FBAN|FBAV|FB_IAB|FBIOS/i', $ua) || preg_match('/(^|\.)(facebook\.com|fb\.com|fb\.me|messenger\.com)$/', $ref) || strpos($s, 'fbclid') !== false) { return 'fb'; }
+  if ($ref === '') { return 'direct'; }
+  if (preg_match('/(^|\.)google\./', $ref)) { return 'google'; } if (preg_match('/bing\.|yahoo\.|duckduckgo|ecosia|yandex|baidu/', $ref)) { return 'search'; }
+  if (strpos($ref, 'yelp') !== false) { return 'yelp'; } if (strpos($ref, 'tiktok') !== false) { return 'tiktok'; } if (preg_match('/youtube|youtu\.be/', $ref)) { return 'youtube'; }
+  if (preg_match('/chatgpt|openai|perplexity|claude\.ai|gemini|copilot/', $ref)) { return 'ai'; } if (preg_match('/mail\.|outlook|gmail/', $ref)) { return 'email'; }
+  return 'site';
+}
 function geo_ip($db, $ip) { // country/city of a visitor's IP, cached 14 days by a hash (the IP itself is never stored)
   if ($ip === '' || preg_match('/^(127\.|10\.|192\.168\.|::1$)/', $ip)) { return ['cc' => '', 'c' => '', 'ci' => '', 'rg' => '']; }
   $hk = '__geo|' . substr(hash('sha256', 'nofa-geo|' . $ip), 0, 24); $r = kv_get($db, $hk);
@@ -527,6 +544,7 @@ switch ($a) {
     if ($g['ci']) { $inc($st['ci'], $g['ci'] . ($g['rg'] ? ', ' . $g['rg'] : '') . ' · ' . $cc); }
     $inc($st['p'], $pg); if ($new) { $inc($st['pu'], $pg); }
     if ($ref !== '' && $ref !== strtolower(preg_replace('/^www\./', '', (string) ($_SERVER['HTTP_HOST'] ?? '')))) { $inc($st['r'], $ref); } elseif ($new) { $inc($st['r'], '(direct)'); }
+    if (!isset($st['src']) || !is_array($st['src'])) { $st['src'] = []; } $extRef = $ref !== '' && $ref !== strtolower(preg_replace('/^www\./', '', (string) ($_SERVER['HTTP_HOST'] ?? ''))); if ($new || $extRef || !empty($b['s'])) { $inc($st['src'], hit_src($extRef ? $ref : '', substr((string) ($b['s'] ?? ''), 0, 200), (string) ($_SERVER['HTTP_USER_AGENT'] ?? ''))); }
     $inc($st['dv'], !empty($b['m']) ? 'm' : 'd'); $lg = preg_replace('/[^a-z]/', '', strtolower(substr((string) ($b['l'] ?? ''), 0, 2))); $inc($st['lg'], $lg ?: '?');
     foreach (['ci', 'r'] as $f) { if (count($st[$f]) > 400) { arsort($st[$f]); $st[$f] = array_slice($st[$f], 0, 300, true); } }
     kv_put($db, $mk, json_encode($st, JSON_UNESCAPED_UNICODE)); out(['ok' => true]);
