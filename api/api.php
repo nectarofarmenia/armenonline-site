@@ -775,6 +775,12 @@ switch ($a) {
     $key = trim((string) ($b['key'] ?? '')); $sid = trim((string) ($b['sid'] ?? '')); $from = sms_e164($b['from'] ?? '');
     if ($key === '' || !$from || ($pv === 'twilio' && !preg_match('/^AC[a-f0-9]{32}$/', $sid))) { out(['ok' => false, 'err' => 'format']); }
     kv_put($db, '__sms', json_encode(['provider' => $pv, 'key' => $key, 'sid' => $sid, 'from' => $from, 't' => now_ms()])); out(['ok' => true, 'on' => true]);
+  case 'sms_optin': // public: customer ticks/unticks the SMS consent box at checkout; kept as proof of opt-in (TCPA / toll-free verification)
+    $b = body(); $ph = sms_e164($b['phone'] ?? ''); if ($ph === '') { out(['ok' => false, 'err' => 'phone']); }
+    $ip = substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64); $rk = '__smsor|' . $ip; $rr = kv_get($db, $rk); $rv = $rr ? (json_decode($rr['v'], true) ?: []) : []; $rv = array_values(array_filter((array) $rv, function ($t) { return $t > now_ms() - 3600000; })); if (count($rv) >= 30) { out(['ok' => false, 'err' => 'rate'], 429); } $rv[] = now_ms(); kv_put($db, $rk, json_encode($rv));
+    $or = kv_get($db, '__sms_optin'); $ov = $or ? (json_decode($or['v'], true) ?: []) : [];
+    $ov[$ph] = ['on' => !empty($b['on']), 't' => now_ms(), 'src' => substr(preg_replace('/[^a-z_]/', '', (string) ($b['src'] ?? 'checkout')), 0, 20), 'ip' => $ip, 'txt' => substr((string) ($b['txt'] ?? ''), 0, 400)];
+    kv_put($db, '__sms_optin', json_encode($ov)); out(['ok' => true]);
   case 'sms_info':
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $c = sms_conf($db); out(['ok' => true, 'on' => !empty($c['key']), 'provider' => $c['provider'] ?? '', 'from' => isset($c['from']) ? substr($c['from'], 0, -4) . '••••' : '']);
