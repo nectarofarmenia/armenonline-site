@@ -279,6 +279,49 @@ function stripe_api($sk, $method, $path, $form, &$code) {
 }
 function sms_conf($db) { $r = kv_get($db, '__sms'); return $r ? (json_decode($r['v'], true) ?: []) : []; }
 function sms_e164($p) { $d = preg_replace('/\D/', '', (string) $p); if (strlen($d) === 10) { return '+1' . $d; } if (strlen($d) === 11 && $d[0] === '1') { return '+' . $d; } return ''; }
+// ---- automatic order SMS (only to customers who agreed): confirmed → delivery-day morning → driver on the way (with tracking link) → delivered ----
+function sms_tpl($k, $l, $v) {
+  $hy = ['c' => 'Nectar of Armenia: պատվեր {no} ընդունված է։ Առաքում՝ {d}։ STOP՝ դադարեցնել', 'cp' => 'Nectar of Armenia: պատվեր {no} ընդունված է։ Վերցնել՝ {d}։ STOP՝ դադարեցնել', 't' => 'Nectar of Armenia: այսօր կբերենք ձեր պատվերը{eta}', 'w' => 'Nectar of Armenia: վարորդը ճանապարհին է, կհասնի ~30 րոպեում {link}', 'd' => 'Nectar of Armenia: պատվերը առաքված է։ Շնորհակալություն, բարի ախորժակ!'];
+  $en = ['c' => 'Nectar of Armenia: order {no} confirmed. Delivery {d}. Reply STOP to opt out.', 'cp' => 'Nectar of Armenia: order {no} confirmed. Pickup {d}. Reply STOP to opt out.', 't' => 'Nectar of Armenia: we deliver your order today{eta}.', 'w' => 'Nectar of Armenia: your driver is on the way, arriving in ~30 min. {link}', 'd' => 'Nectar of Armenia: order {no} delivered. Thank you, enjoy!'];
+  $T = $l === 'hy' ? $hy : $en; $s = $T[$k] ?? ''; foreach ($v as $a => $b) { $s = str_replace('{' . $a . '}', (string) $b, $s); } return trim(preg_replace('/\s+/u', ' ', $s));
+}
+function sms_day($iso, $l) { $t = strtotime((string) $iso); if (!$t) { return $l === 'hy' ? 'շուտով' : 'soon'; } return $l === 'hy' ? date('d.m', $t) : date('D n/j', $t); }
+function sms_eta($eta, $l) { if (!preg_match('/^(\d{1,2}):(\d{2})/', (string) $eta, $m)) { return ''; } $h = (int) $m[1]; $mi = $m[2];
+  return $l === 'hy' ? ', մոտ ' . sprintf('%02d', $h) . ':' . $mi : ', approx. ' . (($h % 12) ?: 12) . ($mi === '00' ? '' : ':' . $mi) . ($h < 12 ? 'am' : 'pm'); }
+function sms_tick($db, $force = false) {
+  $c = sms_conf($db); if (empty($c['key'])) { return ['skip' => 'no_sms']; }
+  $A = json_decode((kv_get($db, '__sms_auto') ?: ['v' => '{"on":true}'])['v'], true) ?: []; if (empty($A['on'])) { return ['skip' => 'off']; }
+  if (empty($A['since'])) { $A['since'] = now_ms(); kv_put($db, '__sms_auto', json_encode($A)); }
+  $last = (int) ((kv_get($db, '__sms_tick') ?: ['v' => '0'])['v']); if (!$force && time() - $last < 55) { return ['skip' => 'wait']; } kv_put($db, '__sms_tick', (string) time());
+  $since = (int) $A['since']; $OP = json_decode((kv_get($db, '__sms_optin') ?: ['v' => '{}'])['v'], true) ?: [];
+  $SENT = json_decode((kv_get($db, '__sms_sent') ?: ['v' => '{}'])['v'], true) ?: [];
+  $tz = new DateTimeZone('America/Los_Angeles'); $now = new DateTime('now', $tz); $today = $now->format('Y-m-d'); $hr = (int) $now->format('G');
+  $O = []; // id => [no, phone, lang, day, pickup]
+  $PW = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: [];
+  foreach ($PW as $no => $pw) { if ((int) ($pw['t'] ?? 0) < $since || strpos((string) $no, 'WSO:') === 0) { continue; } $p = json_decode((kv_get($db, '__pay|' . $no) ?: ['v' => '{}'])['v'], true) ?: []; $ph = sms_e164($p['phone'] ?? ''); if ($ph === '' || empty($OP[$ph]['on'])) { continue; }
+    $O[(string) $no] = ['no' => (string) $no, 'ph' => $ph, 'l' => ($OP[$ph]['l'] ?? 'en') === 'hy' ? 'hy' : 'en', 'day' => (string) ($p['day'] ?? ''), 'pk' => ($p['fm'] ?? 'del') !== 'del']; }
+  $C = json_decode((kv_get($db, 'noa-cost-v2') ?: ['v' => '{}'])['v'], true) ?: [];
+  foreach ((array) ($C['calls'] ?? []) as $cl) { if (!is_array($cl) || empty($cl['sms']) || !empty($cl['past']) || !empty($cl['book']) || (float) ($cl['id'] ?? 0) < $since) { continue; } $ph = sms_e164($cl['phone'] ?? ''); if ($ph === '') { continue; }
+    $id = 'NofA-T-' . substr((string) $cl['id'], -5); $O[$id] = ['no' => $id, 'ph' => $ph, 'l' => ($cl['smsl'] ?? 'hy') === 'en' ? 'en' : 'hy', 'day' => (string) ($cl['ddate'] ?? ''), 'pk' => false]; }
+  // Chef Apri: delivery status, date, ETA and tracking code of each stop
+  $TK = []; $tk = kv_get($db, '__apri_token'); $live = [];
+  foreach ($O as $id => $o) { if (empty($SENT[$id . '|d']) && !$o['pk']) { $live[] = $id; } }
+  if ($tk && $live) { $cc = 0; $rows = json_decode((string) apri_rpc('nofa_track_tokens', ['p_token' => $tk['v'], 'p_ids' => array_slice($live, 0, 200)], $cc), true); foreach ((array) $rows as $r) { if (is_array($r) && isset($r['id'])) { $TK[(string) $r['id']] = $r; } } }
+  $base = 'https://nectarofarmenia.com'; $sent = []; $errs = []; $nw = 0;
+  $send = function ($id, $k, $txt, $ph) use ($db, $c, &$SENT, &$sent, &$errs) { if (!empty($SENT[$id . '|' . $k])) { return; } $e = null; $ok = sms_one($c, $ph, $txt, $e); $SENT[$id . '|' . $k] = ['t' => now_ms(), 'ok' => $ok]; if ($ok) { $sent[] = $id . '|' . $k; } else { $errs[] = $id . '|' . $k . ': ' . $e; }
+    $L = json_decode((kv_get($db, '__sms_log') ?: ['v' => '[]'])['v'], true) ?: []; $L[] = [gmdate('c'), $id, $k, $ok, $ok ? '' : $e]; kv_put($db, '__sms_log', json_encode(array_slice($L, -100), JSON_UNESCAPED_UNICODE)); };
+  foreach ($O as $id => $o) { $l = $o['l']; $r = $TK[$id] ?? null; $st = (string) ($r['status'] ?? ''); $dd = (string) ($r['ddate'] ?? '') ?: $o['day'];
+    if (empty($SENT[$id . '|c'])) { $send($id, 'c', sms_tpl($o['pk'] ? 'cp' : 'c', $l, ['no' => $o['no'], 'd' => sms_day($dd, $l)]), $o['ph']); continue; }
+    if ($o['pk'] || $st === 'failed') { continue; }
+    if ($st === 'delivered') { $dt = strtotime((string) ($r['done_at'] ?? '')); if (!$dt || $dt > time() - 6 * 3600) { $send($id, 'd', sms_tpl('d', $l, ['no' => $o['no']]), $o['ph']); } else { $SENT[$id . '|d'] = ['t' => now_ms(), 'skip' => 1]; } continue; }
+    if ($dd !== $today) { continue; }
+    $eta = (string) ($r['eta'] ?? '');
+    if (empty($SENT[$id . '|t']) && empty($SENT[$id . '|w']) && $hr >= 8 && $hr < 18 && ($eta !== '' || $hr >= 10)) { $send($id, 't', sms_tpl('t', $l, ['eta' => sms_eta($eta, $l)]), $o['ph']); continue; }
+    if (empty($SENT[$id . '|w']) && !empty($r['tok']) && $st === 'assigned' && $nw < 25) { $nw++; $cc = 0; $tr = json_decode((string) apri_rpc('nofa_track', ['p_token' => $tk['v'], 'p_tok' => (string) $r['tok']], $cc), true);
+      if (is_array($tr) && !empty($tr['planned']) && isset($tr['ahead']) && (int) $tr['ahead'] === 0 && !empty($tr['pos'])) { $send($id, 'w', sms_tpl('w', $l, ['link' => $base . '/Track.html?t=' . $r['tok']]), $o['ph']); } } }
+  $cut = now_ms() - 60 * 86400000; foreach ($SENT as $k => $v) { if ((int) ($v['t'] ?? 0) < $cut) { unset($SENT[$k]); } }
+  kv_put($db, '__sms_sent', json_encode($SENT)); return ['ok' => true, 'orders' => count($O), 'sent' => $sent, 'err' => $errs];
+}
 function sms_one($c, $to, $text, &$err) {
   if (($c['provider'] ?? '') === 'twilio') { $url = (getenv('NOFA_SMS_URL') ?: 'https://api.twilio.com/2010-04-01/Accounts/') . rawurlencode($c['sid']) . '/Messages.json'; $hdr = ['Authorization: Basic ' . base64_encode($c['sid'] . ':' . $c['key']), 'Content-Type: application/x-www-form-urlencoded']; $payload = http_build_query(['To' => $to, 'From' => $c['from'], 'Body' => $text]); }
   else { $url = getenv('NOFA_SMS_URL') ?: 'https://api.telnyx.com/v2/messages'; $hdr = ['Authorization: Bearer ' . $c['key'], 'Content-Type: application/json']; $payload = json_encode(['from' => $c['from'], 'to' => $to, 'text' => $text], JSON_UNESCAPED_UNICODE); }
@@ -598,6 +641,7 @@ switch ($a) {
       'visitors' => [$m1 => $J('__stats|' . $m1, null), $m0 => $J('__stats|' . $m0, null)], 'ux' => [$m1 => $J('__ux|' . $m1, null), $m0 => $J('__ux|' . $m0, null)], 'js_errors' => array_values($J('__jserr', [])),
       'retail_orders' => $ret, 'wholesale_orders' => $ws, 'invoices' => $inv, 'payments' => $pays, 'zelle_claims' => $zl,
       'stock_audit' => (function () use ($db) { try { return stock_audit($db); } catch (Throwable $e) { return ['err' => $e->getMessage()]; } })(),
+      'sms_auto' => (function () use ($db) { $L = json_decode((kv_get($db, '__sms_log') ?: ['v' => '[]'])['v'], true) ?: []; $c = sms_conf($db); $tk = (int) ((kv_get($db, '__sms_tick') ?: ['v' => '0'])['v']); return ['provider_on' => !empty($c['key']), 'last_tick_min_ago' => $tk ? round((time() - $tk) / 60) : null, 'last' => array_map(function ($x) { return [$x[0], $x[1], $x[2], $x[3], $x[4] ?? '']; }, array_slice($L, -20)), 'failed_24h' => count(array_filter($L, function ($x) { return empty($x[3]) && strtotime($x[0]) > time() - 86400; }))]; })(),
       'stock' => ['names' => $names, 'packs' => $J('noa-stock', null), 'pcs' => $J('noa-stock-pcs', null), 'soldout' => $J('noa-soldout', null), 'lots' => array_slice((array) $J('noa-apri-lots', []), -40)],
       'prices' => array_map(function ($p) { return ['id' => $p['id'] ?? '', 'pr' => $p['pr'] ?? null]; }, (array) ($J('noa-cost-v2', [])['prod'] ?? [])), 'accounts' => $acc, 'customers_index' => (function () use ($J, $ACC) { $cv = $J('noa-cost-v2', []); $w = []; $r = 0; $src = [];
       foreach ((array) ($cv['cprof'] ?? []) as $k => $q) { if (substr((string) $k, -2) === '|w') { $w[substr((string) $k, 0, -2)][] = 'cost-profile'; } }
@@ -677,6 +721,7 @@ switch ($a) {
       else { $v0 = (string) $v; if ($k === 'noa-accounts') { $v = acc_merge($db, $v0); if ($v !== $v0) { $merged[$k] = $v; } } $done[$k] = kv_put($db, $k, (string) $v); }
     }
     if (isset($done['noa-cost-v2'])) { try { stock_from_calls($db); } catch (Throwable $e) {} }
+    if (isset($done['noa-cost-v2'])) { try { sms_tick($db, true); } catch (Throwable $e) {} }
     foreach (array_keys($done) as $dk) { if ($dk === 'noa-orders' || strpos($dk, 'noa-ws-orders|') === 0) { try { stock_from_site($db); } catch (Throwable $e) {} break; } }
     if (array_intersect(array_keys($done), ['noa-stock', 'noa-stock-pcs', 'noa-cost-v2'])) { try { apri_stock_sync($db); } catch (Throwable $e) {} }
     out(['ok' => true, 't' => $done, 'v' => $merged]);
@@ -779,8 +824,15 @@ switch ($a) {
     $b = body(); $ph = sms_e164($b['phone'] ?? ''); if ($ph === '') { out(['ok' => false, 'err' => 'phone']); }
     $ip = substr($_SERVER['REMOTE_ADDR'] ?? '', 0, 64); $rk = '__smsor|' . $ip; $rr = kv_get($db, $rk); $rv = $rr ? (json_decode($rr['v'], true) ?: []) : []; $rv = array_values(array_filter((array) $rv, function ($t) { return $t > now_ms() - 3600000; })); if (count($rv) >= 30) { out(['ok' => false, 'err' => 'rate'], 429); } $rv[] = now_ms(); kv_put($db, $rk, json_encode($rv));
     $or = kv_get($db, '__sms_optin'); $ov = $or ? (json_decode($or['v'], true) ?: []) : [];
-    $ov[$ph] = ['on' => !empty($b['on']), 't' => now_ms(), 'src' => substr(preg_replace('/[^a-z_]/', '', (string) ($b['src'] ?? 'checkout')), 0, 20), 'ip' => $ip, 'txt' => substr((string) ($b['txt'] ?? ''), 0, 400)];
+    $ov[$ph] = ['on' => !empty($b['on']), 't' => now_ms(), 'src' => substr(preg_replace('/[^a-z_]/', '', (string) ($b['src'] ?? 'checkout')), 0, 20), 'ip' => $ip, 'txt' => substr((string) ($b['txt'] ?? ''), 0, 400), 'l' => ($b['l'] ?? '') === 'hy' ? 'hy' : 'en'];
     kv_put($db, '__sms_optin', json_encode($ov)); out(['ok' => true]);
+  case 'sms_tick': // public & idempotent: send any order SMS that is due (Hostinger cron calls this every 5 minutes); rate limited to once a minute
+    out(sms_tick($db) + ['ok' => true]);
+  case 'sms_auto': // admin: turn automatic order SMS on/off, see the last messages
+    if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
+    $b = body(); $A = json_decode((kv_get($db, '__sms_auto') ?: ['v' => '{"on":true}'])['v'], true) ?: []; if (isset($b['on'])) { $A['on'] = !empty($b['on']); kv_put($db, '__sms_auto', json_encode($A)); }
+    $L = json_decode((kv_get($db, '__sms_log') ?: ['v' => '[]'])['v'], true) ?: []; $OP = json_decode((kv_get($db, '__sms_optin') ?: ['v' => '{}'])['v'], true) ?: [];
+    out(['ok' => true, 'on' => !empty($A['on']), 'log' => array_slice($L, -30), 'optins' => count(array_filter($OP, function ($o) { return !empty($o['on']); })), 'tick' => (int) ((kv_get($db, '__sms_tick') ?: ['v' => '0'])['v'])]);
   case 'sms_info':
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
     $c = sms_conf($db); out(['ok' => true, 'on' => !empty($c['key']), 'provider' => $c['provider'] ?? '', 'from' => isset($c['from']) ? substr($c['from'], 0, -4) . '••••' : '']);
@@ -840,6 +892,7 @@ switch ($a) {
     $no = (string) ($j['client_reference_id'] ?? ''); $paid = ($j['payment_status'] ?? '') === 'paid';
     if ($paid && $no !== '') { $L = json_decode((kv_get($db, '__paidweb') ?: ['v' => '{}'])['v'], true) ?: []; if (empty($L[$no])) { $pr0 = json_decode((kv_get($db, '__pay|' . $no) ?: ['v' => '{}'])['v'], true) ?: []; $L[$no] = ['amt' => ((int) ($j['amount_total'] ?? 0)) / 100, 'base' => isset($pr0['amt']) ? (float) $pr0['amt'] : null, 'fee' => (float) ($pr0['fee'] ?? 0), 'pi' => (string) ($j['payment_intent'] ?? ''), 't' => now_ms()]; kv_put($db, '__paidweb', json_encode($L)); pay_mails($db, $no, ((int) ($j['amount_total'] ?? 0)) / 100); } }
     if (($paid || ($j['status'] ?? '') === 'complete') && strpos($no, 'WSO:') === 0) { $pw0 = json_decode((kv_get($db, '__pay|' . $no) ?: ['v' => '{}'])['v'], true) ?: []; $wem = strtolower((string) ($pw0['email'] ?? '')); if ($wem !== '') { $ok0 = 'noa-ws-orders|' . $wem; $RO = json_decode((kv_get($db, $ok0) ?: ['v' => '[]'])['v'], true) ?: []; $chg = false; foreach ($RO as $i0 => $o0) { if (is_array($o0) && in_array((string) ($o0['no'] ?? ''), (array) ($pw0['nos'] ?? []), true) && empty($o0['paid'])) { if ($paid) { $RO[$i0]['paid'] = true; $RO[$i0]['paidAt'] = gmdate('c'); unset($RO[$i0]['payDue']); } else { $RO[$i0]['payProc'] = true; } $RO[$i0]['pm'] = (string) ($pw0['m'] ?? 'Card'); $chg = true; $RO[$i0]['u'] = now_ms(); } } if ($chg) { kv_put($db, $ok0, json_encode($RO, JSON_UNESCAPED_UNICODE)); } } }
+    if ($paid) { try { sms_tick($db, true); } catch (Throwable $e) {} }
     out(['ok' => true, 'wso' => strpos($no, 'WSO:') === 0, 'paid' => $paid, 'processing' => !$paid && ($j['status'] ?? '') === 'complete', 'no' => $no, 'amt' => ((int) ($j['amount_total'] ?? 0)) / 100]);
   case 'mail_cfg': // admin: save the order mailbox (password stays on the server)
     if (!$isAdmin) { out(['ok' => false, 'err' => 'auth'], 401); }
